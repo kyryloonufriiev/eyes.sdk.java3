@@ -10,8 +10,6 @@ import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.css.ECSSVersion;
 import com.helger.css.decl.*;
@@ -39,7 +37,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private final List<RenderTaskListener> listeners = new ArrayList<>();
     private IEyesConnector eyesConnector;
-    private String scriptResult;
     private ICheckSettings checkSettings;
     private List<VisualGridTask> visualGridTaskList;
     private List<VisualGridTask> openVisualGridTaskList;
@@ -51,7 +48,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private AtomicBoolean isForcePutNeeded;
     private final List<VisualGridSelector[]> regionSelectors;
     private IDebugResourceWriter debugResourceWriter;
-    private HashMap<String, Object> result = null;
+    private FrameData result = null;
     private AtomicInteger framesLevel = new AtomicInteger();
     private RGridDom dom = null;
     private boolean forceFullPageScreenshot;
@@ -68,12 +65,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         void onRenderFailed(Exception e);
     }
 
-    public RenderingTask(IEyesConnector eyesConnector, String scriptResult, ICheckSettings checkSettings,
+    public RenderingTask(IEyesConnector eyesConnector, FrameData scriptResult, ICheckSettings checkSettings,
                          List<VisualGridTask> visualGridTaskList, List<VisualGridTask> openVisualGridTasks, VisualGridRunner renderingGridManager,
                          IDebugResourceWriter debugResourceWriter, RenderTaskListener listener, List<VisualGridSelector[]> regionSelectors, boolean forceFullPageScreenshot) {
 
         this.eyesConnector = eyesConnector;
-        this.scriptResult = scriptResult;
+        this.result = scriptResult;
         this.checkSettings = checkSettings;
         this.visualGridTaskList = visualGridTaskList;
         this.openVisualGridTaskList = openVisualGridTasks;
@@ -103,13 +100,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             logger.verbose("step 1");
 
-            //Parse to Map
-            result = GeneralUtils.parseJsonToObject(scriptResult, null);
-            logger.verbose("step 2");
             //Build RenderRequests
             RenderRequest[] requests = prepareDataForRG(result);
 
-            logger.verbose("step 3");
+            logger.verbose("step 2");
             boolean stillRunning = true;
             int fetchFails = 0;
             boolean isForcePutAlreadyDone = false;
@@ -134,7 +128,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     logger.verbose("ERROR " + e.getMessage());
                     fetchFails++;
                 }
-                logger.verbose("step 4.1");
+                logger.verbose("step 3.1");
                 if (runningRenders == null) {
                     logger.verbose("ERROR - runningRenders is null.");
                     continue;
@@ -144,7 +138,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     RenderRequest request = requests[i];
                     request.setRenderId(runningRenders.get(i).getRenderId());
                 }
-                logger.verbose("step 4.2");
+                logger.verbose("step 3.2");
 
                 RunningRender runningRender = runningRenders.get(0);
                 RenderStatus worstStatus = runningRender.getRenderStatus();
@@ -158,19 +152,19 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     isForcePutAlreadyDone = true;
                 }
 
-                logger.verbose("step 4.3");
+                logger.verbose("step 3.3");
                 stillRunning = worstStatus == RenderStatus.NEED_MORE_RESOURCE || isNeedMoreDom || fetchFails > MAX_FETCH_FAILS;
                 if (stillRunning) {
                     sendMissingResources(runningRenders, requests[0].getDom(), requests[0].getResources(), isNeedMoreDom);
                 }
 
-                logger.verbose("step 4.4");
+                logger.verbose("step 3.4");
 
             } while (stillRunning);
 
             Map<RunningRender, RenderRequest> mapping = mapRequestToRunningRender(runningRenders, requests);
 
-            logger.verbose("step 5");
+            logger.verbose("step 4");
             pollRenderingStatus(mapping);
 
             isTaskCompleted = true;
@@ -350,7 +344,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     }
 
-    private RenderRequest[] prepareDataForRG(HashMap<String, Object> result) throws ExecutionException, InterruptedException, JsonProcessingException {
+    private RenderRequest[] prepareDataForRG(FrameData result) throws ExecutionException, InterruptedException, JsonProcessingException {
 
         final Map<String, RGridResource> allBlobs = Collections.synchronizedMap(new HashMap<String, RGridResource>());
         Set<URL> resourceUrls = new HashSet<>();
@@ -377,14 +371,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         Map<String, RGridResource> resourceMapping = new HashMap<>();
         for (String url : allBlobs.keySet()) {
             try {
-                logger.verbose("trying to fetch - "+url);
+                logger.verbose("trying to fetch - " + url);
                 IResourceFuture iResourceFuture = this.fetchedCacheMap.get(url);
                 if (iResourceFuture != null) {
                     RGridResource value = iResourceFuture.get(10, TimeUnit.SECONDS);
-                    if(value.getContent() != null) resourceMapping.put(url, value);
+                    if (value.getContent() != null) resourceMapping.put(url, value);
                 }
             } catch (Exception e) {
-                logger.verbose("Couldn't download url = "+url);
+                logger.verbose("Couldn't download url = " + url);
             }
         }
 
@@ -406,122 +400,101 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         return asArray;
     }
 
-    private void buildAllRGDoms(Map<String, RGridResource> resourceMapping, Map<String, Object> result) {
-        String url = (String) result.get("url");
-        URL baseUrl = null;
-        try {
-            baseUrl = new URL(url);
-        } catch (MalformedURLException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
+    private void buildAllRGDoms(Map<String, RGridResource> resourceMapping, FrameData result) {
+        URL baseUrl = result.getUrl();
         logger.verbose("baseUrl: " + baseUrl);
-        for (String key : result.keySet()) {
-            if ("frames".equals(key)) {
-                @SuppressWarnings("unchecked")
-                List<Map<String, Object>> allObjects = (List) result.get(key);
-                Map<String, RGridResource> mapping = new HashMap<>();
-                for (Map<String, Object> frameObj : allObjects) {
-                    List allFramesBlobs = (List) frameObj.get("blobs");
-                    @SuppressWarnings("unchecked")
-                    List<String> allResourceUrls = (List) frameObj.get("resourceUrls");
-                    String frameUrl = (String) frameObj.get("url");
-                    URL frameUrlAsObj = null;
-                    try {
-                        frameUrlAsObj = new URL(baseUrl, frameUrl);
-                    } catch (MalformedURLException e) {
-                        GeneralUtils.logExceptionStackTrace(logger, e);
-                        continue;
-                    }
-                    for (Object blob : allFramesBlobs) {
-                        Map blobAsMap = (Map) blob;
-                        String blobUrl = (String) blobAsMap.get("url");
-                        RGridResource rGridResource = resourceMapping.get(blobUrl);
-                        mapping.put(blobUrl, rGridResource);
-
-                    }
-                    for (String resourceUrl : allResourceUrls) {
-                        RGridResource rGridResource = resourceMapping.get(resourceUrl);
-                        mapping.put(resourceUrl, rGridResource);
-                    }
-                    List cdt = (List) frameObj.get("cdt");
-                    RGridDom rGridDom = new RGridDom(cdt, mapping, frameUrlAsObj.toString(), logger, "buildAllRGDoms");
-                    try {
-                        resourceMapping.put(frameUrlAsObj.toString(), rGridDom.asResource());
-                        buildAllRGDoms(resourceMapping, frameObj);
-                    } catch (JsonProcessingException e) {
-                        GeneralUtils.logExceptionStackTrace(logger, e);
-                    }
-
-                }
+        List<FrameData> allFrame = result.getFrames();
+        Map<String, RGridResource> mapping = new HashMap<>();
+        for (FrameData frameObj : allFrame) {
+            List<BlobData> allFramesBlobs = frameObj.getBlobs();
+            @SuppressWarnings("unchecked")
+            List<URL> allResourceUrls = frameObj.getResourceUrls();
+            URL frameUrl = null;
+            try {
+                frameUrl = new URL(baseUrl, frameObj.getUrl().toString());
+            } catch (MalformedURLException e) {
+                GeneralUtils.logExceptionStackTrace(logger, e);
             }
-        }
+            for (BlobData blob : allFramesBlobs) {
+                Map blobAsMap = (Map) blob;
+                String blobUrl = (String) blobAsMap.get("url");
+                RGridResource rGridResource = resourceMapping.get(blobUrl);
+                mapping.put(blobUrl, rGridResource);
 
+            }
+            for (URL resourceUrl : allResourceUrls) {
+                RGridResource rGridResource = resourceMapping.get(resourceUrl);
+                mapping.put(resourceUrl.toString(), rGridResource);
+            }
+            List<CdtData> cdt = frameObj.getCdt();
+            RGridDom rGridDom = new RGridDom(cdt, mapping, frameUrl.toString(), logger, "buildAllRGDoms");
+            try {
+                resourceMapping.put(frameUrl.toString(), rGridDom.asResource());
+                buildAllRGDoms(resourceMapping, frameObj);
+            } catch (JsonProcessingException e) {
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
+
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private void parseScriptResult(Map<String, Object> result, Map<String, RGridResource> allBlobs, Set<URL> resourceUrls) throws ExecutionException, InterruptedException, JsonProcessingException {
-        org.apache.commons.codec.binary.Base64 codec = new Base64();
-        URL baseUrl = null;
-        try {
-            Object url = result.get("url");
-            baseUrl = new URL((String) url);
-        } catch (MalformedURLException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
+    private void parseScriptResult(FrameData result, Map<String, RGridResource> allBlobs, Set<URL> resourceUrls) {
+
+        Base64 codec = new Base64();
+
+        URL baseUrl = result.getUrl();
+
         logger.verbose("baseUrl: " + baseUrl);
-        try {
-            for (String key : result.keySet()) {
-                Object value = result.get(key);
-                switch (key) {
-                    case "blobs":
-                        //TODO check if empty
-                        List listOfBlobs = (List) value;
-                        for (Object blob : listOfBlobs) {
-                            RGridResource resource = parseBlobToGridResource(codec, baseUrl, (Map) blob);
-                            if (!allBlobs.containsKey(resource.getUrl())) {
-                                allBlobs.put(resource.getUrl(), resource);
-                            }
-                        }
-                        break;
 
-                    case "resourceUrls":
-                        List<String> list = (List<String>) value;
-                        for (String url : list) {
-                            try {
-                                resourceUrls.add(new URL(baseUrl, url));
-                            } catch (MalformedURLException e) {
-                                GeneralUtils.logExceptionStackTrace(logger, e);
-                            }
-                        }
-                        break;
+        parseBlobs(allBlobs, codec, baseUrl, result.getBlobs());
 
-                    case "frames":
-                        logger.verbose("handling 'frames' key (level: " + framesLevel.incrementAndGet() + ")");
-                        List<Map<String, Object>> allObjects = (List) value;
-                        for (Map<String, Object> frameObj : allObjects) {
-                            parseScriptResult(frameObj, allBlobs, resourceUrls);
-                        }
-                        logger.verbose("done handling 'frames' key (level: " + framesLevel.getAndDecrement() + ")");
-                        break;
-                }
+        parseResourceUrls(result, resourceUrls, baseUrl);
+
+        parseFrames(result, allBlobs, resourceUrls);
+
+        int written = addBlobsToCache(allBlobs);
+        logger.verbose("written " + written + " blobs to cache.");
+
+        parseAndCollectCSSResources(allBlobs, baseUrl, resourceUrls);
+    }
+
+
+    private void parseFrames(FrameData result, Map<String, RGridResource> allBlobs, Set<URL> resourceUrls) {
+        logger.verbose("handling 'frames' key (level: " + framesLevel.incrementAndGet() + ")");
+        for (FrameData frameObj : result.getFrames()) {
+            parseScriptResult(frameObj, allBlobs, resourceUrls);
+        }
+        logger.verbose("done handling 'frames' key (level: " + framesLevel.getAndDecrement() + ")");
+    }
+
+    private void parseResourceUrls(FrameData result, Set<URL> resourceUrls, URL baseUrl) {
+        List<URL> list = result.getResourceUrls();
+        for (URL url : list) {
+            try {
+                resourceUrls.add(new URL(baseUrl, url.toString()));
+            } catch (MalformedURLException e) {
+                GeneralUtils.logExceptionStackTrace(logger, e);
             }
-            int written = addBlobsToCache(allBlobs);
-            logger.verbose("written " + written + " blobs to cache.");
-            parseAndCollectCSSResources(allBlobs, baseUrl, resourceUrls);
-        } catch (Exception e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
         logger.verbose("exit");
     }
 
-    private List<RenderRequest> buildRenderRequests(HashMap<String, Object> result, Map<String, RGridResource> resourceMapping) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        String url = (String) result.get("url");
-        List cdt = (List) result.get("cdt");
+    private void parseBlobs(Map<String, RGridResource> allBlobs, Base64 codec, URL baseUrl, List<BlobData> value) {
+        //TODO check if empty
+        List<BlobData> listOfBlobs = value;
+        for (BlobData blob : listOfBlobs) {
+            RGridResource resource = parseBlobToGridResource(codec, baseUrl, blob);
+            if (!allBlobs.containsKey(resource.getUrl())) {
+                allBlobs.put(resource.getUrl(), resource);
+            }
+        }
+    }
 
-        RGridDom dom = new RGridDom(cdt, resourceMapping, url, logger, "buildRenderRequests");
+    private List<RenderRequest> buildRenderRequests(FrameData result, Map<String, RGridResource> resourceMapping) {
+
+        RGridDom dom = new RGridDom(result.getCdt(), resourceMapping, result.getUrl().toString(), logger, "buildRenderRequests");
 
         this.dom = dom;
 
@@ -550,7 +523,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(),
                     sizeMode, rcInternal.getRegion(), rcInternal.GetTargetSelector(), browserInfo.getEmulationInfo());
 
-            RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), url, dom,
+            RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl().toString(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),
                     rcInternal.getScriptHooks(), regionSelectorsList, rcInternal.isSendDom(), visualGridTask);
 
@@ -559,11 +532,11 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         return allRequestsForRG;
     }
 
-    private RGridResource parseBlobToGridResource(Base64 codec, URL baseUrl, Map blobAsMap) {
+    private RGridResource parseBlobToGridResource(Base64 codec, URL baseUrl, BlobData blobAsMap) {
         // TODO - handle non-string values (probably empty json objects)
-        String contentAsString = (String) blobAsMap.get("value");
+        String contentAsString = blobAsMap.getValue();
         byte[] content = codec.decode(contentAsString);
-        String urlAsString = (String) blobAsMap.get("url");
+        String urlAsString = blobAsMap.getUrl().toString();
         try {
 
             URL url = new URL(baseUrl, urlAsString);
@@ -574,7 +547,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
 
         @SuppressWarnings("UnnecessaryLocalVariable")
-        RGridResource resource = new RGridResource(urlAsString, (String) blobAsMap.get("type"), content, logger, "parseBlobToGridResource");
+        RGridResource resource = new RGridResource(urlAsString, blobAsMap.getType(), content, logger, "parseBlobToGridResource");
         return resource;
     }
 
@@ -801,7 +774,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             }
 
         }
-        logger.verbose("finished fetching("+allFetches.size()+")");
+        logger.verbose("finished fetching(" + allFetches.size() + ")");
         logger.verbose("exit");
     }
 
@@ -899,16 +872,16 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                             VisualGridTask openVisualGridTask = iterator.next();
                             if (openVisualGridTask.getRunningTest() == visualGridTask.getRunningTest()) {
                                 if (isRenderedStatus) {
-                                    logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render result: " + renderStatusResults + " to url " + this.result.get("url"));
+                                    logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render result: " + renderStatusResults + " to url " + this.result.getUrl());
                                     openVisualGridTask.setRenderResult(renderStatusResults);
                                 } else {
-                                    logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render error: " + removedId + " to url " + this.result.get("url"));
+                                    logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render error: " + removedId + " to url " + this.result.getUrl());
                                     openVisualGridTask.setRenderError(removedId, renderStatusResults.getError());
                                 }
                                 iterator.remove();
                             }
                         }
-                        logger.verbose("setting visualGridTask " + visualGridTask + " render result: " + renderStatusResults + " to url " + this.result.get("url"));
+                        logger.verbose("setting visualGridTask " + visualGridTask + " render result: " + renderStatusResults + " to url " + this.result.getUrl());
                         String error = renderStatusResults.getError();
                         if (error != null) {
                             GeneralUtils.logExceptionStackTrace(logger, new Exception(error));

@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class VisualGridEyes implements IRenderingEyes {
 
+    private static final long FIVE_MINUTES = 1000 * 60 * 5;
     private Logger logger;
 
     private String apiKey;
@@ -52,6 +53,8 @@ public class VisualGridEyes implements IRenderingEyes {
     private IServerConnector serverConnector = null;
     private ISeleniumConfigurationProvider configProvider;
     private RectangleSize viewportSize;
+    private AtomicBoolean isCheckTimerTimedout = new AtomicBoolean(false);
+    private Timer timer = new Timer("VG_StopWatch", true);
     private final List<PropertyData> properties = new ArrayList<>();
 
     private static final String GET_ELEMENT_XPATH_JS =
@@ -76,7 +79,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
     {
         try {
-            PROCESS_RESOURCES = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndSerialize.js"));
+            PROCESS_RESOURCES = GeneralUtils.readToEnd(VisualGridEyes.class.getResourceAsStream("/processPageAndPoll.js"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -427,15 +430,14 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
     public void check(ICheckSettings checkSettings) {
-
         logger.verbose("enter");
 
         if (getIsDisabled()) return;
 
-
         ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
 
         try {
+            isCheckTimerTimedout.set(false);
 
             List<VisualGridTask> openVisualGridTasks = addOpenTaskToAllRunningTest();
 
@@ -443,11 +445,25 @@ public class VisualGridEyes implements IRenderingEyes {
 
             ICheckSettingsInternal checkSettingsInternal = updateCheckSettings(checkSettings);
 
-            String domCaptureScript = "var callback = arguments[arguments.length - 1]; return (" + PROCESS_RESOURCES + ")().then(JSON.stringify).then(callback, function(err) {callback(err.stack || err.toString())})";
 
             logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
-            Object resultAsObject = this.webDriver.executeAsyncScript(domCaptureScript);
-            String scriptResult = (String) resultAsObject;
+
+            timer.schedule(new TimeoutTask(), FIVE_MINUTES);
+            String resultAsString;
+            ScriptResponse.Status status = null;
+            ScriptResponse scriptResponse = null;
+            do {
+                resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES);
+                try {
+                    scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
+                    status = scriptResponse.getStatus();
+                } catch (IOException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
+                Thread.sleep(200);
+            } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedout.get());
+
+            FrameData scriptResult = scriptResponse.getValue();
 
             logger.verbose("Dom extracted  (" + checkSettingsInternal.toString() + ")");
 
@@ -483,6 +499,8 @@ public class VisualGridEyes implements IRenderingEyes {
                 runningTest.setTestInExceptionMode(error);
             }
             throw error;
+        } catch (InterruptedException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
         }
     }
 
@@ -751,4 +769,13 @@ public class VisualGridEyes implements IRenderingEyes {
     public void clearProperties() {
         properties.clear();
     }
+
+    private class TimeoutTask extends TimerTask {
+        @Override
+        public void run() {
+            logger.verbose("Check Timer timeout.");
+            isCheckTimerTimedout.set(true);
+        }
+    }
+
 }
