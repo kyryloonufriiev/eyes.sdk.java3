@@ -453,7 +453,7 @@ public class VisualGridEyes implements IRenderingEyes {
             ScriptResponse.Status status = null;
             ScriptResponse scriptResponse = null;
             do {
-                resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES);
+                resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + "return __processPageAndPoll();");
                 try {
                     scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
                     status = scriptResponse.getStatus();
