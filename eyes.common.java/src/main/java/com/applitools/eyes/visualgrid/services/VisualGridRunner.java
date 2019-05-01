@@ -436,7 +436,7 @@ public class VisualGridRunner extends EyesRunner {
         notifyAllServices();
     }
 
-    public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, String script,
+    public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, FrameData script,
                                    IEyesConnector connector, List<VisualGridTask> visualGridTaskList,
                                    List<VisualGridTask> openVisualGridTasks, final RenderListener listener,
                                    List<VisualGridSelector[]> selectors, boolean forceFullPageScreenshot) {
