@@ -138,7 +138,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                     }
             }
             @SuppressWarnings("UnnecessaryLocalVariable")
-            TestResultContainer testResultContainer = new TestResultContainer(testResults, this.exception);
+            TestResultContainer testResultContainer = new TestResultContainer(testResults, runningTest.getBrowserInfo(), this.exception);
             notifySuccessAllListeners();
             this.isTaskComplete.set(true);
             return testResultContainer;

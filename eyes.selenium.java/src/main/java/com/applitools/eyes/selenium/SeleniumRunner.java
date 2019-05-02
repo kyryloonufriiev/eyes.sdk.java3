@@ -25,7 +25,7 @@ public class SeleniumRunner extends EyesRunner {
     @Override
     public TestResultSummary getAllTestResults(){
         List<TestResultContainer> result = new ArrayList<>();
-        result.add(new TestResultContainer(this.testResult, null));
+        result.add(new TestResultContainer(this.testResult, null, null));
         return new TestResultSummary(result);
     }
 
