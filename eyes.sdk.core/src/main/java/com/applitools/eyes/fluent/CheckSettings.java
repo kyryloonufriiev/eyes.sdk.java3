@@ -20,7 +20,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private Region targetRegion;
     private MatchLevel matchLevel = null;
     private Boolean ignoreCaret = null;
-    private boolean stitchContent = false;
+    private Boolean stitchContent = false;
     private List<GetRegion> ignoreRegions = new ArrayList<>();
     private List<GetRegion> layoutRegions = new ArrayList<>();
     private List<GetRegion> strictRegions = new ArrayList<>();
@@ -28,8 +28,9 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private List<GetFloatingRegion> floatingRegions = new ArrayList<>();
     private int timeout = -1;
     protected String name;
-    private boolean useDom;
     protected boolean enablePatterns;
+    protected Boolean sendDom;
+    protected Boolean useDom;
     protected Map<String, String> scriptHooks = new HashMap<>();
 
     protected CheckSettings() { }
@@ -93,6 +94,11 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         CheckSettings clone = new CheckSettings();
         populateClone(clone);
         return clone;
+    }
+
+    @Override
+    public Boolean isStitchContent() {
+        return null;
     }
 
     /**
@@ -327,6 +333,31 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
+    public Boolean isSendDom() {
+        return sendDom;
+    }
+
+    @Override
+    public Boolean isUseDom() {
+        return useDom;
+    }
+
+    @Override
+    public ICheckSettings useDom(boolean useDom) {
+        CheckSettings clone = this.clone();
+        clone.useDom = useDom;
+        return clone;
+    }
+
+
+    @Override
+    public ICheckSettings sendDom(boolean sendDom) {
+        CheckSettings clone = this.clone();
+        clone.sendDom = sendDom;
+        return clone;
+    }
+
+    @Override
     public Region getTargetRegion() {
         return this.targetRegion;
     }
@@ -337,7 +368,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public boolean getStitchContent() {
+    public Boolean getStitchContent() {
         return this.stitchContent;
     }
 
@@ -386,7 +417,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public Map<String, String> getScriptHooks() {
-        return null;
+        return scriptHooks;
     }
 
     @Override
@@ -396,12 +427,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public Region getRegion() {
-        return null;
-    }
-
-    @Override
-    public Boolean isSendDom() {
-        return false;
+        return targetRegion;
     }
 
     protected void updateTargetRegion(Region region) {
@@ -429,32 +455,25 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public Boolean isUseDom() {
-        return useDom;
-    }
-
-    @Override
-    public ICheckSettings setUseDom(boolean useDom) {
-        CheckSettings clone = this.clone();
-        clone.useDom = useDom;
-        return clone;
-    }
-
-    @Override
     public boolean isEnablePatterns() {
         return enablePatterns;
     }
 
-    @Override
-    public VisualGridSelector GetTargetSelector() {
+        @Override
+    public VisualGridSelector getVGTargetSelector() {
         return null;
     }
 
     @Override
-    public ICheckSettings setEnablePatterns(boolean enablePatterns) {
+    public ICheckSettings enablePatterns(boolean enablePatterns) {
         CheckSettings clone = this.clone();
         clone.enablePatterns = enablePatterns;
         return clone;
+    }
+
+    @Override
+    public ICheckSettings enablePatterns() {
+        return null;
     }
 
     public ICheckSettings scriptHook(String hook) {

@@ -505,12 +505,29 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
     private ICheckSettingsInternal updateCheckSettings(ICheckSettings checkSettings) {
-        SeleniumCheckSettings settingsInternal = ((SeleniumCheckSettings) checkSettings).clone();
+        ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal)checkSettings;
 
-        if (settingsInternal.isSendDom() == null) {
-            settingsInternal = settingsInternal.sendDom(this.getConfigGetter().isSendDom());
+        MatchLevel matchLevel = checkSettingsInternal.getMatchLevel();
+
+        Boolean fully = checkSettingsInternal.isStitchContent();
+        Boolean sendDom = checkSettingsInternal.isSendDom();
+
+        if (matchLevel == null)
+        {
+            checkSettings = checkSettings.matchLevel(getConfigGetter().getMatchLevel());
         }
-        return settingsInternal;
+
+        if (fully == null)
+        {
+            checkSettings = checkSettings.fully(getConfigGetter().isForceFullPageScreenshot());
+        }
+
+        if (sendDom == null)
+        {
+            checkSettings = checkSettings.sendDom(getConfigGetter().isSendDom());
+        }
+
+        return (ICheckSettingsInternal) checkSettings;
     }
 
     private void trySetTargetSelector(SeleniumCheckSettings checkSettings) {

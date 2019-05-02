@@ -157,13 +157,14 @@ public interface ICheckSettings {
      */
     ICheckSettings withName(String name);
 
-    Boolean isUseDom();
 
-    ICheckSettings setUseDom(boolean useDom);
+    ICheckSettings useDom(boolean useDom);
 
-    boolean isEnablePatterns();
+    ICheckSettings sendDom(boolean sendDom);
 
-    ICheckSettings setEnablePatterns(boolean enablePatterns);
+    ICheckSettings enablePatterns(boolean enablePatterns);
+
+    ICheckSettings enablePatterns();
 
     ICheckSettings scriptHook(String scriptHook);
 }
