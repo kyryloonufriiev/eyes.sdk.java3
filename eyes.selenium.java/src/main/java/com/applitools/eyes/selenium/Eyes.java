@@ -1976,7 +1976,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
     /**
      * Is send dom boolean.
      *
-     * @return isSendDom flag
+     * @return sendDom flag
      */
     public boolean isSendDom() {
         return this.configuration.isSendDom();

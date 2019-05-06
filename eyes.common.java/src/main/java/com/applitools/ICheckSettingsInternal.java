@@ -26,7 +26,9 @@ public interface ICheckSettingsInternal {
 
     Boolean isUseDom();
 
-    VisualGridSelector GetTargetSelector();
+    VisualGridSelector getVGTargetSelector();
 
     ICheckSettingsInternal clone();
+
+    Boolean isStitchContent();
 }

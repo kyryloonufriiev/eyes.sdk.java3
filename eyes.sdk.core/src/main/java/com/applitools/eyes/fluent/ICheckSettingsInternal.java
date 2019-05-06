@@ -5,7 +5,7 @@ import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInternal {
 
-    boolean getStitchContent();
+    Boolean getStitchContent();
 
     GetRegion[] getIgnoreRegions();
 
@@ -21,7 +21,11 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
 
     boolean isEnablePatterns();
 
-    VisualGridSelector GetTargetSelector();
+    VisualGridSelector getVGTargetSelector();
 
     ICheckSettings scriptHook(String hook);
+
+    Boolean isUseDom();
+
+    Boolean isSendDom();
 }

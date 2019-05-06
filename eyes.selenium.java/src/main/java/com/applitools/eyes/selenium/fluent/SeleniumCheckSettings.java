@@ -27,7 +27,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     private VisualGridSelector selector;
     private Region region;
-    private Boolean isSendDom;
+
 
     public SeleniumCheckSettings() {
     }
@@ -75,7 +75,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.scrollRootSelector = this.scrollRootSelector;
         clone.region = this.region;
         clone.selector = this.selector;
-        clone.isSendDom = this.isSendDom;
+        clone.sendDom = this.sendDom;
         return clone;
     }
 
@@ -422,19 +422,17 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
 
     public SeleniumCheckSettings(Region region, boolean isSendDom) {
         this.region = region;
-        this.isSendDom = isSendDom;
+        this.sendDom = isSendDom;
     }
 
     @JsonProperty("sizeMode")
     public String getSizeMode() {
-
-
         ICheckSettingsInternal checkSettingsInternal = this;
         boolean stitchContent = checkSettingsInternal.getStitchContent();
         if (region == null) {
             region  = checkSettingsInternal.getTargetRegion();
         }
-        if (region == null && GetTargetSelector() == null)
+        if (region == null && getVGTargetSelector() == null)
         {
             return stitchContent ? FULL_PAGE : VIEWPORT;
         }
@@ -457,16 +455,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return scriptHooks;
     }
 
-    @Override
-    public Boolean isSendDom() {
-        return isSendDom;
-    }
-
-    public SeleniumCheckSettings sendDom(Boolean sendDom) {
-        SeleniumCheckSettings clone = this.clone();
-        clone.isSendDom = sendDom;
-        return clone;
-    }
 
     public SeleniumCheckSettings scriptHook(String hook) {
         SeleniumCheckSettings clone = this.clone();
@@ -475,7 +463,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     @Override
-    public VisualGridSelector GetTargetSelector() {
+    public VisualGridSelector getVGTargetSelector() {
         return this.selector;
     }
 

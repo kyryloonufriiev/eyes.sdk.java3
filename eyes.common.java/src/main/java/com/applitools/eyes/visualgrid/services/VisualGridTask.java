@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
+import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.GeneralUtils;
@@ -117,8 +118,13 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                     try {
                         testResults = eyesConnector.close(true);
                     } catch (Throwable e) {
-                        GeneralUtils.logExceptionStackTrace(logger,e);
+                        GeneralUtils.logExceptionStackTrace(logger, e);
+                        if (e instanceof DiffsFoundException) {
+                            DiffsFoundException diffException = (DiffsFoundException) e;
+                            testResults = diffException.getTestResults();
+                        }
                         this.exception = e;
+
                     }
                     logger.verbose("Eyes Close Done.");
                     break;
@@ -132,7 +138,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                     }
             }
             @SuppressWarnings("UnnecessaryLocalVariable")
-            TestResultContainer testResultContainer = new TestResultContainer(testResults, this.exception);
+            TestResultContainer testResultContainer = new TestResultContainer(testResults, runningTest.getBrowserInfo(), this.exception);
             notifySuccessAllListeners();
             this.isTaskComplete.set(true);
             return testResultContainer;
@@ -217,7 +223,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         this.renderingTask = renderingTask;
     }
 
-    public RunningSession getSession(){
+    public RunningSession getSession() {
         return this.eyesConnector.getSession();
     }
 
