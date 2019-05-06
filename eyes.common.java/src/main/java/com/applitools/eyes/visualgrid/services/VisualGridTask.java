@@ -83,10 +83,18 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
             switch (type) {
                 case OPEN:
                     logger.verbose("VisualGridTask.run opening task");
-                    String userAgent = renderResult.getUserAgent();
-                    RectangleSize deviceSize = renderResult.getDeviceSize();
-                    eyesConnector.setUserAgent(userAgent);
-                    eyesConnector.setDeviceSize(deviceSize);
+                    if (renderResult != null) {
+                        String userAgent = renderResult.getUserAgent();
+                        RectangleSize deviceSize = renderResult.getDeviceSize();
+                        eyesConnector.setUserAgent(userAgent);
+                        eyesConnector.setDeviceSize(deviceSize);
+                    }
+                    else{
+                        // We are in exception mode - trying to do eyes.open() without first render
+                        eyesConnector.setDeviceSize(runningTest.getBrowserInfo().getViewportSize());
+                        eyesConnector.setDevice(runningTest.getBrowserInfo().getBrowserType());
+
+                    }
                     eyesConnector.open(configurationGetter);
                     logger.verbose("Eyes Open Done.");
                     break;
@@ -180,7 +188,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
 
     public boolean isTaskReadyToCheck() {
-        return this.renderResult != null;
+        return this.renderResult != null || this.exception != null;
     }
 
     public RunningTest getRunningTest() {
@@ -211,7 +219,9 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     public void setException(Throwable exception) {
         logger.verbose("aborting task with exception");
         this.exception = exception;
-        this.type = TaskType.ABORT;
+        if (type == TaskType.CLOSE) {
+            this.type = TaskType.ABORT;
+        }
     }
 
     @Override

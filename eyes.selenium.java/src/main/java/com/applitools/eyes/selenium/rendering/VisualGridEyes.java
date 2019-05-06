@@ -312,13 +312,12 @@ public class VisualGridEyes implements IRenderingEyes {
 
             }
         } catch (Exception e) {
-              GeneralUtils.logExceptionStackTrace(logger, e);
+            GeneralUtils.logExceptionStackTrace(logger, e);
         }
         return closeFuturesSet;
     }
 
-    public Collection<Future<TestResultContainer>> closeAsync() {
-        List<Future<TestResultContainer>> futureList = null;
+    public Collection<Future<TestResultContainer>> closeAsync() {List<Future<TestResultContainer>> futureList = null;
         try {
             futureList = new ArrayList<>();
             for (RunningTest runningTest : testList) {
@@ -463,6 +462,13 @@ public class VisualGridEyes implements IRenderingEyes {
                 Thread.sleep(200);
             } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedout.get());
 
+            if (status == ScriptResponse.Status.ERROR) {
+                throw new EyesException("DomSnapshot Error: " + scriptResponse.getError());
+            }
+
+            if (isCheckTimerTimedout.get()) {
+                throw new EyesException("Domsnapshot Timed out");
+            }
             FrameData scriptResult = scriptResponse.getValue();
 
             logger.verbose("Dom extracted  (" + checkSettingsInternal.toString() + ")");
@@ -493,13 +499,12 @@ public class VisualGridEyes implements IRenderingEyes {
                     }, regionsXPaths, this.configProvider.get().getForceFullPageScreenshot());
 
             logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | EyesException | InterruptedException e) {
             Error error = new Error(e);
+            abort();
             for (RunningTest runningTest : testList) {
                 runningTest.setTestInExceptionMode(error);
             }
-            throw error;
-        } catch (InterruptedException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
     }
@@ -792,6 +797,12 @@ public class VisualGridEyes implements IRenderingEyes {
         public void run() {
             logger.verbose("Check Timer timeout.");
             isCheckTimerTimedout.set(true);
+        }
+    }
+
+    private void abort() {
+        for (RunningTest runningTest : testList) {
+            runningTest.abort();
         }
     }
 
