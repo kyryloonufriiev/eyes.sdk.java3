@@ -3,13 +3,13 @@ package com.applitools.eyes;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.GeneralUtils;
+import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +22,6 @@ public class ResourceFuture implements IResourceFuture {
     private Logger logger;
     private IServerConnector serverConnector;
     private RGridResource rgResource;
-    private int retryCount = 3;
 
     public ResourceFuture(Future<Response> future, String url, Logger logger, IServerConnector serverConnector) {
         this.future = future;
@@ -54,57 +53,79 @@ public class ResourceFuture implements IResourceFuture {
     }
 
     @Override
-    public RGridResource get() throws InterruptedException, ExecutionException {
-        logger.verbose("enter - this.rgResource: " + this.rgResource);
-        while (this.rgResource == null && retryCount > 0) {
-            try {
-                Response response = future.get();
-                logger.verbose("response: " + response);
-                ByteArrayOutputStream outputStream = downloadFile(response);
-                String contentType = Utils.getResponseContentType(response);
-                rgResource = new RGridResource(url, contentType, outputStream.toByteArray(), logger, "ResourceFuture");
-                break;
-            } catch (InterruptedException | ExecutionException e) {
-                retryCount--;
-                logger.verbose("Entering retry");
+    public RGridResource get() throws InterruptedException {
+        synchronized (future) {
+            logger.verbose("enter - this.rgResource: " + this.rgResource);
+            if (this.future == null) {
                 try {
-                    Thread.sleep(300);
                     IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), true, null);
                     this.future = ((ResourceFuture) newFuture).future;
                 } catch (MalformedURLException malformedUrlException) {
                     GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);
                 }
             }
+            int retryCount = 3;
+            while (this.rgResource == null && retryCount > 0) {
+                try {
+                    Response response = this.future.get(15, TimeUnit.SECONDS);
+                    int status = response.getStatus();
+                    List<String> contentLengthHeaders = response.getStringHeaders().get("Content-length");
+                    int contentLength = Integer.parseInt(contentLengthHeaders.get(0));
+
+                    logger.verbose("downloading url - : "+ url);
+                    logger.verbose("Content Length: "+ contentLengthHeaders.get(0));
+                    if ((status == 200 || status == 201) && (!contentLengthHeaders.isEmpty() && contentLength > 0)){
+                        logger.verbose("response: " + response);
+                        byte[] content = downloadFile(response);
+                        if(content.length == 0){
+                            throw new Exception("content is empty - url :"+url);
+                        }
+                        String contentType = Utils.getResponseContentType(response);
+                        String contentEncoding = Utils.getResponseContentEncoding(response);
+                        if (contentEncoding != null && contentEncoding.contains("gzip")) {
+                            content = GeneralUtils.getUnGzipByteArrayOutputStream(content);
+                        }
+                        rgResource = new RGridResource(url, contentType, content, logger, "ResourceFuture");
+                        break;
+                    }
+                } catch (Exception e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                    retryCount--;
+                    logger.verbose("Entering retry");
+                    try {
+                        Thread.sleep(300);
+                        IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), true, null);
+                        this.future = ((ResourceFuture) newFuture).future;
+                    } catch (MalformedURLException malformedUrlException) {
+                        GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);
+                    }
+                }
+            }
+
+            logger.verbose("exit");
         }
-        logger.verbose("exit");
         return rgResource;
     }
 
     @Override
-    public RGridResource get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        if (this.rgResource == null) {
-            Response response = future.get(timeout, unit);
-            ByteArrayOutputStream outputStream = downloadFile(response);
-            String contentType = Utils.getResponseContentType(response);
-            rgResource = new RGridResource(url, contentType, outputStream.toByteArray(), logger, "resourceFuture");
+    public RGridResource get(long timeout, TimeUnit unit) {
+        try {
+            return get();
+        } catch (InterruptedException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        return rgResource;
+        return null;
     }
 
-    private ByteArrayOutputStream downloadFile(Response response) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024);
+    private byte[] downloadFile(Response response) {
         InputStream inputStream = response.readEntity(InputStream.class);
-        byte[] bytes = new byte[1024];
+        byte[] bytes = new byte[0];
         try {
-            int readBytes = inputStream.read(bytes);
-            while (readBytes > 0) {
-                outputStream.write(bytes, 0, readBytes);
-                readBytes = inputStream.read(bytes);
-            }
+            bytes = IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        return outputStream;
+        return bytes;
     }
 
     @Override
