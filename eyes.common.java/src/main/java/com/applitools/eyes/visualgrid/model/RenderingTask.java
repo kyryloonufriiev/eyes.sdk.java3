@@ -416,8 +416,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
             for (BlobData blob : allFramesBlobs) {
-                Map blobAsMap = (Map) blob;
-                String blobUrl = (String) blobAsMap.get("url");
+                String blobUrl = blob.getUrl().toString();
                 RGridResource rGridResource = resourceMapping.get(blobUrl);
                 mapping.put(blobUrl, rGridResource);
 
