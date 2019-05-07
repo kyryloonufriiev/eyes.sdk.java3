@@ -172,7 +172,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         return "Mozilla/5.0 (" + platform + "; Unknown)";
     }
 
-    private static String toPascalCase(String str) {
+    public static String toPascalCase(String str) {
         ArgumentGuard.notNullOrEmpty(str, "str");
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
