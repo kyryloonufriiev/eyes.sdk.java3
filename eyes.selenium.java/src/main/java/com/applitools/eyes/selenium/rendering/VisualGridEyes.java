@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class VisualGridEyes implements IRenderingEyes {
 
-    private static final long FIVE_MINUTES = 1000 * 60 * 5;
+    private static long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
     private Logger logger;
 
     private String apiKey;
@@ -444,10 +444,9 @@ public class VisualGridEyes implements IRenderingEyes {
 
             ICheckSettingsInternal checkSettingsInternal = updateCheckSettings(checkSettings);
 
-
             logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
 
-            timer.schedule(new TimeoutTask(), FIVE_MINUTES);
+            timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
             String resultAsString;
             ScriptResponse.Status status = null;
             ScriptResponse scriptResponse = null;

@@ -5,6 +5,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.ArrayList;
@@ -88,12 +89,11 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         RectangleSize deviceSize = renderResult.getDeviceSize();
                         eyesConnector.setUserAgent(userAgent);
                         eyesConnector.setDeviceSize(deviceSize);
-                    }
-                    else{
+                    } else {
                         // We are in exception mode - trying to do eyes.open() without first render
-                        eyesConnector.setDeviceSize(runningTest.getBrowserInfo().getViewportSize());
-                        eyesConnector.setDevice(runningTest.getBrowserInfo().getBrowserType());
-
+                        RenderBrowserInfo browserInfo = runningTest.getBrowserInfo();
+                        eyesConnector.setUserAgent(craftUserAgent(browserInfo));
+                        eyesConnector.setDeviceSize(browserInfo.getViewportSize());
                     }
                     eyesConnector.open(configurationGetter);
                     logger.verbose("Eyes Open Done.");
@@ -156,6 +156,25 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
             notifyFailureAllListeners(new Error(e));
         }
         return null;
+    }
+
+    private String craftUserAgent(RenderBrowserInfo browserInfo) {
+        String browserType = browserInfo.getBrowserType();
+        String platform = toPascalCase(browserInfo.getPlatform());
+        if (!browserType.startsWith("ie")) {
+            browserType = toPascalCase(browserType);
+            return "Mozilla/5.0 (" + platform + ") " + browserType + "/0.0";
+        } else if (browserType.equals("ie")){
+            return "Mozilla/5.0 (" + platform + "; MSIE 11.0)";
+        } else if (browserType.equals("ie10")) {
+            return "Mozilla/5.0 (" + platform + "; MSIE 10.0)";
+        }
+        return "Mozilla/5.0 (" + platform + "; Unknown)";
+    }
+
+    private static String toPascalCase(String str) {
+        ArgumentGuard.notNullOrEmpty(str, "str");
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
     private void notifySuccessAllListeners() {

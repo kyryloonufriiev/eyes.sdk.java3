@@ -61,5 +61,24 @@ public class TestUserAgentParser {
         Assert.assertEquals(ua.getBrowserMinorVersion(),"0");
     }
 
+    @Test
+    public void test_Crafted_UserAgent_1() {
 
+        String uaString = "Mozilla/5.0 (Linux) Chrome/0.0";
+        UserAgent ua = UserAgent.ParseUserAgentString(uaString, true);
+
+        Assert.assertEquals(ua.getOS(), "Linux");
+        Assert.assertEquals(ua.getBrowser(), "Chrome");
+    }
+
+    @Test
+    public void test_Crafted_UserAgent_2() {
+
+        String uaString = "Mozilla/5.0 (Windows; MSIE 10.0)";
+        UserAgent ua = UserAgent.ParseUserAgentString(uaString, true);
+
+        Assert.assertEquals(ua.getOS(), "Windows");
+        Assert.assertEquals(ua.getBrowser(), "IE");
+        Assert.assertEquals(ua.getBrowserMajorVersion(), "10");
+    }
 }

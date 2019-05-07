@@ -1,12 +1,11 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.visualgrid.model.TestResultSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
@@ -25,9 +24,17 @@ public class VisualGrid {
 
     @BeforeClass
     protected void init(){
+
+        try {
+            TestUtils.setFinalStatic(VisualGridEyes.class, "DOM_EXTRACTION_TIMEOUT", 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         FileLogger logHandler = new FileLogger("sophiLog.log", false, true);
         eyes.setLogHandler(logHandler);
         eyes.setBranchName("Child Branch");
+        //eyes.setProxy(new ProxySettings("https://127.0.0.1", 8888));
         VisualGrid.setLogger(eyes.getLogger());
         Configuration configuration = eyes.getConfiguration();
         configuration.setBatch(new BatchInfo("example vg"));
@@ -37,11 +44,14 @@ public class VisualGrid {
     public void setUp(){
         driver = new ChromeDriver();
         Configuration configuration = eyes.getConfiguration();
-        configuration.addBrowser(800, 600, BrowserType.CHROME);
-//        configuration.addBrowser(700, 500, Configuration.BrowserType.CHROME);
-//        configuration.addBrowser(1200, 800, Configuration.BrowserType.CHROME);
-//        configuration.addBrowser(1600, 1200, Configuration.BrowserType.CHROME);
+        configuration.addBrowser(700, 500, BrowserType.CHROME);
+        configuration.addBrowser(800, 600, BrowserType.IE_10);
+        configuration.addBrowser(900, 700, BrowserType.IE_11);
+        configuration.addBrowser(1200, 800, BrowserType.FIREFOX);
+        configuration.addBrowser(1600, 1200, BrowserType.EDGE);
+        //configuration.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         eyes.setConfiguration(configuration);
+
     }
 
     @Test
