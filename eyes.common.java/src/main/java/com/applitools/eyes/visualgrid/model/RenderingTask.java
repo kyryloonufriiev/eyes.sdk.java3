@@ -422,7 +422,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             }
             for (URL resourceUrl : allResourceUrls) {
-                RGridResource rGridResource = resourceMapping.get(resourceUrl);
+                RGridResource rGridResource = resourceMapping.get(resourceUrl.toString());
                 mapping.put(resourceUrl.toString(), rGridResource);
             }
             List<CdtData> cdt = frameObj.getCdt();
