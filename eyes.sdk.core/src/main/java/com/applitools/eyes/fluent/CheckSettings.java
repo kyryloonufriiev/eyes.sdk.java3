@@ -98,7 +98,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public Boolean isStitchContent() {
-        return null;
+        return stitchContent;
     }
 
     /**

@@ -10,6 +10,7 @@ import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.services.VisualGridTask;
 
 import java.net.URI;
 import java.net.URL;
@@ -158,12 +159,12 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     }
 
     @Override
-    protected void openLogger(){
+    protected void openLogger() {
         // do nothing.
     }
 
     @Override
-    protected void closeLogger(){
+    protected void closeLogger() {
         // do nothing.
     }
 
@@ -179,7 +180,7 @@ class EyesConnector extends EyesBase implements IEyesConnector {
 
     @Override
     public IConfigurationSetter setServerUrl(URI serverUrl) {
-       return  super.setServerUrl(serverUrl);
+        return super.setServerUrl(serverUrl);
     }
 
     @Override
@@ -206,8 +207,18 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     protected AppEnvironment getAppEnvironment() {
         AppEnvironment appEnv = super.getAppEnvironment();
         appEnv.setDeviceInfo(device);
-        appEnv.setOs(null);
-        appEnv.setHostingApp(null);
+        if (userAgent == null) {
+            appEnv.setOs(VisualGridTask.toPascalCase(browserInfo.getPlatform()));
+            String browserName = browserInfo.getBrowserType();
+            if (browserName.equals("ie")) {
+                browserName = "IE 11";
+            } else if (browserName.equals("ie10")) {
+                browserName = "IE 10";
+            } else {
+                browserName = VisualGridTask.toPascalCase(browserName);
+            }
+            appEnv.setHostingApp(browserName);
+        }
         logger.log("Done!");
         return appEnv;
     }
