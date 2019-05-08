@@ -36,4 +36,11 @@ public class BlobData {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "BlobData{" +
+                "url=" + url +
+                '}';
+    }
 }

@@ -118,10 +118,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
      *                      If {@code null} then no proxy is set.
      */
     public void setProxy(AbstractProxySettings proxySettings) {
-       this.configuration.setProxy(proxySettings);
-       if(!isVisualGridEyes){
-           seleniumEyes.setProxy(proxySettings);
-       }
+        configuration.setProxy(proxySettings);
     }
 
     /**
