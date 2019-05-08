@@ -207,16 +207,18 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     protected AppEnvironment getAppEnvironment() {
         AppEnvironment appEnv = super.getAppEnvironment();
         appEnv.setDeviceInfo(device);
-        appEnv.setOs(VisualGridTask.toPascalCase(browserInfo.getPlatform()));
-        String browserName = browserInfo.getBrowserType();
-        if (browserName.equals("ie")) {
-            browserName = "IE 11";
-        } else if (browserName.equals("ie10")) {
-            browserName = "IE 10";
-        } else {
-            browserName = VisualGridTask.toPascalCase(browserName);
+        if (userAgent == null) {
+            appEnv.setOs(VisualGridTask.toPascalCase(browserInfo.getPlatform()));
+            String browserName = browserInfo.getBrowserType();
+            if (browserName.equals("ie")) {
+                browserName = "IE 11";
+            } else if (browserName.equals("ie10")) {
+                browserName = "IE 10";
+            } else {
+                browserName = VisualGridTask.toPascalCase(browserName);
+            }
+            appEnv.setHostingApp(browserName);
         }
-        appEnv.setHostingApp(browserName);
         logger.log("Done!");
         return appEnv;
     }

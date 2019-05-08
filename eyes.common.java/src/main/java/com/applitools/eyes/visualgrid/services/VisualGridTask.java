@@ -92,7 +92,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                     } else {
                         // We are in exception mode - trying to do eyes.open() without first render
                         RenderBrowserInfo browserInfo = runningTest.getBrowserInfo();
-                        eyesConnector.setUserAgent(craftUserAgent(browserInfo));
+                        //eyesConnector.setUserAgent(craftUserAgent(browserInfo));
                         eyesConnector.setDeviceSize(browserInfo.getViewportSize());
                     }
                     eyesConnector.open(configurationGetter);
