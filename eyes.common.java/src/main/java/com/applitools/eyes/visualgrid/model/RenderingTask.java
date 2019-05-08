@@ -374,7 +374,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 logger.verbose("trying to fetch - " + url);
                 IResourceFuture iResourceFuture = this.fetchedCacheMap.get(url);
                 if (iResourceFuture != null) {
-                    RGridResource value = iResourceFuture.get(10, TimeUnit.SECONDS);
+                    RGridResource value = iResourceFuture.get();
                     if (value.getContent() != null) resourceMapping.put(url, value);
                 }
             } catch (Exception e) {
@@ -422,7 +422,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             }
             for (URL resourceUrl : allResourceUrls) {
-                RGridResource rGridResource = resourceMapping.get(resourceUrl);
+                RGridResource rGridResource = resourceMapping.get(resourceUrl.toString());
                 mapping.put(resourceUrl.toString(), rGridResource);
             }
             List<CdtData> cdt = frameObj.getCdt();
@@ -740,14 +740,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("starting to fetch( " + allFetches.size() + ") fetched resources");
         for (IResourceFuture future : allFetches) {
             RGridResource resource;
-            try {
-                logger.verbose("trying future.get() for resource " + future.getUrl() + " ...");
-                resource = future.get(10, TimeUnit.SECONDS);
-                logger.verbose("finishing future.get() for resource " + future.getUrl() + " ...");
-            } catch (TimeoutException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-                continue;
-            }
+            logger.verbose("trying future.get() for resource " + future.getUrl() + " ...");
+            resource = future.get();
+            logger.verbose("finishing future.get() for resource " + future.getUrl() + " ...");
             logger.verbose("done getting resource " + future.getUrl());
             try {
                 this.debugResourceWriter.write(resource);

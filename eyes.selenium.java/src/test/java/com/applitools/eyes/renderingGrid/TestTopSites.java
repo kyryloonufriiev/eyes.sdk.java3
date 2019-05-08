@@ -109,8 +109,9 @@ public class TestTopSites {
             }
             eyes.getLogger().log("calling VisualGridEyes.close() for url " + testedUrl);
 //            VisualGridEyes.close();
-            TestResults close = eyes.close(true);
-            Assert.assertNotNull(close);
+//            TestResults close = eyes.close(true);
+//            Assert.assertNotNull(close);
+            eyes.closeAsync();
             logger.log("end of `try` block for url " + testedUrl);
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
