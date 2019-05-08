@@ -120,6 +120,8 @@ public class VisualGridRunner extends EyesRunner {
                         }
                         logger.verbose("releasing eyesToOpenList");
                         break;
+                    case ABORT:
+                        logger.verbose("VisualGridTask Abort.");
                     case CLOSE:
                         logger.verbose("VisualGridTask Close.");
                         eyesOpenerService.decrementConcurrency();
@@ -127,14 +129,7 @@ public class VisualGridRunner extends EyesRunner {
                             openerServiceConcurrencyLock.notify();
                         }
                         logger.verbose("releasing openerServiceConcurrencyLock");
-                        break;
-                    case ABORT:
-                        logger.verbose("VisualGridTask Abort.");
-                        eyesOpenerService.decrementConcurrency();
-                        synchronized (openerServiceConcurrencyLock) {
-                            openerServiceConcurrencyLock.notify();
-                        }
-                        logger.verbose("releasing openerServiceConcurrencyLock");
+                        logger.verbose("VisualGridTask Close.");
                         break;
                     case CHECK:
                         logger.verbose("Check complete.");
