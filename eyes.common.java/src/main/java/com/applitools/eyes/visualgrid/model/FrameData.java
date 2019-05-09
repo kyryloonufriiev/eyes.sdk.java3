@@ -7,15 +7,15 @@ public class FrameData
 {
     private  List<CdtData> cdt; 
 
-    private URL url;
+    private String url;
 
-    private List<URL> resourceUrls;
+    private List<String> resourceUrls;
     
     private List<BlobData> blobs;
 
     private List<FrameData> frames;
 
-    private URL srcAttr;
+    private String srcAttr;
 
     public FrameData() {
     }
@@ -28,19 +28,19 @@ public class FrameData
         this.cdt = cdt;
     }
 
-    public URL getUrl() {
+    public String getUrl() {
         return url;
     }
 
-    public void setUrl(URL url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 
-    public List<URL> getResourceUrls() {
+    public List<String> getResourceUrls() {
         return resourceUrls;
     }
 
-    public void setResourceUrls(List<URL> resourceUrls) {
+    public void setResourceUrls(List<String> resourceUrls) {
         this.resourceUrls = resourceUrls;
     }
 
@@ -60,11 +60,11 @@ public class FrameData
         this.frames = frames;
     }
 
-    public URL getSrcAttr() {
+    public String getSrcAttr() {
         return srcAttr;
     }
 
-    public void setSrcAttr(URL srcAttr) {
+    public void setSrcAttr(String srcAttr) {
         this.srcAttr = srcAttr;
     }
 }

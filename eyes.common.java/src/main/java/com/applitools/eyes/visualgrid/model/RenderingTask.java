@@ -399,16 +399,20 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("exit - returning renderRequest array of length: " + asArray.length);
         return asArray;
     }
-
     private void buildAllRGDoms(Map<String, RGridResource> resourceMapping, FrameData result) {
-        URL baseUrl = result.getUrl();
+        URL baseUrl = null;
+        try {
+            baseUrl = new URL(result.getUrl());
+        } catch (MalformedURLException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
         logger.verbose("baseUrl: " + baseUrl);
         List<FrameData> allFrame = result.getFrames();
         Map<String, RGridResource> mapping = new HashMap<>();
         for (FrameData frameObj : allFrame) {
             List<BlobData> allFramesBlobs = frameObj.getBlobs();
             @SuppressWarnings("unchecked")
-            List<URL> allResourceUrls = frameObj.getResourceUrls();
+            List<String> allResourceUrls = frameObj.getResourceUrls();
             URL frameUrl = null;
             try {
                 frameUrl = new URL(baseUrl, frameObj.getUrl().toString());
@@ -421,9 +425,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 mapping.put(blobUrl, rGridResource);
 
             }
-            for (URL resourceUrl : allResourceUrls) {
+            for (String resourceUrl : allResourceUrls) {
                 RGridResource rGridResource = resourceMapping.get(resourceUrl.toString());
-                mapping.put(resourceUrl.toString(), rGridResource);
+                mapping.put(resourceUrl, rGridResource);
             }
             List<CdtData> cdt = frameObj.getCdt();
             RGridDom rGridDom = new RGridDom(cdt, mapping, frameUrl.toString(), logger, "buildAllRGDoms");
@@ -442,10 +446,16 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         Base64 codec = new Base64();
 
-        URL baseUrl = result.getUrl();
+        String baseUrlStr = result.getUrl();
 
-        logger.verbose("baseUrl: " + baseUrl);
+        logger.verbose("baseUrl: " + baseUrlStr);
 
+        URL baseUrl = null;
+        try {
+            baseUrl = new URL(baseUrlStr);
+        } catch (MalformedURLException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
         parseBlobs(allBlobs, codec, baseUrl, result.getBlobs());
 
         parseResourceUrls(result, resourceUrls, baseUrl);
@@ -468,10 +478,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
     private void parseResourceUrls(FrameData result, Set<URL> resourceUrls, URL baseUrl) {
-        List<URL> list = result.getResourceUrls();
-        for (URL url : list) {
+        List<String> list = result.getResourceUrls();
+        for (String url : list) {
             try {
-                resourceUrls.add(new URL(baseUrl, url.toString()));
+                resourceUrls.add(new URL(baseUrl, url));
             } catch (MalformedURLException e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }

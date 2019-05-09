@@ -4,7 +4,7 @@ import java.net.URI;
 
 public class BlobData {
     
-    private URI url;
+    private String url;
 
     private String type;
 
@@ -13,11 +13,11 @@ public class BlobData {
     public BlobData() {
     }
 
-    public URI getUrl() {
+    public String getUrl() {
         return url;
     }
 
-    public void setUrl(URI url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 
