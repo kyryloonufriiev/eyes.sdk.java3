@@ -89,7 +89,10 @@ public class ResourceFuture implements IResourceFuture {
                         rgResource = new RGridResource(url, contentType, content, logger, "ResourceFuture");
                         break;
                     }
-                } catch (Exception e) {
+                    else{
+                        retryCount--;
+                    }
+                } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     retryCount--;
                     logger.verbose("Entering retry");
