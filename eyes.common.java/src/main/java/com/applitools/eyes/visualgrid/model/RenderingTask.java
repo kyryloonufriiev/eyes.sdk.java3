@@ -418,6 +418,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 frameUrl = new URL(baseUrl, frameObj.getUrl().toString());
             } catch (MalformedURLException e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
+                continue;
             }
             for (BlobData blob : allFramesBlobs) {
                 String blobUrl = blob.getUrl().toString();
@@ -426,7 +427,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             }
             for (String resourceUrl : allResourceUrls) {
-                RGridResource rGridResource = resourceMapping.get(resourceUrl.toString());
+                RGridResource rGridResource = resourceMapping.get(resourceUrl);
                 mapping.put(resourceUrl, rGridResource);
             }
             List<CdtData> cdt = frameObj.getCdt();
@@ -749,32 +750,42 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         logger.verbose("starting to fetch( " + allFetches.size() + ") fetched resources");
         for (IResourceFuture future : allFetches) {
-            RGridResource resource;
-            logger.verbose("trying future.get() for resource " + future.getUrl() + " ...");
-            resource = future.get();
-            logger.verbose("finishing future.get() for resource " + future.getUrl() + " ...");
-            logger.verbose("done getting resource " + future.getUrl());
             try {
-                this.debugResourceWriter.write(resource);
-            } catch (Exception e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
-            logger.verbose("done writing to debugWriter");
-            String urlAsString = resource.getUrl();
+                RGridResource resource;
+                String url = future.getUrl();
+                logger.verbose("trying future.get() for resource " + url + " ...");
+                resource = future.get();
 
-            removeUrlFromList(urlAsString, resourceUrls);
-            allBlobs.put(resource.getUrl(), resource);
+                logger.verbose("finishing future.get() for resource " + url + " ...");
+                logger.verbose("done getting resource " + url);
+                try {
+                    this.debugResourceWriter.write(resource);
+                } catch (Exception e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
+                logger.verbose("done writing to debugWriter");
+                if(resource == null){
+                    logger.verbose("Resource is null ("+url+") ");
+                    continue;
+                }
+                String urlAsString = resource.getUrl();
 
-            // FIXME - remove this
-            String contentType = resource.getContentType();
-            String css = null;
-            css = getCss(resource.getContent(), contentType);
-            logger.verbose("handling " + contentType + " resource from URL: " + urlAsString);
-            if (css == null || css.isEmpty() || !contentType.contains("text/css")) continue;
-            try {
-                parseCSS(css, new URL(urlAsString), resourceUrls);
-            } catch (MalformedURLException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
+                removeUrlFromList(urlAsString, resourceUrls);
+                allBlobs.put(resource.getUrl(), resource);
+
+                // FIXME - remove this
+                String contentType = resource.getContentType();
+                String css = null;
+                css = getCss(resource.getContent(), contentType);
+                logger.verbose("handling " + contentType + " resource from URL: " + urlAsString);
+                if (css == null || css.isEmpty() || !contentType.contains("text/css")) continue;
+                try {
+                    parseCSS(css, new URL(urlAsString), resourceUrls);
+                } catch (MalformedURLException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
 
         }
