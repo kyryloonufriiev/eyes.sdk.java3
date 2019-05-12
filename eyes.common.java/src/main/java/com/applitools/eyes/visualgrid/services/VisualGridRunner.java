@@ -232,7 +232,7 @@ public class VisualGridRunner extends EyesRunner {
                 }
                 return nextTestToRender;
             }
-        });
+        }, renderingServiceLock);
 
         this.eyesCheckerService = new EyesService("eyesCheckerService", servicesGroup, logger, this.concurrentOpenSessions, checkerServiceDebugLock, new EyesService.EyesServiceListener() {
             @Override
