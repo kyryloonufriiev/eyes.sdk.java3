@@ -54,7 +54,8 @@ public class ResourceFuture implements IResourceFuture {
 
     @Override
     public RGridResource get() throws InterruptedException {
-        synchronized (future) {
+        logger.verbose("entering");
+        synchronized (url) {
             logger.verbose("enter - this.rgResource: " + this.rgResource);
             if (this.future == null) {
                 try {
@@ -72,13 +73,13 @@ public class ResourceFuture implements IResourceFuture {
                     List<String> contentLengthHeaders = response.getStringHeaders().get("Content-length");
                     int contentLength = Integer.parseInt(contentLengthHeaders.get(0));
 
-                    logger.verbose("downloading url - : "+ url);
-                    logger.verbose("Content Length: "+ contentLengthHeaders.get(0));
-                    if ((status == 200 || status == 201) && (!contentLengthHeaders.isEmpty() && contentLength > 0)){
+                    logger.verbose("downloading url - : " + url);
+                    logger.verbose("Content Length: " + contentLengthHeaders.get(0));
+                    if ((status == 200 || status == 201) && (!contentLengthHeaders.isEmpty() && contentLength > 0)) {
                         logger.verbose("response: " + response);
                         byte[] content = downloadFile(response);
-                        if(content.length == 0){
-                            throw new Exception("content is empty - url :"+url);
+                        if (content.length == 0) {
+                            throw new Exception("content is empty - url :" + url);
                         }
                         String contentType = Utils.getResponseContentType(response);
                         String contentEncoding = Utils.getResponseContentEncoding(response);
@@ -88,7 +89,10 @@ public class ResourceFuture implements IResourceFuture {
                         rgResource = new RGridResource(url, contentType, content, logger, "ResourceFuture");
                         break;
                     }
-                } catch (Exception e) {
+                    else{
+                        retryCount--;
+                    }
+                } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     retryCount--;
                     logger.verbose("Entering retry");
@@ -102,8 +106,8 @@ public class ResourceFuture implements IResourceFuture {
                 }
             }
 
-            logger.verbose("exit");
         }
+        logger.verbose("exit");
         return rgResource;
     }
 
