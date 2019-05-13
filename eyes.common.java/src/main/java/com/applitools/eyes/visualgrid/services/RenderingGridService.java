@@ -112,7 +112,10 @@ public class RenderingGridService extends Thread {
 
     private void onRenderFinish() {
         concurrentSession.decrementAndGet();
-        concurrencyLock.notify();
+        synchronized (concurrencyLock) {
+            concurrencyLock.notify();
+
+        }
     }
 
     private void debugNotify() {

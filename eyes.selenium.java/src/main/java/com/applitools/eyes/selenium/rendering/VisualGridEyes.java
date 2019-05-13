@@ -24,6 +24,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -292,27 +293,37 @@ public class VisualGridEyes implements IRenderingEyes {
         return str == null ? null : URI.create(str);
     }
 
-    private Collection<Future<TestResultContainer>> closeAndReturnResults(boolean throwException) {
+    private Collection<Future<TestResultContainer>> closeAndReturnResults(boolean throwException)  {
         if (getIsDisabled()) return new HashSet<>();
         if (this.closeFuturesSet == null) {
             closeFuturesSet = new HashSet<>();
         }
+        Throwable exception = null;
         logger.verbose("enter " + getConfigGetter().getBatch());
         try {
             Collection<Future<TestResultContainer>> futureList = closeAsync();
             this.renderingGridRunner.close(this);
             for (Future<TestResultContainer> future : futureList) {
-                TestResultContainer testResultContainer = future.get();
-                if (testResultContainer != null) {
-                    Throwable exception = testResultContainer.getException();
-                    if (throwException && exception != null) {
-                        throw new Error(exception);
+                TestResultContainer testResultContainer = null;
+                try {
+                    testResultContainer = future.get();
+                    if(exception == null && testResultContainer.getException() != null){
+                        exception = testResultContainer.getException();
+                    }
+                } catch (Throwable e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                    if (exception == null) {
+                        exception = e;
                     }
                 }
+
 
             }
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+        if(throwException){
+            throw new Error(exception);
         }
         return closeFuturesSet;
     }

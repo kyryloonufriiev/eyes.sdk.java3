@@ -388,14 +388,14 @@ public class VisualGridRunner extends EyesRunner {
         logger.verbose("enter");
         Map<IRenderingEyes, Collection<Future<TestResultContainer>>> allFutures = new HashMap<>();
         for (IRenderingEyes eyes : allEyes) {
-            Collection<Future<TestResultContainer>> futureList = eyes.close(throwException);
+            Collection<Future<TestResultContainer>> futureList = eyes.close(false);
             Collection<Future<TestResultContainer>> futures = allFutures.get(eyes);
             if (futures != null && !futures.isEmpty()) {
                 futureList.addAll(futures);
             }
             allFutures.put(eyes, futureList);
         }
-
+        Throwable exception = null;
         notifyAllServices();
         List<TestResultContainer> allResults = new ArrayList<>();
         logger.verbose("trying to call future.get on " + allFutures.size() + " future lists.");
@@ -409,10 +409,13 @@ public class VisualGridRunner extends EyesRunner {
                 TestResultContainer obj = null;
                 try {
                     obj = future.get(10, TimeUnit.MINUTES);
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    if(obj.getException() != null && exception == null){
+                        exception = obj.getException();
+                    }
+                } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
-                    if (throwException) {
-                        throw new Error(e);
+                    if (exception == null) {
+                        exception = e;
                     }
                 }
                 logger.verbose("got TestResultContainer: " + obj);
@@ -420,9 +423,13 @@ public class VisualGridRunner extends EyesRunner {
             }
 
         }
+
         stopServices();
         notifyAllServices();
         logger.verbose("exit");
+        if (throwException && exception != null) {
+            throw new Error(exception);
+        }
         return new TestResultSummary(allResults);
     }
 
