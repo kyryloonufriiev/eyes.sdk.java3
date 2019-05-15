@@ -30,10 +30,6 @@ public class RunningTest {
     private VisualGridTask openTask;
     private Throwable error;
 
-    public boolean isCloseTaskIssued() {
-        return isCloseTaskIssued.get();
-    }
-
     public void abort() {
         removeAllCheckTasks();
         if(closeTask != null){
@@ -278,5 +274,9 @@ public class RunningTest {
 
     Logger getLogger() {
         return logger;
+    }
+
+    public boolean isOpenTaskIssued() {
+        return openTask != null;
     }
 }

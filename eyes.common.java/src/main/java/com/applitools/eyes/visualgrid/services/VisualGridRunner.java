@@ -25,7 +25,7 @@ public class VisualGridRunner extends EyesRunner {
     private RenderingGridService renderingGridService;
     private ThreadGroup servicesGroup = new ThreadGroup("Services Group");
     private final List<IRenderingEyes> eyesToOpenList = Collections.synchronizedList(new ArrayList<IRenderingEyes>(200));
-    private final List<IRenderingEyes> allEyes = Collections.synchronizedList(new ArrayList<IRenderingEyes>(200));
+    private final Set<IRenderingEyes> allEyes = Collections.synchronizedSet(new HashSet<IRenderingEyes>());
     private Map<String, IResourceFuture> cachedResources = Collections.synchronizedMap(new HashMap<String, IResourceFuture>());
     private Map<String, IPutFuture> putResourceCache = Collections.synchronizedMap(new HashMap<String, IPutFuture>());
 
@@ -315,7 +315,7 @@ public class VisualGridRunner extends EyesRunner {
                 try {
                     currentTestMark = eyes.getBestScoreTaskForOpen();
                 } catch (Exception e) {
-                    GeneralUtils.logExceptionStackTrace(logger,e);
+                    GeneralUtils.logExceptionStackTrace(logger, e);
                 }
                 if (currentTestMark == null) continue;
                 int currentScore = currentTestMark.getScore();
@@ -336,6 +336,7 @@ public class VisualGridRunner extends EyesRunner {
         VisualGridTask nextOpenVisualGridTask = bestScoreTask.getVisualGridTask();
         return new FutureTask<>(nextOpenVisualGridTask);
     }
+
     public void open(IRenderingEyes eyes, RenderingInfo renderingInfo) {
         logger.verbose("enter");
 
@@ -349,7 +350,7 @@ public class VisualGridRunner extends EyesRunner {
 //        logger.verbose("releasing eyesToOpenList");
 //        logger.verbose("locking allEyes");
 
-        if(allEyes.isEmpty()){
+        if (allEyes.isEmpty()) {
             this.setLogger(eyes.getLogger());
         }
         synchronized (allEyes) {
@@ -409,7 +410,7 @@ public class VisualGridRunner extends EyesRunner {
                 TestResultContainer obj = null;
                 try {
                     obj = future.get(10, TimeUnit.MINUTES);
-                    if(obj.getException() != null && exception == null){
+                    if (obj.getException() != null && exception == null) {
                         exception = obj.getException();
                     }
                 } catch (Throwable e) {
@@ -546,7 +547,7 @@ public class VisualGridRunner extends EyesRunner {
         return rateLimiter;
     }
 
-    public void setLogger(Logger logger){
+    public void setLogger(Logger logger) {
         eyesCheckerService.setLogger(logger);
         eyesCloserService.setLogger(logger);
         eyesOpenerService.setLogger(logger);

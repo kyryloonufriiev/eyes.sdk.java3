@@ -98,6 +98,7 @@ public class RenderingGridService extends Thread {
             }
         }
         else{
+            logger.verbose("trying to sync lock");
             synchronized (concurrencyLock){
                 try {
                     logger.verbose("Waiting for concurrency to be free");
@@ -107,15 +108,18 @@ public class RenderingGridService extends Thread {
                     GeneralUtils.logExceptionStackTrace(logger ,e);
                 }
             }
+            logger.verbose("releasing lock");
         }
     }
 
     private void onRenderFinish() {
         concurrentSession.decrementAndGet();
+        logger.verbose("trying to sync lock");
         synchronized (concurrencyLock) {
             concurrencyLock.notify();
 
         }
+        logger.verbose("releasing lock");
     }
 
     private void debugNotify() {

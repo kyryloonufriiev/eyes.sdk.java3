@@ -293,7 +293,7 @@ public class VisualGridEyes implements IRenderingEyes {
         return str == null ? null : URI.create(str);
     }
 
-    private Collection<Future<TestResultContainer>> closeAndReturnResults(boolean throwException)  {
+    private Collection<Future<TestResultContainer>> closeAndReturnResults(boolean throwException) {
         if (getIsDisabled()) return new HashSet<>();
         if (this.closeFuturesSet == null) {
             closeFuturesSet = new HashSet<>();
@@ -307,7 +307,7 @@ public class VisualGridEyes implements IRenderingEyes {
                 TestResultContainer testResultContainer = null;
                 try {
                     testResultContainer = future.get();
-                    if(exception == null && testResultContainer.getException() != null){
+                    if (exception == null && testResultContainer.getException() != null) {
                         exception = testResultContainer.getException();
                     }
                 } catch (Throwable e) {
@@ -322,13 +322,14 @@ public class VisualGridEyes implements IRenderingEyes {
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        if(throwException){
+        if (throwException) {
             throw new Error(exception);
         }
         return closeFuturesSet;
     }
 
-    public Collection<Future<TestResultContainer>> closeAsync() {List<Future<TestResultContainer>> futureList = null;
+    public Collection<Future<TestResultContainer>> closeAsync() {
+        List<Future<TestResultContainer>> futureList = null;
         try {
             futureList = new ArrayList<>();
             for (RunningTest runningTest : testList) {
@@ -487,8 +488,23 @@ public class VisualGridEyes implements IRenderingEyes {
 
             logger.verbose("regionXPaths : " + regionsXPaths);
 
+            List<RunningTest> filtteredTests = new ArrayList<>();
+
             for (final RunningTest test : testList) {
-                VisualGridTask checkVisualGridTask = test.check((ICheckSettings) checkSettingsInternal, regionsXPaths);
+                VisualGridTask.TaskType taskType = null;
+                List<VisualGridTask> taskList = test.getVisualGridTaskList();
+                if (!taskList.isEmpty()) {
+                    VisualGridTask visualGridTask = taskList.get(taskList.size() - 1);
+                    taskType = visualGridTask.getType();
+                }
+                if (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT) {
+                    filtteredTests.add(test);
+                }
+
+            }
+
+            for (RunningTest runningTest : filtteredTests) {
+                VisualGridTask checkVisualGridTask = runningTest.check((ICheckSettings) checkSettingsInternal, regionsXPaths);
                 visualGridTaskList.add(checkVisualGridTask);
             }
 
@@ -520,25 +536,22 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
     private ICheckSettingsInternal updateCheckSettings(ICheckSettings checkSettings) {
-        ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal)checkSettings;
+        ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
 
         MatchLevel matchLevel = checkSettingsInternal.getMatchLevel();
 
         Boolean fully = checkSettingsInternal.isStitchContent();
         Boolean sendDom = checkSettingsInternal.isSendDom();
 
-        if (matchLevel == null)
-        {
+        if (matchLevel == null) {
             checkSettings = checkSettings.matchLevel(getConfigGetter().getMatchLevel());
         }
 
-        if (fully == null)
-        {
+        if (fully == null) {
             checkSettings = checkSettings.fully(getConfigGetter().isForceFullPageScreenshot());
         }
 
-        if (sendDom == null)
-        {
+        if (sendDom == null) {
             checkSettings = checkSettings.sendDom(getConfigGetter().isSendDom());
         }
 
@@ -639,14 +652,14 @@ public class VisualGridEyes implements IRenderingEyes {
     private synchronized List<VisualGridTask> addOpenTaskToAllRunningTest() {
         logger.verbose("enter");
         List<VisualGridTask> visualGridTasks = new ArrayList<>();
-        if (!this.isVGEyesIssuedOpenTasks.get()) {
-            for (RunningTest runningTest : testList) {
+        for (RunningTest runningTest : testList) {
+            if (!runningTest.isOpenTaskIssued()) {
                 VisualGridTask visualGridTask = runningTest.open();
                 visualGridTasks.add(visualGridTask);
             }
-            logger.verbose("calling addOpenTaskToAllRunningTest.open");
-            this.isVGEyesIssuedOpenTasks.set(true);
         }
+        logger.verbose("calling addOpenTaskToAllRunningTest.open");
+        this.isVGEyesIssuedOpenTasks.set(true);
         logger.verbose("exit");
         return visualGridTasks;
     }
