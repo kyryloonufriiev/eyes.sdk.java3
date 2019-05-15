@@ -473,7 +473,9 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public ICheckSettings enablePatterns() {
-        return null;
+        CheckSettings clone = this.clone();
+        clone.enablePatterns = true;
+        return clone;
     }
 
     public ICheckSettings scriptHook(String hook) {
