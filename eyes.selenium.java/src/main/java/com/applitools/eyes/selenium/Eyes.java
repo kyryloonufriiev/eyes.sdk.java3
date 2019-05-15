@@ -119,6 +119,9 @@ public class Eyes implements ISeleniumConfigurationProvider {
      */
     public void setProxy(AbstractProxySettings proxySettings) {
         configuration.setProxy(proxySettings);
+        if (!isVisualGridEyes) {
+            seleniumEyes.setProxy(proxySettings);
+        }
     }
 
     /**
