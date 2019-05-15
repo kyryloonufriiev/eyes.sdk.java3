@@ -2200,6 +2200,8 @@ public class Eyes implements ISeleniumConfigurationProvider {
     public void closeAsync() {
         if(isVisualGridEyes){
             visualGridEyes.closeAsync();
+        } else {
+            seleniumEyes.close(false);
         }
     }
 }
