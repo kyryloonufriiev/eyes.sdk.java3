@@ -416,6 +416,7 @@ public class TestResults {
     public String toString() {
         String isNewTestStr = isNew ? "New test" : "Existing test";
         return isNewTestStr + " [ steps: " + getSteps()
+                + ", test name: " + name
                 + ", matches: " + getMatches()
                 + ", mismatches:" + getMismatches() + ", missing: "
                 + getMissing() + "] , URL: " + getUrl();
