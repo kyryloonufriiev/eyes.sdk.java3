@@ -322,9 +322,6 @@ public class VisualGridEyes implements IRenderingEyes {
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        if (throwException) {
-            throw new Error(exception);
-        }
         return closeFuturesSet;
     }
 
