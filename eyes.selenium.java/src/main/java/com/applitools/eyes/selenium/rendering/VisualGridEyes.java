@@ -447,13 +447,36 @@ public class VisualGridEyes implements IRenderingEyes {
         ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
 
         try {
+            FrameChain originalFC = webDriver.getFrameChain().clone();
+            EyesTargetLocator switchTo = ((EyesTargetLocator) webDriver.switchTo());
+            ISeleniumCheckTarget seleniumCheckTarget = (ISeleniumCheckTarget) checkSettings;
+
+            int switchedToCount = switchToFrame(seleniumCheckTarget);
+
+            ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
+            boolean isFullPage = true;
+            Boolean b;
+            if ((b = checkSettingsInternal.isStitchContent()) != null) {
+                isFullPage = b;
+            } else if ((b=getConfigGetter().isForceFullPageScreenshot()) != null) {
+                isFullPage = b;
+            }
+            if (switchedToCount > 0 && isFullPage) {
+                FrameChain frameChain = webDriver.getFrameChain().clone();
+                Frame frame = frameChain.pop();
+                checkSettings = ((SeleniumCheckSettings) checkSettings).region(frame.getReference());
+                seleniumCheckTarget = (ISeleniumCheckTarget) checkSettings;
+
+                checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
+                switchTo.parentFrame();
+            }
+
             isCheckTimerTimedout.set(false);
 
             List<VisualGridTask> openVisualGridTasks = addOpenTaskToAllRunningTest();
 
             List<VisualGridTask> visualGridTaskList = new ArrayList<>();
 
-            ICheckSettingsInternal checkSettingsInternal = updateCheckSettings(checkSettings);
 
             logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
 

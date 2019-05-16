@@ -2011,7 +2011,9 @@ public class SeleniumEyes extends EyesBase {
          * @return the force full page screenshot
          */
         public boolean getForceFullPageScreenshot() {
-            return SeleniumEyes.this.getConfigGetter().getForceFullPageScreenshot();
+            Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+            if(forceFullPageScreenshot == null ) return false;
+            return forceFullPageScreenshot;
         }
     }
 

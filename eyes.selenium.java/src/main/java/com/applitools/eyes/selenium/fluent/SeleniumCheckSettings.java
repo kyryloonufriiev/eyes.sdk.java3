@@ -117,6 +117,12 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return clone;
     }
 
+    public SeleniumCheckSettings region(WebElement element) {
+        SeleniumCheckSettings clone = this.clone();
+        clone.targetElement = element;
+        return clone;
+    }
+
     public SeleniumCheckSettings region(By by) {
         SeleniumCheckSettings clone = this.clone();
         clone.targetSelector = by;

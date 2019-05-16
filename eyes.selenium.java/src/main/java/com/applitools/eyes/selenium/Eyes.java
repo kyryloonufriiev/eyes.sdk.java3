@@ -1430,8 +1430,9 @@ public class Eyes implements ISeleniumConfigurationProvider {
      * @return Whether SeleniumEyes should force a full page screenshot.
      */
     public boolean getForceFullPageScreenshot() {
-
-        return configuration.getForceFullPageScreenshot();
+        Boolean forceFullPageScreenshot = configuration.getForceFullPageScreenshot();
+        if(forceFullPageScreenshot == null) return isVisualGridEyes;
+        return forceFullPageScreenshot;
     }
 
     /**
