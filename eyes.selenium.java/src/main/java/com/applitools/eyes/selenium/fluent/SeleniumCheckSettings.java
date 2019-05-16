@@ -321,7 +321,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     @Override
-    public SeleniumCheckSettings fully(boolean fully) {
+    public SeleniumCheckSettings fully(Boolean fully) {
         return (SeleniumCheckSettings) super.fully(fully);
     }
 
@@ -428,13 +428,13 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     @JsonProperty("sizeMode")
     public String getSizeMode() {
         ICheckSettingsInternal checkSettingsInternal = this;
-        boolean stitchContent = checkSettingsInternal.getStitchContent();
+        Boolean stitchContent = checkSettingsInternal.getStitchContent();
         if (region == null) {
             region  = checkSettingsInternal.getTargetRegion();
         }
         if (region == null && getVGTargetSelector() == null)
         {
-            return stitchContent ? FULL_PAGE : VIEWPORT;
+            return stitchContent == null || stitchContent ? FULL_PAGE : VIEWPORT;
         }
         else if (region != null)
         {

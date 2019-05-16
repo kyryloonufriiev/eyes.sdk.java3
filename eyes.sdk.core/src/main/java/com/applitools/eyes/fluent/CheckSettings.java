@@ -20,7 +20,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private Region targetRegion;
     private MatchLevel matchLevel = null;
     private Boolean ignoreCaret = null;
-    private Boolean stitchContent = false;
+    private Boolean stitchContent = null;
     private List<GetRegion> ignoreRegions = new ArrayList<>();
     private List<GetRegion> layoutRegions = new ArrayList<>();
     private List<GetRegion> strictRegions = new ArrayList<>();
@@ -29,7 +29,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private int timeout = -1;
     protected String name;
     protected boolean enablePatterns;
-    protected Boolean sendDom;
+    protected Boolean sendDom = Boolean.TRUE;
     protected Boolean useDom;
     protected Map<String, String> scriptHooks = new HashMap<>();
 
@@ -215,7 +215,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
      * {@inheritDoc}
      */
     @Override
-    public ICheckSettings fully(boolean fully) {
+    public ICheckSettings fully(Boolean fully) {
         CheckSettings clone = clone();
         clone.stitchContent = fully;
         return clone;

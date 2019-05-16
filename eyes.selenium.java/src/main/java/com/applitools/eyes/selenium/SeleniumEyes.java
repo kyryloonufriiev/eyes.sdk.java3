@@ -623,7 +623,7 @@ public class SeleniumEyes extends EyesBase {
 
         logger.verbose(String.format("check(\"%s\", checkSettings) - begin", name));
 
-        this.stitchContent = checkSettingsInternal.getStitchContent();
+        this.stitchContent = checkSettingsInternal.getStitchContent() == null ? false : checkSettingsInternal.getStitchContent();
         final Region targetRegion = checkSettingsInternal.getTargetRegion();
         this.scrollRootElement = this.getScrollRootElement(seleniumCheckTarget);
 
@@ -1672,63 +1672,66 @@ public class SeleniumEyes extends EyesBase {
             logger.verbose("Building screenshot object...");
             result = new EyesWebDriverScreenshot(logger, driver, entireFrameOrElement,
                     new RectangleSize(entireFrameOrElement.getWidth(), entireFrameOrElement.getHeight()));
-        } else if (getConfigGetter().getForceFullPageScreenshot() || stitchContent) {
-            logger.verbose("Full page screenshot requested.");
-
-            // Save the current frame path.
-            Location originalFramePosition =
-                    originalFrameChain.size() > 0
-                            ? originalFrameChain.getDefaultContentScrollPosition()
-                            : Location.ZERO;
-
-            switchTo.frames(this.originalFC);
-            algo = createFullPageCaptureAlgorithm(scaleProviderFactory);
-            ////////////
-            EyesRemoteWebElement eyesScrollRootElement;
-            if (scrollRootElement instanceof EyesRemoteWebElement) {
-                eyesScrollRootElement = (EyesRemoteWebElement) scrollRootElement;
-            } else {
-                eyesScrollRootElement = new EyesRemoteWebElement(logger, driver, scrollRootElement);
-            }
-            Point location = eyesScrollRootElement.getLocation();
-            SizeAndBorders sizeAndBorders = eyesScrollRootElement.getSizeAndBorders();
-
-            Region region = new Region(
-                    location.getX() + sizeAndBorders.getBorders().getLeft(),
-                    location.getY() + sizeAndBorders.getBorders().getTop(),
-                    sizeAndBorders.getSize().getWidth(),
-                    sizeAndBorders.getSize().getHeight());
-
-            markElementForLayoutRCA(null);
-
-            BufferedImage fullPageImage = algo.getStitchedRegion(region, null, positionProviderHandler.get());
-
-            switchTo.frames(originalFrameChain);
-
-            result = new EyesWebDriverScreenshot(logger, driver, fullPageImage, null, originalFramePosition);
         } else {
-            ensureElementVisible(this.targetElement);
+            boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot() != null ? getConfigGetter().getForceFullPageScreenshot() : false;
+            if (forceFullPageScreenshot || stitchContent) {
+                logger.verbose("Full page screenshot requested.");
 
-            logger.verbose("Screenshot requested...");
-            BufferedImage screenshotImage = imageProvider.getImage();
-            debugScreenshotsProvider.save(screenshotImage, "original");
+                // Save the current frame path.
+                Location originalFramePosition =
+                        originalFrameChain.size() > 0
+                                ? originalFrameChain.getDefaultContentScrollPosition()
+                                : Location.ZERO;
 
-            ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
-            if (scaleProvider.getScaleRatio() != 1.0) {
-                logger.verbose("scaling...");
-                screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
-                debugScreenshotsProvider.save(screenshotImage, "scaled");
+                switchTo.frames(this.originalFC);
+                algo = createFullPageCaptureAlgorithm(scaleProviderFactory);
+                ////////////
+                EyesRemoteWebElement eyesScrollRootElement;
+                if (scrollRootElement instanceof EyesRemoteWebElement) {
+                    eyesScrollRootElement = (EyesRemoteWebElement) scrollRootElement;
+                } else {
+                    eyesScrollRootElement = new EyesRemoteWebElement(logger, driver, scrollRootElement);
+                }
+                Point location = eyesScrollRootElement.getLocation();
+                SizeAndBorders sizeAndBorders = eyesScrollRootElement.getSizeAndBorders();
+
+                Region region = new Region(
+                        location.getX() + sizeAndBorders.getBorders().getLeft(),
+                        location.getY() + sizeAndBorders.getBorders().getTop(),
+                        sizeAndBorders.getSize().getWidth(),
+                        sizeAndBorders.getSize().getHeight());
+
+                markElementForLayoutRCA(null);
+
+                BufferedImage fullPageImage = algo.getStitchedRegion(region, null, positionProviderHandler.get());
+
+                switchTo.frames(originalFrameChain);
+
+                result = new EyesWebDriverScreenshot(logger, driver, fullPageImage, null, originalFramePosition);
+            } else {
+                ensureElementVisible(this.targetElement);
+
+                logger.verbose("Screenshot requested...");
+                BufferedImage screenshotImage = imageProvider.getImage();
+                debugScreenshotsProvider.save(screenshotImage, "original");
+
+                ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
+                if (scaleProvider.getScaleRatio() != 1.0) {
+                    logger.verbose("scaling...");
+                    screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
+                    debugScreenshotsProvider.save(screenshotImage, "scaled");
+                }
+
+                CutProvider cutProvider = cutProviderHandler.get();
+                if (!(cutProvider instanceof NullCutProvider)) {
+                    logger.verbose("cutting...");
+                    screenshotImage = cutProvider.cut(screenshotImage);
+                    debugScreenshotsProvider.save(screenshotImage, "cut");
+                }
+
+                logger.verbose("Creating screenshot object...");
+                result = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
             }
-
-            CutProvider cutProvider = cutProviderHandler.get();
-            if (!(cutProvider instanceof NullCutProvider)) {
-                logger.verbose("cutting...");
-                screenshotImage = cutProvider.cut(screenshotImage);
-                debugScreenshotsProvider.save(screenshotImage, "cut");
-            }
-
-            logger.verbose("Creating screenshot object...");
-            result = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
         }
 
         if (getConfigGetter().getHideCaret() && activeElement != null) {

@@ -77,6 +77,10 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings, List<Region> regions, List<VisualGridSelector[]> regionSelectors, Location location) {
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
+        if(checkSettingsInternal.getStitchContent() == null){
+            checkSettings.fully();
+        }
+
 
         MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfigGetter().getMatchTimeout(), this);
 

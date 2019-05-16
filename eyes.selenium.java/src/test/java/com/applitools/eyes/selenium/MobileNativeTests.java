@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class MobileNativeTests {
 
     private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private String appiumServerUrl = System.getenv("SELENIUM_SERVER_URL");
+    private String appiumServerUrl = "http://ondemand.saucelabs.com/wd/hub";
     private static BatchInfo batchInfo = new BatchInfo("Mobile Native Tests");
 
     private void setupLogging(Eyes eyes, DesiredCapabilities capabilities, String methodName) {

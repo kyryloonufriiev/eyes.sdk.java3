@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IConfigurationGetter extends com.applitools.eyes.config.IConfigurationGetter {
 
-    boolean getForceFullPageScreenshot();
+    Boolean getForceFullPageScreenshot();
 
     int getWaitBeforeScreenshots();
 
@@ -21,7 +21,7 @@ public interface IConfigurationGetter extends com.applitools.eyes.config.IConfig
 
     String getTestName();
 
-    boolean isForceFullPageScreenshot();
+    Boolean isForceFullPageScreenshot();
 
     boolean isRenderingConfig();
 

@@ -11,7 +11,7 @@ import java.util.List;
 public class Configuration extends com.applitools.eyes.config.Configuration implements IConfigurationGetter, IConfigurationSetter {
 
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
-    private boolean forceFullPageScreenshot;
+    private Boolean forceFullPageScreenshot;
     private int waitBeforeScreenshots = DEFAULT_WAIT_BEFORE_SCREENSHOTS;
     private StitchMode stitchMode = StitchMode.SCROLL;
     private boolean hideScrollbars = true;
@@ -69,7 +69,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     }
 
     @Override
-    public boolean getForceFullPageScreenshot() {
+    public Boolean getForceFullPageScreenshot() {
         return forceFullPageScreenshot;
     }
 
@@ -243,7 +243,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     }
 
     @Override
-    public boolean isForceFullPageScreenshot() {
+    public Boolean isForceFullPageScreenshot() {
         return forceFullPageScreenshot;
     }
 

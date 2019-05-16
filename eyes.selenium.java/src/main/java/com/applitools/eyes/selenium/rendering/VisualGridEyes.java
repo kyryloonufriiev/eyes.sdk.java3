@@ -24,7 +24,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -522,8 +521,7 @@ public class VisualGridEyes implements IRenderingEyes {
                         public void onRenderFailed(Exception e) {
                             GeneralUtils.logExceptionStackTrace(logger, e);
                         }
-                    }, regionsXPaths, this.configProvider.get().getForceFullPageScreenshot());
-
+                    }, regionsXPaths);
             logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
         } catch (IllegalArgumentException | EyesException | InterruptedException e) {
             Error error = new Error(e);

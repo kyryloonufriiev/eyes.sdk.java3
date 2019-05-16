@@ -50,7 +50,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private FrameData result = null;
     private AtomicInteger framesLevel = new AtomicInteger();
     private RGridDom dom = null;
-    private boolean forceFullPageScreenshot;
     private Timer timer = new Timer("VG_StopWatch", true);
     private AtomicBoolean isTimeElapsed = new AtomicBoolean(false);
 
@@ -66,7 +65,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     public RenderingTask(IEyesConnector eyesConnector, FrameData scriptResult, ICheckSettings checkSettings,
                          List<VisualGridTask> visualGridTaskList, List<VisualGridTask> openVisualGridTasks, VisualGridRunner renderingGridManager,
-                         IDebugResourceWriter debugResourceWriter, RenderTaskListener listener, List<VisualGridSelector[]> regionSelectors, boolean forceFullPageScreenshot) {
+                         IDebugResourceWriter debugResourceWriter, RenderTaskListener listener, List<VisualGridSelector[]> regionSelectors) {
 
         this.eyesConnector = eyesConnector;
         this.result = scriptResult;
@@ -79,7 +78,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         this.logger = renderingGridManager.getLogger();
         this.debugResourceWriter = debugResourceWriter;
         this.regionSelectors = regionSelectors;
-        this.forceFullPageScreenshot = forceFullPageScreenshot;
         this.listeners.add(listener);
         String renderingGridForcePut = System.getenv("APPLITOOLS_RENDERING_GRID_FORCE_PUT");
         this.isForcePutNeeded = new AtomicBoolean(renderingGridForcePut != null && renderingGridForcePut.equalsIgnoreCase("true"));
@@ -525,7 +523,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             String sizeMode = checkSettingsInternal.getSizeMode();
 
-            if (sizeMode.equalsIgnoreCase(VIEWPORT) && forceFullPageScreenshot) {
+            if (sizeMode.equalsIgnoreCase(VIEWPORT) && rcInternal.isStitchContent()) {
                 sizeMode = FULLPAGE;
             }
 

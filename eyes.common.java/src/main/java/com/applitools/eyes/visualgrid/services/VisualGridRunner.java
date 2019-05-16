@@ -221,7 +221,7 @@ public class VisualGridRunner extends EyesRunner {
                             nextTestToRender = getNextRenderingTask();
                             if (nextTestToRender == null) {
                                 renderingServiceLock.wait(500);
-//                                logger.log("Rendering service woke up");
+//                                logger.verbose("Rendering service woke up");
                                 nextTestToRender = getNextRenderingTask();
                             }
 
@@ -288,7 +288,7 @@ public class VisualGridRunner extends EyesRunner {
                 this.renderingTaskList.remove(renderingTask);
             }
         }
-//        logger.log("Starting to renderTask - " + renderingTask);
+//        logger.verbose("Starting to renderTask - " + renderingTask);
         return renderingTask;
     }
 
@@ -358,7 +358,7 @@ public class VisualGridRunner extends EyesRunner {
         }
         logger.verbose("releasing allEyes");
         eyes.setListener(eyesListener);
-        logger.log("concurrencyLock.notify()");
+        logger.verbose("concurrencyLock.notify()");
     }
 
     private void startServices() {
@@ -442,7 +442,7 @@ public class VisualGridRunner extends EyesRunner {
     public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, FrameData script,
                                    IEyesConnector connector, List<VisualGridTask> visualGridTaskList,
                                    List<VisualGridTask> openVisualGridTasks, final RenderListener listener,
-                                   List<VisualGridSelector[]> selectors, boolean forceFullPageScreenshot) {
+                                   List<VisualGridSelector[]> selectors) {
 
         if (debugResourceWriter == null) {
             debugResourceWriter = this.debugResourceWriter;
@@ -466,7 +466,7 @@ public class VisualGridRunner extends EyesRunner {
                 notifyAllServices();
                 listener.onRenderFailed(e);
             }
-        }, selectors, forceFullPageScreenshot);
+        }, selectors);
         logger.verbose("locking renderingTaskList");
         synchronized (renderingTaskList) {
             this.renderingTaskList.add(renderingTask);
@@ -486,7 +486,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     private void notifyRenderingService() {
-        logger.log("trying to notify rendering service");
+        logger.verbose("trying to notify rendering service");
         synchronized (renderingServiceLock) {
             renderingServiceLock.notify();
         }
@@ -494,7 +494,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     private void notifyCloserService() {
-        logger.log("trying to notify closer service");
+        logger.verbose("trying to notify closer service");
         synchronized (closerServiceLock) {
             closerServiceLock.notifyAll();
         }
@@ -502,7 +502,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     private void notifyOpenerService() {
-        logger.log("trying to notify opener service");
+        logger.verbose("trying to notify opener service");
         synchronized (openerServiceLock) {
             openerServiceLock.notifyAll();
             logger.verbose("openerLockFree");
@@ -510,7 +510,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     private void notifyCheckerService() {
-        logger.log("trying to notify checker service");
+        logger.verbose("trying to notify checker service");
         synchronized (checkerServiceLock) {
             checkerServiceLock.notifyAll();
             logger.verbose("checkerLockFree");
