@@ -448,6 +448,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.strictRegions.addAll(this.strictRegions);
         clone.floatingRegions.addAll(this.floatingRegions);
         clone.scriptHooks.putAll(this.scriptHooks);
+        clone.enablePatterns = (this.enablePatterns);
     }
 
     public void setStitchContent(boolean stitchContent) {

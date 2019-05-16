@@ -368,6 +368,7 @@ public class MatchWindowTask {
 
             collectSimpleRegions(checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
+            imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
         }
         return imageMatchSettings;
     }
