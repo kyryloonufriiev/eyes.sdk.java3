@@ -11,7 +11,7 @@
     </test>
     <test name="Test_VG" parallel="instances">
         <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGServerConfigs" />
+            <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />
             <class name="com.applitools.eyes.renderingGrid.TestTopSites" />
             <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook" />
         </classes>
