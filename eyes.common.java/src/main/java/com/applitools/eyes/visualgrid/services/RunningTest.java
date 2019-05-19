@@ -28,7 +28,19 @@ public class RunningTest {
     private AtomicBoolean isCloseTaskIssued = new AtomicBoolean(false);
     private VisualGridTask closeTask;
     private VisualGridTask openTask;
+    private String appName;
+    private String testName;
     private Throwable error;
+
+    public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
+        this.eyes = eyes;
+        this.browserInfo = browserInfo;
+        this.configurationProvider = configuration;
+        this.listener = listener;
+        this.logger = logger;
+        this.appName = configurationProvider.get().getAppName();
+        this.testName = configurationProvider.get().getTestName();
+    }
 
     public void abort() {
         removeAllCheckTasks();
@@ -101,13 +113,6 @@ public class RunningTest {
 
     };
 
-    public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
-        this.eyes = eyes;
-        this.browserInfo = browserInfo;
-        this.configurationProvider = configuration;
-        this.listener = listener;
-        this.logger = logger;
-    }
 
     public boolean isTestOpen() {
         return isTestOpen.get();
@@ -278,5 +283,21 @@ public class RunningTest {
 
     public boolean isOpenTaskIssued() {
         return openTask != null;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getTestName() {
+        return testName;
+    }
+
+    public void setTestName(String testName) {
+        this.testName = testName;
     }
 }

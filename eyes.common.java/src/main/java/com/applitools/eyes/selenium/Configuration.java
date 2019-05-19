@@ -31,14 +31,8 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
         this.hideScrollbars = other.getHideScrollbars();
         this.hideCaret = other.getHideCaret();
         this.isRenderingConfig = other.isRenderingConfig();
-        if (other.getBrowsersInfo() == null) {
-            ArrayList<RenderBrowserInfo> browsersInfo = new ArrayList<>();
-            RectangleSize viewportSize = other.getViewportSize();
-            browsersInfo.add(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, other.getBaselineEnvName()));
-            this.browsersInfo = browsersInfo;
-        } else {
-            this.browsersInfo.addAll(other.getBrowsersInfo());
-        }
+
+        this.browsersInfo.addAll(other.getBrowsersInfo());
     }
 
     public Configuration() {

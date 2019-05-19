@@ -3,6 +3,7 @@ package com.applitools.eyes.visualgrid.services;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.DiffsFoundException;
+import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
@@ -95,7 +96,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         //eyesConnector.setUserAgent(craftUserAgent(browserInfo));
                         eyesConnector.setDeviceSize(browserInfo.getViewportSize());
                     }
-                    eyesConnector.open(configurationGetter);
+                    eyesConnector.open(configurationGetter, runningTest.getAppName(), runningTest.getTestName());
                     logger.verbose("Eyes Open Done.");
                     break;
 

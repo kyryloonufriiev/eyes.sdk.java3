@@ -149,6 +149,12 @@ public class VisualGridEyes implements IRenderingEyes {
         logger.verbose("creating test descriptors for each browser info...");
         IConfigurationSetter configurationSetter = configProvider.set();
         configurationSetter.setViewportSize(viewportSize);
+
+        if (getConfigGetter().getBrowsersInfo() == null) {
+            RectangleSize viewportSize = getConfigGetter().getViewportSize();
+            configurationSetter.addBrowser(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, getConfigGetter().getBaselineEnvName()));
+        }
+
         for (RenderBrowserInfo browserInfo : browserInfoList) {
             logger.verbose("creating test descriptor");
             RunningTest test = new RunningTest(createVGEyesConnector(browserInfo), configProvider, browserInfo, logger, testListener);

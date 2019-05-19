@@ -22,7 +22,7 @@ public interface IEyesConnector {
 
     URI getServerUrl();
 
-    void open(IConfigurationGetter configProvider);
+    void open(IConfigurationGetter configProvider, String appName, String testName);
 
     TestResults close(boolean throwExceptionOn);
 

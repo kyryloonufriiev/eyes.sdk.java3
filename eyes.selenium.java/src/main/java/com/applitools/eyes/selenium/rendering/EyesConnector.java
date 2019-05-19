@@ -24,6 +24,8 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     private String device;
     private RectangleSize deviceSize;
     private IConfigurationGetter configurationGetter;
+    private String appName;
+    private String testName;
 
     public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, RenderBrowserInfo browserInfo) {
         this.configProvider = configProvider;
@@ -40,9 +42,13 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     /**
      * ﻿Starts a new test without setting the viewport size of the AUT.
      * @param config
+     * @param appName
+     * @param testName
      */
-    public void open(IConfigurationGetter config) {
+    public void open(IConfigurationGetter config, String appName, String testName) {
         this.configurationGetter = config;
+        this.appName = appName;
+        this.testName = testName;
         logger.verbose("opening EyesConnector with viewport size: " + browserInfo.getViewportSize());
         openBase();
     }
@@ -265,5 +271,15 @@ class EyesConnector extends EyesBase implements IEyesConnector {
             return baselineEnvName;
         }
         return getConfigGetter().getBaselineEnvName();
+    }
+
+    @Override
+    protected String getAppName() {
+        return this.appName;
+    }
+
+    @Override
+    protected String getTestName() {
+        return this.testName;
     }
 }

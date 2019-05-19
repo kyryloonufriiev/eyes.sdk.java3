@@ -965,7 +965,7 @@ public abstract class EyesBase {
         }
 
         // If there's no default application name, one must be provided for the current test.
-        if (this.getConfigGetter().getAppName() == null) {
+        if (getAppName() == null) {
             ArgumentGuard.notNull(appName, "appName");
             this.getConfigSetter().setAppName(appName );
         }
@@ -1302,9 +1302,9 @@ public abstract class EyesBase {
 
         logger.verbose("Application environment is " + appEnv);
 
-        String appName = configGetter.getAppName();
+        String appName = getAppName();
         sessionStartInfo = new SessionStartInfo(getFullAgentId(), configGetter.getSessionType(), appName ,
-                null, configGetter.getTestName(), configGetter.getBatch(), getBaselineEnvName(),
+                null, getTestName(), configGetter.getBatch(), getBaselineEnvName(),
                 configGetter.getEnvironmentName(), getAppEnvironment(), configGetter.getDefaultMatchSettings(),
                 configGetter.getBranchName(),
                 configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(), properties);
@@ -1314,7 +1314,7 @@ public abstract class EyesBase {
 
         logger.verbose("Server session ID is " + runningSession.getId());
 
-        String testInfo = "'" + configGetter.getTestName() + "' of '" + appName + "' " + appEnv;
+        String testInfo = "'" + getTestName() + "' of '" + appName + "' " + appEnv;
         if (runningSession.getIsNewSession()) {
             logger.log("--- New test started - " + testInfo);
             shouldMatchWindowRunOnceOnTimeout = true;
@@ -1322,6 +1322,14 @@ public abstract class EyesBase {
             logger.log("--- Test started - " + testInfo);
             shouldMatchWindowRunOnceOnTimeout = false;
         }
+    }
+
+    protected String getTestName() {
+        return getConfigGetter().getTestName();
+    }
+
+    protected String getAppName() {
+        return getConfigGetter().getAppName();
     }
 
     protected String getBaselineEnvName() {
