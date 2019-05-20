@@ -60,14 +60,13 @@ public class Eyes implements ISeleniumConfigurationProvider {
      * @param runner the runner
      */
     public Eyes(EyesRunner runner) {
-        ArgumentGuard.notNull(runner, "EyesRunner");
-        this.runner = runner;
-        if (runner instanceof VisualGridRunner) {
-            visualGridEyes = new VisualGridEyes((VisualGridRunner) runner, this);
+       this.runner = runner == null ? new SeleniumRunner() : runner;
+        if (this.runner instanceof VisualGridRunner) {
+            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
             isVisualGridEyes = true;
         } else {
             seleniumEyes = new SeleniumEyes(this);
-            ((SeleniumRunner) runner).addEyes(this);
+            ((SeleniumRunner) this.runner).addEyes(this);
         }
     }
 

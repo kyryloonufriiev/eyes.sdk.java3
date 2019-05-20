@@ -49,7 +49,7 @@ public class VisualGridEyes implements IRenderingEyes {
     private IDebugResourceWriter debugResourceWriter;
     private String url;
     private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
-    private Boolean isDisabled;
+    private Boolean isDisabled = Boolean.FALSE;
     private IServerConnector serverConnector = null;
     private ISeleniumConfigurationProvider configProvider;
     private RectangleSize viewportSize;
@@ -132,7 +132,7 @@ public class VisualGridEyes implements IRenderingEyes {
     public WebDriver open(WebDriver webDriver) {
         logger.verbose("enter");
 
-        if (getIsDisabled()) return webDriver;
+        if (!validateEyes()) return webDriver;
 
         ArgumentGuard.notNull(webDriver, "webDriver");
         ArgumentGuard.notNull(getConfigGetter().getTestName(), "testName");
@@ -257,16 +257,19 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
     public Collection<Future<TestResultContainer>> close(boolean throwException) {
-        if (getIsDisabled()) return null;
+        if (!validateEyes()) return new ArrayList<>();
         return closeAndReturnResults(throwException);
     }
 
     public Collection<Future<TestResultContainer>> close() {
-        if (getIsDisabled()) return null;
+        if (!validateEyes()) return new ArrayList<>();
         return closeAndReturnResults(true);
     }
 
     public void abortIfNotClosed() {
+        for (RunningTest runningTest : testList) {
+            runningTest.abortIfNotClosed();
+        }
     }
 
     public boolean getIsOpen() {
@@ -299,7 +302,8 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
     private Collection<Future<TestResultContainer>> closeAndReturnResults(boolean throwException) {
-        if (getIsDisabled()) return new HashSet<>();
+        if (!validateEyes()) return new ArrayList<>();
+
         if (this.closeFuturesSet == null) {
             closeFuturesSet = new HashSet<>();
         }
@@ -334,6 +338,7 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
     public Collection<Future<TestResultContainer>> closeAsync() {
+        if (!validateEyes()) return new ArrayList<>();
         List<Future<TestResultContainer>> futureList = null;
         try {
             futureList = new ArrayList<>();
@@ -426,17 +431,14 @@ public class VisualGridEyes implements IRenderingEyes {
 
 
     public void check(ICheckSettings... checkSettings) {
-        if (getIsDisabled()) {
-            logger.log(String.format("check(ICheckSettings[%d]): Ignored", checkSettings.length));
-            return;
-        }
+        if (!validateEyes()) return;
         for (ICheckSettings checkSetting : checkSettings) {
             this.check(checkSetting);
         }
     }
 
     public void check(String name, ICheckSettings checkSettings) {
-        if (getIsDisabled()) return;
+        if (!validateEyes()) return;
         ArgumentGuard.notNull(checkSettings, "checkSettings");
         trySetTargetSelector((SeleniumCheckSettings) checkSettings);
         if (name != null) {
@@ -448,7 +450,7 @@ public class VisualGridEyes implements IRenderingEyes {
     public void check(ICheckSettings checkSettings) {
         logger.verbose("enter");
 
-        if (getIsDisabled()) return;
+        if (!validateEyes()) return;
 
         ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
 
@@ -854,6 +856,22 @@ public class VisualGridEyes implements IRenderingEyes {
         for (RunningTest runningTest : testList) {
             runningTest.abort();
         }
+    }
+
+
+    private boolean validateEyes()
+    {
+        if (isDisabled)
+        {
+            logger.verbose("WARNING! Invalid Operation - Eyes Disabled!");
+            return false;
+        }
+        if (!renderingGridRunner.isServicesOn())
+        {
+            logger.verbose("WARNING! Invalid Operation - visualGridRunner.getAllTestResults already called!");
+            return false;
+        }
+        return true;
     }
 
 }

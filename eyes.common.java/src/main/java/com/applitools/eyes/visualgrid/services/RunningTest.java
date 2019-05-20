@@ -67,6 +67,10 @@ public class RunningTest {
         }
     }
 
+    public void abortIfNotClosed() {
+//        if(this.)
+    }
+
     public interface RunningTestListener {
 
         void onTaskComplete(VisualGridTask visualGridTask, RunningTest test);

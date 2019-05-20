@@ -44,6 +44,7 @@ public class VisualGridRunner extends EyesRunner {
     private static final String DEFAULT_API_KEY = System.getenv("APPLITOOLS_API_KEY");
     private String apiKey = DEFAULT_API_KEY;
     private boolean isDisabled;
+    private boolean isServicesOn = false;
 
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -67,6 +68,14 @@ public class VisualGridRunner extends EyesRunner {
 
     public boolean getIsDisabled() {
         return this.isDisabled;
+    }
+
+    public boolean isServicesOn() {
+        return isServicesOn;
+    }
+
+    private void setServicesOn(boolean servicesOn) {
+        isServicesOn = servicesOn;
     }
 
     public interface RenderListener {
@@ -247,6 +256,7 @@ public class VisualGridRunner extends EyesRunner {
                 return getNextCheckTask();
             }
         });
+
     }
 
     private FutureTask<TestResultContainer> getNextCheckTask() {
@@ -363,6 +373,7 @@ public class VisualGridRunner extends EyesRunner {
 
     private void startServices() {
         logger.verbose("enter");
+        setServicesOn(true);
         this.eyesOpenerService.start();
         this.eyesCloserService.start();
         this.renderingGridService.start();
@@ -373,6 +384,7 @@ public class VisualGridRunner extends EyesRunner {
 
     private void stopServices() {
         logger.verbose("enter");
+        setServicesOn(false);
         this.eyesOpenerService.stopService();
         this.eyesCloserService.stopService();
         this.renderingGridService.stopService();
