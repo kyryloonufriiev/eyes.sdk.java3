@@ -358,6 +358,11 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
+    public ICheckSettings sendDom() {
+        return sendDom(true);
+    }
+
+    @Override
     public Region getTargetRegion() {
         return this.targetRegion;
     }

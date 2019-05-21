@@ -162,6 +162,8 @@ public interface ICheckSettings {
 
     ICheckSettings sendDom(boolean sendDom);
 
+    ICheckSettings sendDom();
+
     ICheckSettings enablePatterns(boolean enablePatterns);
 
     ICheckSettings enablePatterns();
