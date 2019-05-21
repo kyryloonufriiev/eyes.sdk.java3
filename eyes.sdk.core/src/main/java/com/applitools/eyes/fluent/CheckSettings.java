@@ -339,7 +339,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public Boolean isUseDom() {
-        return useDom != null ? useDom : true;
+        return useDom != null ? useDom : false;
     }
 
     @Override
@@ -458,7 +458,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public boolean isEnablePatterns() {
-        return enablePatterns != null ? enablePatterns : true;
+        return enablePatterns != null ? enablePatterns : false;
     }
 
         @Override
