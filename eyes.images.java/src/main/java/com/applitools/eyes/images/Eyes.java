@@ -435,7 +435,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     @Override
     public IConfigurationSetter setTestName(String testName) {
 
-        return config;
+        return config.setTestName(testName);
     }
 
     /**
@@ -736,7 +736,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         if (hostApp == null || hostApp.isEmpty()) {
             this.config.setHostApp(null);
         } else {
-            this.setHostApp(hostApp.trim());
+            this.config.setHostApp(hostApp.trim());
         }
         return config;
     }
