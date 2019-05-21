@@ -447,7 +447,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
 
     @Override
     public String getTestName() {
-        return null;
+        return getConfigGetter().getTestName();
     }
 
     /**
