@@ -28,7 +28,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     private List<GetFloatingRegion> floatingRegions = new ArrayList<>();
     private int timeout = -1;
     protected String name;
-    protected boolean enablePatterns;
+    protected Boolean enablePatterns;
     protected Boolean sendDom = Boolean.TRUE;
     protected Boolean useDom;
     protected Map<String, String> scriptHooks = new HashMap<>();
@@ -334,12 +334,12 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public Boolean isSendDom() {
-        return sendDom;
+        return sendDom != null ? sendDom : true;
     }
 
     @Override
     public Boolean isUseDom() {
-        return useDom;
+        return useDom != null ? useDom : true;
     }
 
     @Override
@@ -458,7 +458,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public boolean isEnablePatterns() {
-        return enablePatterns;
+        return enablePatterns != null ? enablePatterns : true;
     }
 
         @Override
