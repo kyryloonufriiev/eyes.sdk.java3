@@ -714,7 +714,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         if (hostOS == null || hostOS.isEmpty()) {
             this.config.setHostOS(null);
         } else {
-            this.setHostOS(hostOS.trim());
+            config.setHostOS(hostOS.trim());
         }
         return config;
     }
