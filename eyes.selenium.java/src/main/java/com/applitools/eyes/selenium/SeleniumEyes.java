@@ -1711,6 +1711,11 @@ public class SeleniumEyes extends EyesBase {
             } else {
                 ensureElementVisible(this.targetElement);
 
+                try {
+                    Thread.sleep(getConfigGetter().getWaitBeforeScreenshots());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 logger.verbose("Screenshot requested...");
                 BufferedImage screenshotImage = imageProvider.getImage();
                 debugScreenshotsProvider.save(screenshotImage, "original");
