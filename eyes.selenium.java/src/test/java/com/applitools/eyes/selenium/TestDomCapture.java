@@ -29,7 +29,7 @@ public final class TestDomCapture {
 //        try {
 
         eyes.open(driver, "DOM Capture with config Test", "DOM Capture V2 - usa today",
-                new RectangleSize(800, 600));
+                new RectangleSize(1200, 800));
 
         // Navigate the browser to the "hello world!" web-site.
 //        driver.get("https://www.usatoday.com");
@@ -41,6 +41,8 @@ public final class TestDomCapture {
 //        eyes.checkElement(element, "Test DOM diffs");
 
         eyes.check(Target.window().fully());
+
+        eyes.check(Target.frame("iframe").fully());
 
         driver.quit();
         eyes.close(true);
