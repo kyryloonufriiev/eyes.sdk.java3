@@ -13,6 +13,7 @@ import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 import com.applitools.eyes.visualgrid.model.TestResultSummary;
 import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
