@@ -8,7 +8,7 @@ import com.applitools.eyes.EyesRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SeleniumRunner extends EyesRunner {
+public class ClassicRunner extends EyesRunner {
 
     public Eyes eyes;
     private TestResults testResult;

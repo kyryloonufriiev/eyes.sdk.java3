@@ -6,7 +6,6 @@ import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.SeleniumRunner;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.visualgrid.model.ChromeEmulationInfo;
 import com.applitools.eyes.visualgrid.model.DeviceName;
