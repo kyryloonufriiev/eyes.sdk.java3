@@ -369,7 +369,8 @@ public class SeleniumEyes extends EyesBase {
             return;
         }
 
-        boolean originalForceFPS = getConfigGetter().getForceFullPageScreenshot();
+        Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+        boolean originalForceFPS = forceFullPageScreenshot == null ? false : forceFullPageScreenshot ;
 
         if (checkSettings.length > 1) {
             getConfigSetter().setForceFullPageScreenshot(true);
@@ -2037,7 +2038,7 @@ public class SeleniumEyes extends EyesBase {
     }
 
     @Override
-    public boolean isSendDom() {
+    public Boolean isSendDom() {
         return !EyesSeleniumUtils.isMobileDevice(driver) && super.isSendDom();
     }
 

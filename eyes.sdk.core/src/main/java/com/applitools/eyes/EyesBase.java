@@ -1449,7 +1449,7 @@ public abstract class EyesBase {
 
     protected abstract String getAUTSessionId();
 
-    public boolean isSendDom() {
+    public Boolean isSendDom() {
         return getConfigGetter().isSendDom();
     }
 
