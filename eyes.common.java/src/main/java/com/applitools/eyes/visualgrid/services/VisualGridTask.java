@@ -1,6 +1,7 @@
 package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
+import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.selenium.Configuration;
@@ -31,12 +32,13 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
     private RenderStatusResults renderResult;
     private List<TaskListener> listeners = new ArrayList<>();
-    private ICheckSettings checkSettings;
+    private ICheckSettingsInternal checkSettings;
 
     private RunningTest runningTest;
     private Throwable exception;
     private RenderingTask renderingTask = null;
     private AtomicBoolean isTaskComplete = new AtomicBoolean(false);
+
     private final List<VisualGridSelector[]> regionSelectors;
 
     interface TaskListener {
@@ -58,7 +60,10 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         this.regionSelectors = regionSelectors;
         this.listeners.add(runningTestListener);
         this.logger = runningTest.getLogger();
-        this.checkSettings = checkSettings;
+        if (checkSettings != null) {
+            this.checkSettings = (ICheckSettingsInternal) checkSettings;
+            this.checkSettings = this.checkSettings.clone();
+        }
         this.runningTest = runningTest;
     }
 
@@ -118,7 +123,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         }
                     }
 
-                    eyesConnector.matchWindow(imageLocation, domLocation, checkSettings, regions, this.regionSelectors, location);
+                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions, this.regionSelectors, location);
                     logger.verbose("match done");
                     break;
 

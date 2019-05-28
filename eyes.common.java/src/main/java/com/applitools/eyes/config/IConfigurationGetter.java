@@ -45,7 +45,7 @@ public interface IConfigurationGetter {
 
     FailureReports getFailureReports();
 
-    boolean isSendDom();
+    Boolean isSendDom();
 
     boolean getIgnoreCaret();
 

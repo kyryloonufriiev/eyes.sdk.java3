@@ -763,10 +763,8 @@ public abstract class EyesBase {
 
     protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal){
         String domUrl = null;
-        Boolean sendDom = checkSettingsInternal.isSendDom();
-        if ((sendDom != null && sendDom) || (sendDom == null && getConfigGetter().isSendDom()) )
-        {
-            try
+        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfigGetter())){
+        try
             {
                 String domJson = tryCaptureDom();
                 domUrl = tryPostDomSnapshot(domJson);

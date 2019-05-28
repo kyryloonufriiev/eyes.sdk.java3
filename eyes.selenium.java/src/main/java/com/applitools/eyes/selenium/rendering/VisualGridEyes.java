@@ -520,6 +520,8 @@ public class VisualGridEyes implements IRenderingEyes {
 
             List<RunningTest> filtteredTests = new ArrayList<>();
 
+           checkSettingsInternal = updateCheckSettings(checkSettings);
+
             for (final RunningTest test : testList) {
                 VisualGridTask.TaskType taskType = null;
                 List<VisualGridTask> taskList = test.getVisualGridTaskList();
@@ -572,16 +574,18 @@ public class VisualGridEyes implements IRenderingEyes {
         Boolean fully = checkSettingsInternal.isStitchContent();
         Boolean sendDom = checkSettingsInternal.isSendDom();
 
+        Boolean b;
+
         if (matchLevel == null) {
             checkSettings = checkSettings.matchLevel(getConfigGetter().getMatchLevel());
         }
 
         if (fully == null) {
-            checkSettings = checkSettings.fully(getConfigGetter().isForceFullPageScreenshot());
+            checkSettings = checkSettings.fully((b = getConfigGetter().isForceFullPageScreenshot()) == null ? false : b);
         }
 
         if (sendDom == null) {
-            checkSettings = checkSettings.sendDom(getConfigGetter().isSendDom());
+            checkSettings = checkSettings.sendDom((b = getConfigGetter().isSendDom()) == null ? true : b);
         }
 
         return (ICheckSettingsInternal) checkSettings;

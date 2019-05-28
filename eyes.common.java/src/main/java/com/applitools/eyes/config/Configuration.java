@@ -26,7 +26,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     // Used for automatic save of a test run.
     private boolean saveNewTests, saveFailedTests;
     private int stitchOverlap = 50;
-    private boolean isSendDom = true;
+    private Boolean isSendDom = true;
     private String apiKey = null;
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
@@ -323,7 +323,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public boolean isSendDom() {
+    public Boolean isSendDom() {
         return isSendDom;
     }
 

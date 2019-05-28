@@ -508,7 +508,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         //Create RG requests
         List<RenderRequest> allRequestsForRG = new ArrayList<>();
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) this.checkSettings;
-        ICheckSettingsInternal rcInternal = checkSettingsInternal;
 
 
         List<VisualGridSelector> regionSelectorsList = new ArrayList<>();
@@ -523,16 +522,16 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             String sizeMode = checkSettingsInternal.getSizeMode();
 
-            if (sizeMode.equalsIgnoreCase(VIEWPORT) && rcInternal.isStitchContent()) {
+            if (sizeMode.equalsIgnoreCase(VIEWPORT) && checkSettingsInternal.isStitchContent()) {
                 sizeMode = FULLPAGE;
             }
 
             RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(),
-                    sizeMode, rcInternal.getRegion(), rcInternal.getVGTargetSelector(), browserInfo.getEmulationInfo());
+                    sizeMode, checkSettingsInternal.getRegion(), checkSettingsInternal.getVGTargetSelector(), browserInfo.getEmulationInfo());
 
             RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl().toString(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),
-                    rcInternal.getScriptHooks(), regionSelectorsList, rcInternal.isSendDom(), visualGridTask);
+                    checkSettingsInternal.getScriptHooks(), regionSelectorsList, checkSettingsInternal.isSendDom(), visualGridTask);
 
             allRequestsForRG.add(request);
         }
