@@ -28,4 +28,6 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
     Boolean isUseDom();
 
     Boolean isSendDom();
+
+    Boolean isIgnoreDisplacements();
 }

@@ -1,10 +1,9 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.ProxySettings;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.visualgrid.services.EyesRunner;
+import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;

@@ -1,15 +1,18 @@
 package com.applitools.eyes.renderingGrid;
 
+import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.SeleniumRunner;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.visualgrid.model.ChromeEmulationInfo;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 import com.applitools.eyes.visualgrid.model.TestResultSummary;
-import com.applitools.eyes.visualgrid.services.VisualGridRunner;
+import com.applitools.eyes.EyesRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -22,7 +25,7 @@ class TestVGDemo
         testVGDemo.run();
     }
 
-    private VisualGridRunner runner;
+    private EyesRunner runner;
     private Eyes eyes;
     private WebDriver webDriver;
 
@@ -76,6 +79,8 @@ class TestVGDemo
 
         // Set the configuration object to eyes
         eyes.setConfiguration(conf);
+
+        eyes.setMatchLevel(MatchLevel.LAYOUT);
     }
 
     private void TestLoginPage()
@@ -84,22 +89,24 @@ class TestVGDemo
         eyes.open(webDriver);
 
         // check the login page
-        eyes.check(Target.window().fully().withName("Login page"));
+        eyes.check(Target.window().fully().withName("Login page").content());
 
-        eyes.closeAsync();
+//        eyes.closeAsync();
     }
 
     private void TestDashboardPage()
     {
         // Call Open on eyes to initialize a test session
-        eyes.open(webDriver);
+//        eyes.open(webDriver);
 
         webDriver.findElement(By.id("log-in")).click();
 
         // Check the app page
-        eyes.check(Target.window().fully().withName("Dashboard page"));
+        eyes.check(Target.window().fully());
 
-        eyes.closeAsync();
+        TestResults close = eyes.close();
+
+        System.out.println(close);
     }
 
     private void ValidateResults()

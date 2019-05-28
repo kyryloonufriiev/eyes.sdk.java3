@@ -6,12 +6,11 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.services.EyesRunner;
+import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
@@ -33,7 +32,6 @@ public class TestTopSites {
         FileLogger logHandler = new FileLogger("eyes.log", false, true);
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");
-        visualGridRunner.setServerUrl("https://eyes.applitools.com/");
     }
 
     @DataProvider(name = "dp", parallel = true)

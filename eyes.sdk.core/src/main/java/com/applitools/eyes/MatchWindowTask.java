@@ -370,6 +370,7 @@ public class MatchWindowTask {
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
             imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements());
         }
         return imageMatchSettings;
     }
@@ -389,6 +390,7 @@ public class MatchWindowTask {
             imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
             imageMatchSettings.setUseDom(checkSettingsInternal.isSendDom());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements());
         }
         return imageMatchSettings;
     }

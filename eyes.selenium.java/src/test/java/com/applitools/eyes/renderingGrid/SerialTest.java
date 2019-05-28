@@ -5,23 +5,12 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.visualgrid.model.TestResultContainer;
 import com.applitools.eyes.visualgrid.model.TestResultSummary;
-import com.applitools.eyes.visualgrid.services.EyesRunner;
+import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.*;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Future;
 
 public class SerialTest {
 
@@ -30,7 +19,6 @@ public class SerialTest {
         EyesRunner visualGridRunner = new VisualGridRunner(10);
         visualGridRunner.setLogHandler(new StdoutLogHandler(true));
         visualGridRunner.getLogger().log("enter");
-        visualGridRunner.setServerUrl("https://eyes.applitools.com/");
         String testedUrl = "https://github.com/";
         Eyes eyes = new Eyes(visualGridRunner);
         BatchInfo batchInfo = new BatchInfo("Github in VG");

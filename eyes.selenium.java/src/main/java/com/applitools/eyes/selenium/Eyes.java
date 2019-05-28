@@ -15,7 +15,7 @@ import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.model.TestResultContainer;
-import com.applitools.eyes.visualgrid.services.EyesRunner;
+import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
@@ -23,14 +23,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * The type Eyes.

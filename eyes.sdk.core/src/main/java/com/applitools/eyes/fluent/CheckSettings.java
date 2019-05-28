@@ -32,6 +32,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     protected Boolean sendDom = null;
     protected Boolean useDom;
     protected Map<String, String> scriptHooks = new HashMap<>();
+    private Boolean ignoreDisplacements;
 
     protected CheckSettings() { }
 
@@ -338,8 +339,13 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
+    public Boolean isIgnoreDisplacements() {
+        return ignoreDisplacements != null ? ignoreDisplacements : Boolean.FALSE;
+    }
+
+    @Override
     public Boolean isUseDom() {
-        return useDom != null ? useDom : false;
+        return useDom != null ? useDom : Boolean.FALSE;
     }
 
     @Override
@@ -454,6 +460,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.floatingRegions.addAll(this.floatingRegions);
         clone.scriptHooks.putAll(this.scriptHooks);
         clone.enablePatterns = (this.enablePatterns);
+        clone.ignoreDisplacements = (this.ignoreDisplacements);
         clone.useDom = (this.useDom);
     }
 
@@ -489,5 +496,17 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         ICheckSettings clone = this.clone();
         ((CheckSettings) clone).scriptHooks.put(BEFORE_CAPTURE_SCREENSHOT, hook);
         return clone;
+    }
+
+    @Override
+    public ICheckSettings ignoreDisplacements(boolean ignoreDisplacements) {
+        ICheckSettings clone = this.clone();
+        ((CheckSettings) clone).ignoreDisplacements = ignoreDisplacements;
+        return clone;
+    }
+
+    @Override
+    public ICheckSettings ignoreDisplacements() {
+        return this.ignoreDisplacements(true);
     }
 }

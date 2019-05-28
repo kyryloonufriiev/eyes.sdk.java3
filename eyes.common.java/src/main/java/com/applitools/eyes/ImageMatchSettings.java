@@ -17,6 +17,7 @@ public class ImageMatchSettings {
     private FloatingMatchSettings floatingMatchSettings[];
     private boolean useDom;
     public boolean enablePatterns;
+    public boolean ignoreDisplacements;
 
     public ImageMatchSettings(MatchLevel matchLevel, ExactMatchSettings exact, boolean useDom) {
         this.matchLevel = matchLevel;
@@ -194,5 +195,13 @@ public class ImageMatchSettings {
 
     public void setEnablePatterns(boolean enablePatterns) {
         this.enablePatterns = enablePatterns;
+    }
+
+    public void setIgnoreDisplacements(boolean ignoreDisplacements) {
+        this.ignoreDisplacements = ignoreDisplacements;
+    }
+
+    public boolean isIgnoreDisplacements() {
+        return ignoreDisplacements;
     }
 }

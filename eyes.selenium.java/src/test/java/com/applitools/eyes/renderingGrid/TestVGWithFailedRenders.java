@@ -8,7 +8,7 @@ import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 import com.applitools.eyes.visualgrid.model.TestResultSummary;
-import com.applitools.eyes.visualgrid.services.EyesRunner;
+import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
@@ -35,7 +35,6 @@ public class TestVGWithFailedRenders {
         FileLogger logHandler = new FileLogger("eyes.log", false, true);
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");
-        visualGridRunner.setServerUrl("https://eyes.applitools.com/");
     }
 
     @DataProvider(name = "dp", parallel = true)

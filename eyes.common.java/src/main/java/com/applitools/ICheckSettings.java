@@ -169,4 +169,8 @@ public interface ICheckSettings {
     ICheckSettings enablePatterns();
 
     ICheckSettings scriptHook(String scriptHook);
+
+    ICheckSettings ignoreDisplacements(boolean ignoreDisplacements);
+
+    ICheckSettings ignoreDisplacements();
 }
