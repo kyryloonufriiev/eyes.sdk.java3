@@ -90,6 +90,7 @@ public class SeleniumEyes extends EyesBase {
     private String cachedAUTSessionId;
     private ISeleniumConfigurationProvider configurationProvider;
     private boolean stitchContent;
+    private ClassicRunner runner;
 
     /**
      * Should stitch content boolean.
@@ -117,7 +118,7 @@ public class SeleniumEyes extends EyesBase {
      * Creates a new SeleniumEyes instance that interacts with the SeleniumEyes cloud
      * service.
      */
-    public SeleniumEyes(ISeleniumConfigurationProvider configurationProvider) {
+    public SeleniumEyes(ISeleniumConfigurationProvider configurationProvider, ClassicRunner runner) {
         super();
         this.configurationProvider = configurationProvider;
         checkFrameOrElement = false;
@@ -125,6 +126,7 @@ public class SeleniumEyes extends EyesBase {
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
+        this.runner = runner;
     }
 
     @Override
@@ -1907,6 +1909,9 @@ public class SeleniumEyes extends EyesBase {
     @Override
     public TestResults close(boolean throwEx) {
         TestResults results = super.close(throwEx);
+        if (runner != null) {
+            this.runner.aggregateResult(results);
+        }
         this.cachedAUTSessionId = null;
         return results;
     }

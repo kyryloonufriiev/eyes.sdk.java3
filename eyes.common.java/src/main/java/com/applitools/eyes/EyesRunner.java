@@ -7,7 +7,6 @@ import com.applitools.eyes.visualgrid.model.TestResultSummary;
 public abstract class EyesRunner {
 
     protected Logger logger = new Logger();
-    private String serverUrl;
 
     public abstract TestResultSummary getAllTestResults();
 
@@ -23,4 +22,5 @@ public abstract class EyesRunner {
     public Logger getLogger(){
       return this.logger;
     }
+
 }

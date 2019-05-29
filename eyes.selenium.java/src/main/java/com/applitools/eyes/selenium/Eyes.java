@@ -46,7 +46,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
      * Instantiates a new Eyes.
      */
     public Eyes() {
-        seleniumEyes = new SeleniumEyes(this);
+        seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
     }
 
     /**
@@ -60,8 +60,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
             visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
             isVisualGridEyes = true;
         } else {
-            seleniumEyes = new SeleniumEyes(this);
-            ((ClassicRunner) this.runner).addEyes(this);
+            seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
         }
     }
 
@@ -534,10 +533,6 @@ public class Eyes implements ISeleniumConfigurationProvider {
             }
         } else {
             TestResults close = seleniumEyes.close(shouldThrowException);
-            if (runner != null) {
-                ClassicRunner seleniumRunner = (ClassicRunner) runner;
-                return seleniumRunner.setTestResults(close);
-            }
             return close;
         }
         return null;

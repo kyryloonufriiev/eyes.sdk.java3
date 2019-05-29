@@ -10,27 +10,23 @@ import java.util.List;
 
 public class ClassicRunner extends EyesRunner {
 
-    public Eyes eyes;
-    private TestResults testResult;
-
-    void addEyes(Eyes eyes){
-        this.eyes = eyes;
-    }
-
-    TestResults setTestResults(TestResults result){
-        this.testResult = result;
-        return result;
-    }
+    private List<TestResults> allTestResult = new ArrayList<>();
 
     @Override
     public TestResultSummary getAllTestResults(){
-        List<TestResultContainer> result = new ArrayList<>();
-        result.add(new TestResultContainer(this.testResult, null, null));
-        return new TestResultSummary(result);
+        return getAllTestResults(false);
     }
 
     @Override
     public TestResultSummary getAllTestResults(boolean shouldThrowException) {
-        return null;
+        List<TestResultContainer> result = new ArrayList<>();
+        for (TestResults testResults : allTestResult) {
+            result.add(new TestResultContainer(testResults, null, null));
+        }
+        return new TestResultSummary(result);
+    }
+
+    void aggregateResult(TestResults testResult){
+        this.allTestResult.add(testResult);
     }
 }
