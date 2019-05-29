@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 public class ImageMatchSettings {
     private MatchLevel matchLevel;
     private ExactMatchSettings exact;
-    private Boolean ignoreCaret;
+    private boolean ignoreCaret;
     private Region ignoreRegions[];
     private Region layoutRegions[];
     private Region strictRegions[];
@@ -22,7 +22,7 @@ public class ImageMatchSettings {
     public ImageMatchSettings(MatchLevel matchLevel, ExactMatchSettings exact, boolean useDom) {
         this.matchLevel = matchLevel;
         this.exact = exact;
-        this.ignoreCaret = null;
+        this.ignoreCaret = false;
         this.useDom = useDom;
     }
 
