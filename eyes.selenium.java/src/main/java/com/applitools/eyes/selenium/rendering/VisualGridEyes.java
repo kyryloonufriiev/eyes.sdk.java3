@@ -742,7 +742,7 @@ public class VisualGridEyes implements IRenderingEyes {
     @SuppressWarnings("WeakerAccess")
     public String getBaseAgentId() {
         //noinspection SpellCheckingInspection
-        return "eyes.selenium.visualgrid.java/3.152.5";
+        return "eyes.selenium.visualgrid.java/3.152.6";
     }
 
     /**
