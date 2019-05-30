@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 public final class TestClassicRunner {
     @Test
-    public void test(){
+    public void test() {
 
         // Open a Chrome browser.
         WebDriver driver = new ChromeDriver();
@@ -20,6 +20,7 @@ public final class TestClassicRunner {
         // Initialize the VisualGridEyes SDK and set your private API key.
         ClassicRunner runner = new ClassicRunner();
         Eyes eyes = new Eyes(runner);
+        Eyes eyes2 = new Eyes(runner);
 
         eyes.setLogHandler(new StdoutLogHandler(true));
         eyes.setServerUrl("https://eyes.applitools.com/");
@@ -27,12 +28,14 @@ public final class TestClassicRunner {
 
         // Switch sendDom flag on
         eyes.setSendDom(true);
+        eyes2.setSendDom(false);
+        eyes2.setStitchMode(StitchMode.CSS);
         eyes.setStitchMode(StitchMode.CSS);
         BatchInfo batchInfo = new BatchInfo("TTS - config batch");
         batchInfo.setId("RCA_Batch_ID");
         eyes.setBatch(batchInfo);
+        eyes2.setBatch(batchInfo);
 //        try {
-
 
 
         // Navigate the browser to the "hello world!" web-site.
@@ -40,10 +43,12 @@ public final class TestClassicRunner {
 
         eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
                 new RectangleSize(1200, 800));
+        eyes2.open(driver, "Applitools Eyes Java SDK", "Classic Runner 2 Test",
+                new RectangleSize(1200, 800));
 
 
         eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
-
+        eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
 
 
         eyes.close(true);
@@ -54,11 +59,12 @@ public final class TestClassicRunner {
         eyes.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
 
         eyes.close(true);
+        eyes2.close(true);
 
         driver.quit();
 
         TestResultSummary allTestResults = runner.getAllTestResults();
-        if (allTestResults.getAllResults().length != 2){
+        if (allTestResults.getAllResults().length != 3) {
             throw new Error();
         }
     }
