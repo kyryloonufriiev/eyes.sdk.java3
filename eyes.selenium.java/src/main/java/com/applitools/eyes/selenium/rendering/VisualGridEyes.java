@@ -523,14 +523,13 @@ public class VisualGridEyes implements IRenderingEyes {
            checkSettingsInternal = updateCheckSettings(checkSettings);
 
             for (final RunningTest test : testList) {
-                VisualGridTask.TaskType taskType = null;
                 List<VisualGridTask> taskList = test.getVisualGridTaskList();
                 if (!taskList.isEmpty()) {
                     VisualGridTask visualGridTask = taskList.get(taskList.size() - 1);
-                    taskType = visualGridTask.getType();
-                }
-                if (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT) {
-                    filtteredTests.add(test);
+                    VisualGridTask.TaskType taskType = visualGridTask.getType();
+                    if (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT) {
+                        filtteredTests.add(test);
+                    }
                 }
 
             }
