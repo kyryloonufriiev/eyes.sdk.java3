@@ -32,7 +32,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     protected Boolean sendDom = null;
     protected Boolean useDom;
     protected Map<String, String> scriptHooks = new HashMap<>();
-    private Boolean ignoreDisplacements;
+    protected Boolean ignoreDisplacements;
 
     protected CheckSettings() { }
 
