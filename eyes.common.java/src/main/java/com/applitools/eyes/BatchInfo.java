@@ -18,6 +18,7 @@ public class BatchInfo {
 
     private static final String BATCH_TIMEZONE = "UTC";
     private String id;
+    private String batchSequenceName;
     private final String name;
     private final String startedAt;
 
@@ -30,8 +31,10 @@ public class BatchInfo {
     public BatchInfo(String name, Calendar startedAt) {
         ArgumentGuard.notNull(startedAt, "startedAt");
         String envVarBatchId = System.getenv("APPLITOOLS_BATCH_ID");
+        String envSequenceName = System.getenv("APPLITOOLS_BATCH_SEQUENCE");
         this.id = envVarBatchId != null ? envVarBatchId : UUID.randomUUID().toString();
         this.name = name != null ? name : System.getenv("APPLITOOLS_BATCH_NAME");
+        this.batchSequenceName = envSequenceName;
         this.startedAt = GeneralUtils.toISO8601DateTime(startedAt);
     }
 
@@ -99,5 +102,13 @@ public class BatchInfo {
     @Override
     public String toString() {
         return "'" + name + "' - " + startedAt;
+    }
+
+    public String getBatchSequenceName() {
+        return batchSequenceName;
+    }
+
+    public void setBatchSequenceName(String sequenceName) {
+        this.batchSequenceName = sequenceName;
     }
 }
