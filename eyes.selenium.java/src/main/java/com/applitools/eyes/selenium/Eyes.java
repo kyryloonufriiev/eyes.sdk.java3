@@ -2183,12 +2183,16 @@ public class Eyes implements ISeleniumConfigurationProvider {
         if (serverUrl != null) {
             this.setServerUrl(serverUrl.toString());
         }
+        AbstractProxySettings proxy = configuration.getProxy();
+        if (proxy != null) {
+            this.setProxy(proxy);
+        }
         this.configuration = new Configuration(configuration);
 
     }
 
     public void closeAsync() {
-        if(isVisualGridEyes){
+        if (isVisualGridEyes) {
             visualGridEyes.closeAsync();
         } else {
             seleniumEyes.close(false);
