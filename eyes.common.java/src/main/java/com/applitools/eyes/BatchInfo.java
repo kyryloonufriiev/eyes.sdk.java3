@@ -21,7 +21,7 @@ public class BatchInfo {
     private String id;
     private String sequenceName;
     private final String name;
-    private final String startedAt;
+    private String startedAt;
 
     /**
      * Creates a new BatchInfo instance.
@@ -98,6 +98,10 @@ public class BatchInfo {
         } catch (ParseException ex) {
             throw new EyesException("Failed to parse batch start time", ex);
         }
+    }
+
+    public void setStartedAt(String startedAt) {
+        this.startedAt = startedAt;
     }
 
     @Override
