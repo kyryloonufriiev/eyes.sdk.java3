@@ -22,10 +22,10 @@ public class BatchSequenceName {
             configuration.setApiKey("ACrb4NqtyPFtin75ambUgsJ67UV3twmQpfiBoq1050AIU110");
             eyes.setConfiguration(configuration);
             eyes.setBatch(batch);
-            String batchSequenceName = eyes.getBatch().getBatchSequenceName();
+            String batchSequenceName = eyes.getBatch().getSequenceName();
             if(batch == null) throw new Error();
             WebDriver driver = new ChromeDriver();
-            batch.setBatchSequenceName("new batch sequence");
+            batch.setSequenceName("new batch sequence");
             eyes.open(driver, "Java Eyes SDK", "BatchSequnceName Batch");
             driver.get("http://applitools.github.io/demo/TestPages/VisualGridTestPage/index.html");
 

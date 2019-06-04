@@ -55,7 +55,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
      * @param runner the runner
      */
     public Eyes(EyesRunner runner) {
-       this.runner = runner == null ? new ClassicRunner() : runner;
+        this.runner = runner == null ? new ClassicRunner() : runner;
         if (this.runner instanceof VisualGridRunner) {
             visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
             isVisualGridEyes = true;
@@ -523,8 +523,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
                     } else {
                         return errorResult.getTestResults();
                     }
-                }
-                else{ // returning the first result
+                } else { // returning the first result
                     if (firstResult != null) {
                         return firstResult.getTestResults();
                     }
@@ -572,8 +571,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
     public void addProperty(String name, String value) {
         if (!isVisualGridEyes) {
             this.seleniumEyes.addProperty(name, value);
-        }
-        else{
+        } else {
             this.visualGridEyes.addProperty(name, value);
         }
     }
@@ -584,8 +582,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
     public void clearProperties() {
         if (!isVisualGridEyes) {
             this.seleniumEyes.clearProperties();
-        }
-        else{
+        } else {
             this.visualGridEyes.clearProperties();
         }
     }
@@ -992,7 +989,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
      *                      region.
      */
     public void checkRegionInFrame(int frameIndex, By selector, String tag, boolean stitchContent) {
-        checkRegionInFrame(frameIndex, selector, USE_DEFAULT_MATCH_TIMEOUT,tag, stitchContent);
+        checkRegionInFrame(frameIndex, selector, USE_DEFAULT_MATCH_TIMEOUT, tag, stitchContent);
     }
 
     /**
@@ -1420,7 +1417,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
      */
     public boolean getForceFullPageScreenshot() {
         Boolean forceFullPageScreenshot = configuration.getForceFullPageScreenshot();
-        if(forceFullPageScreenshot == null) return isVisualGridEyes;
+        if (forceFullPageScreenshot == null) return isVisualGridEyes;
         return forceFullPageScreenshot;
     }
 

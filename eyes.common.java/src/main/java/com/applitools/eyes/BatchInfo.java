@@ -3,6 +3,7 @@ package com.applitools.eyes;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.Iso8610CalendarSerializer;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.text.ParseException;
@@ -18,7 +19,7 @@ public class BatchInfo {
 
     private static final String BATCH_TIMEZONE = "UTC";
     private String id;
-    private String batchSequenceName;
+    private String sequenceName;
     private final String name;
     private final String startedAt;
 
@@ -34,7 +35,7 @@ public class BatchInfo {
         String envSequenceName = System.getenv("APPLITOOLS_BATCH_SEQUENCE");
         this.id = envVarBatchId != null ? envVarBatchId : UUID.randomUUID().toString();
         this.name = name != null ? name : System.getenv("APPLITOOLS_BATCH_NAME");
-        this.batchSequenceName = envSequenceName;
+        this.sequenceName = envSequenceName;
         this.startedAt = GeneralUtils.toISO8601DateTime(startedAt);
     }
 
@@ -104,11 +105,12 @@ public class BatchInfo {
         return "'" + name + "' - " + startedAt;
     }
 
-    public String getBatchSequenceName() {
-        return batchSequenceName;
+    @JsonProperty("batchSequenceName")
+    public String getSequenceName() {
+        return sequenceName;
     }
 
-    public void setBatchSequenceName(String sequenceName) {
-        this.batchSequenceName = sequenceName;
+    public void setSequenceName(String sequenceName) {
+        this.sequenceName = sequenceName;
     }
 }
