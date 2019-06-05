@@ -71,10 +71,14 @@ public class ResourceFuture implements IResourceFuture {
                     Response response = this.future.get(15, TimeUnit.SECONDS);
                     int status = response.getStatus();
                     List<String> contentLengthHeaders = response.getStringHeaders().get("Content-length");
-                    int contentLength = Integer.parseInt(contentLengthHeaders.get(0));
+                    int contentLength = 0;
+                    if (contentLengthHeaders != null) {
+                        contentLength = Integer.parseInt(contentLengthHeaders.get(0));
+                        logger.verbose("Content Length: " + contentLength);
+                    }
 
                     logger.verbose("downloading url - : " + url);
-                    logger.verbose("Content Length: " + contentLengthHeaders.get(0));
+
                     if ((status == 200 || status == 201) && (!contentLengthHeaders.isEmpty() && contentLength > 0)) {
                         logger.verbose("response: " + response);
                         byte[] content = downloadFile(response);
@@ -95,7 +99,7 @@ public class ResourceFuture implements IResourceFuture {
                 } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     retryCount--;
-                    logger.verbose("Entering retry");
+                    logger.verbose("Entering retry for - "+url);
                     try {
                         Thread.sleep(300);
                         IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), true, null);
