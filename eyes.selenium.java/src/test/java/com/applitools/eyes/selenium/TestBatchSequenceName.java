@@ -22,7 +22,7 @@ public class TestBatchSequenceName {
     private Eyes eyes;
 
     @Test
-    public void styleGuide() {
+    public void test() {
         ObjectMapper objectMapper = new ObjectMapper();
         String json1 = null;
         String json2 = null;
@@ -48,6 +48,8 @@ public class TestBatchSequenceName {
         try {
             eyes.open(driver, "Java Eyes SDK", "BatchSequnceName Batch");
 
+            eyes.check(Target.window());
+
             eyes.close(false);
 
             batch.setStartedAt("2019-06-04T10:27:15Z");
@@ -58,7 +60,11 @@ public class TestBatchSequenceName {
 
             batch.setSequenceName("newSequenceName by setter");
 
+            batch.setId("ljndsfknqe12e2qefjh");
+
             eyes.open(driver, "Java Eyes SDK", "BatchSequnceName Batch");
+
+            eyes.check(Target.window());
 
             eyes.close(false);
 
