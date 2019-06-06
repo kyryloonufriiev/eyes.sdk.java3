@@ -3,9 +3,10 @@ package com.applitools.eyes.visualgrid.model;
 import com.applitools.eyes.TestResults;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Iterator;
 import java.util.List;
 
-public class TestResultSummary {
+public class TestResultSummary implements Iterable<TestResultContainer>{
     private List<TestResultContainer> allResults;
     private int passed = 0;
     private int unresolved = 0;
@@ -58,5 +59,10 @@ public class TestResultSummary {
                 "\n\tmissing=" + missing +
                 "\n\tmatches=" + matches +
                 "\n}";
+    }
+
+    @Override
+    public Iterator<TestResultContainer> iterator() {
+        return this.allResults.iterator();
     }
 }
