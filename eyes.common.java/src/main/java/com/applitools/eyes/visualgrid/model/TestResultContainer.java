@@ -22,6 +22,10 @@ public class TestResultContainer {
         return exception;
     }
 
+    public RenderBrowserInfo getBrowserInfo() {
+        return browserInfo;
+    }
+
     @Override
     public String toString() {
         String browserInfoStr = browserInfo != null ?  "\n browserInfo = " + browserInfo : "";
