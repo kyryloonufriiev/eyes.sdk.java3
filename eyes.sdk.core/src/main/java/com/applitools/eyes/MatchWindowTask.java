@@ -132,7 +132,7 @@ public class MatchWindowTask {
                                     String tag, boolean ignoreMismatch,
                                     ICheckSettingsInternal checkSettingsInternal,
                                     ImageMatchSettings imageMatchSettings,
-                                    List<Region> regions,
+                                    List<IRegion> regions,
                                     List<VisualGridSelector[]> regionSelectors,
                                     EyesBase eyes)
     {
@@ -159,7 +159,7 @@ public class MatchWindowTask {
         return serverConnector.matchWindow(runningSession, data);
     }
 
-    private static void collectRegions(ImageMatchSettings imageMatchSettings, List<Region> regions, List<VisualGridSelector[]> regionSelectors) {
+    private static void collectRegions(ImageMatchSettings imageMatchSettings, List<IRegion> regions, List<VisualGridSelector[]> regionSelectors) {
         if (regions == null) return;
 
         int currentCounter = 0;
@@ -174,7 +174,7 @@ public class MatchWindowTask {
         mutableRegions.add(new ArrayList<MutableRegion>()); // Floating Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Target Element Location
 
-        for (Region region : regions) {
+        for (IRegion region : regions) {
             boolean canAddRegion = false;
             while (!canAddRegion) {
                 currentCounter++;
@@ -186,7 +186,7 @@ public class MatchWindowTask {
                     canAddRegion = true;
                 }
             }
-            MutableRegion mr = new MutableRegion(region);
+            MutableRegion mr = new MutableRegion((Region) region);
             mutableRegions.get(currentTypeIndex).add(mr);
         }
 

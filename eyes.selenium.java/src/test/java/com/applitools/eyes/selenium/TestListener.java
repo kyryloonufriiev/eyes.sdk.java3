@@ -100,22 +100,7 @@ public class TestListener implements ITestListener {
                     eyes.getLogger().verbose("no results returned from eyes.close()");
                     return true;
                 }
-                String apiSessionUrl = results.getApiUrls().getSession();
-                URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
-                        .queryParam("format", "json")
-                        .queryParam("AccessToken", results.getSecretToken())
-                        .queryParam("apiKey", eyes.getApiKey())
-                        .build();
-
-                Client client = ClientBuilder.newClient();
-                String srStr = client.target(apiSessionUri)
-                        .request(MediaType.APPLICATION_JSON)
-                        .get(String.class);
-
-                ObjectMapper jsonMapper = new ObjectMapper();
-                jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-                SessionResults resultObject = jsonMapper.readValue(srStr, SessionResults.class);
+                SessionResults resultObject = EyesSeleniumUtils.getSessionResults(eyes.getApiKey(), results);
 
                 ActualAppOutput[] actualAppOutput = resultObject.getActualAppOutput();
 

@@ -18,9 +18,13 @@ import java.util.UUID;
 public class BatchInfo {
 
     private static final String BATCH_TIMEZONE = "UTC";
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("batchSequenceName")
     private String sequenceName;
+    @JsonProperty("name")
     private final String name;
+    @JsonProperty("startedAt")
     private String startedAt;
 
     /**

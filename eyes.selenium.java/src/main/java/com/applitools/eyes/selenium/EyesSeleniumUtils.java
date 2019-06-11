@@ -4,11 +4,13 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
-import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
@@ -16,6 +18,11 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -236,7 +243,7 @@ public class EyesSeleniumUtils {
 
         String script = String.format("var origOF = arguments[0].style.overflow;" +
                 "arguments[0].style.overflow = '%s';" +
-                "return origOF;"+
+                "return origOF;" +
                 "if ('%s'.toUpperCase() === 'HIDDEN' && origOF.toUpperCase() !== 'HIDDEN') arguments[0].setAttribute('data-applitools-original-overflow',origOF);" +
                 "return origOF;", value, value);
 
@@ -702,4 +709,24 @@ public class EyesSeleniumUtils {
 
         return region.getSize();
     }
+
+    public static SessionResults getSessionResults(String apiKey, TestResults results) throws java.io.IOException {
+        String apiSessionUrl = results.getApiUrls().getSession();
+        URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
+                .queryParam("format", "json")
+                .queryParam("AccessToken", results.getSecretToken())
+                .queryParam("apiKey", apiKey)
+                .build();
+
+        Client client = ClientBuilder.newClient();
+        String srStr = client.target(apiSessionUri)
+                .request(MediaType.APPLICATION_JSON)
+                .get(String.class);
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+        jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        return jsonMapper.readValue(srStr, SessionResults.class);
+    }
 }
+

@@ -34,8 +34,6 @@ public abstract class TestSetup implements ITest {
     protected Capabilities caps;
     private DesiredCapabilities desiredCaps = new DesiredCapabilities();
 
-    private static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
-
     protected HashSet<FloatingMatchSettings> expectedFloatingRegions = new HashSet<>();
     protected HashSet<Region> expectedIgnoreRegions = new HashSet<>();
     protected HashSet<Region> expectedLayoutRegions = new HashSet<>();
@@ -70,10 +68,10 @@ public abstract class TestSetup implements ITest {
 
         String batchId = System.getenv("APPLITOOLS_BATCH_ID");
         if (batchId != null) {
-            batchInfo.setId(batchId);
+            TestsDataProvider.batchInfo.setId(batchId);
         }
 
-        seleniumEyes.setBatch(batchInfo);
+        seleniumEyes.setBatch(TestsDataProvider.batchInfo);
         this.setEyes(seleniumEyes);
     }
 

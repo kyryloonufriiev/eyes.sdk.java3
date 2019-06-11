@@ -39,7 +39,6 @@ public class TestTopSites {
         return new Object[][]{
                 {"https://google.com"},
                 {"https://facebook.com"},
-                {"https://youtube.com"},
                 {"https://amazon.com"},
 //                {"https://ebay.com"},
                 {"https://twitter.com"},
@@ -138,7 +137,10 @@ public class TestTopSites {
 
     @AfterClass
     public void afterClass(ITestContext testContext) {
-        TestResultSummary allTestResults = visualGridRunner.getAllTestResults();
+        TestResultSummary allTestResults = visualGridRunner.getAllTestResults(false);
+        for (TestResultContainer allTestResult : allTestResults) {
+            System.out.println(allTestResult.toString());
+        }
         visualGridRunner.getLogger().log(allTestResults.toString());
     }
 }

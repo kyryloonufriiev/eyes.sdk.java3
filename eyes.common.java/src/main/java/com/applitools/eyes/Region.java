@@ -12,7 +12,7 @@ import java.util.List;
  * Represents a region.
  */
 @JsonIgnoreProperties({"location", "empty", "middleOffset", "size", "sizeEmpty", "subRegions"})
-public class Region {
+public class Region implements IRegion{
     @JsonProperty("left")
     private int left;
     @JsonProperty("top")
@@ -152,7 +152,7 @@ public class Region {
      *
      * @param other the other
      */
-    public Region(Region other) {
+    public Region(IRegion other) {
         ArgumentGuard.notNull(other, "other");
 
         left = other.getLeft();

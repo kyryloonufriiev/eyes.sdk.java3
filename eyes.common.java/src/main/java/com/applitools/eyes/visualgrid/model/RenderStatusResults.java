@@ -1,5 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
+import com.applitools.eyes.IRegion;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.Region;
 
@@ -19,7 +20,7 @@ public class RenderStatusResults {
 
     private String error = null;
 
-    private List<Region> selectorRegions = null;
+    private List<IRegion> selectorRegions = null;
 
     private RectangleSize deviceSize = null;
 
@@ -71,11 +72,11 @@ public class RenderStatusResults {
         this.error = error;
     }
 
-    public List<Region> getSelectorRegions() {
+    public List<IRegion> getSelectorRegions() {
         return selectorRegions;
     }
 
-    public void setSelectorRegions(List<Region> selectorRegions) {
+    public void setSelectorRegions(List<IRegion> selectorRegions) {
         this.selectorRegions = selectorRegions;
     }
 

@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.BatchInfo;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -13,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TestsDataProvider {
+    public final  static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
+
     @DataProvider(parallel = true)
     public static Object[][] dp() {
         ChromeOptions chromeOptions = new ChromeOptions();

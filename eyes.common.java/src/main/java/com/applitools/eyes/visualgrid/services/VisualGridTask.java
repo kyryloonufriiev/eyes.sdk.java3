@@ -110,7 +110,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
                     String imageLocation = renderResult.getImageLocation();
                     String domLocation = renderResult.getDomLocation();
-                    List<Region> regions = renderResult.getSelectorRegions();
+                    List<IRegion> regions = renderResult.getSelectorRegions();
                     if (imageLocation == null) {
                         logger.verbose("CHECKING IMAGE WITH NULL LOCATION - ");
                         logger.verbose(renderResult.toString());

@@ -80,7 +80,7 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     }
 
     @Override
-    public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings, List<Region> regions, List<VisualGridSelector[]> regionSelectors, Location location) {
+    public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings, List<IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location) {
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         if(checkSettingsInternal.getStitchContent() == null){
