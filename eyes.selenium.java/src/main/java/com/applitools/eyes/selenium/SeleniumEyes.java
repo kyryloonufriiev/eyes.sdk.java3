@@ -322,7 +322,7 @@ public class SeleniumEyes extends EyesBase {
             case CSS:
                 return new CssTranslatePositionProvider(logger, this.jsExecutor, scrollRootElement);
             default:
-                return new ScrollPositionProvider(logger, this.jsExecutor, scrollRootElement);
+                return ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, this.jsExecutor, scrollRootElement);
         }
     }
 
@@ -592,7 +592,7 @@ public class SeleniumEyes extends EyesBase {
             if (scrollRootElement == null) {
                 scrollRootElement = driver.findElement(By.tagName("html"));
             }
-            PositionProvider positionProvider = new ScrollPositionProvider(logger, jsExecutor, scrollRootElement);
+            PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
 
             DomCapture domCapture = new DomCapture(this);
             fullWindowDom = domCapture.getFullWindowDom(positionProvider);
@@ -932,7 +932,7 @@ public class SeleniumEyes extends EyesBase {
         FrameChain originalFrameChain = driver.getFrameChain().clone();
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
         switchTo.frames(this.originalFC);
-        ScrollPositionProvider spp = new ScrollPositionProvider(logger, jsExecutor, scrollRootElement);
+        ScrollPositionProvider spp = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
         Location location;
         try {
             location = spp.getCurrentPosition();
@@ -1779,7 +1779,7 @@ public class SeleniumEyes extends EyesBase {
 
     private FullPageCaptureAlgorithm createFullPageCaptureAlgorithm(ScaleProviderFactory scaleProviderFactory) {
         WebElement scrollRootElement = getCurrentFrameScrollRootElement();
-        PositionProvider originProvider = new ScrollPositionProvider(logger, jsExecutor, scrollRootElement);
+        PositionProvider originProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
 
         return new FullPageCaptureAlgorithm(logger, regionPositionCompensation,
                 getConfigGetter().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
