@@ -7,8 +7,19 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.ApacheHttpClient4Handler;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import org.apache.http.HttpVersion;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import sun.net.www.http.HttpClient;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -40,15 +51,18 @@ public class RestClient {
     protected ObjectMapper jsonMapper;
 
     /**
-     * @param timeout       Connect/Read timeout in milliseconds. 0 equals infinity.
+     * @param timeout               Connect/Read timeout in milliseconds. 0 equals infinity.
      * @param abstractProxySettings (optional) Setting for communicating via proxy.
      */
     private static Client buildRestClient(int timeout,
                                           AbstractProxySettings abstractProxySettings) {
         // Creating the client configuration
-        ApacheHttpClient4Config cc = new DefaultApacheHttpClient4Config() ;
+        ApacheHttpClient4Config cc = new DefaultApacheHttpClient4Config();
         cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECT_TIMEOUT, timeout);
         cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_READ_TIMEOUT, timeout);
+
+        final ThreadSafeClientConnManager manager=new ThreadSafeClientConnManager();
+
 
 
         if (abstractProxySettings != null) {
@@ -69,10 +83,17 @@ public class RestClient {
                 uri = uriBuilder.build();
             }
             cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_URI, uri);
-            cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME, abstractProxySettings.getUsername());
-            cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD, abstractProxySettings.getPassword());
+            String username = abstractProxySettings.getUsername();
+            if (username != null) {
+                cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME, username);
+            }
+            String password = abstractProxySettings.getPassword();
+            if (password != null) {
+                cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD, password);
+            }
 
-            ApacheHttpClient4 client = ApacheHttpClient4.create(cc);
+            ApacheHttpClient4Handler handler = new ApacheHttpClient4Handler(new DefaultHttpClient(manager), null, false);
+            ApacheHttpClient4 client = new ApacheHttpClient4(handler);
             return client;
         } else {
             // We ignore the proxy settings
@@ -125,7 +146,7 @@ public class RestClient {
      * Sets the proxy settings to be used by the rest client.
      *
      * @param abstractProxySettings The proxy settings to be used by the rest client.
-     *                      If {@code null} then no proxy is set.
+     *                              If {@code null} then no proxy is set.
      */
     @SuppressWarnings("UnusedDeclaration")
     public void setProxyBase(AbstractProxySettings abstractProxySettings) {

@@ -4,13 +4,12 @@ import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.model.RunningRender;
 import com.applitools.utils.GeneralUtils;
 
-import javax.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class PutFuture implements Future {
+public class PutFuture implements IPutFuture {
 
     private Future putFuture;
     private RGridResource resource;
@@ -79,22 +78,41 @@ public class PutFuture implements Future {
     }
 
     @Override
-    public Boolean get(long timeout, TimeUnit unit) throws
-            InterruptedException, ExecutionException, TimeoutException {
+    public Boolean get(long timeout, TimeUnit unit) {
+        if (this.putFuture == null) {
+            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, null);
+            this.putFuture = newFuture.getPutFuture();
+        }
         if (!this.isSentAlready) {
-            Object responseAsObject = this.putFuture.get(timeout, unit);
-            if(responseAsObject instanceof Response){
-                Response response = (Response) responseAsObject;
-                int status = response.getStatus();
-                if(status > 299 || status < 200){
-                    throw new ExecutionException(new Throwable("PUT future failed with status - "+status));
+            while (retryCount != 0) {
+                try {
+                    this.putFuture.get(timeout, unit);
+                    break;
+                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
+                    retryCount--;
+                    logger.verbose("Entering retry");
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e1) {
+                        GeneralUtils.logExceptionStackTrace(logger, e1);
+                    }
+                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, null);
+                    logger.log("fired retry");
+                    this.putFuture = newFuture.getPutFuture();
                 }
-                this.isSentAlready = true;
             }
         }
+        this.isSentAlready = true;
         return true;
     }
 
+    @Override
+    public Future getPutFuture() {
+        return this.putFuture;
+    }
+
+    @Override
     public RGridResource getResource() {
         return this.resource;
     }
