@@ -43,6 +43,13 @@ public class BatchInfo {
         this.startedAt = GeneralUtils.toISO8601DateTime(startedAt);
     }
 
+    public BatchInfo(String id, String sequenceName, String name, String startedAt) {
+        this.id = id;
+        this.sequenceName = sequenceName;
+        this.name = name;
+        this.startedAt = startedAt;
+    }
+
     /**
      * See {@link #BatchInfo(String, Calendar)}.
      * {@code startedAt} defaults to the current time.
@@ -60,6 +67,8 @@ public class BatchInfo {
         return name;
     }
 
+
+
     /**
      * @return The id of the current batch.
      */
@@ -72,6 +81,7 @@ public class BatchInfo {
      * includes the same ID will be grouped together.
      * @param id The batch's ID
      */
+    @JsonProperty("id")
     public void setId (String id) {
         ArgumentGuard.notNullOrEmpty(id, "id");
         this.id = id;
@@ -104,6 +114,7 @@ public class BatchInfo {
         }
     }
 
+    @JsonProperty("startedAt")
     public void setStartedAt(String startedAt) {
         this.startedAt = startedAt;
     }
