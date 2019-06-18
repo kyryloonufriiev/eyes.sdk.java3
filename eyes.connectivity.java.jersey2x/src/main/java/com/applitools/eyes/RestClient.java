@@ -45,7 +45,7 @@ public class RestClient {
      * @param timeout Connect/Read timeout in milliseconds. 0 equals infinity.
      * @param abstractProxySettings (optional) Setting for communicating via proxy.
      */
-    private static Client buildRestClient(int timeout,
+    static Client buildRestClient(int timeout,
                                       AbstractProxySettings abstractProxySettings) {
         // Creating the client configuration
         ClientConfig cc = new ClientConfig();

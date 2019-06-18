@@ -4,11 +4,8 @@ import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.utils.GeneralUtils;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.apache.commons.io.IOUtils;
 
-import javax.ws.rs.core.Response;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -24,19 +21,22 @@ public class ResourceFuture implements IResourceFuture {
     private Logger logger;
     private IServerConnector serverConnector;
     private RGridResource rgResource;
+    private String userAgent;
 
-    public ResourceFuture(Future<ClientResponse> future, String url, Logger logger, IServerConnector serverConnector) {
+    public ResourceFuture(Future<ClientResponse> future, String url, Logger logger, IServerConnector serverConnector, String userAgent) {
         this.future = future;
         this.url = url;
         this.logger = logger;
         this.serverConnector = serverConnector;
+        this.userAgent = userAgent;
     }
 
-    public ResourceFuture(RGridResource rgResource, Logger logger, IServerConnector serverConnector) {
+    public ResourceFuture(RGridResource rgResource, Logger logger, IServerConnector serverConnector, String userAgent) {
         this.url = rgResource.getUrl();
         this.rgResource = rgResource;
         this.logger = logger;
         this.serverConnector = serverConnector;
+        this.userAgent = userAgent;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ResourceFuture implements IResourceFuture {
             logger.verbose("enter - this.rgResource: " + this.rgResource);
             if (this.future == null) {
                 try {
-                    IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), true, null);
+                    IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent);
                     this.future = ((ResourceFuture) newFuture).future;
                 } catch (MalformedURLException malformedUrlException) {
                     GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);
@@ -104,7 +104,7 @@ public class ResourceFuture implements IResourceFuture {
                     logger.verbose("Entering retry for - "+url);
                     try {
                         Thread.sleep(300);
-                        IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), true, null);
+                        IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent);
                         this.future = ((ResourceFuture) newFuture).future;
                     } catch (MalformedURLException malformedUrlException) {
                         GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);

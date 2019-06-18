@@ -4,6 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.IPutFuture;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.GeneralUtils;
 
@@ -455,7 +456,7 @@ public class VisualGridRunner extends EyesRunner {
     public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, FrameData script,
                                    IEyesConnector connector, List<VisualGridTask> visualGridTaskList,
                                    List<VisualGridTask> openVisualGridTasks, final RenderListener listener,
-                                   List<VisualGridSelector[]> selectors) {
+                                   List<VisualGridSelector[]> selectors, UserAgent userAgent) {
 
         if (debugResourceWriter == null) {
             debugResourceWriter = this.debugResourceWriter;
@@ -479,7 +480,7 @@ public class VisualGridRunner extends EyesRunner {
                 notifyAllServices();
                 listener.onRenderFailed(e);
             }
-        }, selectors);
+        }, userAgent, selectors);
         logger.verbose("locking renderingTaskList");
         synchronized (renderingTaskList) {
             this.renderingTaskList.add(renderingTask);

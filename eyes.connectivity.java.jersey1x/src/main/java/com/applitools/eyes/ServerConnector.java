@@ -20,7 +20,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.async.TypeListener;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -404,13 +403,15 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IResourceFuture downloadResource(URL uri, boolean isSecondRetry, final IDownloadListener<Byte[]> listener) {
-        AsyncWebResource target = Client.create().asyncResource(uri.toString());
+    public IResourceFuture downloadResource(URL uri, String userAgent) {
+        Client client = RestClient.buildRestClient(getTimeout(), getProxy());
+        AsyncWebResource target = client.asyncResource(uri.toString());
 
         AsyncWebResource.Builder request = target.accept(MediaType.WILDCARD);
 
+        request.header("User-Agent", userAgent);
         Future<ClientResponse> future = request.get(ClientResponse.class);
-        IResourceFuture newFuture = new ResourceFuture(future, uri.toString(), logger, this);
+        IResourceFuture newFuture = new ResourceFuture(future, uri.toString(), logger, this, userAgent);
         return newFuture;
     }
 
@@ -545,7 +546,7 @@ public class ServerConnector extends RestClient
 
 
     @Override
-    public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, final IResourceUploadListener listener) {
+    public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
         ArgumentGuard.notNull(runningRender, "runningRender");
         ArgumentGuard.notNull(resource, "resource");
         byte[] content = resource.getContent();
@@ -570,7 +571,7 @@ public class ServerConnector extends RestClient
         builder = builder.header("X-Auth-Token", renderingInfo.getAccessToken());
         final Future<ClientResponse> future = builder.put(ClientResponse.class);
         logger.verbose("future created.");
-        PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger);
+        PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger, userAgent);
         return putFuture;
     }
 
@@ -626,8 +627,8 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IResourceFuture createResourceFuture(RGridResource gridResource) {
-        return new ResourceFuture(gridResource, logger, this);
+    public IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent) {
+        return new ResourceFuture(gridResource, logger, this, userAgent);
     }
 
     @Override

@@ -52,6 +52,7 @@ public class VisualGridEyes implements IRenderingEyes {
     private Boolean isDisabled = Boolean.FALSE;
     private IServerConnector serverConnector = null;
     private ISeleniumConfigurationProvider configProvider;
+    private UserAgent userAgent = null;
     private RectangleSize viewportSize;
     private AtomicBoolean isCheckTimerTimedout = new AtomicBoolean(false);
     private Timer timer = new Timer("VG_StopWatch", true);
@@ -139,6 +140,12 @@ public class VisualGridEyes implements IRenderingEyes {
         ArgumentGuard.notNull(getConfigGetter().getAppName(), "appName");
 
         initDriver(webDriver);
+
+        String uaString = this.webDriver.getUserAgent();
+        if (uaString != null) {
+            logger.verbose(String.format("User-Agent: %s", uaString));
+            userAgent = UserAgent.ParseUserAgentString(uaString, true);
+        }
 
         setViewportSize(this.webDriver);
 
@@ -466,7 +473,7 @@ public class VisualGridEyes implements IRenderingEyes {
             Boolean b;
             if ((b = checkSettingsInternal.isStitchContent()) != null) {
                 isFullPage = b;
-            } else if ((b=getConfigGetter().isForceFullPageScreenshot()) != null) {
+            } else if ((b = getConfigGetter().isForceFullPageScreenshot()) != null) {
                 isFullPage = b;
             }
             if (switchedToCount > 0 && isFullPage) {
@@ -520,7 +527,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
             List<RunningTest> filtteredTests = new ArrayList<>();
 
-           checkSettingsInternal = updateCheckSettings(checkSettings);
+            checkSettingsInternal = updateCheckSettings(checkSettings);
 
             for (final RunningTest test : testList) {
                 List<VisualGridTask> taskList = test.getVisualGridTaskList();
@@ -553,7 +560,7 @@ public class VisualGridEyes implements IRenderingEyes {
                         public void onRenderFailed(Exception e) {
                             GeneralUtils.logExceptionStackTrace(logger, e);
                         }
-                    }, regionsXPaths);
+                    }, regionsXPaths, userAgent);
             logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
         } catch (IllegalArgumentException | EyesException | InterruptedException e) {
             Error error = new Error(e);
@@ -862,15 +869,12 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
 
-    private boolean validateEyes()
-    {
-        if (isDisabled)
-        {
+    private boolean validateEyes() {
+        if (isDisabled) {
             logger.verbose("WARNING! Invalid Operation - Eyes Disabled!");
             return false;
         }
-        if (!renderingGridRunner.isServicesOn())
-        {
+        if (!renderingGridRunner.isServicesOn()) {
             logger.verbose("WARNING! Invalid Operation - visualGridRunner.getAllTestResults already called!");
             return false;
         }

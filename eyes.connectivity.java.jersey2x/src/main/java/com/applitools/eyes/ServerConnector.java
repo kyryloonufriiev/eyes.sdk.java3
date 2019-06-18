@@ -374,36 +374,19 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IResourceFuture downloadResource(final URL url, final boolean isSecondRetry, final IDownloadListener<Byte[]> listener) {
-        Client client = ClientBuilder.newBuilder().build();
+    public IResourceFuture downloadResource(final URL url, String userAgent) {
+        Client client = RestClient.buildRestClient(getTimeout(), getProxy());
 
         WebTarget target = client.target(url.toString());
 
         Invocation.Builder request = target.request(MediaType.WILDCARD);
 
-        Future<Response> future = request.async().get(new InvocationCallback<Response>() {
-            @Override
-            public void completed(Response response) {
+        request.header("User-Agent", userAgent);
 
-                if (null != listener) {
-                    listener.onDownloadComplete(null, null);
-                }
-            }
-
-            @Override
-            public void failed(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
-                if (!isSecondRetry) {
-                    logger.verbose("Entering retry");
-                    downloadResource(url, true, listener);
-                } else if (null != listener) {
-                    listener.onDownloadFailed();
-                }
-            }
-        });
+        Future<Response> future = request.async().get();
 
         @SuppressWarnings("UnnecessaryLocalVariable")
-        IResourceFuture newFuture = new ResourceFuture(future, url.toString(), logger, this);
+        IResourceFuture newFuture = new ResourceFuture(future, url.toString(), logger, this, userAgent);
         return newFuture;
     }
 
@@ -546,7 +529,7 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, final IResourceUploadListener listener) {
+    public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
         ArgumentGuard.notNull(runningRender, "runningRender");
         ArgumentGuard.notNull(resource, "resource");
         byte[] content = resource.getContent();
@@ -563,6 +546,7 @@ public class ServerConnector extends RestClient
         String contentType = resource.getContentType();
         Invocation.Builder request = target.request(contentType);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        request.header("User-Agent", userAgent);
         Entity entity = null;
         if (contentType != null) {
             entity = Entity.entity(content, contentType);
@@ -573,7 +557,7 @@ public class ServerConnector extends RestClient
         }
         final Future<Response> future = request.async().put(entity);
         logger.verbose("future created.");
-        PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger);
+        PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger, userAgent);
         return putFuture;
     }
 
@@ -630,8 +614,8 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IResourceFuture createResourceFuture(RGridResource gridResource) {
-        return new ResourceFuture(gridResource, logger, this);
+    public IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent) {
+        return new ResourceFuture(gridResource, logger, this, userAgent);
 
     }
 

@@ -54,13 +54,13 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     }
 
     @Override
-    public IResourceFuture getResource(URL url) {
-        return this.serverConnector.downloadResource(url, true, null);
+    public IResourceFuture getResource(URL url, String userAgent) {
+        return this.serverConnector.downloadResource(url, userAgent);
     }
 
     @Override
-    public IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource) {
-        return this.serverConnector.renderPutResource(runningRender, resource, null);
+    public IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource, String UserAgent) {
+        return this.serverConnector.renderPutResource(runningRender, resource, userAgent, null);
     }
 
 
@@ -76,7 +76,7 @@ class EyesConnector extends EyesBase implements IEyesConnector {
 
     @Override
     public IResourceFuture createResourceFuture(RGridResource rg) {
-        return this.serverConnector.createResourceFuture(rg);
+        return this.serverConnector.createResourceFuture(rg, userAgent);
     }
 
     @Override

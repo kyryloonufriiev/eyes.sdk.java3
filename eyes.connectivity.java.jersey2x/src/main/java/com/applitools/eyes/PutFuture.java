@@ -4,7 +4,6 @@ import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.model.RunningRender;
 import com.applitools.utils.GeneralUtils;
 
-import javax.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -20,16 +19,18 @@ public class PutFuture implements IPutFuture {
 
     private boolean isSentAlready = false;
     private int retryCount = 5;
+    private String useraAgent;
 
-    public PutFuture(RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger) {
+    public PutFuture(RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String useraAgent) {
         this.resource = resource;
         this.runningRender = runningRender;
         this.serverConnector = serverConnector;
         this.logger = logger;
+        this.useraAgent = useraAgent;
     }
 
-    public PutFuture(Future putFuture, RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger) {
-        this(resource, runningRender, serverConnector, logger);
+    public PutFuture(Future putFuture, RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String useraAgent) {
+        this(resource, runningRender, serverConnector, logger, useraAgent);
         this.putFuture = putFuture;
     }
 
@@ -51,7 +52,7 @@ public class PutFuture implements IPutFuture {
     @Override
     public Boolean get() {
         if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, null);
+            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
             this.putFuture = newFuture.getPutFuture();
         }
         if (!this.isSentAlready) {
@@ -68,7 +69,7 @@ public class PutFuture implements IPutFuture {
                     } catch (InterruptedException e1) {
                         GeneralUtils.logExceptionStackTrace(logger, e1);
                     }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, null);
+                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
                     logger.log("fired retry");
                     this.putFuture = newFuture.getPutFuture();
                 }
@@ -81,7 +82,7 @@ public class PutFuture implements IPutFuture {
     @Override
     public Boolean get(long timeout, TimeUnit unit) {
         if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, null);
+            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent, null);
             this.putFuture = newFuture.getPutFuture();
         }
         if (!this.isSentAlready) {
@@ -98,7 +99,7 @@ public class PutFuture implements IPutFuture {
                     } catch (InterruptedException e1) {
                         GeneralUtils.logExceptionStackTrace(logger, e1);
                     }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, null);
+                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
                     logger.log("fired retry");
                     this.putFuture = newFuture.getPutFuture();
                 }
