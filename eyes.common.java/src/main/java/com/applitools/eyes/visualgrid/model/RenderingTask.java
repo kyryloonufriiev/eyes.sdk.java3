@@ -4,6 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.IPutFuture;
 import com.applitools.eyes.Logger;
+import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -40,6 +41,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private List<VisualGridTask> visualGridTaskList;
     private List<VisualGridTask> openVisualGridTaskList;
     private RenderingInfo renderingInfo;
+    private UserAgent userAgent;
     private final Map<String, IResourceFuture> fetchedCacheMap;
     private final Map<String, IPutFuture> putResourceCache;
     private Logger logger;
@@ -65,7 +67,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     public RenderingTask(IEyesConnector eyesConnector, FrameData scriptResult, ICheckSettings checkSettings,
                          List<VisualGridTask> visualGridTaskList, List<VisualGridTask> openVisualGridTasks, VisualGridRunner renderingGridManager,
-                         IDebugResourceWriter debugResourceWriter, RenderTaskListener listener, List<VisualGridSelector[]> regionSelectors) {
+                         IDebugResourceWriter debugResourceWriter, RenderTaskListener listener, UserAgent userAgent, List<VisualGridSelector[]> regionSelectors) {
 
         this.eyesConnector = eyesConnector;
         this.result = scriptResult;
@@ -77,6 +79,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         this.putResourceCache = renderingGridManager.getPutResourceCache();
         this.logger = renderingGridManager.getLogger();
         this.debugResourceWriter = debugResourceWriter;
+        this.userAgent = userAgent;
         this.regionSelectors = regionSelectors;
         this.listeners.add(listener);
         String renderingGridForcePut = System.getenv("APPLITOOLS_RENDERING_GRID_FORCE_PUT");
@@ -201,7 +204,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     }
                 } else {
                     resource = resourceFuture.get();
-                    IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource);
+                    IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
                     logger.verbose("locking putResourceCache");
                     synchronized (putResourceCache) {
                         String contentType = resource.getContentType();
@@ -273,7 +276,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             RunningRender runningRender = runningRenders.get(0);
             IPutFuture future = null;
             try {
-                future = this.eyesConnector.renderPutResource(runningRender, dom.asResource());
+                future = this.eyesConnector.renderPutResource(runningRender, dom.asResource(), userAgent.getOriginalUserAgentString());
             } catch (JsonProcessingException e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
@@ -328,7 +331,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 //
             }
             logger.verbose("resource(" + resource.getUrl() + ") hash : " + resource.getSha256());
-            IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource);
+            IPutFuture future = this.eyesConnector.renderPutResource(runningRender, resource, userAgent.getOriginalUserAgentString());
             String contentType = resource.getContentType();
             if (!putResourceCache.containsKey(url) && (contentType != null && !contentType.equalsIgnoreCase(CDT))) {
                 synchronized (putResourceCache) {
