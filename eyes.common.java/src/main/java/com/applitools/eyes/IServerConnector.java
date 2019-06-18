@@ -107,11 +107,10 @@ public interface IServerConnector {
      * Downloads string from a given Url.
      *
      * @param uri The URI from which the IServerConnector will download the string
-     * @param isSecondRetry Indicates if a retry is mandatory onFailed - 2 retries per request
-     * @param listener the listener will be called when the request will be resolved.
+     * @param userAgent user agent to send to server
      * @return A future which will be resolved when the resources is downloaded.
      */
-    IResourceFuture downloadResource(URL uri, boolean isSecondRetry, IDownloadListener<Byte[]> listener);
+    IResourceFuture downloadResource(URL uri, String userAgent);
 
 
     /**
@@ -150,9 +149,10 @@ public interface IServerConnector {
      * @param runningRender The running render (for second request only)
      * @param resource The resource to upload
      * @param listener The callback wrapper for the upload result.
+     * @param userAgent the userAgent to send to server
      * @return true if resource was uploaded
      */
-    IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource, IResourceUploadListener listener);
+    IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, IResourceUploadListener listener);
 
     /**
      * Get the rendering status for current render
@@ -170,7 +170,7 @@ public interface IServerConnector {
      */
     List<RenderStatusResults> renderStatusById(String... renderIds);
 
-    IResourceFuture createResourceFuture(RGridResource gridResource);
+    IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent);
 
     void setRenderingInfo(RenderingInfo renderInfo);
 }

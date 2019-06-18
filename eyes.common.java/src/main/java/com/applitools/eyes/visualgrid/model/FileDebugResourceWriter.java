@@ -41,6 +41,7 @@ public class FileDebugResourceWriter implements IDebugResourceWriter {
 
     @Override
     public void write(RGridResource resource) {
+        if(resource == null ) return;
         String url = resource.getUrl();
         if (filter == null || filter.isEmpty() || url.toUpperCase().contains(filter.toUpperCase())) {
             try {

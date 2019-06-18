@@ -20,6 +20,7 @@ public class UserAgent {
 
     private static final Pattern IE_BROWSER_REGEX = Pattern.compile("(?:MS(?<product>IE) " + MAJOR_MINOR + ")");
 
+    private String originalUserAgentString;
     private String OS;
     private String OSMajorVersion;
     private String OSMinorVersion;
@@ -77,6 +78,7 @@ public class UserAgent {
 
         userAgent = userAgent.trim();
         UserAgent result = new UserAgent();
+        result.originalUserAgentString = userAgent;
 
         // OS
         Map<String, Matcher> oss = new HashMap<>();
@@ -215,6 +217,10 @@ public class UserAgent {
 
     public String getOSMinorVersion() {
         return OSMinorVersion;
+    }
+
+    public String getOriginalUserAgentString() {
+        return originalUserAgentString;
     }
 
     @Override
