@@ -492,7 +492,14 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return clone;
     }
 
+    @Deprecated
+    @Override
     public ICheckSettings scriptHook(String hook) {
+        return beforeRenderScreenshotHook(hook);
+    }
+
+    @Override
+    public ICheckSettings beforeRenderScreenshotHook(String hook) {
         ICheckSettings clone = this.clone();
         ((CheckSettings) clone).scriptHooks.put(BEFORE_CAPTURE_SCREENSHOT, hook);
         return clone;

@@ -462,8 +462,14 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return scriptHooks;
     }
 
-
+    @Deprecated
+    @Override
     public SeleniumCheckSettings scriptHook(String hook) {
+        return beforeRenderScreenshotHook(hook);
+    }
+
+    @Override
+    public SeleniumCheckSettings beforeRenderScreenshotHook(String hook) {
         SeleniumCheckSettings clone = this.clone();
         clone.scriptHooks.put(BEFORE_CAPTURE_SCREENSHOT, hook);
         return clone;

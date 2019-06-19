@@ -23,7 +23,10 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
 
     VisualGridSelector getVGTargetSelector();
 
+    @Deprecated
     ICheckSettings scriptHook(String hook);
+
+    ICheckSettings beforeRenderScreenshotHook(String hook);
 
     Boolean isUseDom();
 
