@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class RGridResource {
 
     @JsonIgnore
@@ -25,6 +27,10 @@ public class RGridResource {
 
     @JsonIgnore
     private Logger logger;
+
+    @JsonIgnore
+    private AtomicBoolean isResourceParsed = new AtomicBoolean(false);
+
 
 
     public String getUrl() {
@@ -65,6 +71,14 @@ public class RGridResource {
     @Override
     public String toString() {
         return "RGridResource{" + "url='" + url + '\'' + '}';
+    }
+
+    public void setIsResourceParsed(Boolean isResourceParsed) {
+        this.isResourceParsed.set(isResourceParsed);
+    }
+
+    public boolean isResourceParsed() {
+        return isResourceParsed.get();
     }
 }
 

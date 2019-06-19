@@ -813,6 +813,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 logger.verbose("trying future.get() for resource " + url + " ...");
                 resource = future.get();
 
+                if(resource.isResourceParsed()) continue;
+
                 logger.verbose("finishing future.get() for resource " + url + " ...");
                 logger.verbose("done getting resource " + url);
                 try {
@@ -833,6 +835,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 logger.verbose("handling " + contentType + " resource from URL: " + url);
                 Set newResourceUrls = new HashSet();
                 getAndParseResource(resource, result.getUrl(), newResourceUrls);
+                resource.setIsResourceParsed(true);
                 fetchAllResources(allBlobs, newResourceUrls, result);
             } catch (Throwable e) {
                 e.printStackTrace();
