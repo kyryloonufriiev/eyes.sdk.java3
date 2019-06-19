@@ -10,6 +10,7 @@ import com.applitools.eyes.selenium.*;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
+import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
@@ -59,7 +60,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     private static Location getDefaultContentScrollPosition(Logger logger, EyesWebDriver driver, IEyesJsExecutor jsExecutor)
     {
         WebElement scrollRootElement = driver.getEyes().getCurrentFrameScrollRootElement();
-        PositionProvider positionProvider = new ScrollPositionProvider(logger, jsExecutor, scrollRootElement);
+        PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, scrollRootElement);
         return positionProvider.getCurrentPosition();
     }
 

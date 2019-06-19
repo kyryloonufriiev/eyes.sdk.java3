@@ -11,6 +11,8 @@ import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.positioning.ScrollPositionMemento;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
+import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
+import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -110,9 +112,9 @@ public final class Frame {
         jsExecutor.executeScript("arguments[0].style.overflow='" + originalOverflow + "';", scrollRootElement);
     }
 
-    public void returnToOriginalPosition(WebDriver driver) {
+    public void returnToOriginalPosition(EyesWebDriver driver) {
         WebElement scrollRootElement = getScrollRootElement(driver);
-        PositionProvider positionProvider = new ScrollPositionProvider(logger, jsExecutor, scrollRootElement);
+        PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, scrollRootElement);
         positionProvider.restoreState(positionMemento);
     }
 

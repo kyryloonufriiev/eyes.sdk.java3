@@ -15,6 +15,7 @@ import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
+import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -49,7 +50,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         this.targetLocator = targetLocator;
         this.jsExecutor = new SeleniumJavaScriptExecutor(driver);
         if (this.driver.getEyes() != null) {
-            this.scrollPosition = new ScrollPositionProvider(logger, jsExecutor, driver.getEyes().getCurrentFrameScrollRootElement());
+            this.scrollPosition = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, driver.getEyes().getCurrentFrameScrollRootElement());
         }
     }
 
@@ -172,7 +173,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
     public WebDriver framesDoScroll(FrameChain frameChain) {
         logger.verbose("enter");
         this.defaultContent();
-        PositionProvider scrollProvider = new ScrollPositionProvider(logger, jsExecutor, driver.getEyes().getCurrentFrameScrollRootElement());
+        PositionProvider scrollProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, driver.getEyes().getCurrentFrameScrollRootElement());
         defaultContentPositionMemento = scrollProvider.getState();
         for (Frame frame : frameChain) {
             logger.verbose("Scrolling by parent scroll position...");
