@@ -5,6 +5,7 @@ import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.IPutFuture;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.UserAgent;
+import com.applitools.eyes.visualgrid.model.RenderingTask.RenderTaskListener;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -16,23 +17,21 @@ import com.helger.css.ECSSVersion;
 import com.helger.css.decl.*;
 import com.helger.css.reader.CSSReader;
 import org.apache.commons.codec.binary.Base64;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.select.Elements;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -590,24 +589,24 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void ParseSVG_(TextualDataResource tdr, Set<URL> allResourceUris) {
 
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         try {
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(new ByteArrayInputStream(tdr.originalData));
-            doc.getDocumentElement().normalize();
-            XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
-            XPathExpression expr = xpath.compile(XLINK_HREF);
-            NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-            for (int i = 0; i < nodes.getLength(); i++) {
-                String nodeValue = nodes.item(i).getNodeValue();
-                CreateUriAndAddToList(allResourceUris, tdr.uri, nodeValue);
+            Document doc = Jsoup.parse(new String(tdr.originalData), tdr.uri.toString(), Parser.xmlParser());
+            Elements links = doc.select("[href]");
+            links.addAll(doc.select("[xlink:href]"));
+
+            for (Element element : links) {
+                String href = element.attr("href");
+                if(href.isEmpty()){
+                    href = element.attr("xlink:href");
+                    if(href.startsWith("#")) continue;
+                }
+                CreateUriAndAddToList(allResourceUris, tdr.uri, href);
             }
-        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
+        } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-
     }
+
 
     class TextualDataResource {
         String mimeType;
@@ -813,7 +812,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 logger.verbose("trying future.get() for resource " + url + " ...");
                 resource = future.get();
 
-                if(resource.isResourceParsed()) continue;
 
                 logger.verbose("finishing future.get() for resource " + url + " ...");
                 logger.verbose("done getting resource " + url);
@@ -827,6 +825,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     logger.verbose("Resource is null (" + url + ") ");
                     continue;
                 }
+                if (resource.isResourceParsed()) continue;
 
                 removeUrlFromList(url, resourceUrls);
                 allBlobs.put(resource.getUrl(), resource);
