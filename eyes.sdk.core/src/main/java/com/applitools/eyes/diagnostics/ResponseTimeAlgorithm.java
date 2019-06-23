@@ -3,7 +3,6 @@ package com.applitools.eyes.diagnostics;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.BlockingInstanceContainer;
@@ -71,7 +70,7 @@ public class ResponseTimeAlgorithm {
                 currentMwd.getTag(),
                 currentMwd.getIgnoreMismatch(),
                 currentMwd.getOptions(),
-                null);
+                null, null);
 
         return new MatchWindowDataWithScreenshot(updatedMwd,
                 currentMwdws.getScreenshot((null)));
@@ -128,8 +127,8 @@ public class ResponseTimeAlgorithm {
                 true,
                 new MatchWindowData.Options(tag, noUserInputs, false,
                         false, false, false, null),
-                null
-        );
+                null,
+                null);
         serverConnector.matchWindow(runningSession, mwd);
         logger.verbose("Finished saving.");
         logger.verbose("testResponseTimeBase Done!");
@@ -276,8 +275,8 @@ public class ResponseTimeAlgorithm {
                     true,
                     new MatchWindowData.Options(tag, noUserInputs, true,
                             true, false, false, null),
-                    null
-            );
+                    null,
+                    null);
             currentWindowDataWithScreenshot =
                     new MatchWindowDataWithScreenshot(currentWindowData,
                             appOutputWithScreenshot.getScreenshot(null));
@@ -612,8 +611,8 @@ public class ResponseTimeAlgorithm {
                             false,
                             null
                     ),
-                    null
-            );
+                    null,
+                    null);
             serverConnector.matchWindow(runningSession, mwdToSend);
         }
 
@@ -638,8 +637,8 @@ public class ResponseTimeAlgorithm {
                         forceMatch,
                         null
                 ),
-                null
-        );
+                null,
+                null);
         serverConnector.matchWindow(runningSession, mwdToSend);
         logger.verbose("Done setting images!");
     }

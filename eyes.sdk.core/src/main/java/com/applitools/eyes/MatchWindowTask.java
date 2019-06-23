@@ -116,7 +116,7 @@ public class MatchWindowTask {
             }
 
         }
-        return performMatch(userInputs, appOutput, tag, ignoreMismatch, imageMatchSettings, agentSetupStr);
+        return performMatch(userInputs, appOutput, tag, ignoreMismatch, imageMatchSettings, agentSetupStr, null);
     }
 
     /**
@@ -126,6 +126,7 @@ public class MatchWindowTask {
      * @param tag                Optional tag to be associated with the match (can be {@code null}).
      * @param ignoreMismatch     Whether to instruct the server to ignore the match attempt in case of a mismatch.
      * @param imageMatchSettings The settings to use.
+     * @param renderId
      * @return The match result.
      */
     public MatchResult performMatch(AppOutputWithScreenshot appOutput,
@@ -134,25 +135,25 @@ public class MatchWindowTask {
                                     ImageMatchSettings imageMatchSettings,
                                     List<IRegion> regions,
                                     List<VisualGridSelector[]> regionSelectors,
-                                    EyesBase eyes)
+                                    EyesBase eyes, String renderId)
     {
         EyesScreenshot screenshot = appOutput.getScreenshot(checkSettingsInternal);
         String agentSetupStr = (String) eyes.getAgentSetup();
 
         collectRegions(imageMatchSettings, regions, regionSelectors);
 
-        return performMatch(new ArrayList<Trigger>(), appOutput, tag, ignoreMismatch, imageMatchSettings, agentSetupStr);
+        return performMatch(new ArrayList<Trigger>(), appOutput, tag, ignoreMismatch, imageMatchSettings, agentSetupStr, renderId);
     }
 
     private MatchResult performMatch(List<Trigger> userInputs,
-                                      AppOutputWithScreenshot appOutput,
-                                      String tag, boolean ignoreMismatch,
-                                      ImageMatchSettings imageMatchSettings,
-                                      String agentSetupStr)
+                                     AppOutputWithScreenshot appOutput,
+                                     String tag, boolean ignoreMismatch,
+                                     ImageMatchSettings imageMatchSettings,
+                                     String agentSetupStr, String renderId)
     {
         // Prepare match data.
         MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]), ignoreMismatch, false, false, false, imageMatchSettings);
-        MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]),appOutput.getAppOutput(), tag, ignoreMismatch, options, agentSetupStr);
+        MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]),appOutput.getAppOutput(), tag, ignoreMismatch, options, agentSetupStr, renderId);
 
 
         // Perform match.

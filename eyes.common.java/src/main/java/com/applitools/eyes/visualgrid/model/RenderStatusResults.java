@@ -8,6 +8,8 @@ import java.util.List;
 
 public class RenderStatusResults {
 
+    private String renderId = null;
+
     private RenderStatus status = null;
 
     private String domLocation = null;
@@ -86,6 +88,14 @@ public class RenderStatusResults {
 
     public void setDeviceSize(RectangleSize deviceSize) {
         this.deviceSize = deviceSize;
+    }
+
+    public String getRenderId() {
+        return renderId;
+    }
+
+    public void setRenderId(String renderId) {
+        this.renderId = renderId;
     }
 
     @Override

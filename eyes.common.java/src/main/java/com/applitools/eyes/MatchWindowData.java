@@ -92,6 +92,7 @@ public class MatchWindowData {
     private boolean ignoreMismatch;
     private Options options;
     private final Object agentSetup;
+    private String renderId;
 
     /**
      * @param userInputs     A list of triggers between the previous matchWindow
@@ -102,10 +103,11 @@ public class MatchWindowData {
      * @param ignoreMismatch A flag indicating whether the server should ignore the image in case of a mismatch.
      * @param options        A set of match options for the server.
      * @param agentSetup     An object representing the configuration used to create the image.
+     * @param renderId
      */
     public MatchWindowData(Trigger[] userInputs, AppOutput appOutput,
                            String tag, boolean ignoreMismatch,
-                           Options options, Object agentSetup) {
+                           Options options, Object agentSetup, String renderId) {
 
         ArgumentGuard.notNull(userInputs, "userInputs");
 
@@ -115,6 +117,15 @@ public class MatchWindowData {
         this.ignoreMismatch = ignoreMismatch;
         this.options = options;
         this.agentSetup = agentSetup;
+        this.renderId = renderId;
+    }
+
+    public String getRenderId() {
+        return renderId;
+    }
+
+    public void setRenderId(String renderId) {
+        this.renderId = renderId;
     }
 
     public AppOutput getAppOutput() {
