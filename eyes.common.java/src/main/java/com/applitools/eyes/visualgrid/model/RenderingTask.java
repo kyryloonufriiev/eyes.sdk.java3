@@ -5,7 +5,6 @@ import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.IPutFuture;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.UserAgent;
-import com.applitools.eyes.visualgrid.model.RenderingTask.RenderTaskListener;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -582,12 +581,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 parseCSS(tdr, resourceUrls);
                 break;
             case IMAGE_SVG_XML:
-                ParseSVG_(tdr, resourceUrls);
+                parseSVG(tdr, resourceUrls);
                 break;
         }
     }
 
-    private void ParseSVG_(TextualDataResource tdr, Set<URL> allResourceUris) {
+    private void parseSVG(TextualDataResource tdr, Set<URL> allResourceUris) {
 
         try {
             Document doc = Jsoup.parse(new String(tdr.originalData), tdr.uri.toString(), Parser.xmlParser());
@@ -596,9 +595,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             for (Element element : links) {
                 String href = element.attr("href");
-                if(href.isEmpty()){
+                if (href.isEmpty()) {
                     href = element.attr("xlink:href");
-                    if(href.startsWith("#")) continue;
+                    if (href.startsWith("#")) continue;
                 }
                 CreateUriAndAddToList(allResourceUris, tdr.uri, href);
             }
