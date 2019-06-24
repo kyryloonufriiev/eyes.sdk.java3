@@ -474,6 +474,7 @@ public class SeleniumEyes extends EyesBase {
     private void matchRegion(ICheckSettingsInternal checkSettingsInternal, MatchWindowTask mwt, List<EyesScreenshot> subScreenshots) {
 
         String name = checkSettingsInternal.getName();
+        String source = driver.getCurrentUrl();
         for (EyesScreenshot subScreenshot : subScreenshots) {
 
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
@@ -482,7 +483,8 @@ public class SeleniumEyes extends EyesBase {
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
             AppOutput appOutput = new AppOutput(name, ImageUtils.base64FromImage(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
-            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false, checkSettingsInternal, ims, this);
+            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+                    checkSettingsInternal, ims, this, source);
 
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
@@ -657,7 +659,7 @@ public class SeleniumEyes extends EyesBase {
                 public Region getRegion() {
                     return new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
                 }
-            }, name, false, checkSettings);
+            }, name, false, checkSettings, driver.getCurrentUrl());
         } else if (seleniumCheckTarget != null) {
             WebElement targetElement = getTargetElement(seleniumCheckTarget);
             if (targetElement != null) {
@@ -686,7 +688,7 @@ public class SeleniumEyes extends EyesBase {
                     originalFC = tryHideScrollbars();
                     currentFramePositionProvider = createPositionProvider(driver.findElement(By.tagName("html")));
                 }
-                result = this.checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings);
+                result = this.checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings, driver.getCurrentUrl());
                 if (!EyesSeleniumUtils.isMobileDevice(driver)) {
                     switchTo.frames(this.originalFC);
                 }
@@ -811,7 +813,7 @@ public class SeleniumEyes extends EyesBase {
             public Region getRegion() {
                 return getFullFrameOrElementRegion();
             }
-        }, name, false, checkSettings);
+        }, name, false, checkSettings, driver.getCurrentUrl());
 
         checkFrameOrElement = false;
         return result;
@@ -962,7 +964,7 @@ public class SeleniumEyes extends EyesBase {
                 Dimension d = targetElement.getSize();
                 return new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
             }
-        }, name, false, checkSettings);
+        }, name, false, checkSettings, driver.getCurrentUrl());
         logger.verbose("Done! trying to scroll back to original position.");
 
         //regionVisibilityStrategy.returnToOriginalPosition(positionProvider);
@@ -1060,7 +1062,7 @@ public class SeleniumEyes extends EyesBase {
             logger.verbose("replacing regionToCheck");
             setRegionToCheck(screenshot.getFrameWindow());
 
-            super.checkWindowBase(NullRegionProvider.INSTANCE, tag, false, matchTimeout);
+            super.checkWindowBase(NullRegionProvider.INSTANCE, tag, false, matchTimeout, driver.getCurrentUrl());
         } finally {
             checkFrameOrElement = false;
             regionToCheck = null;
@@ -1270,7 +1272,7 @@ public class SeleniumEyes extends EyesBase {
                 regionToCheck.intersect(effectiveViewport);
             }
 
-            result = checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings);
+            result = checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings, driver.getCurrentUrl());
         } catch (Exception ex) {
             GeneralUtils.logExceptionStackTrace(logger, ex);
             throw ex;

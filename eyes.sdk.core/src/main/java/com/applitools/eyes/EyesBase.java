@@ -254,7 +254,6 @@ public abstract class EyesBase {
     }
 
 
-
     /**
      * Clears the user inputs list.
      */
@@ -276,7 +275,7 @@ public abstract class EyesBase {
         return userInputs.toArray(result);
     }
 
-        /**
+    /**
      * @return The base agent id of the SDK.
      */
     protected abstract String getBaseAgentId();
@@ -676,7 +675,7 @@ public abstract class EyesBase {
     }
 
     /**
-     * See {@link #checkWindowBase(RegionProvider, String, boolean, int)}.
+     * See {@link #checkWindowBase(RegionProvider, String, boolean, int, String)}.
      * {@code retryTimeout} defaults to {@code USE_DEFAULT_TIMEOUT}.
      * @param regionProvider Returns the region to check or the empty rectangle to check the entire window.
      * @param tag            An optional tag to be associated with the snapshot.
@@ -684,9 +683,9 @@ public abstract class EyesBase {
      * @return The result of matching the output with the expected output.
      */
     protected MatchResult checkWindowBase(RegionProvider regionProvider,
-                                          String tag, boolean ignoreMismatch) {
+                                          String tag, boolean ignoreMismatch, String source) {
         return checkWindowBase(regionProvider, tag, ignoreMismatch,
-                USE_DEFAULT_TIMEOUT);
+                USE_DEFAULT_TIMEOUT, source);
     }
 
     /**
@@ -700,8 +699,8 @@ public abstract class EyesBase {
      * @return The result of matching the output with the expected output.
      * @throws TestFailedException Thrown if a mismatch is detected and immediate failure reports are enabled.
      */
-    protected MatchResult checkWindowBase(RegionProvider regionProvider, String tag, boolean ignoreMismatch, int retryTimeout) {
-        return this.checkWindowBase(regionProvider, tag, ignoreMismatch, new CheckSettings(retryTimeout));
+    protected MatchResult checkWindowBase(RegionProvider regionProvider, String tag, boolean ignoreMismatch, int retryTimeout, String source) {
+        return this.checkWindowBase(regionProvider, tag, ignoreMismatch, new CheckSettings(retryTimeout), source);
     }
 
     protected void beforeMatchWindow() {
@@ -721,7 +720,7 @@ public abstract class EyesBase {
      * @throws TestFailedException Thrown if a mismatch is detected and immediate failure reports are enabled.
      */
     protected MatchResult checkWindowBase(RegionProvider regionProvider, String tag,
-                                          boolean ignoreMismatch, ICheckSettings checkSettings) {
+                                          boolean ignoreMismatch, ICheckSettings checkSettings, String source) {
         MatchResult result;
 
         if (getIsDisabled()) {
@@ -742,7 +741,7 @@ public abstract class EyesBase {
 
         beforeMatchWindow();
 
-        result = matchWindow(regionProvider, tag, ignoreMismatch, checkSettings);
+        result = matchWindow(regionProvider, tag, ignoreMismatch, checkSettings, source);
 
         afterMatchWindow();
 
@@ -761,17 +760,14 @@ public abstract class EyesBase {
 
     protected abstract String tryCaptureDom();
 
-    protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal){
+    protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal) {
         String domUrl = null;
-        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfigGetter())){
-        try
-            {
+        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfigGetter())) {
+            try {
                 String domJson = tryCaptureDom();
                 domUrl = tryPostDomSnapshot(domJson);
-                logger.verbose("domUrl: " +  domUrl);
-            }
-            catch (Exception ex)
-            {
+                logger.verbose("domUrl: " + domUrl);
+            } catch (Exception ex) {
                 logger.log("Error: " + ex);
             }
         }
@@ -792,7 +788,7 @@ public abstract class EyesBase {
     }
 
     private MatchResult matchWindow(RegionProvider regionProvider, String tag, boolean ignoreMismatch,
-                                    ICheckSettings checkSettings) {
+                                    ICheckSettings checkSettings, String source) {
         MatchResult result;
         ICheckSettingsInternal checkSettingsInternal = (checkSettings instanceof ICheckSettingsInternal) ? (ICheckSettingsInternal) checkSettings : null;
 
@@ -822,7 +818,7 @@ public abstract class EyesBase {
 
         result = matchWindowTask.matchWindow(
                 getUserInputs(), region, tag, shouldMatchWindowRunOnceOnTimeout, ignoreMismatch,
-                checkSettingsInternal, retryTimeout);
+                checkSettingsInternal, retryTimeout, source);
 
         return result;
     }
@@ -965,7 +961,7 @@ public abstract class EyesBase {
         // If there's no default application name, one must be provided for the current test.
         if (getAppName() == null) {
             ArgumentGuard.notNull(appName, "appName");
-            this.getConfigSetter().setAppName(appName );
+            this.getConfigSetter().setAppName(appName);
         }
 
         ArgumentGuard.notNull(testName, "testName");
@@ -1301,7 +1297,7 @@ public abstract class EyesBase {
         logger.verbose("Application environment is " + appEnv);
 
         String appName = getAppName();
-        sessionStartInfo = new SessionStartInfo(getFullAgentId(), configGetter.getSessionType(), appName ,
+        sessionStartInfo = new SessionStartInfo(getFullAgentId(), configGetter.getSessionType(), appName,
                 null, getTestName(), configGetter.getBatch(), getBaselineEnvName(),
                 configGetter.getEnvironmentName(), getAppEnvironment(), configGetter.getDefaultMatchSettings(),
                 configGetter.getBranchName(),

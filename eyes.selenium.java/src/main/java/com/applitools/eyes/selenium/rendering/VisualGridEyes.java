@@ -541,8 +541,9 @@ public class VisualGridEyes implements IRenderingEyes {
 
             }
 
+            String source = webDriver.getCurrentUrl();
             for (RunningTest runningTest : filtteredTests) {
-                VisualGridTask checkVisualGridTask = runningTest.check((ICheckSettings) checkSettingsInternal, regionsXPaths);
+                VisualGridTask checkVisualGridTask = runningTest.check((ICheckSettings) checkSettingsInternal, regionsXPaths, source);
                 visualGridTaskList.add(checkVisualGridTask);
             }
 

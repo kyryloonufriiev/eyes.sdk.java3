@@ -368,7 +368,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     /**
      * See {@link #checkImage_(RegionProvider, String, boolean, ICheckSettings)}.
      * @param regionProvider The region for which verification will be
-     *                       performed. see {@link #checkWindowBase(RegionProvider, String, boolean, int)}.
+     *                       performed. see {@link #checkWindowBase(RegionProvider, String, boolean, int, String)}.
      * @param image          The image to perform visual validation for.
      * @param tag            An optional tag to be associated with the validation checkpoint.
      * @param ignoreMismatch True if the server should ignore a negative result for the visual validation.
@@ -401,7 +401,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * Internal function for performing an image verification for a region of
      * a buffered image.
      * @param regionProvider The region for which verification will be
-     *                       performed. see {@link #checkWindowBase(RegionProvider, String, boolean, int)}.
+     *                       performed. see {@link #checkWindowBase(RegionProvider, String, boolean, int, String)}.
      * @param tag            An optional tag to be associated with the validation checkpoint.
      * @param ignoreMismatch True if the server should ignore a negative result for the visual validation.
      * @param checkSettings  The settings to use when checking the image.
@@ -414,7 +414,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
 
         ValidationInfo validationInfo = this.fireValidationWillStartEvent(tag);
 
-        MatchResult result = checkWindowBase(regionProvider, tag, ignoreMismatch, checkSettings);
+        MatchResult result = checkWindowBase(regionProvider, tag, ignoreMismatch, checkSettings, null);
 
         ValidationResult validationResult = new ValidationResult();
         validationResult.setAsExpected(result.getAsExpected());

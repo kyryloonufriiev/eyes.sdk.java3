@@ -20,6 +20,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     private final Logger logger;
 
     private boolean isSent;
+    private String source;
 
     public enum TaskType {OPEN, CHECK, CLOSE, ABORT}
 
@@ -51,7 +52,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
 
     public VisualGridTask(IConfigurationGetter seleniumConfigurationProvider, TestResults testResults, IEyesConnector eyesConnector, TaskType type, TaskListener runningTestListener,
-                          ICheckSettings checkSettings, RunningTest runningTest, List<VisualGridSelector[]> regionSelectors) {
+                          ICheckSettings checkSettings, RunningTest runningTest, List<VisualGridSelector[]> regionSelectors, String source) {
         this.configurationGetter = seleniumConfigurationProvider;
         this.testResults = testResults;
         this.eyesConnector = eyesConnector;
@@ -59,6 +60,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         this.regionSelectors = regionSelectors;
         this.listeners.add(runningTestListener);
         this.logger = runningTest.getLogger();
+        this.source = source;
         if (checkSettings != null) {
             this.checkSettings = (ICheckSettingsInternal) checkSettings;
             this.checkSettings = this.checkSettings.clone();
@@ -122,7 +124,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         }
                     }
 
-                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions, this.regionSelectors, location, renderResult.getRenderId());
+                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions, this.regionSelectors, location, renderResult.getRenderId(), source);
                     logger.verbose("match done");
                     break;
 

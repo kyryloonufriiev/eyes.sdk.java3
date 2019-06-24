@@ -21,8 +21,7 @@ public class ResponseTimeAlgorithm {
 
     /**
      * Creates a string describing the elapsed time relative to a deadline.
-     *
-     * @param deadline The deadline to be used as reference. (Seconds)
+     * @param deadline    The deadline to be used as reference. (Seconds)
      * @param elapsedTime The elapsed time to describe. (Second)
      * @return A tag describing the elapsed time, with reference to the
      * deadline.
@@ -32,10 +31,10 @@ public class ResponseTimeAlgorithm {
         if (elapsedTime < deadline) {
             tag = String.format("After %d seconds (%d seconds to deadline)",
                     elapsedTime, deadline - elapsedTime);
-        } else if (elapsedTime > deadline){
+        } else if (elapsedTime > deadline) {
             tag = String.format(
                     "After %d seconds (%d seconds after deadline)",
-                    elapsedTime, elapsedTime - deadline );
+                    elapsedTime, elapsedTime - deadline);
         } else {
             tag = String.format("After %d seconds (deadline)",
                     elapsedTime);
@@ -47,7 +46,7 @@ public class ResponseTimeAlgorithm {
     /**
      * Clones the given {@link MatchWindowDataWithScreenshot} instance, while
      * setting the primary to the required value.
-     * @param currentMwdws The instance to clone.
+     * @param currentMwdws  The instance to clone.
      * @param updatePrimary The primary value to set.
      * @return A new instance with the updated primary value.
      */
@@ -78,15 +77,14 @@ public class ResponseTimeAlgorithm {
 
     /**
      * Runs a new progression session (i.e., no existing baseline).
-     *
-     * @param logger The logger to use.
-     * @param serverConnector The server connector to use.
-     * @param runningSession The current session.
+     * @param logger            The logger to use.
+     * @param serverConnector   The server connector to use.
+     * @param runningSession    The current session.
      * @param appOutputProvider A provider which enables us to capture a screenshot.
-     * @param regionProvider Which part of the screenshot we wish to compare.
-     * @param startTime The start time for the test. should be the result of
-     *                  a call to {@link System#currentTimeMillis()}.
-     * @param deadline The expected time by which the application should have been loaded. (Seconds)
+     * @param regionProvider    Which part of the screenshot we wish to compare.
+     * @param startTime         The start time for the test. should be the result of
+     *                          a call to {@link System#currentTimeMillis()}.
+     * @param deadline          The expected time by which the application should have been loaded. (Seconds)
      */
     public static void runNewProgressionSession(Logger logger,
                                                 IServerConnector serverConnector, RunningSession runningSession,
@@ -126,7 +124,7 @@ public class ResponseTimeAlgorithm {
                 tag,
                 true,
                 new MatchWindowData.Options(tag, noUserInputs, false,
-                        false, false, false, null),
+                        false, false, false, null, null),
                 null,
                 null);
         serverConnector.matchWindow(runningSession, mwd);
@@ -140,25 +138,24 @@ public class ResponseTimeAlgorithm {
      * match. It does so by taking screenshots at some interval, and
      * performing the match on a different thread. It is done that way
      * because the matching process is much slower than screenshot taking.
-     *
-     * @param logger The logger to use.
-     * @param serverConnector The server connector to use for the matching.
-     * @param runningSession The current session in which we perform the matching.
+     * @param logger            The logger to use.
+     * @param serverConnector   The server connector to use for the matching.
+     * @param runningSession    The current session in which we perform the matching.
      * @param appOutputProvider A provider which enables us to capture a screenshot.
-     * @param regionProvider Which part of the screenshot we wish to compare.
-     * @param startTime The start time for the test. should be the result of a call to {@code System.currentTimeMillis()}.
-     * @param deadline The expected time by which the application should have been loaded. (Seconds)
-     * @param timeout The maximum time waiting for the application to load. (Seconds)
-     * @param matchInterval The interval between performing matches.
-     * @param collectedData A container in which we will store all the captured screenshots.
+     * @param regionProvider    Which part of the screenshot we wish to compare.
+     * @param startTime         The start time for the test. should be the result of a call to {@code System.currentTimeMillis()}.
+     * @param deadline          The expected time by which the application should have been loaded. (Seconds)
+     * @param timeout           The maximum time waiting for the application to load. (Seconds)
+     * @param matchInterval     The interval between performing matches.
+     * @param collectedData     A container in which we will store all the captured screenshots.
      * @return The result of the initial search.
      */
     private static ResponseTimeInitialMatchSearchResult
-    responseTimeInitialMatchSearch (Logger logger, IServerConnector
+    responseTimeInitialMatchSearch(Logger logger, IServerConnector
             serverConnector, RunningSession runningSession, AppOutputProvider
-            appOutputProvider, RegionProvider regionProvider, long startTime,
-            int deadline, int timeout, long matchInterval,
-            List<MatchWindowDataWithScreenshot> collectedData) {
+                                           appOutputProvider, RegionProvider regionProvider, long startTime,
+                                   int deadline, int timeout, long matchInterval,
+                                   List<MatchWindowDataWithScreenshot> collectedData) {
 
         logger.verbose("responseTimeInitialMatchSearch()");
 
@@ -274,9 +271,8 @@ public class ResponseTimeAlgorithm {
                     tag,
                     true,
                     new MatchWindowData.Options(tag, noUserInputs, true,
-                            true, false, false, null),
-                    null,
-                    null);
+                            true, false, false, null, null),
+                    null, null);
             currentWindowDataWithScreenshot =
                     new MatchWindowDataWithScreenshot(currentWindowData,
                             appOutputWithScreenshot.getScreenshot(null));
@@ -356,22 +352,21 @@ public class ResponseTimeAlgorithm {
 
     /**
      * Recursively binary search for the earliest match.
-     *
-     * @param logger The logger to use.
-     * @param serverConnector The server connector to use for matching.
-     * @param runningSession The session for which we perform the match.
-     * @param dataToSearch The model inside which we search for a match.
-     * @param fromIndex The index in the search getArea from which to start
-     *                  searching. (inclusive)
-     * @param toIndex The index in the search getArea up to which to perform the
-     *                search. (inclusive).
+     * @param logger             The logger to use.
+     * @param serverConnector    The server connector to use for matching.
+     * @param runningSession     The session for which we perform the match.
+     * @param dataToSearch       The model inside which we search for a match.
+     * @param fromIndex          The index in the search getArea from which to start
+     *                           searching. (inclusive)
+     * @param toIndex            The index in the search getArea up to which to perform the
+     *                           search. (inclusive).
      * @param earliestMatchIndex The currently known earliest match index.
      * @return The index of earliest match found.
      */
     private static int binarySearchEarliestMatch(Logger logger,
-            IServerConnector serverConnector, RunningSession runningSession,
-            List<MatchWindowDataWithScreenshot> dataToSearch, int fromIndex,
-            int toIndex, int earliestMatchIndex) {
+                                                 IServerConnector serverConnector, RunningSession runningSession,
+                                                 List<MatchWindowDataWithScreenshot> dataToSearch, int fromIndex,
+                                                 int toIndex, int earliestMatchIndex) {
 
         logger.verbose(String.format("Indices: From %d, to %s ", fromIndex,
                 toIndex));
@@ -405,7 +400,7 @@ public class ResponseTimeAlgorithm {
         // "toIndex" will NEVER be equal to "matchCurrentIndex" unless
         // toIndex==fromIndex, so no need to check for that explicitly.
         if (fromIndex == toIndex ||
-            (toIndex == currentMatchIndex && !matchResult.getAsExpected())) {
+                (toIndex == currentMatchIndex && !matchResult.getAsExpected())) {
 
             logger.verbose(String.format(
                     "Finished matching! Current index: %d, earliest match: %d",
@@ -426,24 +421,23 @@ public class ResponseTimeAlgorithm {
 
     /**
      * Find the EARLIEST match within the collected model.
-     *
-     * @param logger The logger to use.
+     * @param logger          The logger to use.
      * @param serverConnector The server connector to use for the matching.
-     * @param runningSession The current session in which we perform the
-     *                       matching.
-     * @param collectedData The list of captured screenshots in which to
-     *                      search for a match.
-     * @param theMatch The match model of the currently known successful match,
-     *                 or  {@code null} if no match is known.
-     * @param lastNonMatch The match model of the last known failed match, or
-     *                  {@code null} if no such failed match is known.
+     * @param runningSession  The current session in which we perform the
+     *                        matching.
+     * @param collectedData   The list of captured screenshots in which to
+     *                        search for a match.
+     * @param theMatch        The match model of the currently known successful match,
+     *                        or  {@code null} if no match is known.
+     * @param lastNonMatch    The match model of the last known failed match, or
+     *                        {@code null} if no such failed match is known.
      * @return The index of earliest match found.
      */
     private static int findEarliestMatchIndex(Logger logger,
-            IServerConnector serverConnector, RunningSession runningSession,
-            List<MatchWindowDataWithScreenshot> collectedData,
-            MatchWindowDataWithScreenshot theMatch,
-            MatchWindowDataWithScreenshot lastNonMatch) {
+                                              IServerConnector serverConnector, RunningSession runningSession,
+                                              List<MatchWindowDataWithScreenshot> collectedData,
+                                              MatchWindowDataWithScreenshot theMatch,
+                                              MatchWindowDataWithScreenshot lastNonMatch) {
 
         if (theMatch == null) {
             return -1;
@@ -482,13 +476,13 @@ public class ResponseTimeAlgorithm {
      * @param collectedData The list of captured screenshots and their
      *                      meta model.
      * @param theMatchIndex The index of the earliest match found.
-     * @param deadline The deadline given for the progression session.
+     * @param deadline      The deadline given for the progression session.
      * @return The match object which is now marked as primary, or {@code
      * null} if no match exists.
      */
     private static MatchWindowDataWithScreenshot updatePrimary(Logger logger,
-            List<MatchWindowDataWithScreenshot> collectedData,
-            int theMatchIndex, int deadline) {
+                                                               List<MatchWindowDataWithScreenshot> collectedData,
+                                                               int theMatchIndex, int deadline) {
 
         logger.verbose("updatedPrimary()");
 
@@ -548,17 +542,16 @@ public class ResponseTimeAlgorithm {
 
     /**
      * Sets the images in a progression session.
-     *
-     * @param logger The logger to use.
+     * @param logger          The logger to use.
      * @param serverConnector The server connector to use.
-     * @param runningSession The current session.
-     * @param collectedData The list of progression images.
-     * @param theMatchIndex The index of the match within {@code collectedData},
-     *                      or {@code -1} if no match was found.
+     * @param runningSession  The current session.
+     * @param collectedData   The list of progression images.
+     * @param theMatchIndex   The index of the match within {@code collectedData},
+     *                        or {@code -1} if no match was found.
      */
     private static void setProgressionImages(Logger logger, IServerConnector
-        serverConnector, RunningSession runningSession,
-        List<MatchWindowDataWithScreenshot> collectedData, int theMatchIndex) {
+            serverConnector, RunningSession runningSession,
+                                             List<MatchWindowDataWithScreenshot> collectedData, int theMatchIndex) {
 
         logger.verbose("setProgressionImages()");
         logger.verbose("The match index: " + theMatchIndex);
@@ -577,21 +570,21 @@ public class ResponseTimeAlgorithm {
             long currentElapsed = ((TimedAppOutput) currentMwd.getAppOutput())
                     .getElapsed();
             long nextElapsed = ((TimedAppOutput)
-                    collectedData.get(i+1).getMatchWindowData().getAppOutput())
+                    collectedData.get(i + 1).getMatchWindowData().getAppOutput())
                     .getElapsed();
             if (currentElapsed == nextElapsed) {
                 logger.verbose(String.format(
-                    "Skipping image at index %d (same elapsed as next image)..."
+                        "Skipping image at index %d (same elapsed as next image)..."
                         , i));
                 if (((TimedAppOutput)
-                        currentMwd.getAppOutput()).getIsPrimary()){
+                        currentMwd.getAppOutput()).getIsPrimary()) {
                     logger.verbose("Skipped image is primary..");
                     logger.verbose("Moving primary to the next image..");
                     MatchWindowDataWithScreenshot nextMatchData =
-                            collectedData.get(i+1);
+                            collectedData.get(i + 1);
                     nextMatchData = cloneTimedMWDWSWithPrimary(nextMatchData,
                             true);
-                    collectedData.set(i+1, nextMatchData);
+                    collectedData.set(i + 1, nextMatchData);
                     logger.verbose("Done moving primary.");
                 }
 
@@ -609,6 +602,7 @@ public class ResponseTimeAlgorithm {
                             false,
                             true,
                             false,
+                            null,
                             null
                     ),
                     null,
@@ -635,6 +629,7 @@ public class ResponseTimeAlgorithm {
                         false,
                         !forceMatch,
                         forceMatch,
+                        null,
                         null
                 ),
                 null,
@@ -645,28 +640,27 @@ public class ResponseTimeAlgorithm {
 
     /**
      * Runs a progression session, for an existing baseline.
-     *
-     * @param logger The logger to use.
-     * @param serverConnector The server connector to use for the matching.
-     * @param runningSession The current session in which we perform the
-     *                       matching.
+     * @param logger            The logger to use.
+     * @param serverConnector   The server connector to use for the matching.
+     * @param runningSession    The current session in which we perform the
+     *                          matching.
      * @param appOutputProvider A provider which enables us to capture a
      *                          screenshot.
-     * @param regionProvider Which part of the screenshot we wish to compare.
-     * @param startTime The start time for the test. should be the result of
-     *                  a call to {@code System.currentTimeMillis()}.
-     * @param deadline The expected time by which the application
-     *                        should have been loaded. (Seconds)
-     * @param timeout The maximum time waiting for the application to load.
-     *                   (Seconds)
-     * @param matchInterval The interval between performing matches.
+     * @param regionProvider    Which part of the screenshot we wish to compare.
+     * @param startTime         The start time for the test. should be the result of
+     *                          a call to {@code System.currentTimeMillis()}.
+     * @param deadline          The expected time by which the application
+     *                          should have been loaded. (Seconds)
+     * @param timeout           The maximum time waiting for the application to load.
+     *                          (Seconds)
+     * @param matchInterval     The interval between performing matches.
      * @return The earliest match found, or {@code null} if no match is found.
      */
     public static MatchWindowDataWithScreenshot
     runProgressionSessionForExistingBaseline(Logger logger, IServerConnector
             serverConnector, RunningSession runningSession, AppOutputProvider
-             appOutputProvider, RegionProvider regionProvider, long
-            startTime, int deadline, int timeout, long matchInterval) {
+                                                     appOutputProvider, RegionProvider regionProvider, long
+                                                     startTime, int deadline, int timeout, long matchInterval) {
 
         ArgumentGuard.notNull(serverConnector, "serverConnector");
         ArgumentGuard.notNull(runningSession, "runningSession");
@@ -684,16 +678,16 @@ public class ResponseTimeAlgorithm {
         // Run initial progression search for a match.
         ResponseTimeInitialMatchSearchResult initialSearchResult =
                 ResponseTimeAlgorithm.responseTimeInitialMatchSearch(logger,
-                    serverConnector, runningSession, appOutputProvider,
-                    regionProvider, startTime, deadline, timeout, matchInterval,
-                    collectedData);
+                        serverConnector, runningSession, appOutputProvider,
+                        regionProvider, startTime, deadline, timeout, matchInterval,
+                        collectedData);
         MatchWindowDataWithScreenshot theMatch, lastNonMatch;
         theMatch = initialSearchResult.getTheMatch();
         lastNonMatch = initialSearchResult.getLastNonMatch();
 
         logger.verbose("Finished initial search!");
         logger.verbose("No. of screenshots: " + collectedData.size());
-        logger.verbose("Is match found? "  + (theMatch != null));
+        logger.verbose("Is match found? " + (theMatch != null));
 
         if (theMatch != null) {
             logger.verbose("Initial known match index: "

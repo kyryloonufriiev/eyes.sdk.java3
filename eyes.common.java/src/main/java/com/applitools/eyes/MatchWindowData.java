@@ -21,31 +21,33 @@ public class MatchWindowData {
         private final boolean forceMismatch;
         private final boolean forceMatch;
         private final ImageMatchSettings imageMatchSettings;
+        private final String source;
 
 
         /**
-         * @param name                  The tag of the window to be matched.
-         * @param userInputs            A list of triggers between the previous matchWindow
-         *                              call and the current matchWindow call. Can be array
-         *                              of size 0, but MUST NOT be null.
-         * @param ignoreMismatch        Tells the server whether or not to store
-         *                              a mismatch for the current window as window in
-         *                              the session.
-         * @param ignoreMatch           Tells the server whether or not to store
-         *                              a match for the current window as window in
-         *                              the session.
-         * @param forceMismatch         Forces the server to skip the comparison
-         *                              process and mark the current window
-         *                              as a mismatch.
-         * @param forceMatch            Forces the server to skip the comparison
-         *                              process and mark the current window
-         *                              as a match.
-         * @param imageMatchSettings    Settings specifying how the server should compare the image.
+         * @param name               The tag of the window to be matched.
+         * @param userInputs         A list of triggers between the previous matchWindow
+         *                           call and the current matchWindow call. Can be array
+         *                           of size 0, but MUST NOT be null.
+         * @param ignoreMismatch     Tells the server whether or not to store
+         *                           a mismatch for the current window as window in
+         *                           the session.
+         * @param ignoreMatch        Tells the server whether or not to store
+         *                           a match for the current window as window in
+         *                           the session.
+         * @param forceMismatch      Forces the server to skip the comparison
+         *                           process and mark the current window
+         *                           as a mismatch.
+         * @param forceMatch         Forces the server to skip the comparison
+         *                           process and mark the current window
+         *                           as a match.
+         * @param imageMatchSettings Settings specifying how the server should compare the image.
          */
         public Options(String name, Trigger[] userInputs,
                        boolean ignoreMismatch, boolean ignoreMatch,
                        boolean forceMismatch, boolean forceMatch,
-                       ImageMatchSettings imageMatchSettings) {
+                       ImageMatchSettings imageMatchSettings,
+                       String source) {
             ArgumentGuard.notNull(userInputs, "userInputs");
 
             this.name = name;
@@ -55,6 +57,7 @@ public class MatchWindowData {
             this.forceMismatch = forceMismatch;
             this.forceMatch = forceMatch;
             this.imageMatchSettings = imageMatchSettings;
+            this.source = source;
         }
 
         public String getName() {
@@ -81,7 +84,13 @@ public class MatchWindowData {
             return forceMatch;
         }
 
-        public ImageMatchSettings getImageMatchSettings() { return imageMatchSettings; }
+        public ImageMatchSettings getImageMatchSettings() {
+            return imageMatchSettings;
+        }
+
+        public String getSource() {
+            return source;
+        }
     }
 
 
