@@ -80,7 +80,7 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     }
 
     @Override
-    public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings, List<IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location) {
+    public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings, List<IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location, String renderId) {
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         if(checkSettingsInternal.getStitchContent() == null){
@@ -97,7 +97,7 @@ class EyesConnector extends EyesBase implements IEyesConnector {
         AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL);
         AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null, location);
 
-        return matchWindowTask.performMatch(appOutputWithScreenshot, tag, false, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this);
+        return matchWindowTask.performMatch(appOutputWithScreenshot, tag, false, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId);
     }
 
     /**
