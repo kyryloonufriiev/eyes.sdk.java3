@@ -473,7 +473,11 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         List<RGridResource> unparsedResources = addBlobsToCache(allBlobs);
 
-        parseAndCollectExternalResources(unparsedResources, baseUrl.toString(), resourceUrls);
+        String baseUrlAsString = null;
+        if (baseUrl != null) {
+            baseUrlAsString = baseUrl.toString();
+        }
+        parseAndCollectExternalResources(unparsedResources, baseUrlAsString, resourceUrls);
     }
 
 
