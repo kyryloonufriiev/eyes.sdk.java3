@@ -55,9 +55,8 @@ public class ResourceFuture implements IResourceFuture {
 
     @Override
     public RGridResource get() throws InterruptedException {
-        logger.verbose("entering");
+        logger.verbose("entering - "+ url);
         synchronized (url) {
-            logger.verbose("enter - this.rgResource: " + this.rgResource);
             if (this.future == null) {
                 try {
                     IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent);
@@ -80,8 +79,8 @@ public class ResourceFuture implements IResourceFuture {
 
                     logger.verbose("downloading url - : " + url);
 
-                    if(status == 404){
-                        logger.verbose("Status 404 on url - "+url);
+                    if (status == 404) {
+                        logger.verbose("Status 404 on url - " + url);
                         break;
                     }
 
@@ -98,14 +97,13 @@ public class ResourceFuture implements IResourceFuture {
                         }
                         rgResource = new RGridResource(url, contentType, content, logger, "ResourceFuture");
                         break;
-                    }
-                    else{
+                    } else {
                         retryCount--;
                     }
                 } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     retryCount--;
-                    logger.verbose("Entering retry for - "+url);
+                    logger.verbose("Entering retry for - " + url);
                     try {
                         Thread.sleep(300);
                         IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent);
@@ -117,6 +115,7 @@ public class ResourceFuture implements IResourceFuture {
             }
 
         }
+        logger.verbose("enter -1 this.rgResource: " + this.rgResource);
         logger.verbose("exit");
         return rgResource;
     }
