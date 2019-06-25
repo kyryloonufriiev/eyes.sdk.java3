@@ -868,6 +868,7 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean validateEyes() {
         if (isDisabled) {
             logger.verbose("WARNING! Invalid Operation - Eyes Disabled!");
