@@ -1,13 +1,11 @@
 package com.applitools.eyes.selenium.capture;
 
-import com.applitools.eyes.IDownloadListener;
-import com.applitools.eyes.IServerConnector;
-import com.applitools.eyes.Location;
-import com.applitools.eyes.Logger;
+import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
+import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.EfficientStringReplace;
@@ -31,21 +29,22 @@ import java.util.*;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DomCapture {
     private static String CAPTURE_FRAME_SCRIPT;
 
     private final Phaser cssPhaser = new Phaser(); // Phaser for syncing all callbacks on a single Frame
 
-
     static {
         try {
-            CAPTURE_FRAME_SCRIPT = GeneralUtils.readToEnd(DomCapture.class.getResourceAsStream("/captureDom.js"));
+            CAPTURE_FRAME_SCRIPT = GeneralUtils.readToEnd(DomCapture.class.getResourceAsStream("/captureDomAndPoll.js"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private static long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
 
     private static IServerConnector mServerConnector = null;
     private EyesWebDriver driver;
@@ -54,6 +53,8 @@ public class DomCapture {
     private String cssEndToken;
     private Map<String, String> cssData = Collections.synchronizedMap(new HashMap<String, String>());
     private boolean shouldWaitForPhaser = false;
+    private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
+    private Timer timer = new Timer("DomCapture_StopWatch", true);
 
     public DomCapture(SeleniumEyes eyes) {
         mServerConnector = eyes.getServerConnector();
@@ -102,32 +103,58 @@ public class DomCapture {
 
     private String getFrameDom() {
         logger.verbose("Trying to get DOM from driver");
-
-        String scripts = "var callback = arguments[arguments.length - 1]; return (" + CAPTURE_FRAME_SCRIPT + ")().then(callback, function(err) {callback('__ERROR__:' + (err.stack || err.toString()))})";
-
-        String executeScripString = (String) driver.executeAsyncScript(scripts);
-
-        List<String> missingCssList = new ArrayList<>();
-        List<String> missingFramesList = new ArrayList<>();
-        List<String> data = new ArrayList<>();
-
-        Separators separators = parseScriptResult(executeScripString, missingCssList, missingFramesList, data);
-        cssStartToken = separators.cssStartToken;
-        cssEndToken = separators.cssEndToken;
-
-        fetchCssFiles(missingCssList);
-
-        Map<String, String> framesData = null;
         try {
-            framesData = recurseFrames(missingFramesList);
-        } catch (Exception e) {
+            isCheckTimerTimedOut.set(false);
+            timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
+            String resultAsString;
+            ScriptResponse.Status status = null;
+            ScriptResponse scriptResponse = null;
+            do {
+                resultAsString = (String) this.driver.executeScript(CAPTURE_FRAME_SCRIPT + "return __captureDomAndPoll();");
+                try {
+                    scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
+                    status = scriptResponse.getStatus();
+                } catch (IOException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
+                Thread.sleep(200);
+
+            } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
+
+            if (status == ScriptResponse.Status.ERROR) {
+                throw new EyesException("DomCapture Error: " + scriptResponse.getError());
+            }
+
+            if (isCheckTimerTimedOut.get()) {
+                throw new EyesException("DomCapture Timed out");
+            }
+            String executeScripString = scriptResponse.getValue();
+
+            List<String> missingCssList = new ArrayList<>();
+            List<String> missingFramesList = new ArrayList<>();
+            List<String> data = new ArrayList<>();
+
+            Separators separators = parseScriptResult(executeScripString, missingCssList, missingFramesList, data);
+            cssStartToken = separators.cssStartToken;
+            cssEndToken = separators.cssEndToken;
+
+            fetchCssFiles(missingCssList);
+
+            Map<String, String> framesData = null;
+            try {
+                framesData = recurseFrames(missingFramesList);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //noinspection UnnecessaryLocalVariable
+            String inlaidString = EfficientStringReplace.efficientStringReplace(
+                    separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
+            return inlaidString;
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        //noinspection UnnecessaryLocalVariable
-        String inlaidString = EfficientStringReplace.efficientStringReplace(
-                separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
-        return inlaidString;
+        return "";
     }
 
     private Map<String, String> recurseFrames(List<String> missingFramesList) {
@@ -365,6 +392,14 @@ public class DomCapture {
         ICommonsList<CSSImportRule> allImportRules = cascadingStyleSheet.getAllImportRules();
         node.setAllImportRules(allImportRules);
         node.setAllStyleRules(cascadingStyleSheet.getAllStyleRules());
+    }
+
+    private class TimeoutTask extends TimerTask {
+        @Override
+        public void run() {
+            logger.verbose("Check Timer timeout.");
+            isCheckTimerTimedOut.set(true);
+        }
     }
 
 }
