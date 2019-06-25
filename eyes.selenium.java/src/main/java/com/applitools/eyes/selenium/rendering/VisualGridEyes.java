@@ -510,10 +510,12 @@ public class VisualGridEyes implements IRenderingEyes {
             } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
 
             if (status == ScriptResponse.Status.ERROR) {
+                switchTo.frames(originalFC);
                 throw new EyesException("DomSnapshot Error: " + scriptResponse.getError());
             }
 
             if (isCheckTimerTimedOut.get()) {
+                switchTo.frames(originalFC);
                 throw new EyesException("Domsnapshot Timed out");
             }
             FrameData scriptResult = scriptResponse.getValue();
@@ -561,6 +563,7 @@ public class VisualGridEyes implements IRenderingEyes {
                         }
                     }, regionsXPaths, userAgent);
             logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
+            switchTo.frames(originalFC);
         } catch (IllegalArgumentException | EyesException | InterruptedException e) {
             Error error = new Error(e);
             abort();
