@@ -3,6 +3,8 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.*;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITest;
@@ -66,6 +68,8 @@ public abstract class TestSetup implements ITest {
 
         seleniumEyes.setHideScrollbars(true);
 
+//        seleniumEyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
+
         String batchId = System.getenv("APPLITOOLS_BATCH_ID");
         if (batchId != null) {
             TestsDataProvider.batchInfo.setId(batchId);
@@ -116,7 +120,7 @@ public abstract class TestSetup implements ITest {
                 .replace("]", "");
 
         String seleniumServerUrl = System.getenv("SELENIUM_SERVER_URL");
-        if (seleniumServerUrl.equalsIgnoreCase("http://ondemand.saucelabs.com/wd/hub")) {
+        if ("http://ondemand.saucelabs.com/wd/hub".equalsIgnoreCase(seleniumServerUrl)) {
             desiredCaps.setCapability("username", System.getenv("SAUCE_USERNAME"));
             desiredCaps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
             //desiredCaps.setCapability("seleniumVersion", "3.11.0");
@@ -128,7 +132,7 @@ public abstract class TestSetup implements ITest {
             desiredCaps.setCapability("platform", platform);
             desiredCaps.setCapability("name", testName + " (" + seleniumEyes.getFullAgentId() + ")");
 
-        } else if (seleniumServerUrl.equalsIgnoreCase("http://hub-cloud.browserstack.com/wd/hub")) {
+        } else if ("http://hub-cloud.browserstack.com/wd/hub".equalsIgnoreCase(seleniumServerUrl)) {
             seleniumServerUrl = "http://" + System.getenv("BROWSERSTACK_USERNAME") + ":" + System.getenv("BROWSERSTACK_ACCESS_KEY") + "@hub-cloud.browserstack.com/wd/hub";
             desiredCaps.setCapability("platform", platform);
             desiredCaps.setCapability("name", testName + " (" + seleniumEyes.getFullAgentId() + ")");
@@ -146,9 +150,16 @@ public abstract class TestSetup implements ITest {
                 platform + "_" +
                 dateFormat.format(Calendar.getInstance().getTime());
 
-        try {
-            webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), caps);
-        } catch (MalformedURLException ignored) {
+        if (seleniumServerUrl != null) {
+            try {
+                webDriver = new RemoteWebDriver(new URL(seleniumServerUrl), caps);
+            } catch (MalformedURLException ignored) {
+            }
+        } else {
+            switch (caps.getBrowserName()){
+                case "chrome": webDriver = new ChromeDriver((ChromeOptions)caps); break;
+                default: return;
+            }
         }
 
         LogHandler logHandler;
