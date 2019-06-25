@@ -380,10 +380,10 @@ public class ImageUtils {
         // buf2 has width and height of dst2
         DataBuffer buf2 = new DataBufferByte(wDst2 * hDst2 * 4);
         for (i = 0; i < hDst2; i++) {
+            y = (double) i * (hSrc - 1) / hDst2;
+            yPos = (int) Math.floor(y);
+            t = y - yPos;
             for (j = 0; j < wDst2; j++) {
-                y = (double) i * (hSrc - 1) / hDst2;
-                yPos = (int) Math.floor(y);
-                t = y - yPos;
                 buf1Pos = (yPos * wDst2 + j) * 4;
                 buf2Pos = (i * wDst2 + j) * 4;
                 for (k = 0; k < 4; k++) {
