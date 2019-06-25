@@ -54,7 +54,7 @@ public class VisualGridEyes implements IRenderingEyes {
     private ISeleniumConfigurationProvider configProvider;
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
-    private AtomicBoolean isCheckTimerTimedout = new AtomicBoolean(false);
+    private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
     private Timer timer = new Timer("VG_StopWatch", true);
     private final List<PropertyData> properties = new ArrayList<>();
 
@@ -486,7 +486,7 @@ public class VisualGridEyes implements IRenderingEyes {
                 switchTo.parentFrame();
             }
 
-            isCheckTimerTimedout.set(false);
+            isCheckTimerTimedOut.set(false);
 
             List<VisualGridTask> openVisualGridTasks = addOpenTaskToAllRunningTest();
 
@@ -508,13 +508,13 @@ public class VisualGridEyes implements IRenderingEyes {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                 }
                 Thread.sleep(200);
-            } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedout.get());
+            } while (status == ScriptResponse.Status.WIP && !isCheckTimerTimedOut.get());
 
             if (status == ScriptResponse.Status.ERROR) {
                 throw new EyesException("DomSnapshot Error: " + scriptResponse.getError());
             }
 
-            if (isCheckTimerTimedout.get()) {
+            if (isCheckTimerTimedOut.get()) {
                 throw new EyesException("Domsnapshot Timed out");
             }
             FrameData scriptResult = scriptResponse.getValue();
@@ -525,7 +525,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
             logger.verbose("regionXPaths : " + regionsXPaths);
 
-            List<RunningTest> filtteredTests = new ArrayList<>();
+            List<RunningTest> filteredTests = new ArrayList<>();
 
             checkSettingsInternal = updateCheckSettings(checkSettings);
 
@@ -535,14 +535,13 @@ public class VisualGridEyes implements IRenderingEyes {
                     VisualGridTask visualGridTask = taskList.get(taskList.size() - 1);
                     VisualGridTask.TaskType taskType = visualGridTask.getType();
                     if (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT) {
-                        filtteredTests.add(test);
+                        filteredTests.add(test);
                     }
                 }
-
             }
 
             String source = webDriver.getCurrentUrl();
-            for (RunningTest runningTest : filtteredTests) {
+            for (RunningTest runningTest : filteredTests) {
                 VisualGridTask checkVisualGridTask = runningTest.check((ICheckSettings) checkSettingsInternal, regionsXPaths, source);
                 visualGridTaskList.add(checkVisualGridTask);
             }
@@ -859,7 +858,7 @@ public class VisualGridEyes implements IRenderingEyes {
         @Override
         public void run() {
             logger.verbose("Check Timer timeout.");
-            isCheckTimerTimedout.set(true);
+            isCheckTimerTimedOut.set(true);
         }
     }
 
