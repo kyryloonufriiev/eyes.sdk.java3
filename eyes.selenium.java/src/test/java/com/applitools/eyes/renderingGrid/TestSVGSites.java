@@ -18,7 +18,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class TestTopSites {
+public class TestSVGSites {
     private VisualGridRunner visualGridRunner;
 
     private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
