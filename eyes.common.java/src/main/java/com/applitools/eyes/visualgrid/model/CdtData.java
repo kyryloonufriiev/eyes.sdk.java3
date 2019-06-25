@@ -14,6 +14,8 @@ public class CdtData {
 
     public List<AttributeData> attributes;
 
+    public Integer shadowRootIndex;
+
     @Override
     public String toString() {
         return "CdtData{" +
@@ -22,6 +24,7 @@ public class CdtData {
                 ", nodeName='" + nodeName + '\'' +
                 ", nodeValue='" + nodeValue + '\'' +
                 ", attributes=" + attributes +
+                ", shadowRootIndex=" + shadowRootIndex +
                 '}';
     }
 }

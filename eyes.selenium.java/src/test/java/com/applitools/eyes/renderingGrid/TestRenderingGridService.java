@@ -81,6 +81,44 @@ public final class TestRenderingGridService {
         }
     }
 
+    @Test
+    public void testShadowDom() {
+
+        Eyes eyes = new Eyes(renderingManager);
+        eyes.setBatch(new BatchInfo("Visual Grid Shadow Dom Test"));
+
+        try {
+            Configuration configuration = new Configuration();
+            configuration.setTestName("Visual Grid Shadow Dom Test");
+            configuration.setAppName("Visual Grid Shadow Dom Test");
+            configuration.addBrowser(1200, 800, BrowserType.CHROME);
+            configuration.addBrowser(1200, 800, BrowserType.FIREFOX);
+            configuration.addBrowser(1200, 800, BrowserType.EDGE);
+            configuration.addBrowser(1200, 800, BrowserType.IE_10);
+            configuration.addBrowser(1200, 800, BrowserType.IE_11);
+//            eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
+            //VisualGridEyes.setServerUrl("https://eyes.applitools.com/");
+            eyes.setConfiguration(configuration);
+            eyes.open(webDriver);
+            webDriver.get("https://applitools.github.io/demo/TestPages/DomTest/shadow_dom.html");
+            Thread.sleep(500);
+            //CheckRGSettings setting = new CheckRGSettings(CheckRGSettings.SizeMode.FULL_PAGE, null, null, false);
+            eyes.check(Target.window());
+            TestResults close = eyes.close();
+            Assert.assertNotNull(close);
+
+        } catch (Exception e) {
+            GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
+        } finally {
+            if (webDriver != null) {
+                webDriver.quit();
+            }
+            TestResultSummary allTestResults = renderingManager.getAllTestResults();
+            System.out.println(allTestResults);
+            // End the test.
+        }
+    }
+
     @AfterMethod
     public void After(ITestContext testContext) {
         renderingManager.getLogger().log(renderingManager.getAllTestResults().toString());
