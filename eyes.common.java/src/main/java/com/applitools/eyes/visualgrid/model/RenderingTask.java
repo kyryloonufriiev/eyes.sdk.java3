@@ -764,8 +764,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String url;
         for (RGridResource blob : allBlobs.values()) {
             url = blob.getUrl();
-            url = url.endsWith("?") ? url.substring(0, url.length() - 1) : url;
-            blob.setUrl(url);
+            blob.setUrl(sanitizeURL(url));
             String contentType = blob.getContentType();
             if (contentType != null && !contentType.equalsIgnoreCase(CDT)) {
                 IResourceFuture resourceFuture = this.eyesConnector.createResourceFuture(blob);
@@ -786,7 +785,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         while (iterator.hasNext()) {
             URL link = iterator.next();
             String url = link.toString();
-            url = url.endsWith(QUESTION_MARK) ? url.substring(0, url.length() - 1) : url;
+            url = sanitizeURL(url);
             synchronized (this.fetchedCacheMap) {
                 // If resource is already being fetched, remove it from the list, and use the future.
                 IResourceFuture fetch = fetchedCacheMap.get(url);
@@ -986,6 +985,17 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             logger.verbose("VG is Timed out!");
             isTimeElapsed.set(true);
         }
+    }
+
+
+    private String sanitizeURL(String urlToSanitize) {
+        try {
+            URL url = new URL(urlToSanitize);
+            return url.getProtocol() + "://"+ url.getAuthority() + url.getPath() + (url.getQuery() != null && !url.getQuery().isEmpty() ? QUESTION_MARK + url.getQuery() : "");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return urlToSanitize;
     }
 }
 
