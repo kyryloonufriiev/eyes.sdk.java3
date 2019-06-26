@@ -17,6 +17,7 @@
             <class name="com.applitools.eyes.renderingGrid.TestVGDemo" />
             <class name="com.applitools.eyes.renderingGrid.TestTopSites" />
             <class name="com.applitools.eyes.renderingGrid.TestRenderingGridServiceWithJsHook" />
+            <class name="com.applitools.eyes.renderingGrid.TestSVGSites" />
         </classes>
     </test>
     <test name="Test_Mobile" parallel="methods">

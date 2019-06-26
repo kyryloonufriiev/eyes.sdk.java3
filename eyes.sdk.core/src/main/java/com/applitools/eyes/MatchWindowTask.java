@@ -394,9 +394,8 @@ public class MatchWindowTask {
         if (checkSettingsInternal != null)
         {
             MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : eyes.getConfigGetter().getDefaultMatchSettings().getMatchLevel();
-            imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : true );
+            imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false );
             imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
-            imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
             imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements());
         }

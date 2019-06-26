@@ -1,12 +1,14 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.BatchInfo;
+import com.applitools.eyes.FileLogger;
+import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.visualgrid.model.TestResultContainer;
+import com.applitools.eyes.visualgrid.model.TestResultSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
@@ -21,15 +23,10 @@ import java.util.Calendar;
 public class TestSVGSites {
     private VisualGridRunner visualGridRunner;
 
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    private String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
-
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
-//        visualGridRunner.setLogHandler(new StdoutLogHandler(true));
-        FileLogger logHandler = new FileLogger("eyes.log", false, true);
+        FileLogger logHandler = new FileLogger("SVGs.log", false, true);
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");
     }
@@ -37,50 +34,34 @@ public class TestSVGSites {
     @DataProvider(name = "dp", parallel = true)
     public static Object[][] dp() {
         return new Object[][]{
-//                {"https://carbon.sage.com/components/button-toggle-group"},
-//                {"https://google.com"},
-//                {"https://facebook.com"},
-//                {"https://amazon.com"},
-//                {"https://ebay.com"},
-//                {"https://twitter.com"},
+                {"https://carbon.sage.com/components/button-toggle-group"},
                 {"https://wikipedia.org"},
-//                {"https://instagram.com"},
-//                {"https://www.target.com/c/blankets-throws/-/N-d6wsb?lnk=ThrowsBlankets%E2%80%9C,tc"},
+                {"https://www.just-eat.co.uk/"},
         };
     }
 
     private Eyes initEyes(WebDriver webDriver, String testedUrl) {
         Eyes eyes = new Eyes(visualGridRunner);
-        BatchInfo batchInfo = new BatchInfo("Top Ten Sites");
-        batchInfo.setId("Target2");
-        eyes.setBatch(batchInfo);
-        eyes.setEnvName("TTS - migel");
-        initLogging(testedUrl, eyes);
-
+        BatchInfo batchInfo = new BatchInfo("SVG Sites");
+        batchInfo.setId("SVGs");
+        eyes.setApiKey("97ELuwdIiAilbeumIilysV8yY24tygCeRFFTYEBO7EfE110");
         Logger logger = eyes.getLogger();
         logger.log("creating WebDriver: " + testedUrl);
 
         try {
             Configuration configuration = new Configuration();
-            configuration.setTestName("Top 10 websites - " + testedUrl);
-            configuration.setAppName("Top Ten Sites");
-            configuration.setBatch(new BatchInfo("TTS - config batch"));
-            configuration.setBranchName("TTS - config branch");
-            configuration.setBaselineEnvName("My Other Env Name");
-            String environment = "My env name";
-            ChromeEmulationInfo emulation = new ChromeEmulationInfo(DeviceName.iPhone_4, ScreenOrientation.PORTRAIT);
-            configuration.addBrowser(800, 600, BrowserType.CHROME, environment);
-            configuration.addBrowser(700, 500, BrowserType.FIREFOX, environment);
-            configuration.addBrowser(700, 500, BrowserType.IE_10, environment);
-            configuration.addBrowser(700, 500, BrowserType.IE_11, environment);
-            configuration.addBrowser(1600, 1200, BrowserType.CHROME, environment);
-            configuration.addBrowser(1200, 800, BrowserType.EDGE, environment);
-//            configuration.addDeviceEmulation(emulation);
+            configuration.setAppName("Eyes Java SDK - SVG Sites");
+            configuration.setTestName("testedUrl");
+            configuration.setBatch(batchInfo);
+            configuration.addBrowser(800, 600, BrowserType.CHROME);
+            configuration.addBrowser(700, 500, BrowserType.FIREFOX);
+            configuration.addBrowser(700, 500, BrowserType.IE_10);
+            configuration.addBrowser(700, 500, BrowserType.IE_11);
+            configuration.addBrowser(1600, 1200, BrowserType.CHROME);
+            configuration.addBrowser(1200, 800, BrowserType.EDGE);
             logger.log("created configurations for url " + testedUrl);
-            //VisualGridEyes.setServerUrl("https://eyes.applitools.com/");
-            configuration.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
             eyes.setConfiguration(configuration);
-            eyes.open(webDriver, "Michael's App", "First Test", new RectangleSize(1200, 800));
+            eyes.open(webDriver);
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
@@ -97,7 +78,6 @@ public class TestSVGSites {
         logger.log("navigated to " + testedUrl);
 
         try {
-            //CheckRGSettings setting = new CheckRGSettings(CheckRGSettings.SizeMode.FULL_PAGE, null, null, false);
             logger.log("running check for url " + testedUrl);
             try {
                 eyes.check(Target.window().withName("Step1 - " + testedUrl).sendDom(true));
@@ -106,9 +86,6 @@ public class TestSVGSites {
                 e.printStackTrace();
             }
             eyes.getLogger().log("calling VisualGridEyes.close() for url " + testedUrl);
-//            VisualGridEyes.close();
-//            TestResults close = eyes.close(true);
-//            Assert.assertNotNull(close);
             eyes.closeAsync();
             logger.log("end of `try` block for url " + testedUrl);
         } catch (Exception e) {
@@ -121,17 +98,6 @@ public class TestSVGSites {
         }
     }
 
-    private void initLogging(String testedUrl, Eyes eyes) {
-        String testName = testedUrl.substring(8);
-        String path = "." + File.separator+ "sageDebug" + File.separator;
-        visualGridRunner.setDebugResourceWriter(new FileDebugResourceWriter(eyes.getLogger(), path,"", ""));
-//        FileDebugResourceWriter fileDebugResourceWriter = new FileDebugResourceWriter(visualGridRunner.getLogger(), path, null, null);
-//        VisualGridEyes.setDebugResourceWriter(fileDebugResourceWriter);
-
-//        FileLogger eyesLogger = new FileLogger("TopTenSites.log", true, true);
-//        eyes.setLogHandler(eyesLogger);
-    }
-
     @AfterMethod
     public void afterMethod(ITestContext testContext) {
         visualGridRunner.getLogger().log("enter");
@@ -139,7 +105,7 @@ public class TestSVGSites {
 
     @AfterClass
     public void afterClass(ITestContext testContext) {
-        TestResultSummary allTestResults = visualGridRunner.getAllTestResults(false);
+        TestResultSummary allTestResults = visualGridRunner.getAllTestResults();
         for (TestResultContainer allTestResult : allTestResults) {
             System.out.println(allTestResult.toString());
         }

@@ -37,23 +37,24 @@ public class TestTopSites {
     @DataProvider(name = "dp", parallel = true)
     public static Object[][] dp() {
         return new Object[][]{
-                {"https://google.com"},
-                {"https://facebook.com"},
+//                {"https://google.com"},
+//                {"https://facebook.com"},
+//                {"https://twitter.com"},
+//                {"https://wikipedia.org"},
+//                {"https://instagram.com"},
+
+//                {"https://www.pnc.com"},
                 {"https://amazon.com"},
-//                {"https://ebay.com"},
-                {"https://twitter.com"},
-                {"https://wikipedia.org"},
-                {"https://instagram.com"},
-//                {"https://www.target.com/c/blankets-throws/-/N-d6wsb?lnk=ThrowsBlankets%E2%80%9C,tc"},
         };
     }
 
     private Eyes initEyes(WebDriver webDriver, String testedUrl) {
         Eyes eyes = new Eyes(visualGridRunner);
-        BatchInfo batchInfo = new BatchInfo("Top Ten Sites");
-        batchInfo.setId("Target2");
+        BatchInfo batchInfo = new BatchInfo("Top Ten Sites2");
+        batchInfo.setId("Target22");
         eyes.setBatch(batchInfo);
         eyes.setEnvName("TTS - migel");
+        eyes.setMatchLevel(MatchLevel.LAYOUT);
         initLogging(testedUrl, eyes);
 
         Logger logger = eyes.getLogger();
@@ -137,7 +138,7 @@ public class TestTopSites {
 
     @AfterClass
     public void afterClass(ITestContext testContext) {
-        TestResultSummary allTestResults = visualGridRunner.getAllTestResults(false);
+        TestResultSummary allTestResults = visualGridRunner.getAllTestResults();
         for (TestResultContainer allTestResult : allTestResults) {
             System.out.println(allTestResult.toString());
         }
