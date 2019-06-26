@@ -26,7 +26,7 @@ public interface IServerConnector {
     String API_PATH = "/" + API_SESSIONS + "/running";
     String DEFAULT_CHARSET_NAME = "UTF-8";
     int THREAD_SLEEP_MILLIS = 3;
-    int NUM_OF_RETRIES = 100;
+    int NUM_OF_RETRIES = 20;
 
     void setApiKey(String apiKey);
 

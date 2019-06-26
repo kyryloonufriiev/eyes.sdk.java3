@@ -37,14 +37,12 @@ public class TestTopSites {
     @DataProvider(name = "dp", parallel = true)
     public static Object[][] dp() {
         return new Object[][]{
-//                {"https://google.com"},
-//                {"https://facebook.com"},
-//                {"https://twitter.com"},
-//                {"https://wikipedia.org"},
-//                {"https://instagram.com"},
-
-//                {"https://www.pnc.com"},
                 {"https://amazon.com"},
+//                {"https://ebay.com"},
+                {"https://twitter.com"},
+                {"https://wikipedia.org"},
+                {"https://instagram.com"},
+                {"https://www.target.com/c/blankets-throws/-/N-d6wsb?lnk=ThrowsBlankets%E2%80%9C,tc"},
         };
     }
 
@@ -92,7 +90,7 @@ public class TestTopSites {
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
         WebDriver webDriver = new ChromeDriver();
         webDriver.get(testedUrl);
-        Eyes eyes = (Eyes) initEyes(webDriver, testedUrl);
+        Eyes eyes = initEyes(webDriver, testedUrl);
         Logger logger = eyes.getLogger();
         logger.log("navigated to " + testedUrl);
 
@@ -100,8 +98,8 @@ public class TestTopSites {
             //CheckRGSettings setting = new CheckRGSettings(CheckRGSettings.SizeMode.FULL_PAGE, null, null, false);
             logger.log("running check for url " + testedUrl);
             try {
-                eyes.check(Target.window().withName("Step1 - " + testedUrl).sendDom(true));
-                eyes.check(Target.window().fully(false).withName("Step2 - " + testedUrl).sendDom(true));
+                eyes.check(Target.window().withName("Step1 - " + testedUrl).sendDom(true).useDom(true));
+                eyes.check(Target.window().fully(false).withName("Step2 - " + testedUrl).sendDom(true).useDom(true));
             } catch (Exception e) {
                 e.printStackTrace();
             }

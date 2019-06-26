@@ -80,5 +80,9 @@ public class RGridResource {
     public boolean isResourceParsed() {
         return isResourceParsed.get();
     }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }
 

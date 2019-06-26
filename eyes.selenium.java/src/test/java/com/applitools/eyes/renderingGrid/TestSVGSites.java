@@ -73,7 +73,7 @@ public class TestSVGSites {
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
         WebDriver webDriver = new ChromeDriver();
         webDriver.get(testedUrl);
-        Eyes eyes = (Eyes) initEyes(webDriver, testedUrl);
+        Eyes eyes = initEyes(webDriver, testedUrl);
         Logger logger = eyes.getLogger();
         logger.log("navigated to " + testedUrl);
 

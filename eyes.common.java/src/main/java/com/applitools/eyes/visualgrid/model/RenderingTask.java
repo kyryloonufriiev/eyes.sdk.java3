@@ -41,9 +41,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     public static final String FULLPAGE = "full-page";
     public static final String VIEWPORT = "viewport";
     public static final int HOUR = 60 * 60 * 1000;
-    public static final String XLINK_HREF = "//@href | //@xlink:href";
     public static final String TEXT_CSS = "text/css";
     public static final String IMAGE_SVG_XML = "image/svg+xml";
+    public static final String QUESTION_MARK = "?";
 
     private final List<RenderTaskListener> listeners = new ArrayList<>();
     private IEyesConnector eyesConnector;
@@ -515,7 +515,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private List<RenderRequest> buildRenderRequests(FrameData result, Map<String, RGridResource> resourceMapping) {
 
-        RGridDom dom = new RGridDom(result.getCdt(), resourceMapping, result.getUrl().toString(), logger, "buildRenderRequests");
+        RGridDom dom = new RGridDom(result.getCdt(), resourceMapping, result.getUrl(), logger, "buildRenderRequests");
 
         this.dom = dom;
 
@@ -543,7 +543,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(),
                     sizeMode, checkSettingsInternal.getRegion(), checkSettingsInternal.getVGTargetSelector(), browserInfo.getEmulationInfo());
 
-            RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl().toString(), dom,
+            RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),
                     checkSettingsInternal.getScriptHooks(), regionSelectorsList, checkSettingsInternal.isSendDom(), visualGridTask);
 
@@ -764,6 +764,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String url;
         for (RGridResource blob : allBlobs.values()) {
             url = blob.getUrl();
+            url = url.endsWith("?") ? url.substring(0, url.length() - 1) : url;
+            blob.setUrl(url);
             String contentType = blob.getContentType();
             if (contentType != null && !contentType.equalsIgnoreCase(CDT)) {
                 IResourceFuture resourceFuture = this.eyesConnector.createResourceFuture(blob);
@@ -784,6 +786,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         while (iterator.hasNext()) {
             URL link = iterator.next();
             String url = link.toString();
+            url = url.endsWith(QUESTION_MARK) ? url.substring(0, url.length() - 1) : url;
             synchronized (this.fetchedCacheMap) {
                 // If resource is already being fetched, remove it from the list, and use the future.
                 IResourceFuture fetch = fetchedCacheMap.get(url);
