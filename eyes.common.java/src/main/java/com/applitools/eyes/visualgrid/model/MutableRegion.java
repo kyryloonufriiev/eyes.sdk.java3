@@ -1,9 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
-import com.applitools.eyes.CoordinatesType;
-import com.applitools.eyes.Location;
-import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.Region;
+import com.applitools.eyes.*;
 
 public class MutableRegion extends Region {
 
@@ -23,7 +20,7 @@ public class MutableRegion extends Region {
         super(location, size, coordinatesType);
     }
 
-    public MutableRegion(Region region) {
+    public MutableRegion(IRegion region) {
         super(region);
     }
 

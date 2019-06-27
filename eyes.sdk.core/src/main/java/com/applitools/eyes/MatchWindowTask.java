@@ -194,7 +194,7 @@ public class MatchWindowTask {
                     canAddRegion = true;
                 }
             }
-            MutableRegion mr = new MutableRegion((Region) region);
+            MutableRegion mr = new MutableRegion(region);
             mutableRegions.get(currentTypeIndex).add(mr);
         }
 

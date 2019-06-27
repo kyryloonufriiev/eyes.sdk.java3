@@ -45,7 +45,7 @@ public class TestVGWithJunit {
     @After
     public void tearDown() {
         driver.quit();
-        eyes.abortIfNotClosed();
+        eyes.close();
         runner.getAllTestResults();
     }
     @Test
