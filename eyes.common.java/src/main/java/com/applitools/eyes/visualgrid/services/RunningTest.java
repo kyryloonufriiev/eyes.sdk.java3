@@ -69,7 +69,8 @@ public class RunningTest {
     }
 
     public void abortIfNotClosed() {
-//        if(this.)
+        if(isCloseTaskIssued.get()) return;
+        abort();
     }
 
     public interface RunningTestListener {

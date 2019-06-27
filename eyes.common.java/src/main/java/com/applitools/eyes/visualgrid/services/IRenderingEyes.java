@@ -23,6 +23,8 @@ public interface IRenderingEyes {
 
     Logger getLogger();
 
+    List<TestResultContainer> getAllTestResults();
+
     interface EyesListener{
 
         void onTaskComplete(VisualGridTask visualGridTask, IRenderingEyes eyes);

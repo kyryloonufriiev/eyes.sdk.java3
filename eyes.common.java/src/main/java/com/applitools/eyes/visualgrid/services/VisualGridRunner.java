@@ -418,6 +418,7 @@ public class VisualGridRunner extends EyesRunner {
 
             Collection<Future<TestResultContainer>> value = entry.getValue();
             IRenderingEyes key = entry.getKey();
+            key.getAllTestResults().clear();
             logger.verbose("trying to call future.get on " + value.size() + " futures of " + key);
             for (Future<TestResultContainer> future : value) {
                 logger.verbose("calling future.get on " + key);
@@ -435,6 +436,7 @@ public class VisualGridRunner extends EyesRunner {
                 }
                 logger.verbose("got TestResultContainer: " + obj);
                 allResults.add(obj);
+                key.getAllTestResults().add(obj);
             }
 
         }
