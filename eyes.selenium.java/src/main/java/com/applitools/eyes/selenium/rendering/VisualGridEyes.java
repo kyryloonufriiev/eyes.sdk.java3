@@ -41,6 +41,7 @@ public class VisualGridEyes implements IRenderingEyes {
     private final List<RunningTest> testsInCloseProcess = Collections.synchronizedList(new ArrayList<RunningTest>());
     private AtomicBoolean isVGEyesIssuedOpenTasks = new AtomicBoolean(false);
     private IRenderingEyes.EyesListener listener;
+    List<TestResultContainer> allTestResults = new ArrayList<>();
 
     private String PROCESS_RESOURCES;
     private EyesWebDriver webDriver;
@@ -884,4 +885,8 @@ public class VisualGridEyes implements IRenderingEyes {
         return true;
     }
 
+    @Override
+    public List<TestResultContainer> getAllTestResults() {
+        return allTestResults;
+    }
 }
