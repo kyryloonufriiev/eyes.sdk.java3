@@ -22,7 +22,7 @@ public class RenderStatusResults {
 
     private String error = null;
 
-    private List<IRegion> selectorRegions = null;
+    private List<VGRegion> selectorRegions = null;
 
     private RectangleSize deviceSize = null;
 
@@ -74,11 +74,11 @@ public class RenderStatusResults {
         this.error = error;
     }
 
-    public List<IRegion> getSelectorRegions() {
+    public List<VGRegion> getSelectorRegions() {
         return selectorRegions;
     }
 
-    public void setSelectorRegions(List<IRegion> selectorRegions) {
+    public void setSelectorRegions(List<VGRegion> selectorRegions) {
         this.selectorRegions = selectorRegions;
     }
 

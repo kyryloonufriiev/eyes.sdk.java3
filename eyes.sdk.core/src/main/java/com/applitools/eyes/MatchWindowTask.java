@@ -135,7 +135,7 @@ public class MatchWindowTask {
                                     String tag, boolean ignoreMismatch,
                                     ICheckSettingsInternal checkSettingsInternal,
                                     ImageMatchSettings imageMatchSettings,
-                                    List<IRegion> regions,
+                                    List<? extends IRegion> regions,
                                     List<VisualGridSelector[]> regionSelectors,
                                     EyesBase eyes, String renderId, String source)
     {
@@ -167,7 +167,7 @@ public class MatchWindowTask {
         return serverConnector.matchWindow(runningSession, data);
     }
 
-    private static void collectRegions(ImageMatchSettings imageMatchSettings, List<IRegion> regions, List<VisualGridSelector[]> regionSelectors) {
+    private static void collectRegions(ImageMatchSettings imageMatchSettings, List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors) {
         if (regions == null) return;
 
         int currentCounter = 0;

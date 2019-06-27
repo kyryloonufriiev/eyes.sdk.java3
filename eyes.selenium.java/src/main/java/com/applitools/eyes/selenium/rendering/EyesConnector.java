@@ -81,7 +81,7 @@ class EyesConnector extends EyesBase implements IEyesConnector {
 
     @Override
     public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
-                                   List<IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
+                                   List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
                                    String renderId, String source) {
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
