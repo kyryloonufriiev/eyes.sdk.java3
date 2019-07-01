@@ -260,7 +260,7 @@ public class FullPageCaptureAlgorithm {
             debugScreenshotsProvider.save(scaledCroppedPartImage, "scaledCroppedPartImage-" + targetPosition.getX() + "_" + targetPosition.getY());
             logger.verbose("pasting part at " + targetPosition);
 
-            stitchedImage.getRaster().setRect(targetPosition.getX(), targetPosition.getY(), partImage.getData());
+            stitchedImage.getRaster().setRect(targetPosition.getX(), targetPosition.getY(), scaledCroppedPartImage.getData());
 
             debugScreenshotsProvider.save(stitchedImage, "stitched" + index + "(" + targetPosition.toStringForFilename() + ")");
             index++;
