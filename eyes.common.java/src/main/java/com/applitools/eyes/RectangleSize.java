@@ -27,6 +27,12 @@ public class RectangleSize {
         this.height = height;
     }
 
+    public RectangleSize(RectangleSize source) {
+        ArgumentGuard.notNull(source, "Source RectangleSize is null");
+        this.height = source.height;
+        this.width = source.width;
+    }
+
     public boolean isEmpty() {
         return this.width == 0 && this.height == 0;
     }

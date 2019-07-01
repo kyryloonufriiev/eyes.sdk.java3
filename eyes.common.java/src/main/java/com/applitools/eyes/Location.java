@@ -9,11 +9,10 @@ public final class Location implements Cloneable {
     private final int x;
     private final int y;
 
-    public static final Location ZERO = new Location(0,0);
+    public static final Location ZERO = new Location(0, 0);
 
     /**
      * Creates a Location instance.
-     *
      * @param x The X coordinate of this location.
      * @param y The Y coordinate of this location.
      */
@@ -47,15 +46,17 @@ public final class Location implements Cloneable {
      * @param other A location instance from which to create the location.
      */
     public Location(Location other) {
-        ArgumentGuard.notNull(other, "other");
-
-        x = other.getX();
-        y = other.getY();
+        if (other != null) {
+            x = other.getX();
+            y = other.getY();
+        } else {
+            x = 0;
+            y = 0;
+        }
     }
 
     /**
      * Get a location translated by the specified amount.
-     *
      * @param dx The amount to offset the x-coordinate.
      * @param dy The amount to offset the y-coordinate.
      * @return A location translated by the specified amount.
@@ -66,7 +67,6 @@ public final class Location implements Cloneable {
 
     /**
      * Get a location translated by the specified amount.
-     *
      * @param amount The amount to offset.
      * @return A location translated by the specified amount.
      */
@@ -76,7 +76,6 @@ public final class Location implements Cloneable {
 
     /**
      * Get a scaled location.
-     *
      * @param scaleRatio The ratio by which to scale the results.
      * @return A scaled copy of the current location.
      */

@@ -71,9 +71,10 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
         SizeAndBorders sizeAndBorders = eyesFrame.getSizeAndBorders();
         Borders borders = sizeAndBorders.getBorders();
         RectangleSize frameInnerSize = sizeAndBorders.getSize();
+        Rectangle bounds = eyesFrame.getBoundingClientRect();
 
-        Location contentLocation = new Location(pl.getX() + borders.getLeft(), pl.getY() + borders.getTop());
-        Location originalLocation = ScrollPositionProvider.getCurrentPosition(jsExecutor, driver.findElement(By.tagName("html")));
+        Location contentLocation = new Location(bounds.getX() + borders.getLeft(), bounds.getY() + borders.getTop());
+        Location originalLocation = eyesFrame.getScrollLocation();// ScrollPositionProvider.getCurrentPosition(jsExecutor, driver.findElement(By.tagName("html")));
 
         Frame frame = new Frame(logger, targetFrame,
                 contentLocation,

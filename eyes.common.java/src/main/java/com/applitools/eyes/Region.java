@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * Represents a region.
  */
 @JsonIgnoreProperties({"location", "empty", "middleOffset", "size", "sizeEmpty", "subRegions"})
-public class Region implements IRegion{
+public class Region implements IRegion {
     @JsonProperty("left")
     private int left;
     @JsonProperty("top")
@@ -42,7 +43,6 @@ public class Region implements IRegion{
 
     /**
      * Instantiates a new Region.
-     *
      * @param left   the left
      * @param top    the top
      * @param width  the width
@@ -58,7 +58,6 @@ public class Region implements IRegion{
 
     /**
      * Instantiates a new Region.
-     *
      * @param left            the left
      * @param top             the top
      * @param width           the width
@@ -78,7 +77,6 @@ public class Region implements IRegion{
 
     /**
      * Is empty boolean.
-     *
      * @return true if the region is empty, false otherwise.
      */
     public boolean isEmpty() {
@@ -90,7 +88,6 @@ public class Region implements IRegion{
 
     /**
      * Is size empty boolean.
-     *
      * @return true if the region's size is 0, false otherwise.
      */
     public boolean isSizeEmpty() {
@@ -121,7 +118,6 @@ public class Region implements IRegion{
 
     /**
      * Instantiates a new Region.
-     *
      * @param location the location
      * @param size     the size
      */
@@ -131,7 +127,6 @@ public class Region implements IRegion{
 
     /**
      * Instantiates a new Region.
-     *
      * @param location        the location
      * @param size            the size
      * @param coordinatesType the coordinates type
@@ -149,7 +144,6 @@ public class Region implements IRegion{
 
     /**
      * Instantiates a new Region.
-     *
      * @param other the other
      */
     public Region(IRegion other) {
@@ -164,7 +158,6 @@ public class Region implements IRegion{
 
     /**
      * Gets location.
-     *
      * @return The (left, top) position of the current region.
      */
     public Location getLocation() {
@@ -173,7 +166,6 @@ public class Region implements IRegion{
 
     /**
      * Gets negative location.
-     *
      * @return The (-left, -top) position of the current region.
      */
     public Location getNegativeLocation() {
@@ -182,7 +174,6 @@ public class Region implements IRegion{
 
     /**
      * Get an offset region.
-     *
      * @param dx The X axis offset.
      * @param dy The Y axis offset.
      * @return A region with an offset location.
@@ -194,7 +185,6 @@ public class Region implements IRegion{
     /**
      * Get a region which is a scaled version of the current region.
      * IMPORTANT: This also scales the LOCATION(!!) of the region (not just its size).
-     *
      * @param scaleRatio The ratio by which to scale the region.
      * @return A new region which is a scaled version of the current region.
      */
@@ -204,7 +194,6 @@ public class Region implements IRegion{
 
     /**
      * Gets size.
-     *
      * @return The size of the region.
      */
     public RectangleSize getSize() {
@@ -213,7 +202,6 @@ public class Region implements IRegion{
 
     /**
      * Gets coordinates type.
-     *
      * @return The region's coordinate type.
      */
     public CoordinatesType getCoordinatesType() {
@@ -222,7 +210,6 @@ public class Region implements IRegion{
 
     /**
      * Sets coordinates type.
-     *
      * @param value the value
      */
     public void setCoordinatesType(CoordinatesType value) {
@@ -231,7 +218,6 @@ public class Region implements IRegion{
 
     /**
      * Sets size.
-     *
      * @param size The updated size of the region.
      */
     public void setSize(RectangleSize size) {
@@ -241,7 +227,6 @@ public class Region implements IRegion{
 
     /**
      * Set the (top,left) position of the current region
-     *
      * @param location The (top,left) position to set.
      */
     public void setLocation(Location location) {
@@ -368,7 +353,6 @@ public class Region implements IRegion{
 
     /**
      * Returns a list of sub-regions which compose the current region.
-     *
      * @param subRegionSize The default sub-region size to use.
      * @param isFixedSize   If {@code false}, then sub-regions might have a                      size which is smaller then {@code subRegionSize}                      (thus there will be no overlap of regions).                      Otherwise, all sub-regions will have the same                      size, but sub-regions might overlap.
      * @return The sub-regions composing the current region. If {@code
@@ -385,7 +369,6 @@ public class Region implements IRegion{
 
     /**
      * Gets sub regions.
-     *
      * @param subRegionSize the sub region size
      * @return the sub regions
      * @see #getSubRegions(RectangleSize, boolean) #getSubRegions(RectangleSize, boolean). {@code isFixedSize} defaults to {@code false}.
@@ -396,7 +379,6 @@ public class Region implements IRegion{
 
     /**
      * Check if a region is contained within the current region.
-     *
      * @param other The region to check if it is contained within the current              region.
      * @return True if {@code other} is contained within the current region, false otherwise.
      */
@@ -415,7 +397,6 @@ public class Region implements IRegion{
     /**
      * Check if a specified location is contained within this region.
      * <p>
-     *
      * @param location The location to test.
      * @return True if the location is contained within this region, false otherwise.
      */
@@ -428,7 +409,6 @@ public class Region implements IRegion{
 
     /**
      * Check if a region is intersected with the current region.
-     *
      * @param other The region to check intersection with.
      * @return True if the regions are intersected, false otherwise.
      */
@@ -450,7 +430,6 @@ public class Region implements IRegion{
 
     /**
      * Replaces this region with the intersection of itself and {@code other}
-     *
      * @param other The region with which to intersect.
      */
     public void intersect(Region other) {
@@ -487,7 +466,6 @@ public class Region implements IRegion{
 
     /**
      * Gets left.
-     *
      * @return the left
      */
     public int getLeft() {
@@ -496,7 +474,6 @@ public class Region implements IRegion{
 
     /**
      * Gets top.
-     *
      * @return the top
      */
     public int getTop() {
@@ -505,7 +482,6 @@ public class Region implements IRegion{
 
     /**
      * Gets width.
-     *
      * @return the width
      */
     public int getWidth() {
@@ -514,7 +490,6 @@ public class Region implements IRegion{
 
     /**
      * Gets height.
-     *
      * @return the height
      */
     public int getHeight() {
@@ -524,7 +499,6 @@ public class Region implements IRegion{
 
     /**
      * Sets left.
-     *
      * @param value the value
      */
     public void setLeft(int value) {
@@ -533,16 +507,23 @@ public class Region implements IRegion{
 
     /**
      * Sets top.
-     *
      * @param value the value
      */
     public void setTop(int value) {
         top = value;
     }
 
+
+    private int getBottom() {
+        return top + height;
+    }
+
+    private int getRight() {
+        return left + width;
+    }
+
     /**
      * Sets width.
-     *
      * @param value the value
      */
     public void setWidth(int value) {
@@ -551,7 +532,6 @@ public class Region implements IRegion{
 
     /**
      * Sets height.
-     *
      * @param value the value
      */
     public void setHeight(int value) {
@@ -560,7 +540,6 @@ public class Region implements IRegion{
 
     /**
      * Gets middle offset.
-     *
      * @return the middle offset
      */
     public Location getMiddleOffset() {
@@ -572,7 +551,6 @@ public class Region implements IRegion{
 
     /**
      * Expand to contain region.
-     *
      * @param region the region
      * @return the region
      */
@@ -598,16 +576,146 @@ public class Region implements IRegion{
         return "(" + left + ", " + top + ") " + width + "x" + height + ", " + coordinatesType;
     }
 
-    public int getArea(){
+    public int getArea() {
         return this.getWidth() * this.getHeight();
     }
 
     @JsonProperty("x")
-    public void setX(int x){
+    public void setX(int x) {
         this.left = x;
     }
+
     @JsonProperty("y")
-    public void setY(int y){
+    public void setY(int y) {
         this.top = y;
     }
+
+    public Iterable<SubregionForStitching> getSubRegions(RectangleSize maxSubRegionSize, int logicalOverlap, double l2pScaleRatio, Region physicalRectInScreenshot, Logger logger) {
+        List<SubregionForStitching> subRegions = new ArrayList<>();
+
+        int doubleLogicalOverlap = logicalOverlap * 2;
+        int physicalOverlap = (int) Math.round(doubleLogicalOverlap * l2pScaleRatio);
+
+        boolean needVScroll = this.height > physicalRectInScreenshot.getHeight();
+        boolean needHScroll = this.width > physicalRectInScreenshot.getWidth();
+
+
+        int scrollY = 0;
+        int currentTop = 0;
+        int currentLogicalHeight = maxSubRegionSize.getHeight();
+
+        int deltaY = currentLogicalHeight - doubleLogicalOverlap;
+
+        boolean isTopEdge = true;
+        boolean isBottomEdge = false;
+
+        int scaleRaioOffset = (int) Math.round(l2pScaleRatio - 1);
+
+        while (!isBottomEdge) {
+            int currentScrollTop = scrollY + maxSubRegionSize.getHeight();
+            if (currentScrollTop >= height) {
+                if (!isTopEdge) {
+                    scrollY = height - currentLogicalHeight;
+                    currentLogicalHeight = height - currentTop;
+                    currentTop = height - currentLogicalHeight - doubleLogicalOverlap - logicalOverlap + scaleRaioOffset;
+                } else {
+                    currentLogicalHeight = height - currentTop;
+                }
+                isBottomEdge = true;
+            }
+
+            int scrollX = 0;
+            int currentLeft = 0;
+            int currentLogicalWidth = maxSubRegionSize.getWidth();
+
+            int deltaX = currentLogicalWidth - doubleLogicalOverlap;
+
+            boolean isLeftEdge = true;
+            boolean isRightEdge = false;
+
+            while (!isRightEdge) {
+                int currentScrollRight = scrollX + maxSubRegionSize.getWidth();
+                if (currentScrollRight >= width) {
+                    if (!isLeftEdge) {
+                        scrollX = width - currentLogicalWidth;
+                        currentLogicalWidth = width - currentLeft;
+                        currentLeft = width - currentLogicalWidth - doubleLogicalOverlap - logicalOverlap + scaleRaioOffset;
+                    } else {
+                        currentLogicalWidth = width - currentLeft;
+                    }
+                    isRightEdge = true;
+                }
+
+                Region physicalCropArea = new Region(physicalRectInScreenshot);
+                Region logicalCropArea = new Region(0, 0, currentLogicalWidth, currentLogicalHeight);
+                Location pastePoint = new Location(currentLeft, currentTop);
+
+                // handle horizontal
+                if (isRightEdge) {
+                    int physicalWidth = (int) Math.round(currentLogicalWidth * l2pScaleRatio);
+                    physicalCropArea.left = physicalRectInScreenshot.getRight() - physicalWidth;
+                    physicalCropArea.width = physicalWidth;
+                }
+
+                if (!isLeftEdge) {
+                    logicalCropArea.left += logicalOverlap;
+                    logicalCropArea.width -= logicalOverlap;
+                }
+
+                if (isRightEdge && !isLeftEdge) {
+                    physicalCropArea.left -= physicalOverlap * 2;
+                    physicalCropArea.width += physicalOverlap * 2;
+                    logicalCropArea.width += doubleLogicalOverlap * 2;
+                }
+
+                // handle vertical
+                if (isBottomEdge) {
+                    int physicalHeight = (int) Math.round(currentLogicalHeight * l2pScaleRatio);
+                    physicalCropArea.top = physicalRectInScreenshot.getBottom() - physicalHeight;
+                    physicalCropArea.height = physicalHeight;
+                }
+
+                if (!isTopEdge) {
+                    logicalCropArea.top += logicalOverlap;
+                    logicalCropArea.height -= logicalOverlap;
+                }
+
+                if (isBottomEdge && !isTopEdge) {
+                    physicalCropArea.top -= physicalOverlap * 2;
+                    physicalCropArea.height += physicalOverlap * 2;
+                    logicalCropArea.height += doubleLogicalOverlap * 2;
+                }
+
+                SubregionForStitching subregion = new SubregionForStitching(
+                        new Location(scrollX, scrollY),
+                        pastePoint,
+                        physicalCropArea,
+                        logicalCropArea
+                );
+
+                logger.verbose("adding subregion - " + subregion);
+
+                subRegions.add(subregion);
+
+                currentLeft += deltaX;
+                scrollX += deltaX;
+
+                if (needHScroll && isLeftEdge) {
+                    currentLeft += logicalOverlap + scaleRaioOffset;
+                }
+                isLeftEdge = false;
+            }
+
+            currentTop += deltaY;
+            scrollY += deltaY;
+
+            if (needVScroll && isTopEdge) {
+                currentTop += logicalOverlap + scaleRaioOffset;
+            }
+            isTopEdge = false;
+        }
+
+        return subRegions;
+    }
+
 }

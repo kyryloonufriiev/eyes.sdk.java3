@@ -63,7 +63,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     private final String JS_GET_CLIENT_WIDTH = "return arguments[0].clientWidth;";
     private final String JS_GET_CLIENT_HEIGHT = "return arguments[0].clientHeight;";
 
-    private final String JS_GET_CLIENT_SIZE = "return [arguments[0].clientWidth, arguments[0].clientHeight];";
+    private final String JS_GET_CLIENT_SIZE = "return arguments[0].clientWidth + ';' + arguments[0].clientHeight;";
 
     private final String JS_GET_BORDER_WIDTHS_ARR =
             "var retVal = retVal || [];" +
@@ -191,6 +191,11 @@ public class EyesRemoteWebElement extends RemoteWebElement {
                 this).toString()));
     }
 
+    public Location getScrollLocation() {
+        Object position = eyesDriver.executeScript(JS_GET_SCROLL_POSITION, this);
+        return parseLocationString(position);
+    }
+
     /**
      * @return The value of the scrollWidth property of the element.
      */
@@ -251,6 +256,10 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     public Location scrollTo(Location location) {
         Object position = eyesDriver.executeScript(String.format(JS_SCROLL_TO_FORMATTED_STR,
                 location.getX(), location.getY()) + JS_GET_SCROLL_POSITION, this);
+        return parseLocationString(position);
+    }
+
+    private Location parseLocationString(Object position) {
         String[] xy = position.toString().split(";");
         if (xy.length != 2) {
             throw new EyesException("Could not get scroll position!");
@@ -560,10 +569,13 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     public RectangleSize getClientSize() {
         Object retVal = eyesDriver.executeScript(JS_GET_CLIENT_SIZE, this);
-        @SuppressWarnings("unchecked") List<Float> esAsList = (List<Float>) retVal;
+        if (retVal == null) { return null; }
+        @SuppressWarnings("unchecked") String sizeStr = (String) retVal;
+        sizeStr = sizeStr.replace("px", "");
+        String[] parts = sizeStr.split(";");
         return new RectangleSize(
-                (int) Math.round(esAsList.get(0).doubleValue()),
-                (int) Math.round(esAsList.get(1).doubleValue()));
+                Math.round(Float.parseFloat(parts[0])),
+                Math.round(Float.parseFloat(parts[1])));
     }
 
     @Override

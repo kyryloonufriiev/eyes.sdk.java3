@@ -792,16 +792,14 @@ public abstract class EyesBase {
         MatchResult result;
         ICheckSettingsInternal checkSettingsInternal = (checkSettings instanceof ICheckSettingsInternal) ? (ICheckSettingsInternal) checkSettings : null;
 
+        ImageMatchSettings defaultMatchSettings = getConfigGetter().getDefaultMatchSettings();
+
         // Update retry timeout if it wasn't specified.
         int retryTimeout = -1;
-        if (checkSettingsInternal != null) {
-            retryTimeout = checkSettingsInternal.getTimeout();
-        }
-
-        ImageMatchSettings defaultMatchSettings = getConfigGetter().getDefaultMatchSettings();
 
         // Set defaults if necessary
         if (checkSettingsInternal != null) {
+            retryTimeout = checkSettingsInternal.getTimeout();
             if (checkSettingsInternal.getMatchLevel() == null) {
                 checkSettings = checkSettings.matchLevel(defaultMatchSettings.getMatchLevel());
             }

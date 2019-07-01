@@ -11,11 +11,11 @@ import java.awt.image.BufferedImage;
 @SuppressWarnings("WeakerAccess")
 public class FixedCutProvider implements CutProvider {
 
-    private Logger logger = new Logger();
-    private final int header;
-    private final int footer;
-    private final int left;
-    private final int right;
+    protected Logger logger = new Logger();
+    protected final int header;
+    protected final int footer;
+    protected final int left;
+    protected final int right;
 
     /**
      *
@@ -53,5 +53,15 @@ public class FixedCutProvider implements CutProvider {
     public void setLogger(Logger logger) {
         ArgumentGuard.notNull(logger, "logger");
         this.logger = logger;
+    }
+
+    @Override
+    public Region toRegion(RectangleSize size) {
+
+        Region rect = new Region(left, header,
+                size.getWidth() - left - right,
+                size.getHeight() - header - footer);
+
+        return rect;
     }
 }

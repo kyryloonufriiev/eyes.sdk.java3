@@ -25,7 +25,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     private String hostOS;
     // Used for automatic save of a test run.
     private boolean saveNewTests, saveFailedTests;
-    private int stitchOverlap = 50;
+    private int stitchOverlap = 10;
     private Boolean isSendDom = true;
     private String apiKey = null;
     private String serverUrl = null;

@@ -24,4 +24,6 @@ public interface CutProvider {
     CutProvider scale(double scaleRatio);
 
     void setLogger(Logger logger);
+
+    Region toRegion(RectangleSize size);
 }
