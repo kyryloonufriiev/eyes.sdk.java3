@@ -146,11 +146,8 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
                 case ABORT:
                     logger.verbose("VisualGridTask.run abort task");
-                    if (runningTest.isTestOpen()) {
-                        testResults = eyesConnector.abortIfNotClosed();
-                    } else {
-                        logger.verbose("Closing a not opened test");
-                    }
+                    testResults = eyesConnector.abortIfNotClosed();
+                    logger.verbose("Closing a not opened test");
             }
             @SuppressWarnings("UnnecessaryLocalVariable")
             TestResultContainer testResultContainer = new TestResultContainer(testResults, runningTest.getBrowserInfo(), this.exception);
@@ -243,11 +240,20 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
 
     public void setException(Throwable exception) {
+        this.exception = exception;
+    }
+
+    public void setExceptionAndAbort(Throwable exception) {
         logger.verbose("aborting task with exception");
         this.exception = exception;
-        if (type == TaskType.CLOSE) {
-            this.type = TaskType.ABORT;
+        if(type == TaskType.CLOSE){
+            type = TaskType.ABORT;
         }
+        abortRunningTest(exception);
+    }
+
+    public void abortRunningTest(Throwable exception) {
+        runningTest.abort(exception);
     }
 
     @Override

@@ -181,7 +181,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         } catch (Throwable e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
             for (VisualGridTask visualGridTask : this.visualGridTaskList) {
-                visualGridTask.setException(e);
+                visualGridTask.setExceptionAndAbort(e);
             }
         }
         logger.verbose("Finished rendering task - exit");
@@ -803,6 +803,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 } catch (Exception e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     iterator.remove();
+                    continue;
                 }
 
                 if (!this.fetchedCacheMap.containsKey(url)) {
