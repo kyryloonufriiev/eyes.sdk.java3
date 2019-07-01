@@ -39,4 +39,14 @@ public class CssTranslatePositionMemento extends PositionMemento {
      * @return the position
      */
     public Location getPosition() { return position; }
+
+    @Override
+    public int getX() {
+        return position.getX();
+    }
+
+    @Override
+    public int getY() {
+        return position.getY();
+    }
 }
