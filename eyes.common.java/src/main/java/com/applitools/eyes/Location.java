@@ -1,7 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.utils.ArgumentGuard;
-
 /**
  * A location in a two-dimensional plane.
  */

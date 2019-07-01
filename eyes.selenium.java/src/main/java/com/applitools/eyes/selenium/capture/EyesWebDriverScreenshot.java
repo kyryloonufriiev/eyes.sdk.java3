@@ -22,7 +22,7 @@ import java.util.Iterator;
 
 public class EyesWebDriverScreenshot extends EyesScreenshot {
 
-    private enum ScreenshotType {VIEWPORT, ENTIRE_FRAME}
+    public enum ScreenshotType {VIEWPORT, ENTIRE_FRAME}
 
     private final EyesWebDriver driver;
     private final FrameChain frameChain;
@@ -145,10 +145,12 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
     private Location getUpdatedFrameLocationInScreenshot(Logger logger, Location frameLocationInScreenshot) {
         logger.verbose(String.format("frameLocationInScreenshot: %s", frameLocationInScreenshot));
-        if (frameChain.size() > 0) {
-            frameLocationInScreenshot = calcFrameLocationInScreenshot(logger, this.driver, frameChain, this.screenshotType);
-        } else if (frameLocationInScreenshot == null) {
-            frameLocationInScreenshot = new Location(0, 0);
+        if (frameLocationInScreenshot == null) {
+            if (frameChain.size() > 0) {
+                frameLocationInScreenshot = calcFrameLocationInScreenshot(logger, this.driver, frameChain, this.screenshotType);
+            } else {
+                frameLocationInScreenshot = new Location(0, 0);
+            }
         }
         return frameLocationInScreenshot;
     }
@@ -212,7 +214,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
      * @param image  The actual screenshot image.
      */
     public EyesWebDriverScreenshot(Logger logger, EyesWebDriver driver, BufferedImage image) {
-        this(logger, driver, image, ScreenshotType.VIEWPORT, Location.ZERO);
+        this(logger, driver, image, ScreenshotType.VIEWPORT, null);
     }
 
     // FIXME: 18/03/2018 This is a workaround done for handling checkRegion.

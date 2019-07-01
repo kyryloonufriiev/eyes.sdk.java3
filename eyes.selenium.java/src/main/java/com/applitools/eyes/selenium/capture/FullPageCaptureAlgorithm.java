@@ -254,15 +254,15 @@ public class FullPageCaptureAlgorithm {
             BufferedImage scaledCroppedPartImage = ImageUtils.cropImage(logger, scaledPartImage, r2);
 
             debugScreenshotsProvider.save(partImage, "partImage-" + originPosition.getX() + "_" + originPosition.getY());
-            debugScreenshotsProvider.save(cutPart, "cutPart-" + originPosition.getX() + "_" + originPosition.getY());
-            debugScreenshotsProvider.save(croppedPart, "croppedPart-" + originPosition.getX() + "_" + originPosition.getY());
-            debugScreenshotsProvider.save(scaledPartImage, "scaledPartImage-" + originPosition.getX() + "_" + originPosition.getY());
+            //debugScreenshotsProvider.save(cutPart, "cutPart-" + originPosition.getX() + "_" + originPosition.getY());
+            //debugScreenshotsProvider.save(croppedPart, "croppedPart-" + originPosition.getX() + "_" + originPosition.getY());
+            //debugScreenshotsProvider.save(scaledPartImage, "scaledPartImage-" + originPosition.getX() + "_" + originPosition.getY());
             debugScreenshotsProvider.save(scaledCroppedPartImage, "scaledCroppedPartImage-" + targetPosition.getX() + "_" + targetPosition.getY());
             logger.verbose("pasting part at " + targetPosition);
 
             stitchedImage.getRaster().setRect(targetPosition.getX(), targetPosition.getY(), scaledCroppedPartImage.getData());
 
-            debugScreenshotsProvider.save(stitchedImage, "stitched" + index + "(" + targetPosition.toStringForFilename() + ")");
+            //debugScreenshotsProvider.save(stitchedImage, "stitched" + index + "(" + targetPosition.toStringForFilename() + ")");
             index++;
         }
 

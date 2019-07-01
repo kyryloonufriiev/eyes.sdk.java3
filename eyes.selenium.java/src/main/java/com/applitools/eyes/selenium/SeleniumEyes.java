@@ -460,13 +460,13 @@ public class SeleniumEyes extends EyesBase {
                 bBox, positionProviderHandler.get());
 
         debugScreenshotsProvider.save(screenshotImage, "original");
-        EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage, null, bBox.getNegativeLocation());
+        EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage, EyesWebDriverScreenshot.ScreenshotType.VIEWPORT, Location.ZERO);
 
         for (int i = 0; i < checkSettings.length; ++i) {
             if (((Hashtable<Integer, GetRegion>) getRegions).containsKey(i)) {
                 GetRegion getRegion = getRegions.get(i);
                 ICheckSettingsInternal checkSettingsInternal = checkSettingsInternalDictionary.get(i);
-                List<EyesScreenshot> subScreenshots = getSubScreenshots(screenshot, getRegion);
+                List<EyesScreenshot> subScreenshots = getSubScreenshots(hasFrames ? Region.EMPTY : bBox, screenshot, getRegion);
                 matchRegion(checkSettingsInternal, mwt, subScreenshots);
             }
         }
@@ -482,12 +482,13 @@ public class SeleniumEyes extends EyesBase {
         ((EyesTargetLocator) driver.switchTo()).frames(this.originalFC);
     }
 
-    private List<EyesScreenshot> getSubScreenshots(EyesWebDriverScreenshot screenshot, GetRegion getRegion) {
+    private List<EyesScreenshot> getSubScreenshots(Region bBox, EyesWebDriverScreenshot screenshot, GetRegion getRegion) {
         List<EyesScreenshot> subScreenshots = new ArrayList<>();
         for (Region r : getRegion.getRegions(this, screenshot, true)) {
             logger.verbose("original sub-region: " + r);
-            r = regionPositionCompensation.compensateRegionPosition(r, devicePixelRatio);
-            logger.verbose("sub-region after compensation: " + r);
+            r.offset(-bBox.getLeft(), -bBox.getTop());
+            //r = regionPositionCompensation.compensateRegionPosition(r, devicePixelRatio);
+            //logger.verbose("sub-region after compensation: " + r);
             EyesScreenshot subScreenshot = screenshot.getSubScreenshotForRegion(r, false);
             subScreenshots.add(subScreenshot);
         }
