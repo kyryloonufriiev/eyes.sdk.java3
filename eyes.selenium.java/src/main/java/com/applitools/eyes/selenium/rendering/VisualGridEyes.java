@@ -582,6 +582,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
         Boolean fully = checkSettingsInternal.isStitchContent();
         Boolean sendDom = checkSettingsInternal.isSendDom();
+        Boolean ignoreDisplacements = checkSettingsInternal.isIgnoreDisplacements();
 
         Boolean b;
 
@@ -595,6 +596,10 @@ public class VisualGridEyes implements IRenderingEyes {
 
         if (sendDom == null) {
             checkSettings = checkSettings.sendDom((b = getConfigGetter().isSendDom()) == null ? true : b);
+        }
+
+        if (ignoreDisplacements == null) {
+            checkSettings = checkSettings.ignoreDisplacements(getConfigGetter().getIgnoreDisplacemnets());
         }
 
         return (ICheckSettingsInternal) checkSettings;

@@ -56,4 +56,6 @@ public interface IConfigurationGetter {
     AbstractProxySettings getProxy();
 
     MatchLevel getMatchLevel();
+
+    boolean getIgnoreDisplacemnets();
 }

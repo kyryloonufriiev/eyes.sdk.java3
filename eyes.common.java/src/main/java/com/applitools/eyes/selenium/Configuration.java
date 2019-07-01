@@ -267,4 +267,9 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
                 "\n\thideScrollbars = " + hideScrollbars +
                 "\n\thideCaret = " + hideCaret;
     }
+
+    public IConfigurationSetter setIgnoreDisplacements(boolean ignoreDisplacements) {
+        super.setIgnoreDisplacements(ignoreDisplacements);
+        return this;
+    }
 }

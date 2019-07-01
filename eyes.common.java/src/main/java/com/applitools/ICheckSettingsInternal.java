@@ -31,4 +31,6 @@ public interface ICheckSettingsInternal {
     ICheckSettingsInternal clone();
 
     Boolean isStitchContent();
+
+    Boolean isIgnoreDisplacements();
 }

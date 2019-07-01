@@ -340,7 +340,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
 
     @Override
     public Boolean isIgnoreDisplacements() {
-        return ignoreDisplacements != null ? ignoreDisplacements : Boolean.FALSE;
+        return ignoreDisplacements;
     }
 
     @Override

@@ -55,4 +55,7 @@ public interface IConfigurationSetter {
     IConfigurationSetter setProxy(AbstractProxySettings proxy);
 
     IConfigurationSetter setMatchLevel(MatchLevel matchLevel);
+
+        IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements);
+
 }
