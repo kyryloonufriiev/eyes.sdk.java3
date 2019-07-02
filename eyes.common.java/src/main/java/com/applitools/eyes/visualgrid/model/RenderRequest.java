@@ -164,4 +164,23 @@ public class  RenderRequest {
     public void setRenderId(String renderId) {
         this.renderId = renderId;
     }
+
+    @Override
+    public String toString() {
+        return "RenderRequest{" +
+                "renderId='" + renderId + '\'' +
+                ", visualGridTask=" + visualGridTask +
+                ", agentId='" + agentId + '\'' +
+                ", webhook='" + webhook + '\'' +
+                ", url='" + url + '\'' +
+                ", dom=" + dom +
+                ", resources=" + resources +
+                ", renderInfo=" + renderInfo +
+                ", platform='" + platform + '\'' +
+                ", browserName='" + browserName + '\'' +
+                ", scriptHooks=" + scriptHooks +
+                ", selectorsToFindRegionsFor=" + selectorsToFindRegionsFor +
+                ", sendDom=" + sendDom +
+                '}';
+    }
 }

@@ -1,10 +1,7 @@
 package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.EyesRunner;
-import com.applitools.eyes.IPutFuture;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.UserAgent;
+import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.GeneralUtils;
 

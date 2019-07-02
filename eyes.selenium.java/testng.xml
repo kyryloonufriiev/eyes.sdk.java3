@@ -8,8 +8,6 @@
             <class name="com.applitools.eyes.selenium.TestSpecialCases" />
             <class name="com.applitools.eyes.selenium.TestClassicRunner" />
             <class name="com.applitools.eyes.selenium.TestBatchSequenceName" />
-
-            <!--<class name="com.applitools.VisualGridEyes.selenium.IOSTest"/>-->
         </classes>
     </test>
     <test name="Test_VG" parallel="instances">

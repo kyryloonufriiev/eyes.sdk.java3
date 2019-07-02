@@ -1,6 +1,5 @@
-package com.applitools.eyes.visualgrid.model;
+package com.applitools.eyes;
 
-import com.applitools.eyes.TestResults;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Iterator;

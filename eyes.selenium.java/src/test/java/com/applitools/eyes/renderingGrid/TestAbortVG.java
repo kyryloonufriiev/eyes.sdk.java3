@@ -1,8 +1,8 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.visualgrid.model.TestResultContainer;
-import com.applitools.eyes.visualgrid.model.TestResultSummary;
+import com.applitools.eyes.TestResultContainer;
+import com.applitools.eyes.TestResultSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestResult;

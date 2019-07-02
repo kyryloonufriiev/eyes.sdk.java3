@@ -1,9 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.eyes.LogHandler;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.visualgrid.model.TestResultSummary;
-
 public abstract class EyesRunner {
 
     protected Logger logger = new Logger();

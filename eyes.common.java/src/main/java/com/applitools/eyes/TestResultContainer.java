@@ -1,6 +1,6 @@
-package com.applitools.eyes.visualgrid.model;
+package com.applitools.eyes;
 
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 
 public class TestResultContainer {
 
