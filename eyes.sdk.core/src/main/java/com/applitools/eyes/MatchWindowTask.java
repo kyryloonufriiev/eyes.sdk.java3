@@ -5,6 +5,7 @@ package com.applitools.eyes;
 
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
+import com.applitools.eyes.config.IConfigurationGetter;
 import com.applitools.eyes.fluent.GetFloatingRegion;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
@@ -361,15 +362,16 @@ public class MatchWindowTask {
         if (checkSettingsInternal != null) {
 
             MatchLevel matchLevel = checkSettingsInternal.getMatchLevel();
+            IConfigurationGetter configGetter = eyes.getConfigGetter();
             if (matchLevel == null) {
-                matchLevel = eyes.getConfigGetter().getDefaultMatchSettings().getMatchLevel();
+                matchLevel = configGetter.getDefaultMatchSettings().getMatchLevel();
             }
 
             imageMatchSettings = new ImageMatchSettings(matchLevel, null, false);
 
             Boolean ignoreCaret = checkSettingsInternal.getIgnoreCaret();
             if (ignoreCaret == null) {
-                ignoreCaret = eyes.getConfigGetter().getDefaultMatchSettings().getIgnoreCaret();
+                ignoreCaret = configGetter.getDefaultMatchSettings().getIgnoreCaret();
             }
 
             imageMatchSettings.setIgnoreCaret(ignoreCaret);
@@ -378,7 +380,7 @@ public class MatchWindowTask {
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
             imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacemnets());
         }
         return imageMatchSettings;
     }
@@ -397,7 +399,7 @@ public class MatchWindowTask {
             imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false );
             imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : eyes.getConfigGetter().getIgnoreDisplacemnets() );
         }
         return imageMatchSettings;
     }

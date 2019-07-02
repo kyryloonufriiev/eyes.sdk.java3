@@ -567,7 +567,7 @@ public class VisualGridEyes implements IRenderingEyes {
             switchTo.frames(originalFC);
         } catch (IllegalArgumentException | EyesException | InterruptedException e) {
             Error error = new Error(e);
-            abort();
+            abort(e);
             for (RunningTest runningTest : testList) {
                 runningTest.setTestInExceptionMode(error);
             }
@@ -582,6 +582,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
         Boolean fully = checkSettingsInternal.isStitchContent();
         Boolean sendDom = checkSettingsInternal.isSendDom();
+        Boolean ignoreDisplacements = checkSettingsInternal.isIgnoreDisplacements();
 
         Boolean b;
 
@@ -595,6 +596,10 @@ public class VisualGridEyes implements IRenderingEyes {
 
         if (sendDom == null) {
             checkSettings = checkSettings.sendDom((b = getConfigGetter().isSendDom()) == null ? true : b);
+        }
+
+        if (ignoreDisplacements == null) {
+            checkSettings = checkSettings.ignoreDisplacements(getConfigGetter().getIgnoreDisplacemnets());
         }
 
         return (ICheckSettingsInternal) checkSettings;
@@ -865,9 +870,9 @@ public class VisualGridEyes implements IRenderingEyes {
         }
     }
 
-    private void abort() {
+    private void abort(Throwable e) {
         for (RunningTest runningTest : testList) {
-            runningTest.abort();
+            runningTest.abort(e);
         }
     }
 

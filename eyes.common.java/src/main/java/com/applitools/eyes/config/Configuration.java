@@ -19,6 +19,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     protected String appName;
     protected String testName;
     protected RectangleSize viewportSize;
+    protected boolean ignoreDisplacements = false;
     private ImageMatchSettings defaultMatchSettings = new ImageMatchSettings();
     private int matchTimeout = DEFAULT_MATCH_TIMEOUT;
     private String hostApp;
@@ -396,8 +397,19 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
+    public boolean getIgnoreDisplacemnets() {
+        return this.ignoreDisplacements;
+    }
+
+    @Override
     public IConfigurationSetter setMatchLevel(MatchLevel matchLevel) {
         this.defaultMatchSettings.setMatchLevel(matchLevel);
+        return this;
+    }
+
+    @Override
+    public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+        this.ignoreDisplacements = isIgnoreDisplacements;
         return this;
     }
 }
