@@ -663,12 +663,23 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return config;
     }
 
+    @Override
+    public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+        this.config.setIgnoreDisplacements(isIgnoreDisplacements);
+        return config;
+    }
+
     /**
      * @return The test-wide match level.
      * @deprecated Please use{@link #getDefaultMatchSettings} instead.
      */
     public MatchLevel getMatchLevel() {
         return config.getDefaultMatchSettings().getMatchLevel();
+    }
+
+    @Override
+    public boolean getIgnoreDisplacemnets() {
+        return config.getIgnoreDisplacemnets();
     }
 
     /**
