@@ -2,7 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.TestResultSummary;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -70,7 +70,7 @@ public final class TestClassicRunner {
 
         driver.quit();
 
-        TestResultSummary allTestResults = runner.getAllTestResults();
+        TestResultsSummary allTestResults = runner.getAllTestResults();
         if (allTestResults.getAllResults().length != 3) {
             throw new Error();
         }

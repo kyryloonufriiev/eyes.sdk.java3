@@ -122,7 +122,7 @@ public class TestMissingContentSites {
 
     @AfterClass
     public void afterClass(ITestContext testContext) {
-        TestResultSummary allTestResults = visualGridRunner.getAllTestResults(false);
+        TestResultsSummary allTestResults = visualGridRunner.getAllTestResults(false);
         for (TestResultContainer allTestResult : allTestResults) {
             System.out.println(allTestResult.toString());
         }

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Iterator;
 import java.util.List;
 
-public class TestResultSummary implements Iterable<TestResultContainer>{
+public class TestResultsSummary implements Iterable<TestResultContainer>{
     private List<TestResultContainer> allResults;
     private int passed = 0;
     private int unresolved = 0;
@@ -15,7 +15,7 @@ public class TestResultSummary implements Iterable<TestResultContainer>{
     private int missing = 0;
     private int matches = 0;
 
-    public TestResultSummary(List<TestResultContainer> allResults) {
+    public TestResultsSummary(List<TestResultContainer> allResults) {
         this.allResults = allResults;
         for (TestResultContainer resultContainer : allResults) {
             if (resultContainer != null && resultContainer.getException() != null){

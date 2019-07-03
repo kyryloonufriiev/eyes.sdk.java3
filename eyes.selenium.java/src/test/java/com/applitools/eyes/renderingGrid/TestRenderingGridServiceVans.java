@@ -165,7 +165,7 @@ public class TestRenderingGridServiceVans {
 
     @AfterClass
     public void afterTestRun(ITestContext testContext) {
-        TestResultSummary allTestResults = renderingManager.getAllTestResults();
+        TestResultsSummary allTestResults = renderingManager.getAllTestResults();
         renderingManager.getLogger().log(allTestResults.toString());
     }
 }

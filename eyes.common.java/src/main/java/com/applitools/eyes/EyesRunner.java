@@ -4,9 +4,9 @@ public abstract class EyesRunner {
 
     protected Logger logger = new Logger();
 
-    public abstract TestResultSummary getAllTestResults();
+    public abstract TestResultsSummary getAllTestResults();
 
-    public abstract TestResultSummary getAllTestResults(boolean shouldThrowException);
+    public abstract TestResultsSummary getAllTestResults(boolean shouldThrowException);
 
     public void setLogHandler(LogHandler logHandler) {
         logger.setLogHandler(logHandler);

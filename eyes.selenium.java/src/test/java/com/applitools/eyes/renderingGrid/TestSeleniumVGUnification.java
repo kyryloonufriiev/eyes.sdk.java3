@@ -6,7 +6,7 @@ import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.TestResultSummary;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
@@ -59,7 +59,7 @@ public final class TestSeleniumVGUnification {
     @AfterMethod
     public void After(ITestContext testContext) {
         Logger logger = runner.getLogger();
-        TestResultSummary allTestResults = runner.getAllTestResults();
+        TestResultsSummary allTestResults = runner.getAllTestResults();
         logger.log(allTestResults.toString());
         webDriver.quit();
     }

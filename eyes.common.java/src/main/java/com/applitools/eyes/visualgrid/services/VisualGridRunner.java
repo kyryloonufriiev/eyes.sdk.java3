@@ -392,11 +392,11 @@ public class VisualGridRunner extends EyesRunner {
     }
 
 
-    public TestResultSummary getAllTestResults() {
+    public TestResultsSummary getAllTestResults() {
         return getAllTestResults(true);
     }
 
-    public TestResultSummary getAllTestResults(boolean throwException) {
+    public TestResultsSummary getAllTestResults(boolean throwException) {
         logger.verbose("enter");
         Map<IRenderingEyes, Collection<Future<TestResultContainer>>> allFutures = new HashMap<>();
         for (IRenderingEyes eyes : allEyes) {
@@ -444,7 +444,7 @@ public class VisualGridRunner extends EyesRunner {
         if (throwException && exception != null) {
             throw new Error(exception);
         }
-        return new TestResultSummary(allResults);
+        return new TestResultsSummary(allResults);
     }
 
     public void close(IRenderingEyes eyes) {
