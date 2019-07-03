@@ -8,7 +8,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.visualgrid.model.FileDebugResourceWriter;
-import com.applitools.eyes.TestResultSummary;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
@@ -75,7 +75,7 @@ public final class TestRenderingGridService {
             if (webDriver != null) {
                 webDriver.quit();
             }
-            TestResultSummary allTestResults = renderingManager.getAllTestResults();
+            TestResultsSummary allTestResults = renderingManager.getAllTestResults();
             System.out.println(allTestResults);
             // End the test.
         }
@@ -113,7 +113,7 @@ public final class TestRenderingGridService {
             if (webDriver != null) {
                 webDriver.quit();
             }
-            TestResultSummary allTestResults = renderingManager.getAllTestResults();
+            TestResultsSummary allTestResults = renderingManager.getAllTestResults();
             System.out.println(allTestResults);
             // End the test.
         }

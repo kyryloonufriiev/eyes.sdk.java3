@@ -10,7 +10,7 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
-import com.applitools.eyes.TestResultSummary;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
@@ -132,7 +132,7 @@ public class TestVG_EmulationDevices {
 
     @AfterClass
     public void afterClass(ITestContext testContext) {
-        TestResultSummary allTestResults = visualGridRunner.getAllTestResults();
+        TestResultsSummary allTestResults = visualGridRunner.getAllTestResults();
         visualGridRunner.getLogger().log(allTestResults.toString());
     }
 }

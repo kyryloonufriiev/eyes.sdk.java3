@@ -136,7 +136,7 @@ public class TestTopSites {
 
     @AfterClass
     public void afterClass(ITestContext testContext) {
-        TestResultSummary allTestResults = visualGridRunner.getAllTestResults();
+        TestResultsSummary allTestResults = visualGridRunner.getAllTestResults();
         for (TestResultContainer allTestResult : allTestResults) {
             System.out.println(allTestResult.toString());
         }
