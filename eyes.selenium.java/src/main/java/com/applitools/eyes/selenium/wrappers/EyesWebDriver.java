@@ -424,10 +424,14 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
     }
 
     public String getUserAgent() {
-        String userAgent;
+        String userAgent = null;
         try {
-            userAgent = (String) this.driver.executeScript("return navigator.userAgent");
-            logger.verbose("user agent: " + userAgent);
+            if (!EyesSeleniumUtils.isMobileDevice(driver)) {
+                userAgent = (String) this.driver.executeScript("return navigator.userAgent");
+                logger.verbose("user agent: " + userAgent);
+            } else {
+                logger.verbose("no user agent for native apps");
+            }
         } catch (Exception e) {
             logger.verbose("Failed to obtain user-agent string");
             userAgent = null;
