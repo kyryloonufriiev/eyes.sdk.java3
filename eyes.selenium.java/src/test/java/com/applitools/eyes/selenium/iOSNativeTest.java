@@ -18,16 +18,17 @@ public class iOSNativeTest {
 
         capabilities.setCapability("platformName", "iOS");
         capabilities.setCapability("deviceName", "iPhone 7 Simulator");
-        capabilities.setCapability("platformVersion", "10.0");
+        capabilities.setCapability("platformVersion", "10.3");
         capabilities.setCapability("app", "https://store.applitools.com/download/iOS.TestApp.app.zip");
         capabilities.setCapability("clearSystemFiles", true);
         capabilities.setCapability("noReset", true);
 
-        // Open the app.
-//        WebDriver driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
-        final String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
         final String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
-        final String url = "https://" + SAUCE_USERNAME + ":" + SAUCE_ACCESS_KEY + "@ondemand.saucelabs.com:443/wd/hub";
+        final String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
+        capabilities.setCapability("username", SAUCE_USERNAME);
+        capabilities.setCapability("accesskey", SAUCE_ACCESS_KEY);
+
+        final String url = "https://ondemand.saucelabs.com:443/wd/hub";
         WebDriver driver = new IOSDriver(new URL(url), capabilities);
 
         // Initialize the VisualGridEyes SDK and set your private API key.
