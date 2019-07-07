@@ -64,6 +64,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         if (other.getMatchLevel() != null) {
             this.defaultMatchSettings.setMatchLevel(other.getMatchLevel());
         }
+        this.ignoreDisplacements = other.getIgnoreDisplacemnets();
     }
 
     public Configuration() {
