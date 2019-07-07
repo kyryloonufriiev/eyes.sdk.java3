@@ -1,5 +1,11 @@
 package com.applitools.eyes;
 
+import com.applitools.ICheckSettings;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.config.IConfigurationSetter;
+import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.fluent.Target;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.annotations.BeforeClass;
@@ -7,6 +13,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 import org.testng.Assert;
+import org.testng.internal.IConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -250,6 +257,25 @@ public class TestSerialization {
         ims.setIgnoreDisplacements(ignoreDisplacements);
 
         String actualSerialization = jsonMapper.writeValueAsString(ims);
+
+        String expectedSerialization = String.format(
+                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
+                ignoreCaret, useDom, enablePatterns, ignoreDisplacements);
+
+        Assert.assertEquals(actualSerialization,
+                expectedSerialization, "ImageMatchSettings serialization does not match!");
+    }
+
+    @Test(dataProvider = "four_booleans")
+    public void test_ImageMatchSettings_Serialization_Global(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
+        ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret);
+        TestEyes eyes = new TestEyes();
+        Configuration configuration = eyes.getConfigSetter();
+        configuration.setIgnoreDisplacements(ignoreDisplacements);
+        eyes.setConfiguration(configuration);
+        ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal)settings, eyes);
+
+        String actualSerialization = jsonMapper.writeValueAsString(imageMatchSettings);
 
         String expectedSerialization = String.format(
                 "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
