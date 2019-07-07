@@ -31,7 +31,6 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
         this.hideScrollbars = other.getHideScrollbars();
         this.hideCaret = other.getHideCaret();
         this.isRenderingConfig = other.isRenderingConfig();
-
         this.browsersInfo.addAll(other.getBrowsersInfo());
     }
 
