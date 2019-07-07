@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class TestRegion {
+public class TestSerialization {
 
     /**
      * Used for serialization testing
