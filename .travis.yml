@@ -1,6 +1,8 @@
 language: java
 
-jdk: oraclejdk8
+jdk: oraclejdk9
+
+sudo: required
 
 script:
   - export APPLITOOLS_BATCH_ID=`uuidgen -t`
