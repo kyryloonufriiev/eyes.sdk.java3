@@ -158,7 +158,7 @@ public class MatchWindowTask {
     {
         // Prepare match data.
         MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]),
-                ignoreMismatch, false, false, false, imageMatchSettings, source);
+                ignoreMismatch, false, false, false, imageMatchSettings, source, renderId);
 
         MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]),appOutput.getAppOutput(), tag,
                 ignoreMismatch, options, agentSetupStr, renderId);

@@ -65,6 +65,7 @@ public class TestTopSites {
             configuration.setBatch(new BatchInfo("TTS - config batch"));
             configuration.setBranchName("TTS - config branch");
             configuration.setBaselineEnvName("My Other Env Name");
+            configuration.setIgnoreDisplacements(true);
             String environment = "My env name";
             ChromeEmulationInfo emulation = new ChromeEmulationInfo(DeviceName.iPhone_4, ScreenOrientation.PORTRAIT);
             configuration.addBrowser(800, 600, BrowserType.CHROME, environment);
