@@ -4,6 +4,7 @@ import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.GeneralUtils;
 import org.apache.commons.io.IOUtils;
+import org.brotli.dec.BrotliInputStream;
 
 import javax.ws.rs.core.Response;
 import java.io.*;
@@ -55,7 +56,7 @@ public class ResourceFuture implements IResourceFuture {
 
     @Override
     public RGridResource get() throws InterruptedException {
-        logger.verbose("entering - "+ url);
+        logger.verbose("entering - " + url);
         synchronized (url) {
             if (this.future == null) {
                 try {
@@ -131,9 +132,14 @@ public class ResourceFuture implements IResourceFuture {
     }
 
     private byte[] downloadFile(Response response) {
+
         InputStream inputStream = response.readEntity(InputStream.class);
+        Object contentEncoding = response.getHeaders().getFirst("Content-Encoding");
         byte[] bytes = new byte[0];
         try {
+            if ("br".equalsIgnoreCase((String) contentEncoding)) {
+                inputStream = new BrotliInputStream(inputStream);
+            }
             bytes = IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -145,4 +151,5 @@ public class ResourceFuture implements IResourceFuture {
     public String getUrl() {
         return this.url;
     }
+
 }
