@@ -380,7 +380,7 @@ public class MatchWindowTask {
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
             imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacemnets());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacements());
         }
         return imageMatchSettings;
     }
@@ -399,7 +399,7 @@ public class MatchWindowTask {
             imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false );
             imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : eyes.getConfigGetter().getIgnoreDisplacemnets() );
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : eyes.getConfigGetter().getIgnoreDisplacements() );
         }
         return imageMatchSettings;
     }

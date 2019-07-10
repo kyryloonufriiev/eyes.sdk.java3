@@ -64,7 +64,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         if (other.getMatchLevel() != null) {
             this.defaultMatchSettings.setMatchLevel(other.getMatchLevel());
         }
-        this.ignoreDisplacements = other.getIgnoreDisplacemnets();
+        this.ignoreDisplacements = other.getIgnoreDisplacements();
     }
 
     public Configuration() {
@@ -398,7 +398,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public boolean getIgnoreDisplacemnets() {
+    public boolean getIgnoreDisplacements() {
         return this.ignoreDisplacements;
     }
 

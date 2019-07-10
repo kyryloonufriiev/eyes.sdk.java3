@@ -678,8 +678,8 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     }
 
     @Override
-    public boolean getIgnoreDisplacemnets() {
-        return config.getIgnoreDisplacemnets();
+    public boolean getIgnoreDisplacements() {
+        return config.getIgnoreDisplacements();
     }
 
     /**

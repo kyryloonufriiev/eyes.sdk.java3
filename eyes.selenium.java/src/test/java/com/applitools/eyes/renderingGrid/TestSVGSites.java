@@ -45,7 +45,7 @@ public class TestSVGSites {
         try {
             Configuration configuration = new Configuration();
             configuration.setAppName("Eyes Java SDK - SVG Sites");
-            configuration.setTestName("testedUrl");
+            configuration.setTestName("testedUrl - "+testedUrl);
             configuration.setBatch(batchInfo);
             configuration.addBrowser(800, 600, BrowserType.CHROME);
             configuration.addBrowser(700, 500, BrowserType.FIREFOX);

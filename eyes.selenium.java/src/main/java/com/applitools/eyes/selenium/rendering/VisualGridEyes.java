@@ -599,7 +599,7 @@ public class VisualGridEyes implements IRenderingEyes {
         }
 
         if (ignoreDisplacements == null) {
-            checkSettings = checkSettings.ignoreDisplacements(getConfigGetter().getIgnoreDisplacemnets());
+            checkSettings = checkSettings.ignoreDisplacements(getConfigGetter().getIgnoreDisplacements());
         }
 
         return (ICheckSettingsInternal) checkSettings;
