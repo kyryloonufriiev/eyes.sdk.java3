@@ -591,7 +591,7 @@ public class VisualGridEyes implements IRenderingEyes {
         }
 
         if (fully == null) {
-            checkSettings = checkSettings.fully((b = getConfigGetter().isForceFullPageScreenshot()) == null ? false : b);
+            checkSettings = checkSettings.fully((b = getConfigGetter().isForceFullPageScreenshot()) == null ? true : b);
         }
 
         if (sendDom == null) {
