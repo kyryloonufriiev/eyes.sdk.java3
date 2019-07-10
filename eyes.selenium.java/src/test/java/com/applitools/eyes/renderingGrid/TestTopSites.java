@@ -79,7 +79,7 @@ public class TestTopSites {
             //VisualGridEyes.setServerUrl("https://eyes.applitools.com/");
 //            configuration.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
             eyes.setConfiguration(configuration);
-            eyes.open(webDriver, "Michael's App", "First Test", new RectangleSize(1200, 800));
+            eyes.open(webDriver);
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
