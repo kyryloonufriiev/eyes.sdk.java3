@@ -429,7 +429,7 @@ public class SeleniumEyes extends EyesBase {
             }
         }
 
-        Region region = null;
+        Region region = Region.EMPTY;
         boolean hasFrames = driver.getFrameChain().size() > 0;
         if (hasFrames) {
             region = new Region(bBox.getLocation(), ((EyesRemoteWebElement) scrollRootElement).getClientSize());
@@ -671,8 +671,10 @@ public class SeleniumEyes extends EyesBase {
         MatchResult result = null;
 
         EyesTargetLocator switchTo = null;
+        String source = null;
         if (!EyesSeleniumUtils.isMobileDevice(this.driver)) {
             switchTo = (EyesTargetLocator) driver.switchTo();
+            source = driver.getCurrentUrl();
         }
         FrameChain originalFC = null;
         if (targetRegion != null && switchedToFrameCount == 0) {
@@ -683,34 +685,32 @@ public class SeleniumEyes extends EyesBase {
                 public Region getRegion() {
                     return new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
                 }
-            }, name, false, checkSettings, driver.getCurrentUrl());
+            }, name, false, checkSettings, source);
         } else if (seleniumCheckTarget != null) {
             WebElement targetElement = getTargetElement(seleniumCheckTarget);
             if (targetElement != null) {
                 logger.verbose("have target element");
                 this.targetElement = targetElement;
                 if (this.stitchContent) {
-                    result = this.checkElement(name, checkSettings);
+                    result = this.checkElement(name, checkSettings, source);
                 } else {
-                    result = this.checkRegion(name, checkSettings);
+                    result = this.checkRegion(name, checkSettings, source);
                 }
                 this.targetElement = null;
             } else if (seleniumCheckTarget.getFrameChain().size() > 0) {
                 logger.verbose("have frame chain");
                 if (this.stitchContent) {
-                    result = this.checkFullFrameOrElement(name, checkSettings);
+                    result = this.checkFullFrameOrElement(name, checkSettings, source);
                 } else {
-                    result = this.checkFrameFluent(name, checkSettings);
+                    result = this.checkFrameFluent(name, checkSettings, source);
                 }
             } else {
                 logger.verbose("default case");
-                String source = null;
                 if (!EyesSeleniumUtils.isMobileDevice(driver)) {
                     // required to prevent cut line on the last stitched part of the page on some browsers (like firefox).
                     switchTo.defaultContent();
                     originalFC = tryHideScrollbars();
                     currentFramePositionProvider = createPositionProvider(driver.findElement(By.tagName("html")));
-                    source = driver.getCurrentUrl();
                 }
                 result = this.checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, source);
                 if (!EyesSeleniumUtils.isMobileDevice(driver)) {
@@ -756,9 +756,10 @@ public class SeleniumEyes extends EyesBase {
      * Check frame fluent match result.
      * @param name          the name
      * @param checkSettings the check settings
+     * @param source
      * @return the match result
      */
-    protected MatchResult checkFrameFluent(String name, ICheckSettings checkSettings) {
+    protected MatchResult checkFrameFluent(String name, ICheckSettings checkSettings, String source) {
         FrameChain frameChain = driver.getFrameChain().clone();
         Frame targetFrame = frameChain.pop();
         this.targetElement = targetFrame.getReference();
@@ -766,7 +767,7 @@ public class SeleniumEyes extends EyesBase {
         EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
         switchTo.framesDoScroll(frameChain);
 
-        MatchResult result = this.checkRegion(name, checkSettings);
+        MatchResult result = this.checkRegion(name, checkSettings, source);
 
         this.targetElement = null;
         return result;
@@ -826,7 +827,7 @@ public class SeleniumEyes extends EyesBase {
         frame.setScrollRootElement(rootElement);
     }
 
-    private MatchResult checkFullFrameOrElement(String name, ICheckSettings checkSettings) {
+    private MatchResult checkFullFrameOrElement(String name, ICheckSettings checkSettings, String source) {
         checkFrameOrElement = true;
 
         logger.verbose("enter");
@@ -836,7 +837,7 @@ public class SeleniumEyes extends EyesBase {
             public Region getRegion(ICheckSettingsInternal settings) {
                 return getFullFrameOrElementRegion(settings);
             }
-        }, name, false, checkSettings, driver.getCurrentUrl());
+        }, name, false, checkSettings, source);
 
         checkFrameOrElement = false;
         return result;
@@ -1026,7 +1027,7 @@ public class SeleniumEyes extends EyesBase {
         return viewportBounds;
     }
 
-    private MatchResult checkRegion(String name, ICheckSettings checkSettings) {
+    private MatchResult checkRegion(String name, ICheckSettings checkSettings, String source) {
 //        // If needed, scroll to the top/left of the element (additional help
 //        // to make sure it's visible).
 //        Point locationAsPoint = targetElement.getLocation();
@@ -1063,7 +1064,7 @@ public class SeleniumEyes extends EyesBase {
 
                 return r;
             }
-        }, name, false, checkSettings, driver.getCurrentUrl());
+        }, name, false, checkSettings, source);
         logger.verbose("Done! trying to scroll back to original position.");
 
         //regionVisibilityStrategy.returnToOriginalPosition(positionProvider);
@@ -1145,7 +1146,7 @@ public class SeleniumEyes extends EyesBase {
      * @param matchTimeout The amount of time to retry matching. (Milliseconds)
      * @param tag          An optional tag to be associated with the snapshot.
      */
-    protected void checkCurrentFrame(int matchTimeout, String tag) {
+    protected void checkCurrentFrame(int matchTimeout, String tag, String source) {
         try {
             logger.verbose(String.format("CheckCurrentFrame(%d, '%s')", matchTimeout, tag));
 
@@ -1167,7 +1168,7 @@ public class SeleniumEyes extends EyesBase {
             logger.verbose("replacing regionToCheck");
             setRegionToCheck(screenshot.getFrameWindow());
 
-            super.checkWindowBase(RegionProvider.NULL_INSTANCE, tag, false, matchTimeout, driver.getCurrentUrl());
+            super.checkWindowBase(RegionProvider.NULL_INSTANCE, tag, false, matchTimeout, source);
         } finally {
             checkFrameOrElement = false;
             regionToCheck = null;
@@ -1311,11 +1312,11 @@ public class SeleniumEyes extends EyesBase {
     }
 
 
-    private MatchResult checkElement(String name, ICheckSettings checkSettings) {
-        return this.checkElement(this.targetElement, name, checkSettings);
+    private MatchResult checkElement(String name, ICheckSettings checkSettings, String source) {
+        return this.checkElement(this.targetElement, name, checkSettings, source);
     }
 
-    private MatchResult checkElement(WebElement element, String name, ICheckSettings checkSettings) {
+    private MatchResult checkElement(WebElement element, String name, ICheckSettings checkSettings, String source) {
 
         // Since the element might already have been found using EyesWebDriver.
         final EyesRemoteWebElement eyesElement = (element instanceof EyesRemoteWebElement) ?
@@ -1376,7 +1377,7 @@ public class SeleniumEyes extends EyesBase {
                 regionToCheck.intersect(effectiveViewport);
             }
 
-            result = checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, driver.getCurrentUrl());
+            result = checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, source);
         } catch (Exception ex) {
             GeneralUtils.logExceptionStackTrace(logger, ex);
             throw ex;
