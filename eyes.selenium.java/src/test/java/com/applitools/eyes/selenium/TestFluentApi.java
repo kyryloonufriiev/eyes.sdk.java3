@@ -195,7 +195,7 @@ public class TestFluentApi extends TestSetup {
 
     @Test
     public void TestCheckMany() {
-        ((Eyes) getEyes()).check(
+        getEyes().check(
                 Target.region(By.id("overflowing-div-image")).withName("overflowing div image"),
                 Target.region(By.id("overflowing-div")).withName("overflowing div"),
                 Target.region(By.id("overflowing-div-image")).fully().withName("overflowing div image (fully)"),
@@ -207,7 +207,7 @@ public class TestFluentApi extends TestSetup {
 
     //@Test
     public void TestCheckScrollableModal() {
-        Eyes eyes = (Eyes) getEyes();
+        Eyes eyes = getEyes();
         driver.findElement(By.id("centered")).click();
         StitchMode originalStitchMode = eyes.getStitchMode();
         eyes.setStitchMode(StitchMode.SCROLL);
