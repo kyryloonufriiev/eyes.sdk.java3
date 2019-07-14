@@ -486,7 +486,7 @@ public class SeleniumEyes extends EyesBase {
         List<EyesScreenshot> subScreenshots = new ArrayList<>();
         for (Region r : getRegion.getRegions(this, screenshot, true)) {
             logger.verbose("original sub-region: " + r);
-            r.offset(-bBox.getLeft(), -bBox.getTop());
+            r = r.offset(-bBox.getLeft(), -bBox.getTop());
             //r = regionPositionCompensation.compensateRegionPosition(r, devicePixelRatio);
             //logger.verbose("sub-region after compensation: " + r);
             EyesScreenshot subScreenshot = screenshot.getSubScreenshotForRegion(r, false);
