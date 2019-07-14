@@ -6,7 +6,7 @@ import com.applitools.eyes.Region;
 /**
  *
  */
-public class CheckTarget {
+public class Target {
 
     public static ICheckSettings window()
     {

@@ -1,24 +1,18 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.Logger;
+import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.visualgrid.model.TestResultContainer;
-import com.applitools.eyes.visualgrid.model.TestResultSummary;
+import com.applitools.eyes.TestResultContainer;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class TestSVGSites {
     private VisualGridRunner visualGridRunner;
@@ -105,7 +99,7 @@ public class TestSVGSites {
 
     @AfterClass
     public void afterClass(ITestContext testContext) {
-        TestResultSummary allTestResults = visualGridRunner.getAllTestResults();
+        TestResultsSummary allTestResults = visualGridRunner.getAllTestResults();
         for (TestResultContainer allTestResult : allTestResults) {
             System.out.println(allTestResult.toString());
         }

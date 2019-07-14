@@ -130,7 +130,7 @@ public class SeleniumEyes extends EyesBase {
 
     @Override
     public String getBaseAgentId() {
-        return "eyes.selenium.java/3.154.1";
+        return "eyes.selenium.java/3.155.0";
     }
 
     /**
@@ -704,13 +704,15 @@ public class SeleniumEyes extends EyesBase {
                 }
             } else {
                 logger.verbose("default case");
+                String source = null;
                 if (!EyesSeleniumUtils.isMobileDevice(driver)) {
                     // required to prevent cut line on the last stitched part of the page on some browsers (like firefox).
                     switchTo.defaultContent();
                     originalFC = tryHideScrollbars();
                     currentFramePositionProvider = createPositionProvider(driver.findElement(By.tagName("html")));
+                    source = driver.getCurrentUrl();
                 }
-                result = this.checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings, driver.getCurrentUrl());
+                result = this.checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings, source);
                 if (!EyesSeleniumUtils.isMobileDevice(driver)) {
                     switchTo.frames(this.originalFC);
                 }
@@ -1058,11 +1060,16 @@ public class SeleniumEyes extends EyesBase {
                 scaleProviderHandler.get() instanceof NullScaleProvider) {
             ScaleProviderFactory factory;
             logger.verbose("Trying to extract device pixel ratio...");
-            try {
-                devicePixelRatio = EyesSeleniumUtils.getDevicePixelRatio(this.jsExecutor);
-            } catch (Exception e) {
-                logger.verbose(
-                        "Failed to extract device pixel ratio! Using default.");
+            if (!EyesSeleniumUtils.isMobileDevice(driver)) {
+                try {
+                    devicePixelRatio = EyesSeleniumUtils.getDevicePixelRatio(this.jsExecutor);
+                } catch (Exception e) {
+                    logger.verbose(
+                            "Failed to extract device pixel ratio! Using default.");
+                    devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
+                }
+            } else {
+                logger.verbose("Native App");
                 devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
             }
             logger.verbose(String.format("Device pixel ratio: %f", devicePixelRatio));

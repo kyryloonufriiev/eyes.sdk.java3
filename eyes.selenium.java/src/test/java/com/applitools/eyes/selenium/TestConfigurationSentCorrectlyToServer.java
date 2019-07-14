@@ -3,7 +3,7 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.visualgrid.model.TestResultSummary;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -131,7 +131,7 @@ public class TestConfigurationSentCorrectlyToServer {
         Assert.assertEquals(MatchLevel.LAYOUT2, sessionResults.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel());
         Assert.assertEquals(MatchLevel.CONTENT, sessionResults.getActualAppOutput()[1].getImageMatchSettings().getMatchLevel());
 
-        TestResultSummary resultsSummary = runner.getAllTestResults();
+        TestResultsSummary resultsSummary = runner.getAllTestResults();
         eyes.abortIfNotClosed();
     }
 

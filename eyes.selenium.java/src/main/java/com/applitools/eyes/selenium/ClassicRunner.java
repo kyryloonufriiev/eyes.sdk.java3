@@ -1,8 +1,8 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.TestResults;
-import com.applitools.eyes.visualgrid.model.TestResultContainer;
-import com.applitools.eyes.visualgrid.model.TestResultSummary;
+import com.applitools.eyes.TestResultContainer;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.EyesRunner;
 
 import java.util.ArrayList;
@@ -13,17 +13,17 @@ public class ClassicRunner extends EyesRunner {
     private List<TestResults> allTestResult = new ArrayList<>();
 
     @Override
-    public TestResultSummary getAllTestResults(){
+    public TestResultsSummary getAllTestResults(){
         return getAllTestResults(false);
     }
 
     @Override
-    public TestResultSummary getAllTestResults(boolean shouldThrowException) {
+    public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
         List<TestResultContainer> result = new ArrayList<>();
         for (TestResults testResults : allTestResult) {
             result.add(new TestResultContainer(testResults, null, null));
         }
-        return new TestResultSummary(result);
+        return new TestResultsSummary(result);
     }
 
     void aggregateResult(TestResults testResult){

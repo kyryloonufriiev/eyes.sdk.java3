@@ -7,7 +7,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.RenderingTask;
-import com.applitools.eyes.visualgrid.model.TestResultContainer;
+import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 import java.util.*;

@@ -1,8 +1,8 @@
 package com.applitools.eyes.renderingGrid;
 
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.visualgrid.model.TestResultContainer;
-import com.applitools.eyes.visualgrid.model.TestResultSummary;
+import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestResult;
@@ -31,7 +31,7 @@ public class TestAbortVG {
 
     @AfterClass
     public void afterClass() {
-        TestResultSummary allTestResults = runner.getAllTestResults();
+        TestResultsSummary allTestResults = runner.getAllTestResults();
         for (TestResultContainer allTestResult : allTestResults) {
             if (!allTestResult.getTestResults().isAborted()) {
                 throw new Error("Test not aborted");

@@ -1,9 +1,6 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
@@ -125,7 +122,7 @@ public class TestMissingContentSites {
 
     @AfterClass
     public void afterClass(ITestContext testContext) {
-        TestResultSummary allTestResults = visualGridRunner.getAllTestResults(false);
+        TestResultsSummary allTestResults = visualGridRunner.getAllTestResults(false);
         for (TestResultContainer allTestResult : allTestResults) {
             System.out.println(allTestResult.toString());
         }

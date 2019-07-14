@@ -59,7 +59,6 @@ public class Android2Test {
 
         // This is your api key, make sure you use it in all your tests.
         DesiredCapabilities caps = DesiredCapabilities.iphone();
-        caps.setCapability("appiumVersion", "1.7.2");
         caps.setCapability("deviceName", deviceName);
         caps.setCapability("deviceOrientation", deviceOrientation);
         caps.setCapability("platformVersion", platformVersion);

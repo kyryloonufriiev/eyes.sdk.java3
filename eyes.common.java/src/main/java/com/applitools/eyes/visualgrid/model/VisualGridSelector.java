@@ -28,4 +28,12 @@ public class VisualGridSelector {
     public Object getCategory() {
         return category;
     }
+
+    @Override
+    public String toString() {
+        return "VisualGridSelector{" +
+                "selector='" + selector + '\'' +
+                ", category=" + category +
+                '}';
+    }
 }

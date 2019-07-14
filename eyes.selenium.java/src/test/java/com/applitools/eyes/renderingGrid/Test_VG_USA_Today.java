@@ -1,14 +1,11 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.MatchLevel;
-import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.visualgrid.model.TestResultSummary;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
@@ -122,7 +119,7 @@ public class Test_VG_USA_Today {
 
     @AfterClass
     public void afterClass(ITestContext testContext){
-        TestResultSummary allTestResults = renderingManager.getAllTestResults();
+        TestResultsSummary allTestResults = renderingManager.getAllTestResults();
         renderingManager.getLogger().log(allTestResults.toString());
     }
 

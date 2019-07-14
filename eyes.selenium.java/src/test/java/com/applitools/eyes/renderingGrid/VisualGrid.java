@@ -6,7 +6,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
-import com.applitools.eyes.visualgrid.model.TestResultSummary;
+import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -72,7 +72,7 @@ public class VisualGrid {
             eyes.close();
 
 
-            TestResultSummary allTestResults = VisualGrid.getAllTestResults();
+            TestResultsSummary allTestResults = VisualGrid.getAllTestResults();
             System.out.println("Results: " + allTestResults);
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,7 +90,7 @@ public class VisualGrid {
 
         eyes.close();
 
-//        TestResultSummary allTestResults = VisualGrid.getAllTestResults();
+//        TestResultsSummary allTestResults = VisualGrid.getAllTestResults();
 //        System.out.println("Results: " + allTestResults);
     }
 
@@ -101,7 +101,7 @@ public class VisualGrid {
 
     @AfterClass
     public void closeRunner() {
-        TestResultSummary allTestResults = this.VisualGrid.getAllTestResults();
+        TestResultsSummary allTestResults = this.VisualGrid.getAllTestResults();
         String message = allTestResults.toString();
         eyes.getLogger().verbose(message);
     }

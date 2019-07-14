@@ -17,7 +17,7 @@ public class  RenderRequest {
     private final VisualGridTask visualGridTask;
 
     @JsonInclude
-    private String agentId = "eyes.selenium.visualgrid.java/3.154.1";
+    private String agentId = "eyes.selenium.visualgrid.java/3.155.0";
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String webhook;
@@ -163,5 +163,24 @@ public class  RenderRequest {
 
     public void setRenderId(String renderId) {
         this.renderId = renderId;
+    }
+
+    @Override
+    public String toString() {
+        return "RenderRequest{" +
+                "renderId='" + renderId + '\'' +
+                ", visualGridTask=" + visualGridTask +
+                ", agentId='" + agentId + '\'' +
+                ", webhook='" + webhook + '\'' +
+                ", url='" + url + '\'' +
+                ", dom=" + dom +
+                ", resources=" + resources +
+                ", renderInfo=" + renderInfo +
+                ", platform='" + platform + '\'' +
+                ", browserName='" + browserName + '\'' +
+                ", scriptHooks=" + scriptHooks +
+                ", selectorsToFindRegionsFor=" + selectorsToFindRegionsFor +
+                ", sendDom=" + sendDom +
+                '}';
     }
 }

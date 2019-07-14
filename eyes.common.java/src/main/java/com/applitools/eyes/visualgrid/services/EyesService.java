@@ -1,7 +1,7 @@
 package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.visualgrid.model.TestResultContainer;
+import com.applitools.eyes.TestResultContainer;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.concurrent.*;
