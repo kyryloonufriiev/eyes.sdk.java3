@@ -9,10 +9,10 @@ import org.openqa.selenium.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IgnoreRegionBySelector implements GetRegion , IGetSeleniumRegion {
+public class SimpleRegionBySelector implements GetRegion , IGetSeleniumRegion {
     private By selector;
 
-    public IgnoreRegionBySelector(By selector) {
+    public SimpleRegionBySelector(By selector) {
         this.selector = selector;
     }
 

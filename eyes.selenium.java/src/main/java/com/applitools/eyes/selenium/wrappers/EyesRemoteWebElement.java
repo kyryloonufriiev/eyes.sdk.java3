@@ -615,8 +615,8 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         Rectangle rect = new Rectangle(
                 Math.round(Float.parseFloat(parts[0])),
                 Math.round(Float.parseFloat(parts[1])),
-                Math.round(Float.parseFloat(parts[2])),
-                Math.round(Float.parseFloat(parts[3])));
+                Math.round(Float.parseFloat(parts[3])),
+                Math.round(Float.parseFloat(parts[2])));
         return rect;
     }
 }

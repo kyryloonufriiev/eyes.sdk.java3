@@ -185,7 +185,7 @@ public class EyesWebDriver implements HasCapabilities, HasInputDevices,
 
     public WebElement findElement(By by) {
         WebElement webElement = driver.findElement(by);
-        if (webElement instanceof RemoteWebElement) {
+        if ((webElement instanceof RemoteWebElement) && !(webElement instanceof EyesRemoteWebElement)) {
             webElement = new EyesRemoteWebElement(logger, this, webElement);
 
             // For Remote web elements, we can keep the IDs,

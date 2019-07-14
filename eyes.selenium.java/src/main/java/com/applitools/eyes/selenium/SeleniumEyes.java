@@ -389,7 +389,7 @@ public class SeleniumEyes extends EyesBase {
                     }
 
                     if (targetElement != null) {
-                        getRegions.put(i, new IgnoreRegionByElement(targetElement));
+                        getRegions.put(i, new SimpleRegionByElement(targetElement));
                     }
                 }
             }
@@ -577,6 +577,8 @@ public class SeleniumEyes extends EyesBase {
         WebElement targetElement = seleniumCheckTarget.getTargetElement();
         if (targetElement == null && targetSelector != null) {
             targetElement = this.driver.findElement(targetSelector);
+        } else if (targetElement != null && !(targetElement instanceof EyesRemoteWebElement)) {
+            targetElement = new EyesRemoteWebElement(logger, driver, targetElement);
         }
         return targetElement;
     }
@@ -854,7 +856,7 @@ public class SeleniumEyes extends EyesBase {
             // FIXME - Scaling should be handled in a single place instead
             ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
 
-            EyesTargetLocator switchTo = (EyesTargetLocator)driver.switchTo();
+            EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
             switchTo.frames(fc);
 
             EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
