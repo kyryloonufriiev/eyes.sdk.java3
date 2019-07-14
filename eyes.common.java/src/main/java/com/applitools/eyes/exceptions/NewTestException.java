@@ -1,6 +1,5 @@
 package com.applitools.eyes.exceptions;
 
-import com.applitools.eyes.SessionStartInfo;
 import com.applitools.eyes.TestResults;
 
 /**
@@ -8,10 +7,10 @@ import com.applitools.eyes.TestResults;
  */
 public class NewTestException extends TestFailedException {
 
-    public NewTestException(TestResults testResults, SessionStartInfo sessionStartInfo){
+    public NewTestException(TestResults testResults, String scenarioIdOrName, String appIdOrName){
         super(testResults, String.format("'%s' of '%s'. Please approve the new baseline at %s",
-                sessionStartInfo.getScenarioIdOrName(),
-                sessionStartInfo.getAppIdOrName(),
+                scenarioIdOrName,
+                appIdOrName,
                 testResults.getUrl()));
     }
 

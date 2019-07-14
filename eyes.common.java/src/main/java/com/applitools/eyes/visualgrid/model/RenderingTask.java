@@ -23,10 +23,7 @@ import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -650,13 +647,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
 
         try {
-            URI uri = new URI(blob.getUrl());
-            if (!uri.isAbsolute()) {
+            URL uri = new URL(this.sanitizeURL(blob.getUrl()));
                 tdr.uri = new URL(new URL(baseUrl), uri.toString());
-            } else {
-                tdr.uri = new URL(uri.toString());
-            }
-        } catch (URISyntaxException | MalformedURLException e) {
+        } catch (MalformedURLException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
@@ -996,13 +989,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
 
     private String sanitizeURL(String urlToSanitize) {
+        String encoded = null;
         try {
             URL url = new URL(urlToSanitize);
-            return url.getProtocol() + "://"+ url.getAuthority() + url.getPath() + (url.getQuery() != null && !url.getQuery().isEmpty() ? QUESTION_MARK + url.getQuery() : "");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            encoded = url.getProtocol() + "://" + url.getAuthority() + url.getPath() + (url.getQuery() != null && !url.getQuery().isEmpty() ? QUESTION_MARK +  URLEncoder.encode(url.getQuery(), "UTF-8") : "");
+        } catch (UnsupportedEncodingException | MalformedURLException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        return urlToSanitize;
+        return encoded;
     }
 }
 

@@ -40,7 +40,8 @@ public class BlobData {
     @Override
     public String toString() {
         return "BlobData{" +
-                "url=" + url +
+                "type='" + type + '\'' +
+                ", url='" + url + '\'' +
                 '}';
     }
 }

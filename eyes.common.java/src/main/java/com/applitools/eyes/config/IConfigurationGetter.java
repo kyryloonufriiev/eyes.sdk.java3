@@ -57,5 +57,5 @@ public interface IConfigurationGetter {
 
     MatchLevel getMatchLevel();
 
-    boolean getIgnoreDisplacemnets();
+    boolean getIgnoreDisplacements();
 }

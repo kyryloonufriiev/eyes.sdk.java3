@@ -3,7 +3,6 @@
  */
 package com.applitools.eyes.exceptions;
 
-import com.applitools.eyes.SessionStartInfo;
 import com.applitools.eyes.TestResults;
 
 /**
@@ -13,10 +12,10 @@ public class TestFailedException extends AssertionError {
 
     private TestResults testResults = null;
 
-    public TestFailedException(TestResults testResults, SessionStartInfo sessionStartInfo) {
+    public TestFailedException(TestResults testResults, String scenarioIdOrName, String appIdOrName) {
         super(String.format("'%s' of '%s'. See details at %s",
-                sessionStartInfo.getScenarioIdOrName(),
-                sessionStartInfo.getAppIdOrName(),
+                scenarioIdOrName,
+                appIdOrName,
                 testResults.getUrl()));
         this.testResults = testResults;
     }

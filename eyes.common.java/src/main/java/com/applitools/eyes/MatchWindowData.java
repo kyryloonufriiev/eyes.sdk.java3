@@ -22,6 +22,7 @@ public class MatchWindowData {
         private final boolean forceMatch;
         private final ImageMatchSettings imageMatchSettings;
         private final String source;
+        private String renderId;
 
 
         /**
@@ -30,24 +31,25 @@ public class MatchWindowData {
          *                           call and the current matchWindow call. Can be array
          *                           of size 0, but MUST NOT be null.
          * @param ignoreMismatch     Tells the server whether or not to store
-         *                           a mismatch for the current window as window in
-         *                           the session.
+ *                           a mismatch for the current window as window in
+ *                           the session.
          * @param ignoreMatch        Tells the server whether or not to store
-         *                           a match for the current window as window in
-         *                           the session.
+*                           a match for the current window as window in
+*                           the session.
          * @param forceMismatch      Forces the server to skip the comparison
-         *                           process and mark the current window
-         *                           as a mismatch.
+*                           process and mark the current window
+*                           as a mismatch.
          * @param forceMatch         Forces the server to skip the comparison
-         *                           process and mark the current window
-         *                           as a match.
+*                           process and mark the current window
+*                           as a match.
          * @param imageMatchSettings Settings specifying how the server should compare the image.
+         * @param renderId
          */
         public Options(String name, Trigger[] userInputs,
                        boolean ignoreMismatch, boolean ignoreMatch,
                        boolean forceMismatch, boolean forceMatch,
                        ImageMatchSettings imageMatchSettings,
-                       String source) {
+                       String source, String renderId) {
             ArgumentGuard.notNull(userInputs, "userInputs");
 
             this.name = name;
@@ -58,6 +60,7 @@ public class MatchWindowData {
             this.forceMatch = forceMatch;
             this.imageMatchSettings = imageMatchSettings;
             this.source = source;
+            this.renderId = renderId;
         }
 
         public String getName() {
@@ -90,6 +93,10 @@ public class MatchWindowData {
 
         public String getSource() {
             return source;
+        }
+
+        public String getRenderId() {
+            return renderId;
         }
     }
 

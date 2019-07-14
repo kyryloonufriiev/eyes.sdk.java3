@@ -64,21 +64,19 @@ public class TestTopSites {
             configuration.setAppName("Top Ten Sites");
             configuration.setBatch(new BatchInfo("TTS - config batch"));
             configuration.setBranchName("TTS - config branch");
-            configuration.setBaselineEnvName("My Other Env Name");
-            String environment = "My env name";
-            ChromeEmulationInfo emulation = new ChromeEmulationInfo(DeviceName.iPhone_4, ScreenOrientation.PORTRAIT);
-            configuration.addBrowser(800, 600, BrowserType.CHROME, environment);
-            configuration.addBrowser(700, 500, BrowserType.FIREFOX, environment);
-            configuration.addBrowser(700, 500, BrowserType.IE_10, environment);
-            configuration.addBrowser(700, 500, BrowserType.IE_11, environment);
-            configuration.addBrowser(1600, 1200, BrowserType.CHROME, environment);
-            configuration.addBrowser(1200, 800, BrowserType.EDGE, environment);
+            configuration.setIgnoreDisplacements(true);
+            configuration.addBrowser(800, 600, BrowserType.CHROME);
+            configuration.addBrowser(700, 500, BrowserType.FIREFOX);
+            configuration.addBrowser(700, 500, BrowserType.IE_10);
+            configuration.addBrowser(700, 500, BrowserType.IE_11);
+            configuration.addBrowser(1600, 1200, BrowserType.CHROME);
+            configuration.addBrowser(1200, 800, BrowserType.EDGE);
 //            configuration.addDeviceEmulation(emulation);
             logger.log("created configurations for url " + testedUrl);
             //VisualGridEyes.setServerUrl("https://eyes.applitools.com/");
-            configuration.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
+//            configuration.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
             eyes.setConfiguration(configuration);
-            eyes.open(webDriver, "Michael's App", "First Test", new RectangleSize(1200, 800));
+            eyes.open(webDriver);
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }

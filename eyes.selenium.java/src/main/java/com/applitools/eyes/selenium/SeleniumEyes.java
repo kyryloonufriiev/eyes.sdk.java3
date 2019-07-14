@@ -2026,7 +2026,15 @@ public class SeleniumEyes extends EyesBase {
 
     @Override
     public TestResults close(boolean throwEx) {
-        TestResults results = super.close(throwEx);
+        TestResults results = null;
+        try {
+            results = super.close(throwEx);
+        } catch (Throwable e) {
+            runner.setException(new Error(e));
+            if (throwEx){
+                throw e;
+            }
+        }
         if (runner != null) {
             this.runner.aggregateResult(results);
         }

@@ -481,7 +481,6 @@ public abstract class EyesBase {
             }
 
             boolean isNewSession = runningSession.getIsNewSession();
-            String sessionResultsUrl = runningSession.getUrl();
 
             logger.verbose("Ending server session...");
             boolean save = (isNewSession && getConfigGetter().getSaveNewTests())
@@ -490,34 +489,12 @@ public abstract class EyesBase {
             TestResults results = serverConnector.stopSession(runningSession, false, save);
 
             results.setNew(isNewSession);
-            results.setUrl(sessionResultsUrl);
+            results.setUrl(runningSession.getUrl());
             logger.verbose(results.toString());
-
-            TestResultsStatus status = results.getStatus();
 
             sessionEventHandlers.testEnded(getAUTSessionId(), results);
 
-            if (status == TestResultsStatus.Unresolved) {
-                if (results.isNew()) {
-                    logger.log("--- New test ended. Please approve the new baseline at " + sessionResultsUrl);
-                    if (throwEx) {
-                        throw new NewTestException(results, sessionStartInfo);
-                    }
-                } else {
-                    logger.log("--- Failed test ended. See details at " + sessionResultsUrl);
-                    if (throwEx) {
-                        throw new DiffsFoundException(results, sessionStartInfo);
-                    }
-                }
-            } else if (status == TestResultsStatus.Failed) {
-                logger.log("--- Failed test ended. See details at " + sessionResultsUrl);
-                if (throwEx) {
-                    throw new TestFailedException(results, sessionStartInfo);
-                }
-            } else {
-                // Test passed
-                logger.log("--- Test passed. See details at " + sessionResultsUrl);
-            }
+            logSessionResultsAndThrowException(logger, throwEx, results);
 
             results.setServerConnector(this.serverConnector);
 
@@ -527,6 +504,34 @@ public abstract class EyesBase {
             // exception was thrown during close.
             runningSession = null;
 //            logger.getLogHandler().close();
+        }
+    }
+
+    public static void logSessionResultsAndThrowException(Logger logger, boolean throwEx, TestResults results) {
+        TestResultsStatus status = results.getStatus();
+        String sessionResultsUrl = results.getUrl();
+        String scenarioIdOrName = results.getName();
+        String appIdOrName = results.getAppName();
+        if (status == TestResultsStatus.Unresolved) {
+            if (results.isNew()) {
+                logger.log("--- New test ended. Please approve the new baseline at " + sessionResultsUrl);
+                if (throwEx) {
+                    throw new NewTestException(results, scenarioIdOrName, appIdOrName);
+                }
+            } else {
+                logger.log("--- Failed test ended. See details at " + sessionResultsUrl);
+                if (throwEx) {
+                    throw new DiffsFoundException(results, scenarioIdOrName, appIdOrName);
+                }
+            }
+        } else if (status == TestResultsStatus.Failed) {
+            logger.log("--- Failed test ended. See details at " + sessionResultsUrl);
+            if (throwEx) {
+                throw new TestFailedException(results, scenarioIdOrName, appIdOrName);
+            }
+        } else {
+            // Test passed
+            logger.log("--- Test passed. See details at " + sessionResultsUrl);
         }
     }
 
