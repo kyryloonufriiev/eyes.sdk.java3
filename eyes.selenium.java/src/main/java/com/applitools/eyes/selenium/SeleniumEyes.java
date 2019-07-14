@@ -13,7 +13,7 @@ import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import com.applitools.eyes.fluent.IgnoreRegionByRectangle;
+import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.positioning.*;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
@@ -377,7 +377,7 @@ public class SeleniumEyes extends EyesBase {
             Region targetRegion = checkSettingsInternal.getTargetRegion();
 
             if (targetRegion != null) {
-                getRegions.put(i, new IgnoreRegionByRectangle(targetRegion));
+                getRegions.put(i, new SimpleRegionByRectangle(targetRegion));
             } else {
                 ISeleniumCheckTarget seleniumCheckTarget =
                         (settings instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) settings : null;

@@ -8,10 +8,10 @@ import com.applitools.eyes.Region;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IgnoreRegionByRectangle implements GetRegion {
+public class SimpleRegionByRectangle implements GetRegion {
     private Region region;
 
-    public IgnoreRegionByRectangle(Region region) {
+    public SimpleRegionByRectangle(Region region) {
         this.region = region;
     }
 

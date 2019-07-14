@@ -49,7 +49,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     protected void ignore_(Region region) {
-        this.ignore_(new IgnoreRegionByRectangle(region));
+        this.ignore_(new SimpleRegionByRectangle(region));
     }
 
     protected void ignore_(GetRegion regionProvider) {
@@ -57,7 +57,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     protected void layout_(Region region) {
-        this.layout_(new IgnoreRegionByRectangle(region));
+        this.layout_(new SimpleRegionByRectangle(region));
     }
 
     protected void layout_(GetRegion regionProvider) {
@@ -65,7 +65,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     protected void content_(Region region) {
-        this.content_(new IgnoreRegionByRectangle(region));
+        this.content_(new SimpleRegionByRectangle(region));
     }
 
     protected void content_(GetRegion regionProvider) {
@@ -73,7 +73,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     protected void strict_(Region region) {
-        this.strict_(new IgnoreRegionByRectangle(region));
+        this.strict_(new SimpleRegionByRectangle(region));
     }
 
     protected void strict_(GetRegion regionProvider) {
