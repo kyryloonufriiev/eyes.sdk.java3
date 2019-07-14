@@ -673,7 +673,7 @@ public class SeleniumEyes extends EyesBase {
             switchTo = (EyesTargetLocator) driver.switchTo();
         }
         FrameChain originalFC = null;
-        if (targetRegion != null) {
+        if (targetRegion != null && switchedToFrameCount == 0) {
             logger.verbose("have target region");
             originalFC = tryHideScrollbars();
             result = this.checkWindowBase(new RegionProvider() {
@@ -686,7 +686,6 @@ public class SeleniumEyes extends EyesBase {
             WebElement targetElement = getTargetElement(seleniumCheckTarget);
             if (targetElement != null) {
                 logger.verbose("have target element");
-                originalFC = tryHideScrollbars();
                 this.targetElement = targetElement;
                 if (this.stitchContent) {
                     result = this.checkElement(name, checkSettings);
@@ -696,7 +695,6 @@ public class SeleniumEyes extends EyesBase {
                 this.targetElement = null;
             } else if (seleniumCheckTarget.getFrameChain().size() > 0) {
                 logger.verbose("have frame chain");
-                originalFC = tryHideScrollbars();
                 if (this.stitchContent) {
                     result = this.checkFullFrameOrElement(name, checkSettings);
                 } else {
@@ -712,7 +710,7 @@ public class SeleniumEyes extends EyesBase {
                     currentFramePositionProvider = createPositionProvider(driver.findElement(By.tagName("html")));
                     source = driver.getCurrentUrl();
                 }
-                result = this.checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings, source);
+                result = this.checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, source);
                 if (!EyesSeleniumUtils.isMobileDevice(driver)) {
                     switchTo.frames(this.originalFC);
                 }
@@ -833,8 +831,8 @@ public class SeleniumEyes extends EyesBase {
 
         MatchResult result = checkWindowBase(new RegionProvider() {
             @Override
-            public Region getRegion() {
-                return getFullFrameOrElementRegion();
+            public Region getRegion(ICheckSettingsInternal settings) {
+                return getFullFrameOrElementRegion(settings);
             }
         }, name, false, checkSettings, driver.getCurrentUrl());
 
@@ -842,32 +840,31 @@ public class SeleniumEyes extends EyesBase {
         return result;
     }
 
-    private Region getFullFrameOrElementRegion() {
+    private Region getFullFrameOrElementRegion(ICheckSettingsInternal checkSettingsInternal) {
         logger.verbose("checkFrameOrElement: " + checkFrameOrElement);
         if (checkFrameOrElement) {
 
-            FrameChain fc = ensureFrameVisible();
-
-            // FIXME - Scaling should be handled in a single place instead
+            List<PositionProviderAndMemento> ppams = new ArrayList<>();
+            FrameChain fc = ensureFrameVisible(ppams);
             ScaleProviderFactory scaleProviderFactory = updateScalingParams();
 
             BufferedImage screenshotImage = imageProvider.getImage();
-
             debugScreenshotsProvider.save(screenshotImage, "checkFullFrameOrElement");
 
-            scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
+            // FIXME - Scaling should be handled in a single place instead
+            ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
 
-            EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
+            EyesTargetLocator switchTo = (EyesTargetLocator)driver.switchTo();
             switchTo.frames(fc);
 
-            final EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
-
-            logger.verbose("replacing regionToCheck");
-            setRegionToCheck(screenshot.getFrameWindow());
+            EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
+            regionToCheck = screenshot.getFrameWindow();
             fullRegionToCheck = Region.EMPTY;
         }
 
-        return Region.EMPTY;
+        Region targetRegion = checkSettingsInternal.getTargetRegion();
+        if (targetRegion == null) targetRegion = Region.EMPTY;
+        return targetRegion;
     }
 
     private FrameChain ensureFrameVisible(List<PositionProviderAndMemento> ppams) {
@@ -1038,10 +1035,31 @@ public class SeleniumEyes extends EyesBase {
 
         MatchResult result = checkWindowBase(new RegionProvider() {
             @Override
-            public Region getRegion() {
-                Point p = targetElement.getLocation();
-                Dimension d = targetElement.getSize();
-                return new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
+            public Region getRegion(ICheckSettingsInternal settings) {
+                EyesRemoteWebElement eyesTargetElement = ((EyesRemoteWebElement) targetElement);
+                Region rect = settings.getTargetRegion();
+                Region r;
+                if (rect == null) {
+                    Rectangle bounds = eyesTargetElement.getBoundingClientRect();
+                    r = new Region(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
+                } else {
+                    SizeAndBorders sizeAndBorders = eyesTargetElement.getSizeAndBorders();
+                    RectangleSize s = sizeAndBorders.getSize();
+                    Borders b = sizeAndBorders.getBorders();
+                    Point p = targetElement.getLocation();
+                    p = p.moveBy(b.getLeft(), b.getTop());
+                    Region r2 = rect;
+
+                    //TODO - ITAI - try to use Region.Intersect
+                    int x = p.getX() + r2.getLeft();
+                    int y = p.getY() + r2.getTop();
+                    int w = Math.min(p.getX() + s.getWidth(), r2.getRight()) - x;
+                    int h = Math.min(p.getY() + s.getHeight(), r2.getBottom()) - y;
+
+                    r = new Region(x, y, w, h, CoordinatesType.CONTEXT_RELATIVE);
+                }
+
+                return r;
             }
         }, name, false, checkSettings, driver.getCurrentUrl());
         logger.verbose("Done! trying to scroll back to original position.");
@@ -1147,7 +1165,7 @@ public class SeleniumEyes extends EyesBase {
             logger.verbose("replacing regionToCheck");
             setRegionToCheck(screenshot.getFrameWindow());
 
-            super.checkWindowBase(NullRegionProvider.INSTANCE, tag, false, matchTimeout, driver.getCurrentUrl());
+            super.checkWindowBase(RegionProvider.NULL_INSTANCE, tag, false, matchTimeout, driver.getCurrentUrl());
         } finally {
             checkFrameOrElement = false;
             regionToCheck = null;
@@ -1356,7 +1374,7 @@ public class SeleniumEyes extends EyesBase {
                 regionToCheck.intersect(effectiveViewport);
             }
 
-            result = checkWindowBase(NullRegionProvider.INSTANCE, name, false, checkSettings, driver.getCurrentUrl());
+            result = checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, driver.getCurrentUrl());
         } catch (Exception ex) {
             GeneralUtils.logExceptionStackTrace(logger, ex);
             throw ex;
@@ -1836,22 +1854,19 @@ public class SeleniumEyes extends EyesBase {
         return result;
     }
 
-    private EyesWebDriverScreenshot getScaledAndCroppedScreenshot(ScaleProviderFactory scaleProviderFactory)
-    {
+    private EyesWebDriverScreenshot getScaledAndCroppedScreenshot(ScaleProviderFactory scaleProviderFactory) {
         BufferedImage screenshotImage = this.imageProvider.getImage();
 
         ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
         CutProvider cutProvider = cutProviderHandler.get();
-        if (scaleProvider.getScaleRatio() != 1.0)
-        {
+        if (scaleProvider.getScaleRatio() != 1.0) {
             BufferedImage scaledImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
             screenshotImage = scaledImage;
             debugScreenshotsProvider.save(screenshotImage, "scaled");
             cutProvider.scale(scaleProvider.getScaleRatio());
         }
 
-        if (!(cutProvider instanceof NullCutProvider))
-        {
+        if (!(cutProvider instanceof NullCutProvider)) {
             BufferedImage croppedImage = cutProvider.cut(screenshotImage);
             screenshotImage = croppedImage;
             debugScreenshotsProvider.save(screenshotImage, "cut");

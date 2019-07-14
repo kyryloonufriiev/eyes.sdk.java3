@@ -118,10 +118,16 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
+    public void TestCheckRegionByCoordinateInFrameFully_Fluent() {
+        getEyes().check("Fluent - Inner frame coordinates", Target.frame("frame1")
+                .region(new Region(30, 40, 400, 1200))
+                .fully());
+    }
+
+    @Test
     public void TestCheckRegionByCoordinateInFrame_Fluent() {
         getEyes().check("Fluent - Inner frame coordinates", Target.frame("frame1")
-                .region(new Region(30, 40, 400, 1200, CoordinatesType.CONTEXT_RELATIVE))
-                .fully());
+                .region(new Region(30, 40, 400, 1200)));
     }
 
     @Test
@@ -209,9 +215,9 @@ public class TestFluentApi extends TestSetup {
         eyes.setStitchMode(originalStitchMode);
     }
 
-    //@Test
+    @Test
     public void TestCheckLongIFrameModal() {
-        Eyes eyes = (Eyes) getEyes();
+        Eyes eyes = getEyes();
         StitchMode originalStitchMode = eyes.getStitchMode();
         eyes.setStitchMode(StitchMode.SCROLL);
         driver.findElement(By.id("stretched")).click();

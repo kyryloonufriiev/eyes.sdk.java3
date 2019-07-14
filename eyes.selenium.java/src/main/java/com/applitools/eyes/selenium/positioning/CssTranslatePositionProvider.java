@@ -22,7 +22,7 @@ public class CssTranslatePositionProvider implements PositionProvider, ISelenium
                     "arguments[0].style.transform = '%s';" +
                     "return originalTransform;";
 
-    private Location lastSetPosition; // cache.
+    private Location lastSetPosition = Location.ZERO; // cache.
 
     public CssTranslatePositionProvider(Logger logger, IEyesJsExecutor executor, WebElement scrollRootElement) {
         ArgumentGuard.notNull(logger, "logger");

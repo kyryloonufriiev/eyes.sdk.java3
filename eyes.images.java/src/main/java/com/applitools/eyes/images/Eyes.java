@@ -13,7 +13,6 @@ import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import com.applitools.eyes.positioning.NullRegionProvider;
 import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
@@ -77,7 +76,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
 
-        return checkImage_(NullRegionProvider.INSTANCE, image, name, false, checkSettings);
+        return checkImage_(RegionProvider.NULL_INSTANCE, image, name, false, checkSettings);
     }
 
     /**
@@ -143,7 +142,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
             setViewportSize(new RectangleSize(image.getWidth(), image.getHeight()));
         }
 
-        return checkImage_(NullRegionProvider.INSTANCE, image, tag, ignoreMismatch, new CheckSettings(USE_DEFAULT_TIMEOUT));
+        return checkImage_(RegionProvider.NULL_INSTANCE, image, tag, ignoreMismatch, new CheckSettings(USE_DEFAULT_TIMEOUT));
     }
 
     /**

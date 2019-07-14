@@ -811,7 +811,7 @@ public abstract class EyesBase {
             checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         }
 
-        Region region = regionProvider.getRegion();
+        Region region = regionProvider.getRegion(checkSettingsInternal);
         logger.verbose("params: ([" + region + "], " + tag + ", " + retryTimeout + ")");
 
         result = matchWindowTask.matchWindow(
