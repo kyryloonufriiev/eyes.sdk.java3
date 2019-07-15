@@ -152,6 +152,10 @@ public class VisualGridEyes implements IRenderingEyes {
 
         ensureBrowsers();
 
+        if (getConfigGetter().getBatch() == null)
+        {
+            getConfigSetter().setBatch(new BatchInfo(null));
+        }
         logger.verbose("getting all browsers info...");
         List<RenderBrowserInfo> browserInfoList = getConfigGetter().getBrowsersInfo();
         logger.verbose("creating test descriptors for each browser info...");
