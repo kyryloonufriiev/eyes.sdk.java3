@@ -8,7 +8,7 @@ public class VGRegion implements IRegion{
     public int y;
     public int width;
     public int height;
-    public String error;
+    public String error = null;
 
     public Location Location() {
         return new Location(x, y);
@@ -72,6 +72,11 @@ public class VGRegion implements IRegion{
     @Override
     public CoordinatesType getCoordinatesType() {
         return null;
+    }
+
+
+    public String getError() {
+        return error;
     }
 
     @Override
