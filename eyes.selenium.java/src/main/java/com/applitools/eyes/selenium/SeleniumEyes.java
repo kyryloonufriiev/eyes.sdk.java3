@@ -1921,7 +1921,9 @@ public class SeleniumEyes extends EyesBase {
         try {
             results = super.close(throwEx);
         } catch (Throwable e) {
-            runner.setException(new Error(e));
+            if (runner != null) {
+                runner.setException(new Error(e));
+            }
             if (throwEx){
                 throw e;
             }
