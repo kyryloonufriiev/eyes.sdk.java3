@@ -11,6 +11,7 @@ import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -42,7 +43,7 @@ public class RunningTest {
         this.testName = configurationProvider.get().getTestName();
     }
 
-    public void abort(Throwable e) {
+    public Future<TestResultContainer> abort(Throwable e) {
         removeAllCheckTasks();
         openTask.setException(e);
         if(closeTask != null && closeTask.getType() == VisualGridTask.TaskType.CLOSE){
@@ -57,6 +58,7 @@ public class RunningTest {
             taskToFutureMapping.put(abortTask, futureTask);
             this.isCloseTaskIssued.set(true);
         }
+        return taskToFutureMapping.get(closeTask);
     }
 
     private void removeAllCheckTasks() {
@@ -68,9 +70,13 @@ public class RunningTest {
         }
     }
 
-    public void abortIfNotClosed() {
-        if (isCloseTaskIssued.get()) return;
-        abort(null);
+    public Future<TestResultContainer> abortIfNotClosed() {
+        if (isCloseTaskIssued.get()) return null;
+        return abort(null);
+    }
+
+    public boolean isCloseTaskIssued() {
+        return closeTask != null;
     }
 
     public interface RunningTestListener {
