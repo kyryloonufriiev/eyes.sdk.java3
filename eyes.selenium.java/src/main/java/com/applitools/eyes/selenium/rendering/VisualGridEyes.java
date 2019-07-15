@@ -464,6 +464,8 @@ public class VisualGridEyes implements IRenderingEyes {
 
         ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
 
+        waitBeforeDomSnapshot();
+
         try {
             FrameChain originalFC = webDriver.getFrameChain().clone();
             EyesTargetLocator switchTo = ((EyesTargetLocator) webDriver.switchTo());
@@ -574,6 +576,15 @@ public class VisualGridEyes implements IRenderingEyes {
             for (RunningTest runningTest : testList) {
                 runningTest.setTestInExceptionMode(error);
             }
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+    }
+
+    private void waitBeforeDomSnapshot() {
+        int waitBeforeScreenshots = this.getConfigGetter().getWaitBeforeScreenshots();
+        try {
+            Thread.sleep(waitBeforeScreenshots);
+        } catch (InterruptedException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
     }
