@@ -648,7 +648,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         try {
             URL uri = new URL(this.sanitizeURL(blob.getUrl()));
-                tdr.uri = new URL(new URL(baseUrl), uri.toString());
+            tdr.uri = new URL(new URL(baseUrl), uri.toString());
         } catch (MalformedURLException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
@@ -759,9 +759,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             url = blob.getUrl();
             blob.setUrl(sanitizeURL(url));
             String contentType = blob.getContentType();
-            if (contentType != null && !contentType.equalsIgnoreCase(CDT)) {
-                IResourceFuture resourceFuture = this.eyesConnector.createResourceFuture(blob);
-                fetchedCacheMap.put(url, resourceFuture);
+            try {
+                if (contentType == null || !contentType.equalsIgnoreCase(CDT)) {
+                    IResourceFuture resourceFuture = this.eyesConnector.createResourceFuture(blob);
+                    fetchedCacheMap.put(url, resourceFuture);
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
             unparsedResources.add(blob);
         }
@@ -992,7 +996,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String encoded = null;
         try {
             URL url = new URL(urlToSanitize);
-            encoded = url.getProtocol() + "://" + url.getAuthority() + url.getPath() + (url.getQuery() != null && !url.getQuery().isEmpty() ? QUESTION_MARK +  URLEncoder.encode(url.getQuery(), "UTF-8") : "");
+            encoded = url.getProtocol() + "://" + url.getAuthority() + url.getPath() + (url.getQuery() != null && !url.getQuery().isEmpty() ? QUESTION_MARK + URLEncoder.encode(url.getQuery(), "UTF-8") : "");
         } catch (UnsupportedEncodingException | MalformedURLException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
