@@ -1748,11 +1748,13 @@ public class SeleniumEyes extends EyesBase {
             activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
         }
 
+        Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+        if (forceFullPageScreenshot == null) forceFullPageScreenshot = false;
         if (checkFrameOrElement && !isMobileDevice) {
             result = getFrameOrElementScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
-        } else if ((getConfigGetter().getForceFullPageScreenshot() || stitchContent) && !isMobileDevice) {
+        } else if ((forceFullPageScreenshot || stitchContent) &&!isMobileDevice){
             result = getFullPageScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
-        } else {
+        } else{
             result = getElementScreenshot(scaleProviderFactory, switchTo);
         }
 
@@ -1772,7 +1774,7 @@ public class SeleniumEyes extends EyesBase {
             }
             switchTo.frames(originalFrameChain);
         }
-        
+
         return result;
     }
 
