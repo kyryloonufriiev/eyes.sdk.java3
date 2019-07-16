@@ -1724,29 +1724,33 @@ public class SeleniumEyes extends EyesBase {
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
 
         FrameChain originalFrameChain = driver.getFrameChain().clone();
-        EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
-
         PositionProvider positionProvider = positionProviderHandler.get();
 
-        switchTo.frames(this.originalFC);
+        EyesTargetLocator switchTo = null;
         PositionMemento originalPosition = null;
-        if (positionProvider != null) {
-            originalPosition = positionProvider.getState();
+        boolean isMobileDevice = EyesSeleniumUtils.isMobileDevice(this.driver);
+        if (!isMobileDevice) {
+            switchTo = (EyesTargetLocator) driver.switchTo();
+            switchTo.frames(this.originalFC);
+
+            if (positionProvider != null) {
+                originalPosition = positionProvider.getState();
+            }
+            switchTo.frames(originalFrameChain);
         }
-        switchTo.frames(originalFrameChain);
 
         FrameChain originalFC = tryHideScrollbars();
 
         EyesWebDriverScreenshot result;
 
         Object activeElement = null;
-        if (getConfigGetter().getHideCaret()) {
+        if (getConfigGetter().getHideCaret() && !isMobileDevice) {
             activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
         }
 
-        if (checkFrameOrElement) {
+        if (checkFrameOrElement && !isMobileDevice) {
             result = getFrameOrElementScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
-        } else if (getConfigGetter().getForceFullPageScreenshot() || stitchContent) {
+        } else if ((getConfigGetter().getForceFullPageScreenshot() || stitchContent) && !isMobileDevice) {
             result = getFullPageScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
         } else {
             result = getElementScreenshot(scaleProviderFactory, switchTo);
@@ -1761,12 +1765,14 @@ public class SeleniumEyes extends EyesBase {
 
         tryRestoreScrollbars(originalFC);
 
-        switchTo.frames(this.originalFC);
-        if (positionProvider != null) {
-            positionProvider.restoreState(originalPosition);
+        if (!isMobileDevice) {
+            switchTo.frames(this.originalFC);
+            if (positionProvider != null) {
+                positionProvider.restoreState(originalPosition);
+            }
+            switchTo.frames(originalFrameChain);
         }
-        switchTo.frames(originalFrameChain);
-
+        
         return result;
     }
 
@@ -1841,19 +1847,23 @@ public class SeleniumEyes extends EyesBase {
 
     private EyesWebDriverScreenshot getElementScreenshot(ScaleProviderFactory scaleProviderFactory, EyesTargetLocator switchTo) {
         EyesWebDriverScreenshot result;
-        List<PositionProviderAndMemento> ppams = ensureElementVisible(targetElement);
+        List<PositionProviderAndMemento> ppams = null;
+        if (switchTo != null) {
+            ppams = ensureElementVisible(targetElement);
+        }
         try {
             Thread.sleep(getWaitBeforeScreenshots());
         } catch (InterruptedException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         result = getScaledAndCroppedScreenshot(scaleProviderFactory);
-        for (int i = ppams.size() - 1; i >= 0; i--) {
-            PositionProviderAndMemento ppam = ppams.get(i);
-            switchTo.frames(ppam.getFrames());
-            ppam.restoreState();
+        if (switchTo != null) {
+            for (int i = ppams.size() - 1; i >= 0; i--) {
+                PositionProviderAndMemento ppam = ppams.get(i);
+                switchTo.frames(ppam.getFrames());
+                ppam.restoreState();
+            }
         }
-
         return result;
     }
 
@@ -2030,7 +2040,7 @@ public class SeleniumEyes extends EyesBase {
         try {
             results = super.close(throwEx);
         } catch (Throwable e) {
-            if (throwEx){
+            if (throwEx) {
                 throw e;
             }
         }
