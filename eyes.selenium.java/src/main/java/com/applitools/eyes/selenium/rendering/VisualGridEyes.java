@@ -152,6 +152,10 @@ public class VisualGridEyes implements IRenderingEyes {
 
         ensureBrowsers();
 
+        if (getConfigGetter().getBatch() == null)
+        {
+            getConfigSetter().setBatch(new BatchInfo(null));
+        }
         logger.verbose("getting all browsers info...");
         List<RenderBrowserInfo> browserInfoList = getConfigGetter().getBrowsersInfo();
         logger.verbose("creating test descriptors for each browser info...");
@@ -274,10 +278,13 @@ public class VisualGridEyes implements IRenderingEyes {
         return closeAndReturnResults(true);
     }
 
-    public void abortIfNotClosed() {
+    public Collection<Future<TestResultContainer>> abortIfNotClosed() {
+        List<Future<TestResultContainer>> futures = new ArrayList<>();
         for (RunningTest runningTest : testList) {
-            runningTest.abortIfNotClosed();
+            Future<TestResultContainer> future = runningTest.abortIfNotClosed();
+            futures.add(future);
         }
+        return futures;
     }
 
     public boolean getIsOpen() {
@@ -461,6 +468,8 @@ public class VisualGridEyes implements IRenderingEyes {
 
         ArgumentGuard.notOfType(checkSettings, ICheckSettings.class, "checkSettings");
 
+        waitBeforeDomSnapshot();
+
         try {
             FrameChain originalFC = webDriver.getFrameChain().clone();
             EyesTargetLocator switchTo = ((EyesTargetLocator) webDriver.switchTo());
@@ -536,7 +545,7 @@ public class VisualGridEyes implements IRenderingEyes {
                 if (!taskList.isEmpty()) {
                     VisualGridTask visualGridTask = taskList.get(taskList.size() - 1);
                     VisualGridTask.TaskType taskType = visualGridTask.getType();
-                    if (taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT) {
+                    if ((taskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued()) || taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT) {
                         filteredTests.add(test);
                     }
                 }
@@ -571,6 +580,15 @@ public class VisualGridEyes implements IRenderingEyes {
             for (RunningTest runningTest : testList) {
                 runningTest.setTestInExceptionMode(error);
             }
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+    }
+
+    private void waitBeforeDomSnapshot() {
+        int waitBeforeScreenshots = this.getConfigGetter().getWaitBeforeScreenshots();
+        try {
+            Thread.sleep(waitBeforeScreenshots);
+        } catch (InterruptedException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
     }

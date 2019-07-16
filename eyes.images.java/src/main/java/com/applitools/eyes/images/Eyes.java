@@ -859,4 +859,12 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     public String getApiKey() {
         return super.getApiKey();
     }
+
+    public Configuration getConfiguration() {
+        return config;
+    }
+
+    public void setConfiguration(Configuration config) {
+        this.config = config;
+    }
 }

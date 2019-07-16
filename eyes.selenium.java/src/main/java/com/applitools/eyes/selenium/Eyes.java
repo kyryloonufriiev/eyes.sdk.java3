@@ -18,6 +18,7 @@ import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -152,12 +153,20 @@ public class Eyes implements ISeleniumConfigurationProvider {
     /**
      * If a test is running, aborts it. Otherwise, does nothing.
      */
-    public void abortIfNotClosed() {
+    @Deprecated
+    public TestResults abortIfNotClosed() {
+        return abort();
+    }
+
+    public TestResults abort(){
+        TestResults testResults;
         if (isVisualGridEyes) {
-            visualGridEyes.abortIfNotClosed();
+            Collection<Future<TestResultContainer>> futures = visualGridEyes.abortIfNotClosed();
+            testResults =  parseCloseFutures(futures, false);
         } else {
-            seleniumEyes.abortIfNotClosed();
+            testResults = seleniumEyes.abortIfNotClosed();
         }
+        return testResults;
     }
 
     /**
@@ -497,45 +506,50 @@ public class Eyes implements ISeleniumConfigurationProvider {
     public TestResults close(boolean shouldThrowException) {
         if (isVisualGridEyes) {
             Collection<Future<TestResultContainer>> close = visualGridEyes.close(shouldThrowException);
-            if (close != null && !close.isEmpty()) {
-                TestResultContainer errorResult = null;
-                TestResultContainer firstResult = null;
-                try {
-                    for (Future<TestResultContainer> closeFuture : close) {
-                        TestResultContainer testResultContainer = closeFuture.get();
-                        if (firstResult == null) {
-                            firstResult = testResultContainer;
-                        }
-                        Throwable error = testResultContainer.getException();
-                        if (error != null && errorResult == null) {
-                            errorResult = testResultContainer;
-                        }
-
-                    }
-//                    return firstCloseFuture.get().getTestResults();
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-
-                if (errorResult != null) {
-                    if (shouldThrowException) {
-                        throw new Error(errorResult.getException());
-                    } else {
-                        return errorResult.getTestResults();
-                    }
-                } else { // returning the first result
-                    if (firstResult != null) {
-                        return firstResult.getTestResults();
-                    }
-                }
-
-            }
+            return parseCloseFutures(close, shouldThrowException);
         } else {
             TestResults close = seleniumEyes.close(shouldThrowException);
             return close;
         }
+    }
+
+    private TestResults parseCloseFutures(Collection<Future<TestResultContainer>> close, boolean shouldThrowException) {
+        if (close != null && !close.isEmpty()) {
+            TestResultContainer errorResult = null;
+            TestResultContainer firstResult = null;
+            try {
+                for (Future<TestResultContainer> closeFuture : close) {
+                    TestResultContainer testResultContainer = closeFuture.get();
+                    if (firstResult == null) {
+                        firstResult = testResultContainer;
+                    }
+                    Throwable error = testResultContainer.getException();
+                    if (error != null && errorResult == null) {
+                        errorResult = testResultContainer;
+                    }
+
+                }
+//                    return firstCloseFuture.get().getTestResults();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            if (errorResult != null) {
+                if (shouldThrowException) {
+                    throw new Error(errorResult.getException());
+                } else {
+                    return errorResult.getTestResults();
+                }
+            } else { // returning the first result
+                if (firstResult != null) {
+                    return firstResult.getTestResults();
+                }
+            }
+
+        }
         return null;
     }
+
 
 
     /**

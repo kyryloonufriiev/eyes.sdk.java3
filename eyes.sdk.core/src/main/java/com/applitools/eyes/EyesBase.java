@@ -637,7 +637,10 @@ public abstract class EyesBase {
             logger.verbose("Aborting server session...");
             try {
                 // When aborting we do not save the test.
+                boolean isNewSession = runningSession.getIsNewSession();
                 TestResults results = serverConnector.stopSession(runningSession, true, false);
+                results.setNew(isNewSession);
+                results.setUrl(runningSession.getUrl());
                 logger.log("--- Test aborted.");
                 return results;
             } catch (EyesException ex) {

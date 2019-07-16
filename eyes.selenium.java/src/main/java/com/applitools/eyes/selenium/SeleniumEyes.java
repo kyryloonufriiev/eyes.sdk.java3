@@ -125,7 +125,7 @@ public class SeleniumEyes extends EyesBase {
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
-        this.runner = runner;
+        this.runner = runner != null ? runner : new ClassicRunner();
     }
 
     @Override
@@ -2030,7 +2030,6 @@ public class SeleniumEyes extends EyesBase {
         try {
             results = super.close(throwEx);
         } catch (Throwable e) {
-            runner.setException(new Error(e));
             if (throwEx){
                 throw e;
             }
