@@ -8,6 +8,7 @@
             <class name="com.applitools.eyes.selenium.TestSpecialCases" />
             <class name="com.applitools.eyes.selenium.TestClassicRunner" />
             <class name="com.applitools.eyes.selenium.TestBatchSequenceName" />
+            <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner" />
         </classes>
     </test>
     <test name="Test_VG" parallel="instances">
@@ -18,6 +19,8 @@
             <class name="com.applitools.eyes.renderingGrid.TestSVGSites" />
             <class name="com.applitools.eyes.renderingGrid.TestVGWithJunit"/>
             <class name="com.applitools.eyes.renderingGrid.TestAbortVG"/>
+            <class name="com.applitools.eyes.renderingGrid.TestVGExceptionInRegion"/>
+
         </classes>
     </test>
     <test name="Test_Mobile" parallel="methods">
