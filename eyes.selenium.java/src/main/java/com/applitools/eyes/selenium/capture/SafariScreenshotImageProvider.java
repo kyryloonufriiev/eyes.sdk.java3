@@ -100,6 +100,16 @@ public class SafariScreenshotImageProvider implements ImageProvider {
     private void initDeviceRegionsTable() {
         devicesRegions = new HashMap<>();
 
+        devicesRegions.put(new DeviceData(828, 1792, 414, 719, 12), new Region(0, 189, 828, 1436));
+        devicesRegions.put(new DeviceData(1792, 828, 808, 364, 12), new Region(88, 101, 1616, 685));
+        devicesRegions.put(new DeviceData(1242, 2688, 414, 719, 12), new Region(0, 283, 1242, 2155));
+        devicesRegions.put(new DeviceData(2688, 1242, 808, 364, 12), new Region(132, 151, 2424, 1028));
+        devicesRegions.put(new DeviceData(1125, 2436, 375, 635, 12), new Region(0, 283, 1125, 1903));
+        devicesRegions.put(new DeviceData(2436, 1125, 724, 325, 12), new Region(132, 151, 2436, 930));
+        devicesRegions.put(new DeviceData(1242, 2208, 414, 622, 12), new Region(0, 211, 1242, 1863));
+        devicesRegions.put(new DeviceData(2208, 1242, 736, 364, 12), new Region(0, 151, 2208, 1090));
+
+
         devicesRegions.put(new DeviceData(1125, 2436, 375, 635, 11), new Region(0, 283, 1125, 1903));
         devicesRegions.put(new DeviceData(2436, 1125, 724, 325, 11), new Region(132, 151, 2436, 930));
 
