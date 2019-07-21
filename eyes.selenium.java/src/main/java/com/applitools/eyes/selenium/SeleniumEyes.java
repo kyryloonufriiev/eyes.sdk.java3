@@ -1329,6 +1329,11 @@ public class SeleniumEyes extends EyesBase {
         regionToCheck = Region.EMPTY;
         fullRegionToCheck = Region.EMPTY;
 
+        if(scrollRootElement instanceof EyesRemoteWebElement){
+            EyesRemoteWebElement eyesRemoteWebElement = (EyesRemoteWebElement) scrollRootElement;
+            eyesRemoteWebElement.setPositionProvider(positionProvider);
+        }
+
         ensureElementVisible(targetElement);
 
         String originalOverflow = null;

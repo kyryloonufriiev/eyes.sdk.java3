@@ -221,7 +221,7 @@ public class FullPageCaptureAlgorithm {
             logger.verbose("Part: " + partRegion);
             // Scroll to the part's top/left
             Location partRegionLocation = partRegion.getScrollTo();
-            partRegionLocation.offset(originalStitchedState.getX(), originalStitchedState.getY());
+            partRegionLocation = partRegionLocation.offset(originalStitchedState.getX(), originalStitchedState.getY());
             Location originPosition = stitchProvider.setPosition(partRegionLocation);
 
             int dx = partRegionLocation.getX() - originPosition.getX();
