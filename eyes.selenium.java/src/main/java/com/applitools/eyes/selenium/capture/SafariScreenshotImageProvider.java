@@ -77,21 +77,24 @@ public class SafariScreenshotImageProvider implements ImageProvider {
             } else {
                 logger.verbose("device not found in list. returning original image.");
             }
-        } else if (!eyes.getConfigGetter().getForceFullPageScreenshot()) {
+        } else {
+            Boolean forceFullPageScreenshot = eyes.getConfigGetter().getForceFullPageScreenshot();
+            if (forceFullPageScreenshot != null && ! forceFullPageScreenshot) {
 
-            Location loc;
-            FrameChain currentFrameChain = ((EyesWebDriver) eyes.getDriver()).getFrameChain();
+                Location loc;
+                FrameChain currentFrameChain = ((EyesWebDriver) eyes.getDriver()).getFrameChain();
 
-            if (currentFrameChain.size() == 0) {
-                PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, eyes.getDriver().findElement(By.tagName("html")));
-                loc = positionProvider.getCurrentPosition();
-            } else {
-                loc = currentFrameChain.getDefaultContentScrollPosition();
+                if (currentFrameChain.size() == 0) {
+                    PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, eyes.getDriver().findElement(By.tagName("html")));
+                    loc = positionProvider.getCurrentPosition();
+                } else {
+                    loc = currentFrameChain.getDefaultContentScrollPosition();
+                }
+
+                loc = loc.scale(scaleRatio);
+
+                image = ImageUtils.cropImage(logger, image, new Region(loc, viewportSize));
             }
-
-            loc = loc.scale(scaleRatio);
-
-            image = ImageUtils.cropImage(logger, image, new Region(loc, viewportSize));
         }
 
         return image;
