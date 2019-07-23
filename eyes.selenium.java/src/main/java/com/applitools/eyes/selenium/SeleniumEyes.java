@@ -484,7 +484,7 @@ public class SeleniumEyes extends EyesBase {
 
     private List<EyesScreenshot> getSubScreenshots(Region bBox, EyesWebDriverScreenshot screenshot, GetRegion getRegion) {
         List<EyesScreenshot> subScreenshots = new ArrayList<>();
-        for (Region r : getRegion.getRegions(this, screenshot, true)) {
+        for (Region r : getRegion.getRegions(this, screenshot)) {
             logger.verbose("original sub-region: " + r);
             r = r.offset(-bBox.getLeft(), -bBox.getTop());
             //r = regionPositionCompensation.compensateRegionPosition(r, devicePixelRatio);
@@ -528,7 +528,7 @@ public class SeleniumEyes extends EyesBase {
         for (int i = 0; i < checkSettings.length; ++i) {
             GetRegion getRegion = getRegions.get(i);
             if (getRegion != null) {
-                List<Region> regions = getRegion.getRegions(this, screenshot, true);
+                List<Region> regions = getRegion.getRegions(this, screenshot);
                 for (Region region : regions) {
                     if (bBox == null) {
                         bBox = new Region(region);

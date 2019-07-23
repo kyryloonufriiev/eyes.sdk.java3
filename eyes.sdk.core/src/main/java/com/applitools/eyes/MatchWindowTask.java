@@ -264,7 +264,7 @@ public class MatchWindowTask {
                                                            EyesScreenshot screenshot, GetRegion[] regionProviders) {
         List<List<Region>> mutableRegions = new ArrayList<>();
         for (GetRegion regionProvider : regionProviders) {
-            mutableRegions.add(regionProvider.getRegions(eyes, screenshot, false));
+            mutableRegions.add(regionProvider.getRegions(eyes, screenshot));
         }
 
         List<Region> allRegions = new ArrayList<>();
@@ -342,7 +342,7 @@ public class MatchWindowTask {
         List<Region> regions = new ArrayList<>();
         for (GetRegion regionProvider : regionProviders) {
             try {
-                regions.addAll(regionProvider.getRegions(eyes, screenshot, adjustLocation));
+                regions.addAll(regionProvider.getRegions(eyes, screenshot));
             } catch (OutOfBoundsException ex) {
                 logger.log("WARNING - region was out of bounds.");
             }

@@ -23,7 +23,7 @@ public class SimpleRegionByElement implements GetRegion, IGetSeleniumRegion {
     }
 
     @Override
-    public List<Region> getRegions(EyesBase eyesBase, EyesScreenshot screenshot, boolean adjustLocation) {
+    public List<Region> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
         if (!(element instanceof EyesRemoteWebElement) && (eyesBase instanceof SeleniumEyes)) {
             SeleniumEyes seleniumEyes = (SeleniumEyes) eyesBase;
             element = new EyesRemoteWebElement(eyesBase.getLogger(), (EyesWebDriver) seleniumEyes.getDriver(), element);

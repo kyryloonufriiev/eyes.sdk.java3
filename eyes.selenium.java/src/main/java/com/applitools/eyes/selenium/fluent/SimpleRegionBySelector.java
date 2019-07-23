@@ -17,7 +17,7 @@ public class SimpleRegionBySelector implements GetRegion , IGetSeleniumRegion {
     }
 
     @Override
-    public List<Region> getRegions(EyesBase eyesBase, EyesScreenshot screenshot, boolean adjustLocation) {
+    public List<Region> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
         List<WebElement> elements = ((SeleniumEyes) eyesBase).getDriver().findElements(this.selector);
         List<Region> values = new ArrayList<>(elements.size());
         for (WebElement element : elements) {
