@@ -538,7 +538,8 @@ public class SeleniumEyes extends EyesBase {
                 }
             }
         }
-        return bBox;
+        Location offset = screenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.CONTEXT_AS_IS);
+        return bBox.offset(offset.getX(), offset.getY());
     }
 
     private WebElement getFrameElement(FrameLocator frameLocator) {
