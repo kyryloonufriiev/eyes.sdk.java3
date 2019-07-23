@@ -33,12 +33,19 @@ public class TestBatchSequenceName {
             e.printStackTrace();
         }
         eyes = new Eyes();
-        eyes.setLogHandler(new StdoutLogHandler());
         BatchInfo batch = new BatchInfo("BatchSequnceName Batch");
         batch.setId("6e712b7a-61fd-45d1-87a3-c8af9df8a3d6");
         Configuration configuration = new Configuration();
 //        configuration.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
 
+        BatchInfo obj = null;
+        BatchInfo obj2 = null;
+        try {
+            obj = objectMapper.readValue(json1, BatchInfo.class);
+            obj2 = objectMapper.readValue(json2, BatchInfo.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         eyes.setConfiguration(configuration);
         eyes.setBatch(batch);
@@ -54,9 +61,8 @@ public class TestBatchSequenceName {
 
             batch.setStartedAt("2019-06-04T10:27:15Z");
 
-            String batchAsString = objectMapper.writeValueAsString(batch);
 
-            if(!batchAsString.equals(json1)) throw new Error("Batches(1) not equal");
+            if(!batch.equals(obj)) throw new Error("Batches(1) not equal");
 
             batch.setSequenceName("newSequenceName by setter");
 
@@ -68,9 +74,7 @@ public class TestBatchSequenceName {
 
             eyes.close(false);
 
-            batchAsString = objectMapper.writeValueAsString(batch);
-
-            if(!batchAsString.equals(json2)) throw new Error("Batches(2) not equal");
+            if(!batch.equals(obj2)) throw new Error("Batches(2) not equal");
 
         } catch (Exception e) {
             e.printStackTrace();

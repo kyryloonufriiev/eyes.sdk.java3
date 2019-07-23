@@ -43,11 +43,15 @@ public class BatchInfo {
         this.startedAt = GeneralUtils.toISO8601DateTime(startedAt);
     }
 
-    public BatchInfo(String id, String sequenceName, String name, String startedAt) {
+    public BatchInfo(String id, String batchSequenceName, String name, String startedAt) {
         this.id = id;
-        this.sequenceName = sequenceName;
+        this.sequenceName = batchSequenceName;
         this.name = name;
         this.startedAt = startedAt;
+    }
+
+    public BatchInfo() {
+        this(null);
     }
 
     /**
@@ -131,5 +135,12 @@ public class BatchInfo {
 
     public void setSequenceName(String sequenceName) {
         this.sequenceName = sequenceName;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(! (obj instanceof BatchInfo)) return false;
+        BatchInfo other = (BatchInfo) obj;
+        return this.id.equals(other.id) && this.name.equals(other.name) && this.sequenceName.equals(other.sequenceName) && this.startedAt. equals(other.startedAt);
     }
 }
