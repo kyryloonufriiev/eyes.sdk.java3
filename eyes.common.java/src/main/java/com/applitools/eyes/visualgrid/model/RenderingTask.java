@@ -638,6 +638,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             }
         }
 
+        //remove double quotes if surrounded
+        charset = charset.replaceAll( "\"", "");
+
         if (charset != null) {
             try {
                 tdr.data = new String(contentBytes, charset);
@@ -663,12 +666,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 //        logger.verbose("enter");
         CascadingStyleSheet cascadingStyleSheet = null;
         try {
-            cascadingStyleSheet = CSSReader.readFromString(css.data, ECSSVersion.CSS30);
+            String data = css.data;
+            if(data == null ) return;
+            cascadingStyleSheet = CSSReader.readFromString(data, ECSSVersion.CSS30);
             if (cascadingStyleSheet == null) {
                 logger.verbose("exit - failed to read CSS String");
                 return;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         collectAllImportUris(cascadingStyleSheet, resourceUrls, css.uri);
