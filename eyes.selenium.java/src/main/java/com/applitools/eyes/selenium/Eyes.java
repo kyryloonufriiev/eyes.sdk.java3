@@ -1587,6 +1587,12 @@ public class Eyes implements ISeleniumConfigurationProvider {
         check(tag, Target.window().timeout(matchTimeout));
     }
 
+    public void checkWindow(String tag, boolean fully)
+    {
+        check(tag, Target.window().fully(fully));
+
+    }
+
     /**
      * Takes multiple screenshots at once (given all <code>ICheckSettings</code> objects are on the same level).
      *
