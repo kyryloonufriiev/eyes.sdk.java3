@@ -38,7 +38,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     private final Region frameWindow;
 
     // FIXME: 18/03/2018 Workaround specifically for regions
-    private final Region regionWindow;
+    //private final Region regionWindow;
 
     private static Location getDefaultContentScrollPosition(Logger logger, FrameChain currentFrames, EyesWebDriver driver) {
         IEyesJsExecutor jsExecutor = new SeleniumJavaScriptExecutor(driver);
@@ -148,7 +148,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             throw new EyesException("Got empty frame window for screenshot!");
         }
 
-        regionWindow = new Region(0, 0, 0, 0); // FIXME: 18/03/2018 Region workaround
+        //regionWindow = new Region(0, 0, 0, 0); // FIXME: 18/03/2018 Region workaround
 
         logger.verbose("Done!");
     }
@@ -250,7 +250,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         currentFrameScrollPosition = new Location(0, 0);
         frameLocationInScreenshot = new Location(0, 0);
         frameWindow = new Region(new Location(0, 0), screenshotRegion.getSize());
-        regionWindow = new Region(screenshotRegion);
+        //regionWindow = new Region(screenshotRegion);
     }
 
     // TODO replace "entireFrameSize" as frame window ctor identifier
@@ -276,7 +276,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         currentFrameScrollPosition = new Location(0, 0);
         frameLocationInScreenshot = new Location(0, 0);
         frameWindow = new Region(new Location(0, 0), entireFrameSize);
-        regionWindow = new Region(0, 0, 0, 0); // FIXME: 18/03/2018 Region workaround
+        //regionWindow = new Region(0, 0, 0, 0); // FIXME: 18/03/2018 Region workaround
     }
 
     /**
@@ -381,9 +381,9 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
                 result = result.offset(frameLocationInScreenshot.getX(),
                         frameLocationInScreenshot.getY());
 
-                // FIXME: 18/03/2018 Region workaround
-                // If this is not a region subscreenshot, this will have no effect.
-                result = result.offset(-regionWindow.getLeft(), -regionWindow.getTop());
+//                // FIXME: 18/03/2018 Region workaround
+//                // If this is not a region subscreenshot, this will have no effect.
+//                result = result.offset(-regionWindow.getLeft(), -regionWindow.getTop());
 
             } else if (from == CoordinatesType.SCREENSHOT_AS_IS &&
                     (to == CoordinatesType.CONTEXT_RELATIVE
