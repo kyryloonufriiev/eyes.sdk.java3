@@ -32,6 +32,7 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Window with Ignore region", Target.window()
                 .fully()
                 .timeout(5000)
+                .ignoreCaret()
                 .ignore(new Region(50, 50, 100, 100)));
 
         setExpectedIgnoreRegions(new Region(50, 50, 100, 100));
@@ -46,99 +47,8 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckFrame_Fully_Fluent() {
-        getEyes().check("Fluent - Full Frame", Target.frame("frame1").fully());
-    }
-
-    @Test
-    public void TestCheckFrame_Fluent() {
-        getEyes().check("Fluent - Frame", Target.frame("frame1"));
-    }
-
-    @Test
-    public void TestCheckFrameInFrame_Fully_Fluent() {
-        getEyes().check("Fluent - Full Frame in Frame", Target.frame("frame1")
-                .frame("frame1-1")
-                .fully());
-    }
-
-    @Test
-    public void TestCheckRegionInFrame_Fluent() {
-        getEyes().check("Fluent - Region in Frame", Target.frame("frame1")
-                .region(By.id("inner-frame-div"))
-                .fully());
-    }
-
-    @Test
-    public void TestCheckRegionInFrameInFrame_Fluent() {
-        getEyes().check("Fluent - Region in Frame in Frame", Target.frame("frame1")
-                .frame("frame1-1")
-                .fully()
-                .region(By.tagName("img"))
-        );
-    }
-
-    @Test
-    public void TestScrollbarsHiddenAndReturned_Fluent() {
-        getEyes().check("Fluent - Window (Before)", Target.window().fully());
-        getEyes().check("Fluent - Inner frame div",
-                Target.frame("frame1")
-                        .region(By.id("inner-frame-div"))
-                        .fully());
-        getEyes().check("Fluent - Window (After)", Target.window().fully());
-    }
-
-    @Test
-    public void TestCheckRegionInFrame2_Fluent() {
-        getEyes().check("Fluent - Inner frame div 1", Target.frame("frame1")
-                .region(By.id("inner-frame-div"))
-                .fully()
-                .timeout(5000)
-                .ignore(new Region(50, 50, 100, 100)));
-
-        getEyes().check("Fluent - Inner frame div 2", Target.frame("frame1")
-                .region(By.id("inner-frame-div"))
-                .fully()
-                .ignore(new Region(50, 50, 100, 100))
-                .ignore(new Region(70, 170, 90, 90)));
-
-        getEyes().check("Fluent - Inner frame div 3", Target.frame("frame1")
-                .region(By.id("inner-frame-div"))
-                .fully()
-                .timeout(5000));
-
-        getEyes().check("Fluent - Inner frame div 4", Target.frame("frame1")
-                .region(By.id("inner-frame-div"))
-                .fully());
-
-        getEyes().check("Fluent - Full frame with floating region", Target.frame("frame1")
-                .fully()
-                .layout()
-                .floating(25, new Region(200, 200, 150, 150)));
-    }
-
-    @Test
-    public void TestCheckRegionByCoordinateInFrameFully_Fluent() {
-        getEyes().check("Fluent - Inner frame coordinates", Target.frame("frame1")
-                .region(new Region(30, 40, 400, 1200))
-                .fully());
-    }
-
-    @Test
-    public void TestCheckRegionByCoordinateInFrame_Fluent() {
-        getEyes().check("Fluent - Inner frame coordinates", Target.frame("frame1")
-                .region(new Region(30, 40, 400, 1200)));
-    }
-
-    @Test
-    public void TestCheckFrameInFrame_Fully_Fluent2() {
-        getEyes().check("Fluent - Window", Target.window()
-                .fully()
-        );
-
-        getEyes().check("Fluent - Full Frame in Frame 2", Target.frame("frame1")
-                .frame("frame1-1")
-                .fully());
+    public void TestCheckWindow_Fluent() {
+        getEyes().check("Fluent - Window", Target.window());
     }
 
     @Test
@@ -148,24 +58,31 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
+    public void TestCheckWindowWithIgnoreBySelector_Centered_Fluent() {
+        getEyes().check("Fluent - Window with ignore region by selector centered", Target.window()
+                .ignore(By.id("centered")));
+    }
+
+    @Test
+    public void TestCheckWindowWithIgnoreBySelector_Stretched_Fluent() {
+        getEyes().check("Fluent - Window with ignore region by selector stretched", Target.window()
+                .ignore(By.id("stretched")));
+    }
+
+    @Test
     public void TestCheckWindowWithFloatingBySelector_Fluent() {
         getEyes().check("Fluent - Window with floating region by selector", Target.window()
                 .floating(By.id("overflowing-div"), 3, 3, 20, 30));
     }
 
     @Test
-    public void TestCheckWindowWithFloatingByRegion_Fluent() {
-        ICheckSettings settings = Target.window()
-                .floating(new Region(10, 10, 20, 20), 3, 3, 20, 30);
-        getEyes().check("Fluent - Window with floating region by region", settings);
-
-        setExpectedFloatingsRegions(new FloatingMatchSettings(10, 10, 20, 20, 3, 3, 20, 30));
+    public void TestCheckRegionByCoordinates_Fluent() {
+        getEyes().check("Fluent - Region by coordinates", Target.region(new Region(50, 70, 90, 110)));
     }
 
     @Test
-    public void TestCheckElementFully_Fluent() {
-        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
-        getEyes().check("Fluent - Region by element - fully", Target.region(element).fully());
+    public void TestCheckOverflowingRegionByCoordinates_Fluent() {
+        getEyes().check("Fluent - Region by overflowing coordinates", Target.region(new Region(50, 110, 90, 550)));
     }
 
     @Test
@@ -181,6 +98,16 @@ public class TestFluentApi extends TestSetup {
         WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
         getEyes().check("Fluent - Region by element", Target.region(element).ignore(element));
         setExpectedIgnoreRegions(new Region(0, 0, 304, 184));
+    }
+
+    @Test
+    public void TestScrollbarsHiddenAndReturned_Fluent() {
+        getEyes().check("Fluent - Window (Before)", Target.window().fully());
+        getEyes().check("Fluent - Inner frame div",
+                Target.frame("frame1")
+                        .region(By.id("inner-frame-div"))
+                        .fully());
+        getEyes().check("Fluent - Window (After)", Target.window().fully());
     }
 
     @Test
@@ -205,7 +132,7 @@ public class TestFluentApi extends TestSetup {
         );
     }
 
-    //@Test
+    @Test
     public void TestCheckScrollableModal() {
         Eyes eyes = getEyes();
         driver.findElement(By.id("centered")).click();
@@ -215,35 +142,38 @@ public class TestFluentApi extends TestSetup {
         eyes.setStitchMode(originalStitchMode);
     }
 
+
     @Test
-    public void TestCheckLongIFrameModal() {
-        Eyes eyes = getEyes();
-        StitchMode originalStitchMode = eyes.getStitchMode();
-        eyes.setStitchMode(StitchMode.SCROLL);
-        driver.findElement(By.id("stretched")).click();
-        WebElement frame = driver.findElement(By.cssSelector("#modal2 iframe"));
-        driver.switchTo().frame(frame);
-        WebElement element = driver.findElement(By.tagName("html"));
-        Dimension size = element.getSize();
-        Point location = element.getLocation();
-        Rectangle elementRect = new Rectangle(location, size);
-        Region rect;
-        List<ICheckSettings> targets = new ArrayList<>();
-        for (int i = location.getY(), c = 1; i < location.getY() + size.getHeight(); i += 5000, c++) {
-            if ((elementRect.getY() + elementRect.getHeight()) > i + 5000) {
-                rect = new Region(location.getX(), i, size.getWidth(), 5000);
-            } else {
-                rect = new Region(location.getX(), i, size.getWidth(), elementRect.getY() + elementRect.getHeight() - i);
-            }
-            targets.add(Target.region(rect));
-            //eyes_.Check("Long IFrame Modal #" + c, Target.Region(rect).Fully());
-        }
-        eyes.check(targets.toArray(new ICheckSettings[0]));
-        eyes.setStitchMode(originalStitchMode);
+    public void TestCheckWindowWithFloatingByRegion_Fluent() {
+        ICheckSettings settings = Target.window()
+                .floating(new Region(10, 10, 20, 20), 3, 3, 20, 30);
+        getEyes().check("Fluent - Window with floating region by region", settings);
+
+        setExpectedFloatingsRegions(new FloatingMatchSettings(10, 10, 20, 20, 3, 3, 20, 30));
     }
 
     @Test
-    public void TestSimpleRegion(){
+    public void TestCheckElementFully_Fluent() {
+        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
+        getEyes().check("Fluent - Region by element - fully", Target.region(element).fully());
+    }
+
+
+    @Test
+    public void TestSimpleRegion() {
         getEyes().check(Target.window().region(new Region(50, 50, 100, 100)));
     }
+
+
+//
+//    public static boolean[] booleanDP() {
+//        return new boolean[]{true, false};
+//    }
+//
+//    @Test(dataProvider = "booleanDP")
+//    public void TestIgnoreDisplacements(boolean ignoreDisplacements) {
+//        getEyes().check("Fluent - Ignore Displacements = " + ignoreDisplacements, Target.window().ignoreDisplacements(ignoreDisplacements).fully());
+//        addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);
+//    }
+
 }
