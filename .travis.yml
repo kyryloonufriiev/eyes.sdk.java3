@@ -7,4 +7,5 @@ sudo: required
 script:
   - export APPLITOOLS_BATCH_ID=`uuidgen -t`
   - echo $APPLITOOLS_BATCH_ID
+  - mvn -U install
   - mvn test
