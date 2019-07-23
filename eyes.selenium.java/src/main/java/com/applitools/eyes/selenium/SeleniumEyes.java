@@ -872,34 +872,34 @@ public class SeleniumEyes extends EyesBase {
 
     private FrameChain ensureFrameVisible(List<PositionProviderAndMemento> ppams) {
         logger.verbose("scrollRootElement_: " + scrollRootElement);
-        FrameChain originalFC = driver.getFrameChain().clone();
+        FrameChain currentFC = driver.getFrameChain().clone();
         FrameChain fc = driver.getFrameChain().clone();
         driver.executeScript("window.scrollTo(0,0);");
         while (fc.size() > 0) {
             logger.verbose("fc.Count: " + fc.size());
             EyesTargetLocator.parentFrame(logger, driver.getRemoteWebDriver().switchTo(), fc);
             driver.executeScript("window.scrollTo(0,0);");
-            Frame prevFrame = fc.pop();
-            Frame frame = fc.peek();
+            Frame childFrame = fc.pop();
+            Frame parentFrame = fc.peek();
             WebElement scrollRootElement = null;
-            if (fc.size() == originalFC.size()) {
+            if (fc.size() == this.originalFC.size()) {
                 logger.verbose("PositionProvider: " + getPositionProvider());
                 positionMemento = getPositionProvider().getState();
                 scrollRootElement = this.scrollRootElement;
                 logger.verbose("scrollRootElement_:          " + scrollRootElement);
             } else {
-                if (frame != null) {
-                    scrollRootElement = frame.getScrollRootElement();
+                if (parentFrame != null) {
+                    scrollRootElement = parentFrame.getScrollRootElement();
                 }
                 if (scrollRootElement == null) {
                     scrollRootElement = driver.findElement(By.tagName("html"));
                 }
             }
 
-            if (prevFrame != null) {
-                logger.verbose("prevFrame.Reference:         " + prevFrame.getLocation());
-                if (prevFrame.getScrollRootElement() != null) {
-                    logger.verbose("prevFrame.ScrollRootElement: " + prevFrame.getScrollRootElement());
+            if (childFrame != null) {
+                logger.verbose("childFrame.Reference:         " + childFrame.getLocation());
+                if (childFrame.getScrollRootElement() != null) {
+                    logger.verbose("childFrame.ScrollRootElement: " + childFrame.getScrollRootElement());
                 }
             }
             logger.verbose("scrollRootElement: " + scrollRootElement);
@@ -908,51 +908,14 @@ public class SeleniumEyes extends EyesBase {
             PositionMemento positionMemento = positionProvider.getState();
             PositionProviderAndMemento ppam = new PositionProviderAndMemento(positionProvider, positionMemento, fc);
             ppams.add(ppam);
-            positionProvider.setPosition(prevFrame.getLocation());
+            positionProvider.setPosition(childFrame.getLocation());
 
-            Region reg = new Region(Location.ZERO, prevFrame.getInnerSize());
+            Region reg = new Region(Location.ZERO, childFrame.getInnerSize());
             effectiveViewport.intersect(reg);
         }
 
-        ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
-        return originalFC;
-    }
-
-    private FrameChain ensureFrameVisible() {
-        logger.verbose("scrollRootElement_: " + scrollRootElement);
-        FrameChain originalFC = driver.getFrameChain().clone();
-        FrameChain fc = driver.getFrameChain().clone();
-        driver.executeScript("window.scrollTo(0,0);");
-        while (fc.size() > 0) {
-            logger.verbose("fc.Count: " + fc.size());
-            //driver.getRemoteWebDriver().switchTo().parentFrame();
-            EyesTargetLocator.parentFrame(logger, driver.getRemoteWebDriver().switchTo(), fc);
-            driver.executeScript("window.scrollTo(0,0);");
-            Frame prevFrame = fc.pop();
-            Frame frame = fc.peek();
-            WebElement scrollRootElement = null;
-            if (fc.size() == this.originalFC.size()) {
-                logger.verbose("PositionProvider: " + positionProviderHandler.get());
-                positionMemento = positionProviderHandler.get().getState();
-                scrollRootElement = this.scrollRootElement;
-            } else {
-                if (frame != null) {
-                    scrollRootElement = frame.getScrollRootElement();
-                }
-                if (scrollRootElement == null) {
-                    scrollRootElement = driver.findElement(By.tagName("html"));
-                }
-            }
-            logger.verbose("scrollRootElement: " + scrollRootElement);
-
-            PositionProvider positionProvider = getElementPositionProvider(scrollRootElement);
-            positionProvider.setPosition(prevFrame.getLocation());
-
-            Region reg = new Region(Location.ZERO, prevFrame.getInnerSize());
-            effectiveViewport.intersect(reg);
-        }
-        ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
-        return originalFC;
+        ((EyesTargetLocator) driver.switchTo()).frames(currentFC);
+        return currentFC;
     }
 
     private List<PositionProviderAndMemento> ensureElementVisible(WebElement element) {
