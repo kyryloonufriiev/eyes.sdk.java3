@@ -18,11 +18,11 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
+    <scm>
+        <connection>scm:git:git://github.com/applitools/eyes.sdk.java3.git</connection>
+        <developerConnection>scm:git:ssh://github.com:applitools/eyes.sdk.java3.git</developerConnection>
+        <url>https://github.com/applitools/eyes.sdk.java3</url>
+    </scm>
     <developers>
         <developer>
             <id>team@applitools.com</id>
