@@ -69,7 +69,7 @@ public class SeleniumEyes extends EyesBase {
     private EyesWebDriver driver;
     private boolean doNotGetTitle;
 
-    private boolean checkFrameOrElement;
+    public boolean checkFrameOrElement;
     private Region regionToCheck;
     private String originalOverflow;
 

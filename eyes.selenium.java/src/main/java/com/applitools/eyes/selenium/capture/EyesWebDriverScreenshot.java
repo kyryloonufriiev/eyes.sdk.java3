@@ -124,8 +124,18 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         PositionProvider positionProvider;
         SeleniumEyes eyes = driver.getEyes();
         PositionProvider currentFramePositionProvider = eyes.getCurrentFramePositionProvider();
-        if (currentFramePositionProvider != null) {
+        if (frameLocationInScreenshot != null && eyes.checkFrameOrElement) {
+
+            positionProvider = eyes.getCurrentFramePositionProvider(); // TODO - ITAI - this is not the way I do it in C# !!!
+
+            // TODO - ITAI - THAT'S the way I do it in C#, but I don't have SeleniumScrollPositionProviderFactory.
+            //IWebElement frameScrollRoot = driver.Eyes.GetCurrentFrameScrollRootElement();
+            //positionProvider = SeleniumScrollPositionProviderFactory.GetPositionProvider(logger, driver.Eyes.StitchMode, driver, frameScrollRoot);
+
+            logger.verbose("position provider: using the current frame scroll root element's position provider: " + positionProvider);
+        } else if (currentFramePositionProvider != null) {
             positionProvider = currentFramePositionProvider;
+            logger.verbose("position provider: using CurrentFramePositionProvider: " + positionProvider);
         } else {
             positionProvider = eyes.getPositionProvider();
             logger.verbose("position provider: using PositionProvider: " + positionProvider);
