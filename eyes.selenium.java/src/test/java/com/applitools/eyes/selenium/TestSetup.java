@@ -29,7 +29,8 @@ public abstract class TestSetup implements ITest {
     protected String testSuitName;
 
     protected String testedPageUrl = "http://applitools.github.io/demo/TestPages/FramesTestPage/";
-    protected RectangleSize testedPageSize = new RectangleSize(800, 600);
+    //protected RectangleSize testedPageSize = new RectangleSize(1200, 800);
+    protected RectangleSize testedPageSize = new RectangleSize(700, 460);
 
     private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
 
