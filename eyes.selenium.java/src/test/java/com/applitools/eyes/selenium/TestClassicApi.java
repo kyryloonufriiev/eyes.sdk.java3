@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.IEyesJsExecutor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Listeners;
@@ -39,8 +40,23 @@ public class TestClassicApi extends TestSetup {
     }
 
     @Test
+    public void TestCheckWindowFully() {
+        eyes.checkWindow("Full Window", true);
+    }
+
+    @Test
+    public void TestCheckWindowViewport() {
+        eyes.checkWindow("Viewport Window", false);
+    }
+
+    @Test
     public void TestCheckRegion() {
         eyes.checkRegion(By.id("overflowing-div"), "Region", true);
+    }
+
+    @Test
+    public void TestCheckRegion2() {
+        eyes.checkRegion(By.id("overflowing-div-image"), "minions", true);
     }
 
     @Test
@@ -51,11 +67,6 @@ public class TestClassicApi extends TestSetup {
     @Test
     public void TestCheckRegionInFrame() {
         eyes.checkRegionInFrame("frame1", By.id("inner-frame-div"), "Inner frame div", true);
-    }
-
-    @Test
-    public void TestCheckRegion2() {
-        eyes.checkRegion(By.id("overflowing-div-image"), "minions", true);
     }
 
     @Test
@@ -70,5 +81,22 @@ public class TestClassicApi extends TestSetup {
         WebElement innerFrameBody = driver.findElement(By.tagName("body"));
         ((IEyesJsExecutor) driver).executeScript("arguments[0].style.background='red';", innerFrameBody);
         eyes.checkWindow("window after change background color of inner frame");
+    }
+
+    @Test
+    public void TestCheckWindowAfterScroll() {
+        ((JavascriptExecutor) eyes).executeScript("document.documentElement.scrollTo(0,350);");
+        eyes.checkWindow("viewport after scroll", false);
+    }
+
+    @Test
+    public void TestDoubleCheckWindow() {
+        getEyes().checkWindow("first");
+        getEyes().checkWindow("second");
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
