@@ -57,8 +57,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         return defaultContentScrollPosition;
     }
 
-    private static Location getDefaultContentScrollPosition(Logger logger, EyesWebDriver driver, IEyesJsExecutor jsExecutor)
-    {
+    private static Location getDefaultContentScrollPosition(Logger logger, EyesWebDriver driver, IEyesJsExecutor jsExecutor) {
         WebElement scrollRootElement = driver.getEyes().getCurrentFrameScrollRootElement();
         PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, scrollRootElement);
         return positionProvider.getCurrentPosition();
@@ -69,15 +68,18 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
         Location windowScroll = getDefaultContentScrollPosition(logger, frameChain, driver);
 
+        logger.verbose("windowScroll: " + windowScroll);
+
         logger.verbose("Getting first frame...");
         Iterator<Frame> frameIterator = frameChain.iterator();
         Frame firstFrame = frameIterator.next();
-        logger.verbose("Done!");
         Location locationInScreenshot = new Location(firstFrame.getLocation());
+        logger.verbose("Done! locationInScreenshot: " + locationInScreenshot);
 
         // We only consider scroll of the default content if this is a viewport screenshot.
         if (screenshotType == ScreenshotType.VIEWPORT) {
             locationInScreenshot = locationInScreenshot.offset(-windowScroll.getX(), -windowScroll.getY());
+            logger.verbose("updated locationInScreenshot: " + locationInScreenshot);
         }
 
         logger.verbose("Iterating over frames...");
@@ -89,12 +91,14 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             Location frameLocation = frame.getLocation();
             // For inner frames we must consider the scroll
             Location frameOriginalLocation = frame.getOriginalLocation();
+            logger.verbose("Done! frameLocation: " + frameLocation + " ; frameOriginalLocation: " + frameOriginalLocation);
             // Offsetting the location in the screenshot
             locationInScreenshot = locationInScreenshot.offset(
                     frameLocation.getX() - frameOriginalLocation.getX(),
                     frameLocation.getY() - frameOriginalLocation.getY());
+            logger.verbose("updated locationInScreenshot: " + locationInScreenshot);
         }
-        logger.verbose("Done!");
+        logger.verbose("Done! final locationInScreenshot: " + locationInScreenshot);
 
         return locationInScreenshot;
     }
@@ -113,6 +117,8 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         ArgumentGuard.notNull(driver, "driver");
         this.driver = driver;
 
+        logger.verbose("enter");
+
         this.screenshotType = updateScreenshotType(screenshotType, image);
 
         PositionProvider positionProvider;
@@ -122,6 +128,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             positionProvider = currentFramePositionProvider;
         } else {
             positionProvider = eyes.getPositionProvider();
+            logger.verbose("position provider: using PositionProvider: " + positionProvider);
         }
 
         frameChain = driver.getFrameChain();
@@ -133,7 +140,10 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
         logger.verbose("Calculating frame window...");
         this.frameWindow = new Region(frameLocationInScreenshot, frameSize);
-        this.frameWindow.intersect(new Region(0, 0, image.getWidth(), image.getHeight()));
+        Region imageSizeAsRegion = new Region(0, 0, image.getWidth(), image.getHeight());
+        logger.verbose("this.frameWindow: " + this.frameWindow + " ; imageSizeAsRegion: " + imageSizeAsRegion);
+        this.frameWindow.intersect(imageSizeAsRegion);
+        logger.verbose("updated frameWindow: " + this.frameWindow);
         if (this.frameWindow.getWidth() <= 0 || this.frameWindow.getHeight() <= 0) {
             throw new EyesException("Got empty frame window for screenshot!");
         }
