@@ -99,4 +99,22 @@ public class ScrollPositionProvider implements PositionProvider, ISeleniumPositi
     public WebElement getScrolledElement() {
         return this.scrollRootElement;
     }
+
+
+    public boolean equals(ScrollPositionProvider other){
+        return this.scrollRootElement.equals(other.scrollRootElement);
+    }
+
+    @Override
+    public boolean equals(Object other){
+        if (other instanceof  ScrollPositionProvider) {
+            return equals((ScrollPositionProvider)other);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.scrollRootElement.hashCode();
+    }
 }
