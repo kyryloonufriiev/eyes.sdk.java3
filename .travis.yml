@@ -6,16 +6,11 @@ dist: trusty
 
 addons:
   chrome: stable
-  firefox: stable
 
 before_script:
   - wget http://chromedriver.storage.googleapis.com/74.0.3729.6/chromedriver_linux64.zip
-  - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
   - unzip chromedriver_linux64.zip -d /home/travis/build/
-  - tar xzf geckodriver-v0.24.0-linux64.tar.gz -C /home/travis/build/
-  - export CHROME_BIN=chromium-browser
-  - export DRIVER_PATH=/home/travis/build/
-  - sudo apt-get install -y libgdiplus
+  - export webdriver.chrome.driver=/home/travis/build/
 
 script:
   - export APPLITOOLS_BATCH_ID=`uuidgen -t`
