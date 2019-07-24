@@ -1537,6 +1537,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
     public void setRotation(ImageRotation rotation) {
         this.rotation = rotation;
         if (!isVisualGridEyes) {
+            WebDriver driver = getDriver();
             if (driver != null) {
                 ((EyesWebDriver) driver).setRotation(rotation);
             }

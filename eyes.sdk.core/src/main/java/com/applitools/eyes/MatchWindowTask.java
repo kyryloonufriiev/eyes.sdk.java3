@@ -5,10 +5,7 @@ package com.applitools.eyes;
 
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.fluent.GetFloatingRegion;
-import com.applitools.eyes.fluent.GetRegion;
-import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
@@ -20,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MatchWindowTask {
@@ -144,6 +142,7 @@ public class MatchWindowTask {
         String agentSetupStr = (String) eyes.getAgentSetup();
 
         collectRegions(imageMatchSettings, regions, regionSelectors);
+        collectRegions(imageMatchSettings, checkSettingsInternal);
 
         return performMatch(new ArrayList<Trigger>(), appOutput, tag, ignoreMismatch, imageMatchSettings, agentSetupStr,
                 renderId, source);
@@ -166,6 +165,53 @@ public class MatchWindowTask {
 
         // Perform match.
         return serverConnector.matchWindow(runningSession, data);
+    }
+
+    private void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal)
+    {
+        imageMatchSettings.setIgnoreRegions(convertSimpleRegions(checkSettingsInternal.getIgnoreRegions(), imageMatchSettings.getIgnoreRegions()));
+        imageMatchSettings.setContentRegions(convertSimpleRegions(checkSettingsInternal.getContentRegions(), imageMatchSettings.getContentRegions()));
+        imageMatchSettings.setLayoutRegions(convertSimpleRegions(checkSettingsInternal.getLayoutRegions(), imageMatchSettings.getLayoutRegions()));
+        imageMatchSettings.setStrictRegions(convertSimpleRegions(checkSettingsInternal.getStrictRegions(), imageMatchSettings.getStrictRegions()));
+        imageMatchSettings.setFloatingRegions(convertFloatingRegions(checkSettingsInternal.getFloatingRegions(), imageMatchSettings.getFloatingRegions()));
+    }
+
+    private static Region[] convertSimpleRegions(GetRegion[] simpleRegions, Region[] currentRegions)
+    {
+        List<Region> mutableRegions = new ArrayList<>();
+        if (currentRegions != null)
+        {
+            Collections.addAll(mutableRegions, currentRegions);
+        }
+
+        for (GetRegion getRegions : simpleRegions)
+        {
+            if (getRegions instanceof SimpleRegionByRectangle)
+            {
+                mutableRegions.addAll(getRegions.getRegions(null, null));
+            }
+        }
+
+        return mutableRegions.toArray(new Region[0]);
+    }
+
+    private FloatingMatchSettings[] convertFloatingRegions(GetFloatingRegion[] floatingRegions, FloatingMatchSettings[] currentRegions)
+    {
+        List<FloatingMatchSettings> mutableRegions = new ArrayList<>();
+        if (currentRegions != null)
+        {
+            Collections.addAll(mutableRegions, currentRegions);
+        }
+
+        for (GetFloatingRegion getRegions : floatingRegions)
+        {
+            if (getRegions instanceof FloatingRegionByRectangle)
+            {
+                mutableRegions.addAll(getRegions.getRegions(null, null));
+            }
+        }
+
+        return mutableRegions.toArray(new FloatingMatchSettings[0]);
     }
 
     private static void collectRegions(ImageMatchSettings imageMatchSettings, List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors) {
@@ -331,13 +377,13 @@ public class MatchWindowTask {
                                       ImageMatchSettings imageMatchSettings,
                                       EyesScreenshot screenshot) {
 
-        imageMatchSettings.setIgnoreRegions(collectRegions(checkSettingsInternal.getIgnoreRegions(), screenshot, false));
-        imageMatchSettings.setLayoutRegions(collectRegions(checkSettingsInternal.getLayoutRegions(), screenshot, true));
-        imageMatchSettings.setStrictRegions(collectRegions(checkSettingsInternal.getStrictRegions(), screenshot, true));
-        imageMatchSettings.setContentRegions(collectRegions(checkSettingsInternal.getContentRegions(), screenshot, true));
+        imageMatchSettings.setIgnoreRegions(collectSimpleRegions(checkSettingsInternal.getIgnoreRegions(), screenshot));
+        imageMatchSettings.setLayoutRegions(collectSimpleRegions(checkSettingsInternal.getLayoutRegions(), screenshot));
+        imageMatchSettings.setStrictRegions(collectSimpleRegions(checkSettingsInternal.getStrictRegions(), screenshot));
+        imageMatchSettings.setContentRegions(collectSimpleRegions(checkSettingsInternal.getContentRegions(), screenshot));
     }
 
-    private Region[] collectRegions(GetRegion[] regionProviders, EyesScreenshot screenshot, boolean adjustLocation) {
+    private Region[] collectSimpleRegions(GetRegion[] regionProviders, EyesScreenshot screenshot) {
 
         List<Region> regions = new ArrayList<>();
         for (GetRegion regionProvider : regionProviders) {
@@ -358,29 +404,10 @@ public class MatchWindowTask {
      * @return Merged match settings.
      */
     public ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesScreenshot screenshot, EyesBase eyesBase) {
-        ImageMatchSettings imageMatchSettings = null;
-        if (checkSettingsInternal != null) {
-
-            MatchLevel matchLevel = checkSettingsInternal.getMatchLevel();
-            IConfigurationGetter configGetter = eyes.getConfigGetter();
-            if (matchLevel == null) {
-                matchLevel = configGetter.getDefaultMatchSettings().getMatchLevel();
-            }
-
-            imageMatchSettings = new ImageMatchSettings(matchLevel, null, false);
-
-            Boolean ignoreCaret = checkSettingsInternal.getIgnoreCaret();
-            if (ignoreCaret == null) {
-                ignoreCaret = configGetter.getDefaultMatchSettings().getIgnoreCaret();
-            }
-
-            imageMatchSettings.setIgnoreCaret(ignoreCaret);
-
+        ImageMatchSettings imageMatchSettings = createImageMatchSettings(checkSettingsInternal, eyesBase);
+        if (imageMatchSettings != null) {
             collectSimpleRegions(checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
-            imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
-            imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacements());
         }
         return imageMatchSettings;
     }

@@ -32,7 +32,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
     // The top/left coordinates of the frame window(!) relative to the top/left
     // of the screenshot. Used for calculations, so can also be outside(!)
     // the screenshot.
-    private final Location frameLocationInScreenshot;
+    private Location frameLocationInScreenshot;
 
     // The part of the frame window which is visible in the screenshot
     private final Region frameWindow;
@@ -144,12 +144,10 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         frameChain = driver.getFrameChain();
         RectangleSize frameSize = getFrameSize(positionProvider);
         currentFrameScrollPosition = getUpdatedScrollPosition(positionProvider);
-        frameLocationInScreenshot = getUpdatedFrameLocationInScreenshot(logger, frameLocationInScreenshot);
-
-        this.frameLocationInScreenshot = frameLocationInScreenshot;
+        updateFrameLocationInScreenshot(frameLocationInScreenshot);
 
         logger.verbose("Calculating frame window...");
-        this.frameWindow = new Region(frameLocationInScreenshot, frameSize);
+        this.frameWindow = new Region(this.frameLocationInScreenshot, frameSize);
         Region imageSizeAsRegion = new Region(0, 0, image.getWidth(), image.getHeight());
         logger.verbose("this.frameWindow: " + this.frameWindow + " ; imageSizeAsRegion: " + imageSizeAsRegion);
         this.frameWindow.intersect(imageSizeAsRegion);
@@ -163,16 +161,16 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         logger.verbose("Done!");
     }
 
-    private Location getUpdatedFrameLocationInScreenshot(Logger logger, Location frameLocationInScreenshot) {
-        logger.verbose(String.format("frameLocationInScreenshot: %s", frameLocationInScreenshot));
-        if (frameLocationInScreenshot == null) {
+    private void updateFrameLocationInScreenshot(Location location) {
+        if (location == null) {
             if (frameChain.size() > 0) {
                 frameLocationInScreenshot = calcFrameLocationInScreenshot(logger, this.driver, frameChain, this.screenshotType);
             } else {
                 frameLocationInScreenshot = new Location(0, 0);
             }
+        } else {
+            this.frameLocationInScreenshot = location;
         }
-        return frameLocationInScreenshot;
     }
 
     private static Location getUpdatedScrollPosition(PositionProvider positionProvider) {
@@ -329,6 +327,8 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
         EyesWebDriverScreenshot result = new EyesWebDriverScreenshot(logger, driver, subScreenshotImage,
                 new Region(region.getLeft(), region.getTop(), subScreenshotImage.getWidth(), subScreenshotImage.getHeight()));
+
+        result.updateFrameLocationInScreenshot(new Location(-region.getLeft(), -region.getTop()));
         result.setDomUrl(this.domUrl);
         logger.verbose("Done!");
         return result;
