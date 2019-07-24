@@ -912,4 +912,8 @@ public class VisualGridEyes implements IRenderingEyes {
     public List<TestResultContainer> getAllTestResults() {
         return allTestResults;
     }
+
+    public EyesWebDriver getDriver() {
+        return webDriver;
+    }
 }
