@@ -677,10 +677,9 @@ public class SeleniumEyes extends EyesBase {
             switchTo = (EyesTargetLocator) driver.switchTo();
             source = driver.getCurrentUrl();
         }
-        FrameChain originalFC = null;
+        FrameChain originalFC = tryHideScrollbars();
         if (targetRegion != null && switchedToFrameCount == 0) {
             logger.verbose("have target region");
-            originalFC = tryHideScrollbars();
             result = this.checkWindowBase(new RegionProvider() {
                 @Override
                 public Region getRegion() {
@@ -710,7 +709,6 @@ public class SeleniumEyes extends EyesBase {
                 if (!EyesSeleniumUtils.isMobileDevice(driver)) {
                     // required to prevent cut line on the last stitched part of the page on some browsers (like firefox).
                     switchTo.defaultContent();
-                    originalFC = tryHideScrollbars();
                     currentFramePositionProvider = createPositionProvider(driver.findElement(By.tagName("html")));
                 }
                 result = this.checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings, source);
@@ -1708,7 +1706,7 @@ public class SeleniumEyes extends EyesBase {
             switchTo.frames(originalFrameChain);
         }
 
-        FrameChain originalFC = tryHideScrollbars();
+        //FrameChain originalFC = tryHideScrollbars();
 
         EyesWebDriverScreenshot result;
 
@@ -1734,7 +1732,7 @@ public class SeleniumEyes extends EyesBase {
 
         result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));
 
-        tryRestoreScrollbars(originalFC);
+        //tryRestoreScrollbars(originalFC);
 
         if (!isMobileDevice) {
             switchTo.frames(this.originalFC);
