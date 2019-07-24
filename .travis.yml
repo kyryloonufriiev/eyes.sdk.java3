@@ -1,11 +1,10 @@
 language: java
 
-jdk: oraclejdk9
+jdk: oraclejdk8
 
-sudo: required
+dist: trusty
 
 script:
   - export APPLITOOLS_BATCH_ID=`uuidgen -t`
   - echo $APPLITOOLS_BATCH_ID
-  - mvn -U install
   - mvn test
