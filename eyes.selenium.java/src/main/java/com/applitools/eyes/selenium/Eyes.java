@@ -18,7 +18,6 @@ import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
-import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -2099,7 +2098,10 @@ public class Eyes implements ISeleniumConfigurationProvider {
      * @return the driver
      */
     public WebDriver getDriver() {
-        return this.driver;
+        if (!this.isVisualGridEyes) {
+            return this.seleniumEyes.getDriver();
+        }
+        return visualGridEyes.getDriver();
     }
 
     /**
