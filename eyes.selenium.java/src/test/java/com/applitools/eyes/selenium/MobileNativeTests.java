@@ -103,7 +103,7 @@ public class MobileNativeTests {
             eyes.check("Main window with ignore", Target.region(scrollableElement).ignore(scrollableElement));
             eyes.close(false);
         } finally {
-            driver.resetApp();
+            driver.quit();
             eyes.abortIfNotClosed();
         }
     }

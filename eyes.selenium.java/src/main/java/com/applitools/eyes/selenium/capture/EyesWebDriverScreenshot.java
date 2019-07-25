@@ -140,14 +140,21 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             positionProvider = eyes.getPositionProvider();
             logger.verbose("position provider: using PositionProvider: " + positionProvider);
         }
+        if (!EyesSeleniumUtils.isMobileDevice(driver)) {
 
-        frameChain = driver.getFrameChain();
-        RectangleSize frameSize = getFrameSize(positionProvider);
-        currentFrameScrollPosition = getUpdatedScrollPosition(positionProvider);
-        updateFrameLocationInScreenshot(frameLocationInScreenshot);
+            this.frameChain = driver.getFrameChain();
+            RectangleSize frameSize = getFrameSize(positionProvider);
+            this.currentFrameScrollPosition = getUpdatedScrollPosition(positionProvider);
+            updateFrameLocationInScreenshot(frameLocationInScreenshot);
 
-        logger.verbose("Calculating frame window...");
-        this.frameWindow = new Region(this.frameLocationInScreenshot, frameSize);
+            logger.verbose("Calculating frame window...");
+            this.frameWindow = new Region(this.frameLocationInScreenshot, frameSize);
+        } else {
+            this.frameChain = new FrameChain(logger);
+            this.currentFrameScrollPosition = new Location(0,0);
+            this.frameLocationInScreenshot = new Location(0,0);
+            this.frameWindow = new Region(this.frameLocationInScreenshot, new RectangleSize(image.getWidth(), image.getHeight()));
+        }
         Region imageSizeAsRegion = new Region(0, 0, image.getWidth(), image.getHeight());
         logger.verbose("this.frameWindow: " + this.frameWindow + " ; imageSizeAsRegion: " + imageSizeAsRegion);
         this.frameWindow.intersect(imageSizeAsRegion);
@@ -190,15 +197,10 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         RectangleSize frameSize;
         if (frameChain.size() != 0) {
             frameSize = frameChain.getCurrentFrameInnerSize();
+        } else if (!EyesSeleniumUtils.isMobileDevice(driver)) {
+            frameSize = positionProvider.getEntireSize();
         } else {
-            // get entire page size might throw an exception for applications
-            // which don't support Javascript (e.g., Appium). In that case
-            // we'll use the viewport size as the frame's size.
-            try {
-                frameSize = positionProvider.getEntireSize();
-            } catch (Exception e) {
-                frameSize = this.driver.getDefaultContentViewportSize();
-            }
+            frameSize = this.driver.getDefaultContentViewportSize();
         }
         return frameSize;
     }

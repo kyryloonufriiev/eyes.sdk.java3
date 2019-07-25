@@ -357,12 +357,14 @@ public class EyesSeleniumUtils {
     public static RectangleSize getViewportSizeOrDisplaySize(Logger logger, WebDriver driver) {
         logger.verbose("getViewportSizeOrDisplaySize()");
 
-        try {
-            return getViewportSize((JavascriptExecutor) driver);
-        } catch (Exception ex) {
-            logger.verbose(String.format(
-                    "Failed to extract viewport size using Javascript: %s",
-                    ex.getMessage()));
+        if (!EyesSeleniumUtils.isMobileDevice(driver)) {
+            try {
+                return getViewportSize((JavascriptExecutor) driver);
+            } catch (Exception ex) {
+                logger.verbose(String.format(
+                        "Failed to extract viewport size using Javascript: %s",
+                        ex.getMessage()));
+            }
         }
         // If we failed to extract the viewport size using JS, will use the
         // window size instead.

@@ -1005,7 +1005,12 @@ public class SeleniumEyes extends EyesBase {
                 Region rect = settings.getTargetRegion();
                 Region r;
                 if (rect == null) {
-                    Rectangle bounds = eyesTargetElement.getBoundingClientRect();
+                    Rectangle bounds;
+                    if (EyesSeleniumUtils.isMobileDevice(driver)) {
+                        bounds = eyesTargetElement.getRect();
+                    } else {
+                        bounds = eyesTargetElement.getBoundingClientRect();
+                    }
                     r = new Region(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
                 } else {
                     SizeAndBorders sizeAndBorders = eyesTargetElement.getSizeAndBorders();
@@ -1051,21 +1056,16 @@ public class SeleniumEyes extends EyesBase {
                             "Failed to extract device pixel ratio! Using default.");
                     devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
                 }
+                logger.verbose("Setting web scale provider...");
+                factory = getScaleProviderFactory();
             } else {
                 logger.verbose("Native App");
                 devicePixelRatio = DEFAULT_DEVICE_PIXEL_RATIO;
+                logger.verbose("Setting native app scale provider...");
+                factory = new FixedScaleProviderFactory(logger, 1 / devicePixelRatio, scaleProviderHandler);
             }
             logger.verbose(String.format("Device pixel ratio: %f", devicePixelRatio));
 
-            logger.verbose("Setting scale provider...");
-            try {
-                factory = getScaleProviderFactory();
-            } catch (Exception e) {
-                // This can happen in Appium for example.
-                logger.verbose("Failed to set ContextBasedScaleProvider.");
-                logger.verbose("Using FixedScaleProvider instead...");
-                factory = new FixedScaleProviderFactory(logger, 1 / devicePixelRatio, scaleProviderHandler);
-            }
             logger.verbose("Done!");
             return factory;
         }
@@ -1291,7 +1291,7 @@ public class SeleniumEyes extends EyesBase {
         regionToCheck = Region.EMPTY;
         fullRegionToCheck = Region.EMPTY;
 
-        if(scrollRootElement instanceof EyesRemoteWebElement){
+        if (scrollRootElement instanceof EyesRemoteWebElement) {
             EyesRemoteWebElement eyesRemoteWebElement = (EyesRemoteWebElement) scrollRootElement;
             eyesRemoteWebElement.setPositionProvider(positionProvider);
         }
@@ -1719,9 +1719,9 @@ public class SeleniumEyes extends EyesBase {
         if (forceFullPageScreenshot == null) forceFullPageScreenshot = false;
         if (checkFrameOrElement && !isMobileDevice) {
             result = getFrameOrElementScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
-        } else if ((forceFullPageScreenshot || stitchContent) &&!isMobileDevice){
+        } else if ((forceFullPageScreenshot || stitchContent) && !isMobileDevice) {
             result = getFullPageScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
-        } else{
+        } else {
             result = getElementScreenshot(scaleProviderFactory, switchTo);
         }
 
@@ -1730,11 +1730,10 @@ public class SeleniumEyes extends EyesBase {
             driver.executeScript("arguments[0].focus();", activeElement);
         }
 
-        result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));
-
         //tryRestoreScrollbars(originalFC);
 
         if (!isMobileDevice) {
+            result.setDomUrl(tryCaptureAndPostDom(checkSettingsInternal));
             switchTo.frames(this.originalFC);
             if (positionProvider != null) {
                 positionProvider.restoreState(originalPosition);
@@ -1889,7 +1888,7 @@ public class SeleniumEyes extends EyesBase {
 
     @Override
     protected String getTitle() {
-        if (!doNotGetTitle) {
+        if (!doNotGetTitle && !EyesSeleniumUtils.isMobileDevice(driver)) {
             try {
                 return driver.getTitle();
             } catch (Exception ex) {
