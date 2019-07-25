@@ -52,7 +52,9 @@ public abstract class TestSetup implements ITest {
 
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
-        System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
+        if (TestsDataProvider.runOnCI && System.getenv("TRAVIS") != null) {
+            System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
+        }
         // Initialize the seleniumEyes SDK and set your private API key.
         seleniumEyes = new Eyes();
         //seleniumEyes.setServerConnector(new ServerConnector());
@@ -84,7 +86,7 @@ public abstract class TestSetup implements ITest {
         this.eyes = eyes;
     }
 
-    public Eyes getEyes(){
+    public Eyes getEyes() {
         return this.eyes;
     }
 
@@ -147,9 +149,9 @@ public abstract class TestSetup implements ITest {
 
         String extendedTestName =
                 testName + "_" +
-                caps.getBrowserName() + "_" +
-                platform + "_" +
-                dateFormat.format(Calendar.getInstance().getTime());
+                        caps.getBrowserName() + "_" +
+                        platform + "_" +
+                        dateFormat.format(Calendar.getInstance().getTime());
 
         if (seleniumServerUrl != null) {
             try {
@@ -157,16 +159,19 @@ public abstract class TestSetup implements ITest {
             } catch (MalformedURLException ignored) {
             }
         } else {
-            switch (caps.getBrowserName()){
-                case "chrome": webDriver = new ChromeDriver((ChromeOptions)caps); break;
-                default: return;
+            switch (caps.getBrowserName()) {
+                case "chrome":
+                    webDriver = new ChromeDriver((ChromeOptions) caps);
+                    break;
+                default:
+                    return;
             }
         }
 
         LogHandler logHandler;
 
         if (!TestsDataProvider.runOnCI && logsPath != null) {
-            String path = logsPath + File.separator + "java" + File.separator + extendedTestName.replaceAll("\\s","_");
+            String path = logsPath + File.separator + "java" + File.separator + extendedTestName.replaceAll("\\s", "_");
             logHandler = new FileLogger(path + File.separator + testName + "_" + platform + ".log", true, true);
             seleniumEyes.setDebugScreenshotsPath(path);
             seleniumEyes.setDebugScreenshotsPrefix(testName + "_");
