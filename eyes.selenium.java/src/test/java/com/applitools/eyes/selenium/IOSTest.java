@@ -121,7 +121,7 @@ public class IOSTest {
         WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 
-        if (System.getenv("CI") == null) {
+        if (!TestsDataProvider.runOnCI) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss_SSS");
             String logPath = logsPath + File.separator + "java" + File.separator + String.format("IOSTest %s %s", testName, dateFormat.format(Calendar.getInstance().getTime()));
             String logFilename = logPath + File.separator + "log.log";

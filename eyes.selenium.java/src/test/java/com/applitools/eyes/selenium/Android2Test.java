@@ -78,7 +78,7 @@ public class Android2Test {
             testName += " fully";
         }
 
-        if (System.getenv("CI") == null) {
+        if (!TestsDataProvider.runOnCI) {
             //String logFilename = String.format("c:\\temp\\logs\\iostest_%s.log", testName);
             //eyes.setLogHandler(new FileLogger(logFilename, false, true));
             //eyes.setImageCut(new FixedCutProvider(30, 12, 8, 5));

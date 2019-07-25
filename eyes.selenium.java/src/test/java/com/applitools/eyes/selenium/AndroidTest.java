@@ -72,7 +72,7 @@ public class AndroidTest {
             testName += " fully";
         }
 
-        if (System.getenv("CI") == null) {
+        if (!TestsDataProvider.runOnCI) {
             //String logFilename = String.format("c:\\temp\\logs\\iostest_%s.log", testName);
             //VisualGridEyes.setLogHandler(new FileLogger(logFilename, false, true));
             //VisualGridEyes.setImageCut(new FixedCutProvider(30, 12, 8, 5));

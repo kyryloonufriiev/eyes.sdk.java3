@@ -14,7 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TestsDataProvider {
-    public final  static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
+    public final static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
+
+    public final static boolean runOnCI = System.getenv("CI") != null;
 
     @DataProvider(parallel = true)
     public static Object[][] dp() {
@@ -29,7 +31,7 @@ public class TestsDataProvider {
         SafariOptions safariOptions = new SafariOptions();
 
         String runHeadless = System.getenv("APPLITOOLS_RUN_HEADLESS");
-        if (runHeadless != null && runHeadless.equalsIgnoreCase("true")) {
+        if (runOnCI || "true".equalsIgnoreCase(runHeadless)) {
             chromeOptions.setHeadless(true);
             firefoxOptions.setHeadless(true);
         }
@@ -51,13 +53,13 @@ public class TestsDataProvider {
         lists.add(Arrays.asList(platforms));
 
         List<Object[]> permutations = TestUtils.generatePermutationsList(lists);
-        int i=0;
-        while (permutations.size() > 0 && i < permutations.size()){
+        int i = 0;
+        while (permutations.size() > 0 && i < permutations.size()) {
             Object[] perm = permutations.get(i);
-            String browser = ((Capabilities)perm[0]).getBrowserName().toUpperCase().trim();
-            String platform = ((String)perm[1]).toUpperCase().trim();
+            String browser = ((Capabilities) perm[0]).getBrowserName().toUpperCase().trim();
+            String platform = ((String) perm[1]).toUpperCase().trim();
             if ((platform.startsWith("WIN") && browser.equals("SAFARI")) ||
-                (platform.startsWith("MAC") && browser.equals("INTERNET EXPLORER"))) {
+                    (platform.startsWith("MAC") && browser.equals("INTERNET EXPLORER"))) {
                 permutations.remove(i);
             } else {
                 i++;

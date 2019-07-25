@@ -28,7 +28,7 @@ public class MobileNativeTests {
 
     private void setupLogging(Eyes eyes, DesiredCapabilities capabilities, String methodName) {
         LogHandler logHandler;
-        if (System.getenv("CI") == null && logsPath != null) {
+        if (!TestsDataProvider.runOnCI && logsPath != null) {
             String path = logsPath + File.separator + "java" + File.separator + methodName;
             logHandler = new FileLogger(path + File.separator + methodName + "_" + capabilities.getPlatform() + ".log", true, true);
             eyes.setDebugScreenshotsPath(path);
