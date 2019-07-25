@@ -52,7 +52,7 @@ public abstract class TestSetup implements ITest {
 
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
-        System.setProperty("webdriver.chrome.driver", "/home/travis/build/"); // for travis build.
+        System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         // Initialize the seleniumEyes SDK and set your private API key.
         seleniumEyes = new Eyes();
         //seleniumEyes.setServerConnector(new ServerConnector());
