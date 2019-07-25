@@ -115,6 +115,8 @@ public class ScrollPositionProvider implements PositionProvider, ISeleniumPositi
 
     @Override
     public int hashCode() {
-        return this.scrollRootElement.hashCode();
+        if (this.scrollRootElement != null)
+            return this.scrollRootElement.hashCode();
+        return 0;
     }
 }
