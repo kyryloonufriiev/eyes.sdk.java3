@@ -44,10 +44,11 @@ public class CssTranslatePositionProvider implements PositionProvider, ISelenium
     public Location setPosition(Location location) {
         ArgumentGuard.notNull(location, "location");
         logger.verbose("CssTranslatePositionProvider - Setting position to: " + location);
+        Location negatedLocation = new Location(-location.getX(), -location.getY());
         //EyesSeleniumUtils.translateTo(executor, location);
         executor.executeScript(
-                String.format("arguments[0].style.transform='translate(-%dpx,-%dpx)';",
-                        location.getX(), location.getY()),
+                String.format("arguments[0].style.transform='translate(%dpx,%dpx)';",
+                        negatedLocation.getX(), negatedLocation.getY()),
                 this.scrollRootElement);
         logger.verbose("Done!");
         lastSetPosition = location;
