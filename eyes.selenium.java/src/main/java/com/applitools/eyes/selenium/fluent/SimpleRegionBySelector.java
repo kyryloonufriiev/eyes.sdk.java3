@@ -25,14 +25,11 @@ public class SimpleRegionBySelector implements GetRegion , IGetSeleniumRegion {
             Point locationAsPoint = element.getLocation();
             Dimension size = element.getSize();
 
-            Location adjustedLocation;
+            Location adjustedLocation = new Location(locationAsPoint.getX(), locationAsPoint.getY());
             if (screenshot != null) {
                 // Element's coordinates are context relative, so we need to convert them first.
-                adjustedLocation = screenshot.getLocationInScreenshot(
-                        new Location(locationAsPoint.getX(), locationAsPoint.getY()),
-                        CoordinatesType.CONTEXT_RELATIVE);
-            } else {
-                adjustedLocation = new Location(locationAsPoint.getX(), locationAsPoint.getY());
+                adjustedLocation = screenshot.convertLocation(adjustedLocation,
+                        CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
             }
             values.add(new Region(adjustedLocation, new RectangleSize(size.getWidth(), size.getHeight()),
                     CoordinatesType.SCREENSHOT_AS_IS));

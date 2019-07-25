@@ -114,8 +114,8 @@ public class TestFluentApi extends TestSetup {
     public void TestCheckFullWindowWithMultipleIgnoreRegionsBySelector_Fluent() {
         getEyes().check("Fluent - Region by element", Target.window().fully().ignore(By.cssSelector(".ignore")));
         setExpectedIgnoreRegions(
-                new Region(172, 928, 456, 306),
-                new Region(8, 1270, 790, 206),
+                new Region(122, 928, 456, 306),
+                new Region(8, 1270, 690, 206),
                 new Region(10, 284, 800, 500)
         );
     }
