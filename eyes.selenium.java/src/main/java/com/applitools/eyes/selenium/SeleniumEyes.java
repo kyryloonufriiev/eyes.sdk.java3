@@ -453,6 +453,7 @@ public class SeleniumEyes extends EyesBase {
                         sizeAndBorders.getSize().getHeight());
             }
         }
+        region.intersect(effectiveViewport);
         markElementForLayoutRCA(null);
 
         BufferedImage screenshotImage = algo.getStitchedRegion(
