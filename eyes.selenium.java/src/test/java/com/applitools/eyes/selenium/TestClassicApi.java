@@ -85,7 +85,7 @@ public class TestClassicApi extends TestSetup {
 
     @Test
     public void TestCheckWindowAfterScroll() {
-        ((JavascriptExecutor) driver).executeScript("document.documentElement.scrollTo(0,350);");
+        ((JavascriptExecutor) this.driver).executeScript("document.documentElement.scrollTo(0,350);");
         eyes.checkWindow("viewport after scroll", false);
     }
 

@@ -5,19 +5,18 @@ import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.LogHandler;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.testng.annotations.Test;
 
 @org.testng.annotations.Test()
 public class MobileNativeTests {
@@ -111,19 +110,22 @@ public class MobileNativeTests {
     @Test
     public void iOSNativeAppTest() throws Exception {
 
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-
-        capabilities.setCapability("platformName", "iOS");
-        capabilities.setCapability("deviceName", "iPhone 7 Simulator");
-        capabilities.setCapability("platformVersion", "10.0");
-        capabilities.setCapability("app", "https://store.applitools.com/download/iOS.TestApp.app.zip");
-        capabilities.setCapability("clearSystemFiles", true);
-        capabilities.setCapability("noReset", true);
+        DesiredCapabilities caps = DesiredCapabilities.iphone();
+        caps.setCapability("appiumVersion", "1.13.0");
+        caps.setCapability("deviceName","iPhone XS Simulator");
+        caps.setCapability("deviceOrientation", "portrait");
+        caps.setCapability("platformVersion","12.2");
+        caps.setCapability("platformName", "iOS");
+        caps.setCapability("browserName", "");
+        caps.setCapability("app", "https://applitools.bintray.com/Examples/HelloWorldiOS_1_0.zip");
+//        caps.setCapability("clearSystemFiles", true);
+//        caps.setCapability("noReset", true);
 
         Eyes eyes = new Eyes();
-        setupLogging(eyes, capabilities,"iOSNativeAppTest");
+        setupLogging(eyes, caps,"iOSNativeAppTest");
+        eyes.setLogHandler(new StdoutLogHandler());
 
-        WebDriver driver = new IOSDriver(new URL(appiumServerUrl), capabilities);
+        WebDriver driver = new IOSDriver(new URL(appiumServerUrl), caps);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "iOS Native App");
