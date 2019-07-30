@@ -841,7 +841,7 @@ public class Eyes implements ISeleniumConfigurationProvider {
      * @param selector The selector by which to specify which region to check.
      */
     public void checkRegion(By selector) {
-        checkRegion(selector, USE_DEFAULT_MATCH_TIMEOUT, null, true);
+        checkRegion(selector, USE_DEFAULT_MATCH_TIMEOUT, null, false);
     }
 
     /**
