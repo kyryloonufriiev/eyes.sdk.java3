@@ -1,9 +1,12 @@
 package com.applitools.eyes.visualgrid.model;
 
+
 import java.net.URI;
+import java.util.Arrays;
 
 public class BlobData {
-    
+
+    public static final int MAX_RESOURCE_SIZE = 15 * 1024 * 1024;
     private String url;
 
     private String type;
@@ -34,7 +37,7 @@ public class BlobData {
     }
 
     public void setValue(String value) {
-        this.value = value;
+        this.value = value.getBytes().length > MAX_RESOURCE_SIZE ? new String(Arrays.copyOf(value.getBytes(), MAX_RESOURCE_SIZE)) : value;
     }
 
     @Override
