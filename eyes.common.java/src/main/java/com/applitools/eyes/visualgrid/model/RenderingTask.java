@@ -155,7 +155,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 boolean isNeedMoreDom = runningRender.isNeedMoreDom();
 
                 if (isForcePutNeeded.get() && !isForcePutAlreadyDone) {
-                    forcePutAllResources(requests[0].getResources(), runningRender);
+                    forcePutAllResources(requests[0].getResources(), requests[0].getDom(), runningRender);
                     isForcePutAlreadyDone = true;
                 }
 
@@ -194,10 +194,16 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
     }
 
-    private void forcePutAllResources(Map<String, RGridResource> resources, RunningRender runningRender) {
+    private void forcePutAllResources(Map<String, RGridResource> resources, RGridDom dom, RunningRender runningRender) {
         RGridResource resource;
         List<IPutFuture> allPuts = new ArrayList<>();
-        for (String url : resources.keySet()) {
+        Set<String> strings = resources.keySet();
+        try {
+            allPuts.add(this.eyesConnector.renderPutResource(runningRender, dom.asResource(), userAgent.getOriginalUserAgentString()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        for (String url : strings) {
             try {
                 logger.verbose("trying to get url from map - " + url);
                 IResourceFuture resourceFuture = fetchedCacheMap.get(url);
@@ -216,7 +222,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     synchronized (putResourceCache) {
                         String contentType = resource.getContentType();
                         if (contentType != null && !contentType.equalsIgnoreCase(CDT)) {
-                            putResourceCache.put(dom.getUrl(), future);
+                            putResourceCache.put(this.dom.getUrl(), future);
                         }
                         allPuts.add(future);
                     }
@@ -284,7 +290,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             IPutFuture future = null;
             try {
                 future = this.eyesConnector.renderPutResource(runningRender, dom.asResource(), userAgent.getOriginalUserAgentString());
-            } catch (JsonProcessingException e) {
+            } catch (Throwable e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
             logger.verbose("locking putResourceCache");
