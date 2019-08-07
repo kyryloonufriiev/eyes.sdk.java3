@@ -27,6 +27,9 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     private String inferred;
     private Configuration config = new Configuration();
 
+    public Eyes() {
+    }
+
     /**
      * Get the base agent id.
      * @return Base agent id.
