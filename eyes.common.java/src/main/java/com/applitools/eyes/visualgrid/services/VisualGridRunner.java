@@ -454,7 +454,7 @@ public class VisualGridRunner extends EyesRunner {
 
     public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, FrameData script,
                                    IEyesConnector connector, List<VisualGridTask> visualGridTaskList,
-                                   List<VisualGridTask> openVisualGridTasks, final RenderListener listener,
+                                   List<VisualGridTask> openVisualGridTasks, String resultAsString, final RenderListener listener,
                                    List<VisualGridSelector[]> selectors, UserAgent userAgent) {
 
         if (debugResourceWriter == null) {
@@ -484,6 +484,10 @@ public class VisualGridRunner extends EyesRunner {
         synchronized (renderingTaskList) {
             this.renderingTaskList.add(renderingTask);
         }
+
+        //Write all DomSnapshot data
+        debugResourceWriter.write(new RGridResource("THE_DOM_SNAPSHOT_RESULT", "DOM_SNAPSHOT", resultAsString.getBytes(), logger, ""));
+
         logger.verbose("releasing renderingTaskList");
         notifyAllServices();
 //        logger.verbose("exit");
