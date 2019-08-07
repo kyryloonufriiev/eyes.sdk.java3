@@ -560,7 +560,7 @@ public class VisualGridEyes implements IRenderingEyes {
             logger.verbose("added check tasks  (" + checkSettingsInternal.toString() + ")");
 
             this.renderingGridRunner.check((ICheckSettings) checkSettingsInternal, debugResourceWriter, scriptResult,
-                    this.VGEyesConnector, visualGridTaskList, openVisualGridTasks,
+                    this.VGEyesConnector, visualGridTaskList, openVisualGridTasks, resultAsString,
                     new VisualGridRunner.RenderListener() {
                         @Override
                         public void onRenderSuccess() {
