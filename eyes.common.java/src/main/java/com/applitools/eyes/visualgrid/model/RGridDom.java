@@ -75,7 +75,7 @@ public class RGridDom {
     @JsonProperty("hash")
     public String getSha256() throws JsonProcessingException {
         if (this.sha256 == null) {
-            sha256 = GeneralUtils.getSha256hash(ArrayUtils.toObject(getStringObjectMap().getBytes()));
+            sha256 = GeneralUtils.getSha256hash((getStringObjectMap().getBytes()));
         }
         return sha256;
     }
@@ -85,7 +85,6 @@ public class RGridDom {
         Map<String, Object> map = new HashMap<>();
         map.put("domNodes", this.domNodes);
         map.put("resources", this.resources);
-
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
@@ -98,7 +97,9 @@ public class RGridDom {
     }
 
     public RGridResource asResource() throws JsonProcessingException {
-        gridResource =  new RGridResource(this.url, CONTENT_TYPE, getStringObjectMap().getBytes(), logger, "RGridDom - "+msg);
+       if (gridResource == null) {
+            gridResource =  new RGridResource(this.url, CONTENT_TYPE, getStringObjectMap().getBytes(), logger, "RGridDom - "+msg);
+        }
         return gridResource;
     }
 

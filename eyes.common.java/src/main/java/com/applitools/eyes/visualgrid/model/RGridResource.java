@@ -6,7 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RGridResource {
@@ -18,13 +23,13 @@ public class RGridResource {
     private String url;
 
     @JsonInclude
-    private String contentType;
+    private final String contentType;
 
     @JsonIgnore
-    private byte[] content;
+    private final byte[] content;
 
     @JsonProperty("hash")
-    private String sha256;
+    private final String sha256;
 
     @JsonInclude
     private final String hashFormat = "sha256";
@@ -45,7 +50,7 @@ public class RGridResource {
         this.content = content.length > MAX_RESOURCE_SIZE ? Arrays.copyOf(contentType.getBytes(), MAX_RESOURCE_SIZE) : content;
         this.logger = logger;
         this.sha256 = GeneralUtils.getSha256hash(this.content);
-        this.url = url;
+        this.url = GeneralUtils.sanitizeURL(url, logger);
     }
 
     public String getContentType() {
@@ -73,13 +78,26 @@ public class RGridResource {
     public void setIsResourceParsed(Boolean isResourceParsed) {
         this.isResourceParsed.set(isResourceParsed);
     }
-
+    @JsonIgnore
     public boolean isResourceParsed() {
         return isResourceParsed.get();
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RGridResource)) return false;
+        RGridResource that = (RGridResource) o;
+        return Arrays.equals(getContent(), that.getContent()) &&
+                getSha256().equals(that.getSha256()) &&
+                getHashFormat().equals(that.getHashFormat());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(getSha256(), getHashFormat());
+        result = 31 * result + Arrays.hashCode(getContent());
+        return result;
     }
 }
 

@@ -9,8 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -34,6 +33,7 @@ public class GeneralUtils {
     @SuppressWarnings("SpellCheckingInspection")
     private static final String DATE_FORMAT_RFC1123 =
             "E, dd MMM yyyy HH:mm:ss 'GMT'";
+    private static final String QUESTION_MARK = "?";
 
     private GeneralUtils() {
     }
@@ -338,4 +338,14 @@ public class GeneralUtils {
         return false;
     }
 
+    public static String sanitizeURL(String urlToSanitize, Logger logger) {
+        String encoded = urlToSanitize;
+        try {
+            URL url = new URL(urlToSanitize);
+            encoded = url.getProtocol() + "://" + url.getAuthority() + url.getPath() + (url.getQuery() != null && !url.getQuery().isEmpty() ? QUESTION_MARK + URLEncoder.encode(url.getQuery(), "UTF-8") : "");
+        } catch (UnsupportedEncodingException | MalformedURLException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+        return encoded;
+    }
 }

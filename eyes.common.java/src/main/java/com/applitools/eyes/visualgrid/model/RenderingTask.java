@@ -40,7 +40,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     public static final int HOUR = 60 * 60 * 1000;
     public static final String TEXT_CSS = "text/css";
     public static final String IMAGE_SVG_XML = "image/svg+xml";
-    public static final String QUESTION_MARK = "?";
 
     private final List<RenderTaskListener> listeners = new ArrayList<>();
     private IEyesConnector eyesConnector;
@@ -656,7 +655,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
 
         try {
-            URL uri = new URL(this.sanitizeURL(blob.getUrl()));
+            URL uri = new URL(GeneralUtils.sanitizeURL(blob.getUrl(), logger));
             tdr.uri = new URL(new URL(baseUrl), uri.toString());
         } catch (MalformedURLException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -768,7 +767,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String url;
         for (RGridResource blob : allBlobs.values()) {
             url = blob.getUrl();
-            blob.setUrl(sanitizeURL(url));
             String contentType = blob.getContentType();
             try {
                 if (contentType == null || !contentType.equalsIgnoreCase(CDT)) {
@@ -793,7 +791,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         while (iterator.hasNext()) {
             URL link = iterator.next();
             String url = link.toString();
-            url = sanitizeURL(url);
+            url = GeneralUtils.sanitizeURL(url, logger);
             synchronized (this.fetchedCacheMap) {
                 // If resource is already being fetched, remove it from the list, and use the future.
                 IResourceFuture fetch = fetchedCacheMap.get(url);
@@ -1000,18 +998,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             logger.verbose("VG is Timed out!");
             isTimeElapsed.set(true);
         }
-    }
-
-
-    private String sanitizeURL(String urlToSanitize) {
-        String encoded = null;
-        try {
-            URL url = new URL(urlToSanitize);
-            encoded = url.getProtocol() + "://" + url.getAuthority() + url.getPath() + (url.getQuery() != null && !url.getQuery().isEmpty() ? QUESTION_MARK + URLEncoder.encode(url.getQuery(), "UTF-8") : "");
-        } catch (UnsupportedEncodingException | MalformedURLException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
-        return encoded;
     }
 }
 
