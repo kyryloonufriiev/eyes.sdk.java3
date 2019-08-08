@@ -400,6 +400,11 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         if (debugResourceWriter != null && !(debugResourceWriter instanceof NullDebugResourceWriter)) {
             for (RenderRequest renderRequest : asArray) {
+                try {
+                    debugResourceWriter.write(renderRequest.getDom().asResource());
+                } catch (JsonProcessingException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
                 for (RGridResource value : renderRequest.getResources().values()) {
                     this.debugResourceWriter.write(value);
                 }
