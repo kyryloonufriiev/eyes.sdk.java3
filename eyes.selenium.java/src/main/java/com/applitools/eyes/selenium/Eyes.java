@@ -152,7 +152,6 @@ public class Eyes implements ISeleniumConfigurationProvider {
     /**
      * If a test is running, aborts it. Otherwise, does nothing.
      */
-    @Deprecated
     public TestResults abortIfNotClosed() {
         return abort();
     }
