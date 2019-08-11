@@ -50,7 +50,7 @@ public class RGridResource {
         this.content = content.length > MAX_RESOURCE_SIZE ? Arrays.copyOf(contentType.getBytes(), MAX_RESOURCE_SIZE) : content;
         this.logger = logger;
         this.sha256 = GeneralUtils.getSha256hash(this.content);
-        this.url = GeneralUtils.sanitizeURL(url, logger);
+        this.url = url;
     }
 
     public String getContentType() {
