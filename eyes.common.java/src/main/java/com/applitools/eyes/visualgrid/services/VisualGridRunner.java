@@ -486,7 +486,7 @@ public class VisualGridRunner extends EyesRunner {
         }
 
         //Write all DomSnapshot data
-        debugResourceWriter.write(new RGridResource("THE_DOM_SNAPSHOT_RESULT", "DOM_SNAPSHOT", resultAsString.getBytes(), logger, ""));
+        debugResourceWriter.write(new RGridResource("http://THE_DOM_SNAPSHOT_RESULT.com", "DOM_SNAPSHOT", resultAsString.getBytes(), logger, ""));
 
         logger.verbose("releasing renderingTaskList");
         notifyAllServices();
