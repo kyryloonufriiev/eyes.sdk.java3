@@ -548,13 +548,24 @@ public class ServerConnector extends RestClient
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
         request.header("User-Agent", userAgent);
         Entity entity = null;
+        String applitoolsFileDebugResource = System.getenv("APPLITOOLS_FILE_DEBUG_RESOURCE");
+        if (applitoolsFileDebugResource != null) {
+            FileDebugResourceWriter debugWriter = new FileDebugResourceWriter(logger, applitoolsFileDebugResource, "ServerConnector.before", null);
+            debugWriter.write(resource);
+
+        }
         if (contentType != null) {
             entity = Entity.entity(content, contentType);
-
         }
         else{
             entity = Entity.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         }
+        if (applitoolsFileDebugResource != null) {
+            FileDebugResourceWriter debugWriter = new FileDebugResourceWriter(logger, applitoolsFileDebugResource, "ServerConnector.after", null);
+            debugWriter.write(new RGridResource(resource.getUrl(), resource.getContentType(),(byte[])entity.getEntity(), logger, ""));
+
+        }
+
         final Future<Response> future = request.async().put(entity);
         logger.verbose("future created.");
         PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger, userAgent);
