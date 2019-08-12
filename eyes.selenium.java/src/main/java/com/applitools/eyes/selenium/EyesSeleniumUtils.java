@@ -347,6 +347,24 @@ public class EyesSeleniumUtils {
     }
 
     /**
+     * Gets viewport size.
+     *
+     * @param executor The executor to use.
+     * @param logger logger
+     * @return The viewport size.
+     */
+    public static RectangleSize getViewportSize(
+            JavascriptExecutor executor, Logger logger) {
+        //noinspection unchecked
+        Object scriptResult = executor.executeScript(JS_GET_VIEWPORT_SIZE);
+        logger.verbose("scriptResult result = "+ scriptResult);
+        List<Long> vsAsList =
+                (List<Long>) scriptResult;
+        return new RectangleSize(vsAsList.get(0).intValue(),
+                vsAsList.get(1).intValue());
+    }
+
+    /**
      * Gets viewport size or display size.
      *
      * @param logger The logger to use.
@@ -454,7 +472,13 @@ public class EyesSeleniumUtils {
         logger.verbose("setViewportSize(" + size + ")");
 
         RectangleSize requiredSize = new RectangleSize(size.getWidth(), size.getHeight());
-        RectangleSize actualViewportSize = getViewportSize((JavascriptExecutor) driver);
+        RectangleSize actualViewportSize = null;
+        try {
+            actualViewportSize = getViewportSize((JavascriptExecutor) driver, logger);
+        } catch (Exception e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+            throw e;
+        }
         logger.verbose("Initial viewport size:" + actualViewportSize);
 
         // If the viewport size is already the required size
