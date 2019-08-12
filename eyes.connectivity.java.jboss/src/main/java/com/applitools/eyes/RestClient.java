@@ -310,7 +310,9 @@ public class RestClient {
                     statusCode,
                     statusPhrase,
                     data);
-
+            if(statusCode == 401 || statusCode == 403){
+                errorMessage += "This is most likely an invalid API key";
+            }
             throw new EyesException(errorMessage);
         }
 
