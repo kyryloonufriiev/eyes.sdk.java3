@@ -45,7 +45,9 @@ public class RunningTest {
 
     public Future<TestResultContainer> abort(Throwable e) {
         removeAllCheckTasks();
-        openTask.setException(e);
+        if (isOpenTaskIssued()) {
+            openTask.setException(e);
+        }
         if(closeTask != null && closeTask.getType() == VisualGridTask.TaskType.CLOSE){
             closeTask.setExceptionAndAbort(e);
         }
@@ -71,7 +73,7 @@ public class RunningTest {
     }
 
     public Future<TestResultContainer> abortIfNotClosed() {
-        if (isCloseTaskIssued.get()) return null;
+        if (isCloseTaskIssued.get() && closeTask.isSent()) return null;
         return abort(null);
     }
 
