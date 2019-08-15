@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class RestClient {
 
+    public static final int DEFAULT_MAX_PER_ROUTE = 50;
+
     /**
      * An interface used as base for anonymous classes wrapping Http Method
      * calls.
@@ -54,7 +56,7 @@ public class RestClient {
         cc.property(ClientProperties.CONNECT_TIMEOUT, timeout);
         cc.property(ClientProperties.READ_TIMEOUT, timeout);
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultMaxPerRoute(30);
+        connectionManager.setDefaultMaxPerRoute(DEFAULT_MAX_PER_ROUTE);
 
         // tell the config about the connection manager
         cc.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
