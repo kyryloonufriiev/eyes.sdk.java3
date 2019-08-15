@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class RestClient {
 
-    public static final int DEFAULT_MAX_PER_ROUTE = 50;
+    public static final int DEFAULT_MAX_PER_ROUTE = 250;
 
     /**
      * An interface used as base for anonymous classes wrapping Http Method
