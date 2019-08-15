@@ -3,6 +3,8 @@ package com.applitools.eyes;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -51,6 +53,11 @@ public class RestClient {
         ClientConfig cc = new ClientConfig();
         cc.property(ClientProperties.CONNECT_TIMEOUT, timeout);
         cc.property(ClientProperties.READ_TIMEOUT, timeout);
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setDefaultMaxPerRoute(30);
+
+        // tell the config about the connection manager
+        cc.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
         if (abstractProxySettings != null) {
             // URI is mandatory.
             cc = cc.property(ClientProperties.PROXY_URI,
