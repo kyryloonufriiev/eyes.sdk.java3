@@ -8,6 +8,10 @@ import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.codec.binary.Base64;
 
@@ -307,7 +311,9 @@ public class ServerConnector extends RestClient
             requestDos.writeInt(jsonBytes.length);
             requestDos.flush();
             requestOutputStream.write(jsonBytes);
-            requestOutputStream.write(screenshot);
+            if (screenshot != null) {
+                requestOutputStream.write(screenshot);
+            }
             requestOutputStream.flush();
 
             // Ok, get the model bytes
@@ -462,29 +468,48 @@ public class ServerConnector extends RestClient
     public List<RunningRender> render(RenderRequest... renderRequests) {
 
         ArgumentGuard.notNull(renderRequests, "renderRequests");
-        this.logger.verbose("called with " + renderRequests);
+        this.logger.verbose("called with " + Arrays.toString(renderRequests));
 
-        WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
+        WebTarget target = buildRestClient(30 * 1000, getProxy()).target(renderingInfo.getServiceUrl()).path((RENDER));
         if (renderRequests.length > 1) {
-            target.matrixParam("render-id", (Object[]) renderRequests);
+            target.matrixParam("render-id", (Object) renderRequests);
         } else {
-            target.queryParam("render-id", (Object[]) renderRequests);
+            target.queryParam("render-id", (Object) renderRequests);
         }
         Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
-
         // Ok, let's create the running session from the response
         List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(Response.Status.OK.getStatusCode());
         validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
 
-        Response response = request.head();
-        if (validStatusCodes.contains(response.getStatus())) {
-            this.logger.verbose("request succeeded");
-            return Arrays.asList(response.readEntity(RunningRender[].class));
+        Response response = null;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+            String json = objectMapper.writeValueAsString(renderRequests);
+            response = null;
+            try {
+                Entity<String> json1 = Entity.json(json);
+                response = request.post(json1);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            if (validStatusCodes.contains(response.getStatus())) {
+                RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
+                return Arrays.asList(runningRenders);
+            }
+            throw new EyesException("Jersey2 ServerConnector.render - unexpected status (" + response.getStatus() + "), msg (" + response.readEntity(String.class) + ")");
+        } catch (JsonProcessingException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
-        throw new EyesException("JBoss ServerConnector.render - unexpected status (" + response.getStatus() + ")");
+        return null;
     }
 
     @Override
@@ -526,55 +551,83 @@ public class ServerConnector extends RestClient
         String renderId = runningRender.getRenderId();
         logger.verbose("resource hash:" + hash + " ; url: " + resource.getUrl() + " ; render id: " + renderId);
 
-        WebTarget target = restClient.target(renderingInfo.getServiceUrl())
+        WebTarget target = buildRestClient(30 * 1000, getProxy()).target(renderingInfo.getServiceUrl())
                 .path(RESOURCES_SHA_256 + hash)
                 .queryParam("render-id", renderId);
 
         String contentType = resource.getContentType();
         Invocation.Builder request = target.request(contentType);
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
-        Entity entity = Entity.entity(content, contentType);
-        final Future<Response> future = request.async().put(entity);
-        return new PutFuture(future, resource, runningRender, this, logger, userAgent);
+        request.header("User-Agent", userAgent);
+        Entity entity = null;
+        if (contentType != null) {
+            entity = Entity.entity(content, contentType);
 
+        }
+        else{
+            entity = Entity.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        }
+        final Future<Response> future = request.async().put(entity);
+        logger.verbose("future created.");
+        PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger, userAgent);
+        return putFuture;
     }
+
 
     @Override
     public RenderStatusResults renderStatus(RunningRender runningRender) {
-        List<RenderStatusResults> renderStatusResults = renderStatusById(runningRender.getRenderId());
-        if (!renderStatusResults.isEmpty()) {
-            return renderStatusResults.get(0);
-        }
         return null;
     }
 
     @Override
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
 
-        ArgumentGuard.notNull(renderIds, "renderIds");
-        this.logger.verbose("called for render: " + renderIds);
+        Response response = null;
+        try {
+            ArgumentGuard.notNull(renderIds, "renderIds");
+            this.logger.verbose("called for render: " + Arrays.toString(renderIds));
 
-        WebTarget target = restClient.target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
-        if (renderIds.length > 1) {
-            target.matrixParam("render-id", (Object[]) renderIds);
-        } else {
-            target.queryParam("render-id", (Object[]) renderIds);
+            WebTarget target = buildRestClient(TIMEOUT, getProxy()).target(renderingInfo.getServiceUrl()).path((RENDER_STATUS));
+            Invocation.Builder request = target.request(MediaType.TEXT_PLAIN);
+            request.header("X-Auth-Token", renderingInfo.getAccessToken());
+
+            // Ok, let's create the running session from the response
+            List<Integer> validStatusCodes = new ArrayList<>();
+            validStatusCodes.add(Response.Status.OK.getStatusCode());
+            validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+            try {
+                String json = objectMapper.writeValueAsString(renderIds);
+                Entity<String> entity = Entity.entity(json, MediaType.APPLICATION_JSON);
+                response = request.post(entity);
+                if (validStatusCodes.contains(response.getStatus())) {
+                    this.logger.verbose("request succeeded");
+                    RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
+                    for (int i = 0; i < renderStatusResults.length; i++) {
+                        RenderStatusResults renderStatusResult = renderStatusResults[i];
+                        if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
+                            logger.verbose("error on render id - " + renderStatusResult);
+                        }
+                    }
+                    return Arrays.asList(renderStatusResults);
+                }
+            } catch (JsonProcessingException e) {
+                logger.log("exception in render status");
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
+            return null;
+        } catch (Exception e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
-        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON);
-        request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        return null;
 
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(Response.Status.OK.getStatusCode());
-        validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
-
-        Response response = request.head();
-        if (validStatusCodes.contains(response.getStatus())) {
-            this.logger.verbose("request succeeded");
-            return Arrays.asList(response.readEntity(RenderStatusResults[].class));
-        }
-
-        throw new EyesException("JBoss ServerConnector.renderStatusById - unexpected status (" + response.getStatus() + ")");
     }
 
     @Override
