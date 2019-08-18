@@ -1,6 +1,5 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.TestUtils;
@@ -20,7 +19,6 @@ import java.net.URL;
 public class MobileNativeTests {
 
     private String appiumServerUrl = "http://ondemand.saucelabs.com/wd/hub";
-    private static BatchInfo batchInfo = new BatchInfo("Mobile Native Tests");
 
     private void setCapabilities(Eyes eyes, DesiredCapabilities capabilities, String methodName) {
         capabilities.setCapability("username", System.getenv("SAUCE_USERNAME"));
@@ -33,7 +31,7 @@ public class MobileNativeTests {
         String testName = Thread.currentThread().getStackTrace()[2].getMethodName();
         TestUtils.setupLogging(eyes, testName);
         setCapabilities(eyes, capabilities, testName);
-        eyes.setBatch(batchInfo);
+        eyes.setBatch(TestsDataProvider.batchInfo);
         return eyes;
     }
 
@@ -79,7 +77,6 @@ public class MobileNativeTests {
         capabilities.setCapability("appActivity", "com.applitoolstest.ScrollActivity");
         capabilities.setCapability("newCommandTimeout", 600);
 
-
         Eyes eyes = initEyes(capabilities);
 
         AndroidDriver<AndroidElement> driver = new AndroidDriver<>(new URL(appiumServerUrl), capabilities);
@@ -114,7 +111,8 @@ public class MobileNativeTests {
 
         Eyes eyes = new Eyes();
         setCapabilities(eyes, caps, "iOSNativeAppTest");
-        eyes.setLogHandler(new StdoutLogHandler());
+        TestUtils.setupLogging(eyes);
+        eyes.setBatch(TestsDataProvider.batchInfo);
 
         WebDriver driver = new IOSDriver(new URL(appiumServerUrl), caps);
 

@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.FileDebugResourceWriter;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
@@ -19,24 +20,17 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 public final class TestRenderingGridService {
 
     private VisualGridRunner renderingManager;
     private WebDriver webDriver;
 
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-
     @BeforeMethod
-    public void Before(ITestContext testContext){
+    public void Before(ITestContext testContext) {
         renderingManager = new VisualGridRunner(3);
         renderingManager.setLogHandler(new StdoutLogHandler(true));
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-        String path = logsPath + File.separator + "java" + File.separator + "TestRenderingGridService" + dateFormat.format(Calendar.getInstance().getTime());
+        String path = TestUtils.initLogPath("TestRenderingGridService");
         FileDebugResourceWriter fileDebugResourceWriter = new FileDebugResourceWriter(renderingManager.getLogger(), path, null, null);
         renderingManager.setDebugResourceWriter(fileDebugResourceWriter);
 

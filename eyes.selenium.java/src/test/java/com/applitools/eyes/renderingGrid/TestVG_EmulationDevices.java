@@ -6,6 +6,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -15,9 +16,6 @@ import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 public class TestVG_EmulationDevices {
     private static final BrowserType CHROME = BrowserType.CHROME;
     private static final BrowserType FIREFOX = BrowserType.FIREFOX;
@@ -26,13 +24,13 @@ public class TestVG_EmulationDevices {
     private EyesRunner visualGridRunner;
 
     private BatchInfo batchInfo;
-    private FileLogger logHandler;
+    private LogHandler logHandler;
 
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
 //        visualGridRunner.setLogHandler(new StdoutLogHandler(true));
-        logHandler = new FileLogger("eyes3.log", false, true);
+        logHandler = TestUtils.initLogger("TestVG_EmulationDevices");
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");
         batchInfo = new BatchInfo("hello world batch");

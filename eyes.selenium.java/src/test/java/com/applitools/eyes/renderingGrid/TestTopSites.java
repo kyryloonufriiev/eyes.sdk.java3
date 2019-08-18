@@ -7,28 +7,21 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 public class TestTopSites {
+    public static BatchInfo batch = new BatchInfo("TTS - config batch");
     private EyesRunner visualGridRunner;
-
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    private String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
 
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
-//        visualGridRunner.setLogHandler(new StdoutLogHandler(true));
-        FileLogger logHandler = new FileLogger("eyes.log", false, true);
+        LogHandler logHandler = TestUtils.initLogger("TestTopSites");
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");
     }
@@ -52,7 +45,7 @@ public class TestTopSites {
         eyes.setBatch(batchInfo);
         eyes.setEnvName("TTS - migel");
         eyes.setMatchLevel(MatchLevel.LAYOUT);
-        initLogging(testedUrl, eyes);
+        TestUtils.setupLogging(eyes, testedUrl);
 
         Logger logger = eyes.getLogger();
         logger.log("creating WebDriver: " + testedUrl);
@@ -61,7 +54,7 @@ public class TestTopSites {
             Configuration configuration = new Configuration();
             configuration.setTestName("Top 10 websites - " + testedUrl);
             configuration.setAppName("Top Ten Sites");
-            configuration.setBatch(new BatchInfo("TTS - config batch"));
+            configuration.setBatch(TestTopSites.batch);
             configuration.setBranchName("TTS - config branch");
             configuration.setIgnoreDisplacements(true);
             configuration.addBrowser(800, 600, BrowserType.CHROME);
@@ -114,16 +107,6 @@ public class TestTopSites {
             logger.log("url " + testedUrl + " - done with browser.");
             // End the test.
         }
-    }
-
-    private void initLogging(String testedUrl, Eyes eyes) {
-        String testName = testedUrl.substring(8);
-        String path = logsPath + File.separator + "java" + File.separator + "TestTopSites_" + dateTimeString;
-//        FileDebugResourceWriter fileDebugResourceWriter = new FileDebugResourceWriter(visualGridRunner.getLogger(), path, null, null);
-//        VisualGridEyes.setDebugResourceWriter(fileDebugResourceWriter);
-
-//        FileLogger eyesLogger = new FileLogger("TopTenSites.log", true, true);
-//        eyes.setLogHandler(eyesLogger);
     }
 
     @AfterMethod

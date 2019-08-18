@@ -2,6 +2,7 @@ package com.applitools.eyes.utils;
 
 import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.LogHandler;
+import com.applitools.eyes.NullLogHandler;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.Eyes;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -21,16 +22,39 @@ public class TestUtils {
     public final static String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
     public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
 
-    public static void setupLogging(Eyes eyes){
+    public static String initLogPath() {
+        return initLogPath(Thread.currentThread().getStackTrace()[2].getMethodName());
+    }
+
+    public static String initLogPath(String methodName) {
+        String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
+        return logsPath + File.separator + "java" + File.separator + methodName + dateTimeString;
+    }
+
+    public static LogHandler initLogger() {
+        return initLogger(Thread.currentThread().getStackTrace()[2].getMethodName());
+    }
+
+    public static LogHandler initLogger(String methodName) {
+        LogHandler logHandler;
+        if (!TestUtils.runOnCI && logsPath != null) {
+            String path = initLogPath(methodName);
+            logHandler = new FileLogger(path + File.separator + "log.log", false, true);
+        } else {
+            logHandler = new StdoutLogHandler(true);
+        }
+        return logHandler;
+    }
+
+    public static void setupLogging(Eyes eyes) {
         setupLogging(eyes, Thread.currentThread().getStackTrace()[2].getMethodName());
     }
 
     public static void setupLogging(Eyes eyes, String methodName) {
         LogHandler logHandler;
         if (!TestUtils.runOnCI && logsPath != null) {
-            String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
-            String path = logsPath + File.separator + "java" + File.separator + methodName + "_" + dateTimeString;
-            logHandler = new FileLogger(path + File.separator + methodName + ".log", true, true);
+            String path = initLogPath(methodName);
+            logHandler = new FileLogger(path + File.separator + methodName + ".log", false, true);
             eyes.setDebugScreenshotsPath(path);
             eyes.setDebugScreenshotsPrefix(methodName + "_");
             eyes.setSaveDebugScreenshots(true);
@@ -90,4 +114,5 @@ public class TestUtils {
             permutation.remove(permutation.size() - 1);
         }
     }
+
 }

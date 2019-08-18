@@ -6,6 +6,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
@@ -18,8 +19,7 @@ public class TestSVGSites {
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
-        FileLogger logHandler = new FileLogger("SVGs.log", false, true);
-        visualGridRunner.setLogHandler(logHandler);
+        visualGridRunner.setLogHandler(TestUtils.initLogger("SVGs.log"));
         visualGridRunner.getLogger().log("enter");
     }
 

@@ -20,16 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 public class IOSTest {
 
-    private static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
-
-    @BeforeClass
-    public static void classSetup() {
-        String batchId = System.getenv("APPLITOOLS_BATCH_ID");
-        if (batchId != null) {
-            batchInfo.setId(batchId);
-        }
-    }
-
     @DataProvider(parallel = true)
     public static Object[][] data() {
 //        Object[][] iPhoneXPermutations = TestUtils.generatePermutations(
@@ -96,7 +86,7 @@ public class IOSTest {
         Eyes eyes = new Eyes();
         eyes.setServerConnector(new ServerConnector());
 
-        eyes.setBatch(batchInfo);
+        eyes.setBatch(TestsDataProvider.batchInfo);
 
         DesiredCapabilities caps = DesiredCapabilities.iphone();
 

@@ -15,6 +15,7 @@ public class TestSeleniumEyesWithNullRunner {
     @BeforeClass
     public void beforeClass(){
         eyes = new Eyes(null);
+        eyes.setBatch(TestsDataProvider.batchInfo);
         driver = SeleniumUtils.createChromeDriver();
         driver.get(testedPageUrl);
     }
@@ -27,20 +28,18 @@ public class TestSeleniumEyesWithNullRunner {
     @Test
     public void testCloseTrue(){
         close = eyes.close(true);
-
     }
 
     @Test
     public void testCloseFalse(){
         close = eyes.close(false);
-
     }
 
     @Test
     public void testClose(){
         close = eyes.close();
-
     }
+
     @AfterMethod
     public void afterMethod(){
         System.out.println(close);
