@@ -373,11 +373,11 @@ public class VisualGridRunner extends EyesRunner {
     private void startServices() {
         logger.verbose("enter");
         setServicesOn(true);
+        this.servicesGroup.setDaemon(true);
         this.eyesOpenerService.start();
         this.eyesCloserService.start();
         this.renderingGridService.start();
         this.eyesCheckerService.start();
-        this.servicesGroup.setDaemon(false);
         logger.verbose("exit");
     }
 
