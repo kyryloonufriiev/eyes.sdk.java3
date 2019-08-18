@@ -4,10 +4,10 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.eyes.triggers.MouseAction;
+import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -53,7 +53,7 @@ public class SeleniumEyesCompileTest {
 
         eyes.setIsDisabled(true);
 
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
 
         eyes.setConfiguration( new Configuration(new RectangleSize(100, 100)));
         driver = eyes.open(webDriver);

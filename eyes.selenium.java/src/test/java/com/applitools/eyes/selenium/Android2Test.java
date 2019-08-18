@@ -4,6 +4,7 @@ import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.TestUtils;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.MutableCapabilities;
@@ -78,7 +79,7 @@ public class Android2Test {
             testName += " fully";
         }
 
-        if (!TestsDataProvider.runOnCI) {
+        if (!TestUtils.runOnCI) {
             //String logFilename = String.format("c:\\temp\\logs\\iostest_%s.log", testName);
             //eyes.setLogHandler(new FileLogger(logFilename, false, true));
             //eyes.setImageCut(new FixedCutProvider(30, 12, 8, 5));

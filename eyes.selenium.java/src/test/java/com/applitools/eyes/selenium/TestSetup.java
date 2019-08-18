@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -32,8 +33,6 @@ public abstract class TestSetup implements ITest {
     //protected RectangleSize testedPageSize = new RectangleSize(1200, 800);
     protected RectangleSize testedPageSize = new RectangleSize(700, 460);
 
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-
     protected Capabilities caps;
     private DesiredCapabilities desiredCaps = new DesiredCapabilities();
 
@@ -52,7 +51,7 @@ public abstract class TestSetup implements ITest {
 
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
-        if (TestsDataProvider.runOnCI && System.getenv("TRAVIS") != null) {
+        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
             System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         }
         // Initialize the seleniumEyes SDK and set your private API key.
@@ -170,8 +169,8 @@ public abstract class TestSetup implements ITest {
 
         LogHandler logHandler;
 
-        if (!TestsDataProvider.runOnCI && logsPath != null) {
-            String path = logsPath + File.separator + "java" + File.separator + extendedTestName.replaceAll("\\s", "_");
+        if (!TestUtils.runOnCI && TestUtils.logsPath != null) {
+            String path = TestUtils.logsPath + File.separator + "java" + File.separator + extendedTestName.replaceAll("\\s", "_");
             logHandler = new FileLogger(path + File.separator + testName + "_" + platform + ".log", true, true);
             seleniumEyes.setDebugScreenshotsPath(path);
             seleniumEyes.setDebugScreenshotsPrefix(testName + "_");

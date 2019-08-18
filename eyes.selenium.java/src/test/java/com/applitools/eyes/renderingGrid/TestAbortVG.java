@@ -1,5 +1,6 @@
 package com.applitools.eyes.renderingGrid;
 
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.TestResultContainer;
@@ -17,7 +18,7 @@ public class TestAbortVG {
     @Test
     public void test() {
         eyes = new Eyes(runner);
-        ChromeDriver driver = new ChromeDriver();
+        ChromeDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("http://google.com");
         eyes.open(driver, "Java SDK", "Test Abort");
         eyes.checkWindow();

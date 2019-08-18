@@ -5,12 +5,10 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.TestResultContainer;
-import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
@@ -65,7 +63,7 @@ public class TestSVGSites {
     @Test(dataProvider = "dp")
     public void test(String testedUrl) {
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(testedUrl);
         Eyes eyes = initEyes(webDriver, testedUrl);
         Logger logger = eyes.getLogger();

@@ -7,6 +7,7 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
@@ -25,7 +26,7 @@ public class SerialTest {
         eyes.setBatch(batchInfo);
         Logger logger = eyes.getLogger();
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(testedUrl);
         try {
             Configuration configuration = new Configuration();

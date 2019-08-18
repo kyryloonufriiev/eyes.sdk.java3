@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.BatchInfo;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -16,8 +17,6 @@ import java.util.List;
 public class TestsDataProvider {
     public final static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
 
-    public final static boolean runOnCI = System.getenv("CI") != null;
-    public final static boolean runHeadless = runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_RUN_HEADLESS"));
 
     @DataProvider(parallel = true)
     public static Object[][] dp() {
@@ -31,7 +30,7 @@ public class TestsDataProvider {
 
         SafariOptions safariOptions = new SafariOptions();
 
-        if (runHeadless) {
+        if (TestUtils.runHeadless) {
             chromeOptions.setHeadless(true);
             firefoxOptions.setHeadless(true);
         }

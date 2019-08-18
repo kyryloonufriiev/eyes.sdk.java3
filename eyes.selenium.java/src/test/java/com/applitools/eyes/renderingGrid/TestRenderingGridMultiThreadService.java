@@ -8,11 +8,11 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -29,7 +29,7 @@ public final class TestRenderingGridMultiThreadService {
         renderingManager = new VisualGridRunner(1);
         renderingManager.setLogHandler(new StdoutLogHandler(true));
 
-        webDriver = new ChromeDriver();
+        webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage");
         //webDriver.get("http://applitools-vg-test.surge.sh/test.html");
 

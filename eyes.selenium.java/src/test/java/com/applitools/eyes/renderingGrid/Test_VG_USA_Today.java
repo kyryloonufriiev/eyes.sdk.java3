@@ -6,6 +6,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
@@ -63,7 +64,7 @@ public class Test_VG_USA_Today {
         initLogging(testedUrl, eyes);
 
         eyes.getLogger().log("creating WebDriver: " + testedUrl);
-        WebDriver webDriver = new ChromeDriver(); //Change to headless mode
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         eyes.getLogger().log("navigating to " + testedUrl);
         webDriver.get(testedUrl);
 

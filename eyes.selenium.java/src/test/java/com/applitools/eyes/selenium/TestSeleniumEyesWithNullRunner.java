@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.TestResults;
-import org.openqa.selenium.WebDriver;
+import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.*;
 
@@ -15,7 +15,7 @@ public class TestSeleniumEyesWithNullRunner {
     @BeforeClass
     public void beforeClass(){
         eyes = new Eyes(null);
-        driver = new ChromeDriver();
+        driver = SeleniumUtils.createChromeDriver();
         driver.get(testedPageUrl);
     }
     @BeforeMethod

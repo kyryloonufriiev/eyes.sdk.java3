@@ -5,14 +5,12 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
-import com.applitools.eyes.TestResultsSummary;
-import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
@@ -27,9 +25,6 @@ public class TestVG_EmulationDevices {
     private static final ScreenOrientation PORTRAIT = ScreenOrientation.PORTRAIT;
     private EyesRunner visualGridRunner;
 
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    private String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
     private BatchInfo batchInfo;
     private FileLogger logHandler;
 
@@ -92,7 +87,7 @@ public class TestVG_EmulationDevices {
     @Test(dataProvider = "dp")
     public void test(String testedUrl) {
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(testedUrl);
         Eyes eyes = (Eyes) initEyes(webDriver, testedUrl);
         Logger logger = eyes.getLogger();

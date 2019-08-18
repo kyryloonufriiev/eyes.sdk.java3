@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -72,7 +73,7 @@ public class AndroidTest {
             testName += " fully";
         }
 
-        if (!TestsDataProvider.runOnCI) {
+        if (!TestUtils.runOnCI) {
             //String logFilename = String.format("c:\\temp\\logs\\iostest_%s.log", testName);
             //VisualGridEyes.setLogHandler(new FileLogger(logFilename, false, true));
             //VisualGridEyes.setImageCut(new FixedCutProvider(30, 12, 8, 5));
