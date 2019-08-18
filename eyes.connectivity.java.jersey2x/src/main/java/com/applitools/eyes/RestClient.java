@@ -23,7 +23,8 @@ import java.util.List;
  */
 public class RestClient {
 
-    public static final int DEFAULT_MAX_PER_ROUTE = 250;
+    private static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = 20;
+    private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 100;
 
     /**
      * An interface used as base for anonymous classes wrapping Http Method
@@ -56,7 +57,8 @@ public class RestClient {
         cc.property(ClientProperties.CONNECT_TIMEOUT, timeout);
         cc.property(ClientProperties.READ_TIMEOUT, timeout);
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultMaxPerRoute(DEFAULT_MAX_PER_ROUTE);
+        connectionManager.setDefaultMaxPerRoute(DEFAULT_MAX_CONNECTIONS_PER_ROUTE);
+        connectionManager.setMaxTotal(DEFAULT_MAX_TOTAL_CONNECTIONS);
 
         // tell the config about the connection manager
         cc.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
