@@ -21,7 +21,8 @@ public class TestsDataProvider {
     @DataProvider(parallel = true)
     public static Object[][] dp() {
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("disable-infobars");
+        String platformName = System.getenv("APPLITOOLS_TEST_PLATFORM");
+        chromeOptions.setCapability(CapabilityType.PLATFORM_NAME, platformName == null ? "Any" : platformName);
 
         FirefoxOptions firefoxOptions = new FirefoxOptions();
 
@@ -49,21 +50,24 @@ public class TestsDataProvider {
 //                ie11Options,
 //                safariOptions
         }));
-        lists.add(Arrays.asList(platforms));
+        //lists.add(Arrays.asList(platforms));
+        lists.add(Arrays.asList(new Object[]{
+                "CSS", "SCROLL", "VG"
+        }));
 
         List<Object[]> permutations = TestUtils.generatePermutationsList(lists);
-        int i = 0;
-        while (permutations.size() > 0 && i < permutations.size()) {
-            Object[] perm = permutations.get(i);
-            String browser = ((Capabilities) perm[0]).getBrowserName().toUpperCase().trim();
-            String platform = ((String) perm[1]).toUpperCase().trim();
-            if ((platform.startsWith("WIN") && browser.equals("SAFARI")) ||
-                    (platform.startsWith("MAC") && browser.equals("INTERNET EXPLORER"))) {
-                permutations.remove(i);
-            } else {
-                i++;
-            }
-        }
+//        int i = 0;
+//        while (permutations.size() > 0 && i < permutations.size()) {
+//            Object[] perm = permutations.get(i);
+//            String browser = ((Capabilities) perm[0]).getBrowserName().toUpperCase().trim();
+//            String platform = ((String) perm[1]).toUpperCase().trim();
+//            if ((platform.startsWith("WIN") && browser.equals("SAFARI")) ||
+//                    (platform.startsWith("MAC") && browser.equals("INTERNET EXPLORER"))) {
+//                permutations.remove(i);
+//            } else {
+//                i++;
+//            }
+//        }
 
         return permutations.toArray(new Object[0][]);
     }

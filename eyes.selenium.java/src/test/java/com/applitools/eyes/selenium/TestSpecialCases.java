@@ -11,12 +11,8 @@ import org.testng.annotations.*;
 public class TestSpecialCases extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestSpecialCases(Capabilities caps, String platform) {
-        super.caps = caps;
-        super.platform = platform;
-        super.forceFPS = false;
-
-        testSuitName = "SeleniumEyes Selenium SDK - Special Cases";
+    public TestSpecialCases(Capabilities caps, String mode) {
+        super("SeleniumEyes Selenium SDK - Special Cases", caps, mode);
         testedPageUrl = "http://applitools.github.io/demo/TestPages/WixLikeTestPage/index.html";
     }
 
@@ -26,11 +22,11 @@ public class TestSpecialCases extends TestSetup {
     }
 
     @Test
-    public void TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame(){
-        driver.switchTo().frame("frame1");
+    public void TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame() {
+        getDriver().switchTo().frame("frame1");
 
-        WebElement element = driver.findElement(By.cssSelector("img"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+        WebElement element = getDriver().findElement(By.cssSelector("img"));
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
 
         getEyes().check("", Target.region(By.cssSelector("img")));
     }

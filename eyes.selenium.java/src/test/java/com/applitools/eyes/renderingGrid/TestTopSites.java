@@ -14,6 +14,9 @@ import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class TestTopSites {
     public static BatchInfo batch = new BatchInfo("TTS - config batch");
     private EyesRunner visualGridRunner;
@@ -45,9 +48,16 @@ public class TestTopSites {
         eyes.setBatch(batchInfo);
         eyes.setEnvName("TTS - migel");
         eyes.setMatchLevel(MatchLevel.LAYOUT);
-        TestUtils.setupLogging(eyes, testedUrl);
 
         Logger logger = eyes.getLogger();
+
+        try {
+            URL url = new URL(testedUrl);
+            TestUtils.setupLogging(eyes, url.getHost());
+        } catch (MalformedURLException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+
         logger.log("creating WebDriver: " + testedUrl);
 
         try {

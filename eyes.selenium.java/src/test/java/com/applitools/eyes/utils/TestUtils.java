@@ -28,7 +28,7 @@ public class TestUtils {
 
     public static String initLogPath(String methodName) {
         String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
-        return logsPath + File.separator + "java" + File.separator + methodName + dateTimeString;
+        return logsPath + File.separator + "java" + File.separator + methodName + "_" + dateTimeString;
     }
 
     public static LogHandler initLogger() {
