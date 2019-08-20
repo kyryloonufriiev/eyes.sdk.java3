@@ -36,7 +36,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      */
     @Override
     public String getBaseAgentId() {
-        return "eyes.images.java/3.157.3";
+        return "eyes.images.java/3.157.6";
     }
 
     @Override
