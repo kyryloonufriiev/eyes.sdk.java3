@@ -12,7 +12,7 @@ public class TestSpecialCases extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
     public TestSpecialCases(Capabilities caps, String mode) {
-        super("SeleniumEyes Selenium SDK - Special Cases", caps, mode);
+        super("Eyes Selenium SDK - Special Cases", caps, mode);
         testedPageUrl = "http://applitools.github.io/demo/TestPages/WixLikeTestPage/index.html";
     }
 

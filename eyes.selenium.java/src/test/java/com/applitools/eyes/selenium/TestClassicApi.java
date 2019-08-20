@@ -14,7 +14,7 @@ public class TestClassicApi extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
     public TestClassicApi(Capabilities caps, String mode) {
-        super("SeleniumEyes Selenium SDK - Classic API", caps, mode);
+        super("Eyes Selenium SDK - Classic API", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
     }
 

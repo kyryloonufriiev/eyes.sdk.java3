@@ -12,7 +12,7 @@ public class TestScrollRootElement extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
     public TestScrollRootElement(Capabilities caps, String mode) {
-        super("SeleniumEyes Selenium SDK - Scroll Root Element", caps, mode);
+        super("Eyes Selenium SDK - Scroll Root Element", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/SimpleTestPage/scrollablebody.html";
     }
 

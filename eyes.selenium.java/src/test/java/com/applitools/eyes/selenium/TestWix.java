@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 public class TestWix extends TestSetup {
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
     public TestWix(Capabilities caps, String mode) {
-        super("SeleniumEyes Selenium SDK - Test Wix", caps, mode);
+        super("Eyes Selenium SDK - Test Wix", caps, mode);
         testedPageUrl = "https://eventstest.wixsite.com/events-page-e2e/events/ba837913-7dad-41b9-b530-6c2cbfc4c265";
     }
 

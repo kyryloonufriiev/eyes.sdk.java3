@@ -69,7 +69,7 @@ public class AndroidTest {
 
         try {
             driver.get("https://www.applitools.com/customers");
-            eyes.open(driver, "SeleniumEyes Selenium SDK - Android Chrome Cropping", testName);
+            eyes.open(driver, "Eyes Selenium SDK - Android Chrome Cropping", testName);
             eyes.check("Initial view", Target.region(By.cssSelector("body")).fully(fully));
             eyes.close();
         } finally {
