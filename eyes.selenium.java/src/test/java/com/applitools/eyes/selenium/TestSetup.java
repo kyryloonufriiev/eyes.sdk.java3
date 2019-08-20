@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class TestSetup implements ITest {
 
     private static String testNameSuffix = System.getenv("TEST_NAME_SUFFIX");
+    private final String mode;
 
     private boolean useVisualGrid = false;
     StitchMode stitchMode = StitchMode.SCROLL;
@@ -30,6 +31,7 @@ public abstract class TestSetup implements ITest {
         if (testNameSuffix == null) testNameSuffix = "";
         this.testSuitName = testSuitName + testNameSuffix;
         this.options = options;
+        this.mode = mode;
         switch (mode) {
             case "VG":
                 this.useVisualGrid = true;
@@ -146,7 +148,7 @@ public abstract class TestSetup implements ITest {
 
     void beforeMethod(String testName) {
         // Initialize the eyes SDK and set your private API key.
-        this.testName = testName + " " + options.getBrowserName() + " " + platform;
+        this.testName = testName + " " + options.getBrowserName() + " (" + this.mode + ")";
         Eyes eyes = initEyes();
         SpecificTestContextRequirements testData = new SpecificTestContextRequirements(eyes);
         testDataByTestId.put("testId", testData);
@@ -209,7 +211,9 @@ public abstract class TestSetup implements ITest {
         eyes.setStitchMode(this.stitchMode);
         eyes.setSaveNewTests(false);
         eyes.setBatch(TestsDataProvider.batchInfo);
-
+        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
+            eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
+        }
         return eyes;
     }
 
