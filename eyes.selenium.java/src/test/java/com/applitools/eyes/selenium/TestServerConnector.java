@@ -5,9 +5,9 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.ServerConnector;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import org.testng.annotations.Test;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 public class TestServerConnector {
 
@@ -15,7 +15,7 @@ public class TestServerConnector {
     public void TestDelete() {
         Eyes eyes = new Eyes();
         eyes.setServerConnector(new ServerConnector(eyes.getLogger(), EyesBase.getDefaultServerUrl()));
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         try {
             WebDriver driver = eyes.open(webDriver,
                     TestServerConnector.class.getSimpleName(),

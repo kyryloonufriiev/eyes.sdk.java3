@@ -4,25 +4,20 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.TestsDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class TestMissingContentSites {
     private VisualGridRunner visualGridRunner;
-
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    private String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
 
     @BeforeClass
     public void beforeClass() {
@@ -55,7 +50,7 @@ public class TestMissingContentSites {
             Configuration configuration = new Configuration();
             configuration.setTestName(testedUrl);
             configuration.setAppName("Java SDK");
-            configuration.setBatch(new BatchInfo("Missing content Issue"));
+            configuration.setBatch(TestsDataProvider.batchInfo);
             configuration.addBrowser(1200, 800, BrowserType.CHROME);
             configuration.addBrowser(1200, 800, BrowserType.EDGE);
 //            configuration.addDeviceEmulation(emulation);
@@ -73,9 +68,9 @@ public class TestMissingContentSites {
     @Test(dataProvider = "dp")
     public void test(String testedUrl) {
         visualGridRunner.getLogger().log("entering with url " + testedUrl);
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(testedUrl);
-        Eyes eyes = (Eyes) initEyes(webDriver, testedUrl);
+        Eyes eyes = initEyes(webDriver, testedUrl);
         Logger logger = eyes.getLogger();
         logger.log("navigated to " + testedUrl);
 

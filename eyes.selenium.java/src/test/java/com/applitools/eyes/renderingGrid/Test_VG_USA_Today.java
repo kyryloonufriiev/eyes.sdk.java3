@@ -6,6 +6,8 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.By;
@@ -22,9 +24,6 @@ import java.util.Calendar;
 public class Test_VG_USA_Today {
     private VisualGridRunner renderingManager;
 
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
-    private String dateTimeString = dateFormat.format(Calendar.getInstance().getTime());
     private String defaultServerUrl = "https://eyes.applitools.com";
     private String defaultApiKey = System.getenv("APPLITOOLS_API_KEY");
     private String fabricDemoServerUrl = "https://fabricdemoeyes.applitools.com";
@@ -58,12 +57,9 @@ public class Test_VG_USA_Today {
         eyes.setBatch(batch);
         eyes.setMatchLevel(MatchLevel.STRICT);
         eyes.setServerUrl(defaultServerUrl);
-//        VisualGridEyes.setApiKey("2wDc2MarTPsvSJoJ98vT46iPQrT9H110XHY6mvt4dAb9mU110");
-
-        initLogging(testedUrl, eyes);
 
         eyes.getLogger().log("creating WebDriver: " + testedUrl);
-        WebDriver webDriver = new ChromeDriver(); //Change to headless mode
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         eyes.getLogger().log("navigating to " + testedUrl);
         webDriver.get(testedUrl);
 
@@ -104,12 +100,6 @@ public class Test_VG_USA_Today {
             eyes.getLogger().log("closing WebDriver for url " + testedUrl);
             webDriver.quit();
         }
-    }
-
-    private void initLogging(String testedUrl, Eyes eyes) {
-        String testName = testedUrl.substring(8);
-        String path = logsPath + File.separator + "java" + File.separator + "TestTopSites_" + dateTimeString;
-
     }
 
     @AfterMethod

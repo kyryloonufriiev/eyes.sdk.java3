@@ -4,14 +4,14 @@ import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 public final class TestDomCapture {
     public static void main(String[] args) throws Exception {
 
         // Open a Chrome browser.
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver = SeleniumUtils.createChromeDriver();
 
         // Initialize the VisualGridEyes SDK and set your private API key.
         Eyes eyes = new Eyes();

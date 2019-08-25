@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -18,17 +19,6 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 public class IOSTest {
-
-    private static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
-
-    @BeforeClass
-    public static void classSetup() {
-        String batchId = System.getenv("APPLITOOLS_BATCH_ID");
-        if (batchId != null) {
-            batchInfo.setId(batchId);
-        }
-    }
 
     @DataProvider(parallel = true)
     public static Object[][] data() {
@@ -96,7 +86,7 @@ public class IOSTest {
         Eyes eyes = new Eyes();
         eyes.setServerConnector(new ServerConnector());
 
-        eyes.setBatch(batchInfo);
+        eyes.setBatch(TestsDataProvider.batchInfo);
 
         DesiredCapabilities caps = DesiredCapabilities.iphone();
 
@@ -121,9 +111,9 @@ public class IOSTest {
         WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 
-        if (!TestsDataProvider.runOnCI) {
+        if (!TestUtils.runOnCI) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss_SSS");
-            String logPath = logsPath + File.separator + "java" + File.separator + String.format("IOSTest %s %s", testName, dateFormat.format(Calendar.getInstance().getTime()));
+            String logPath = TestUtils.logsPath + File.separator + "java" + File.separator + String.format("IOSTest %s %s", testName, dateFormat.format(Calendar.getInstance().getTime()));
             String logFilename = logPath + File.separator + "log.log";
             eyes.setLogHandler(new FileLogger(logFilename, false, true));
             eyes.setSaveDebugScreenshots(true);
@@ -139,7 +129,7 @@ public class IOSTest {
 
         try {
             driver.get("https://www.applitools.com/customers");
-            eyes.open(driver, "SeleniumEyes Selenium SDK - iOS Safari Cropping", testName);
+            eyes.open(driver, "Eyes Selenium SDK - iOS Safari Cropping", testName);
             eyes.check("Initial view", Target.region(By.cssSelector("body")).fully(fully));
             eyes.close();
         } finally {

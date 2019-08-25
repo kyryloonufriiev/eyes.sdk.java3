@@ -32,12 +32,14 @@ public class RenderingGridService extends Thread {
     RenderingGridService(String serviceName, ThreadGroup servicesGroup, Logger logger, int threadPoolSize, Object debugLock, RGServiceListener listener, Object concurrencyLock) {
         super(servicesGroup, serviceName);
         maximumPoolSize = threadPoolSize * FACTOR;
-        this.executor = new ThreadPoolExecutor(threadPoolSize, maximumPoolSize, 1, TimeUnit.DAYS, new ArrayBlockingQueue<Runnable>(20));
+        this.executor = new ThreadPoolExecutor(threadPoolSize, maximumPoolSize, 1, TimeUnit.DAYS,
+                new ArrayBlockingQueue<Runnable>(20), new EyesService.LocalThreadFactory(serviceName));
         this.debugLock = debugLock;
         this.listener = listener;
         this.logger = logger;
         this.isPaused = debugLock != null;
         this.concurrencyLock = concurrencyLock;
+        this.setDaemon(true);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class RenderingGridService extends Thread {
             }
             logger.verbose("Service '" + this.getName() + "' is finished");
         } catch (Throwable e) {
-            logger.verbose("Rendering Service Error : "+e);
+            logger.verbose("Rendering Service Error : " + e);
         }
     }
 
@@ -89,23 +91,22 @@ public class RenderingGridService extends Thread {
                     this.executor.submit(task);
                 } catch (Exception e) {
                     logger.verbose("Exception in - this.executor.submit(task); ");
-                    if(e.getMessage().contains("Read timed out")){
+                    if (e.getMessage().contains("Read timed out")) {
                         logger.verbose("Read timed out");
                     }
                     e.printStackTrace();
                     GeneralUtils.logExceptionStackTrace(logger, e);
                 }
             }
-        }
-        else{
+        } else {
             logger.verbose("trying to sync lock");
-            synchronized (concurrencyLock){
+            synchronized (concurrencyLock) {
                 try {
                     logger.verbose("Waiting for concurrency to be free");
                     concurrencyLock.wait();
                     logger.verbose("concurrency free");
                 } catch (InterruptedException e) {
-                    GeneralUtils.logExceptionStackTrace(logger ,e);
+                    GeneralUtils.logExceptionStackTrace(logger, e);
                 }
             }
             logger.verbose("releasing lock");
@@ -131,7 +132,7 @@ public class RenderingGridService extends Thread {
     }
 
     public void debugPauseService() {
-      this.isPaused = true;
+        this.isPaused = true;
     }
 
     public void stopService() {

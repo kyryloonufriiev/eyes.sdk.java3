@@ -16,13 +16,8 @@ import java.util.List;
 public class TestFluentApi_Frames extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestFluentApi_Frames(Capabilities caps, String platform) {
-        super.caps = caps;
-        super.platform = platform;
-        super.forceFPS = false;
-
-        super.compareExpectedRegions = caps.getBrowserName().equalsIgnoreCase("chrome");
-        testSuitName = "Eyes Selenium SDK - Fluent API";
+    public TestFluentApi_Frames(Capabilities caps, String mode) {
+        super("Eyes Selenium SDK - Fluent API", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
     }
 
@@ -126,10 +121,10 @@ public class TestFluentApi_Frames extends TestSetup {
         Eyes eyes = getEyes();
         StitchMode originalStitchMode = eyes.getStitchMode();
         eyes.setStitchMode(StitchMode.SCROLL);
-        driver.findElement(By.id("stretched")).click();
-        WebElement frame = driver.findElement(By.cssSelector("#modal2 iframe"));
-        driver.switchTo().frame(frame);
-        WebElement element = driver.findElement(By.tagName("html"));
+        getDriver().findElement(By.id("stretched")).click();
+        WebElement frame = getDriver().findElement(By.cssSelector("#modal2 iframe"));
+        getDriver().switchTo().frame(frame);
+        WebElement element = getDriver().findElement(By.tagName("html"));
         Dimension size = element.getSize();
         Point location = element.getLocation();
         Rectangle elementRect = new Rectangle(location, size);

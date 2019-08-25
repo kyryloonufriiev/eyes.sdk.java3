@@ -7,10 +7,11 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.*;
 
 public class VisualGrid {
@@ -31,8 +32,7 @@ public class VisualGrid {
             e.printStackTrace();
         }
 
-        FileLogger logHandler = new FileLogger("sophiLog.log", false, true);
-        eyes.setLogHandler(logHandler);
+        eyes.setLogHandler(TestUtils.initLogger("VisualGrid"));
         eyes.setBranchName("Child Branch");
         //eyes.setProxy(new ProxySettings("https://127.0.0.1", 8888));
         VisualGrid.setLogger(eyes.getLogger());
@@ -42,7 +42,7 @@ public class VisualGrid {
 
     @BeforeMethod
     public void setUp(){
-        driver = new ChromeDriver();
+        driver = SeleniumUtils.createChromeDriver();
         Configuration configuration = eyes.getConfiguration();
         configuration.addBrowser(700, 500, BrowserType.CHROME);
         configuration.addBrowser(800, 600, BrowserType.IE_10);

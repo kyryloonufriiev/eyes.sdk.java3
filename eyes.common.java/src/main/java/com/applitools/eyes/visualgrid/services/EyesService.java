@@ -5,6 +5,7 @@ import com.applitools.eyes.TestResultContainer;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class EyesService extends Thread {
 
@@ -34,13 +35,39 @@ public class EyesService extends Thread {
     public EyesService(String serviceName, ThreadGroup servicesGroup, Logger logger, int threadPoolSize, Object debugLock, EyesServiceListener listener, Tasker tasker) {
         super(servicesGroup, serviceName);
         this.threadPoolSize = threadPoolSize;
-        this.executor = new ThreadPoolExecutor(this.threadPoolSize, threadPoolSize, 1, TimeUnit.DAYS, new ArrayBlockingQueue<Runnable>(20));
+        this.executor = new ThreadPoolExecutor(this.threadPoolSize, threadPoolSize, 1, TimeUnit.DAYS,
+                new ArrayBlockingQueue<Runnable>(20), new LocalThreadFactory(serviceName));
         this.listener = listener;
         this.logger = logger;
         this.debugLock = debugLock;
         this.tasker = tasker;
         this.isPaused = debugLock != null;
-}
+        this.setDaemon(true);
+    }
+
+    static class LocalThreadFactory implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        LocalThreadFactory(String name) {
+            SecurityManager s = System.getSecurityManager();
+            Thread currThread = Thread.currentThread();
+            group = (s != null) ? s.getThreadGroup() : currThread.getThreadGroup();
+            namePrefix = name + "-pool-" +
+                    poolNumber.getAndIncrement() +
+                    "-thread-";
+        }
+
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r,
+                    namePrefix + threadNumber.getAndIncrement(),
+                    0);
+            t.setDaemon(true);
+            return t;
+        }
+    }
 
     @Override
     public void run() {

@@ -16,19 +16,14 @@ import java.util.List;
 public class TestFluentApi extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
-    public TestFluentApi(Capabilities caps, String platform) {
-        super.caps = caps;
-        super.platform = platform;
-        super.forceFPS = false;
-
-        super.compareExpectedRegions = caps.getBrowserName().equalsIgnoreCase("chrome");
-        testSuitName = "Eyes Selenium SDK - Fluent API";
+    public TestFluentApi(Capabilities caps, String mode) {
+        super("Eyes Selenium SDK - Fluent API", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
     }
 
     @Test
     public void TestCheckWindowWithIgnoreRegion_Fluent() {
-        webDriver.findElement(By.tagName("input")).sendKeys("My Input");
+        super.getWebDriver().findElement(By.tagName("input")).sendKeys("My Input");
         getEyes().check("Fluent - Window with Ignore region", Target.window()
                 .fully()
                 .timeout(5000)
@@ -87,15 +82,15 @@ public class TestFluentApi extends TestSetup {
 
     @Test
     public void TestCheckElementWithIgnoreRegionByElementOutsideTheViewport_Fluent() {
-        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
-        WebElement ignoreElement = webDriver.findElement(By.id("overflowing-div"));
+        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
+        WebElement ignoreElement = getWebDriver().findElement(By.id("overflowing-div"));
         setExpectedIgnoreRegions();
         getEyes().check("Fluent - Region by element", Target.region(element).ignore(ignoreElement));
     }
 
     @Test
     public void TestCheckElementWithIgnoreRegionBySameElement_Fluent() {
-        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
+        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
         getEyes().check("Fluent - Region by element", Target.region(element).ignore(element));
         setExpectedIgnoreRegions(new Region(0, 0, 304, 184));
     }
@@ -135,7 +130,7 @@ public class TestFluentApi extends TestSetup {
     @Test
     public void TestCheckScrollableModal() {
         Eyes eyes = getEyes();
-        driver.findElement(By.id("centered")).click();
+        getDriver().findElement(By.id("centered")).click();
         StitchMode originalStitchMode = eyes.getStitchMode();
         eyes.setStitchMode(StitchMode.SCROLL);
         eyes.check("Scrollable Modal", Target.region(By.id("modal-content")).fully().scrollRootElement(By.id("modal1")));
@@ -154,7 +149,7 @@ public class TestFluentApi extends TestSetup {
 
     @Test
     public void TestCheckElementFully_Fluent() {
-        WebElement element = webDriver.findElement(By.id("overflowing-div-image"));
+        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
         getEyes().check("Fluent - Region by element - fully", Target.region(element).fully());
     }
 

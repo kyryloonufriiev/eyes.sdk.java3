@@ -3,6 +3,8 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -22,13 +24,7 @@ public final class TestClassicRunner {
 
     private void eyesTest(EyesRunner runner) {
 
-        ChromeOptions chromeOptions = new ChromeOptions();
-        if (TestsDataProvider.runHeadless) {
-            chromeOptions.setHeadless(true);
-        }
-
-        // Open a Chrome browser.
-        WebDriver driver = new ChromeDriver(chromeOptions);
+        WebDriver driver = SeleniumUtils.createChromeDriver();
 
         // Initialize the VisualGridEyes SDK and set your private API key.
         Eyes eyes = new Eyes(runner);

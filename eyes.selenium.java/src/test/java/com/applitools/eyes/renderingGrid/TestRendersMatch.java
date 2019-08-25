@@ -8,10 +8,10 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -30,7 +30,7 @@ public class TestRendersMatch {
                 new RectangleSize(1200, 800),
         };
 
-        WebDriver webDriver = new ChromeDriver();
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.com/helloworld");
 
         try {
@@ -58,7 +58,7 @@ public class TestRendersMatch {
         final VisualGridRunner visualGridRunner = new VisualGridRunner(10);
         visualGridRunner.setLogHandler(new FileLogger("TestRendersMatch.log", false, true));
 
-        final WebDriver webDriver = new ChromeDriver();
+        final WebDriver webDriver = SeleniumUtils.createChromeDriver();
 
         RectangleSize[] ViewportList = {
                 new RectangleSize(800, 600),

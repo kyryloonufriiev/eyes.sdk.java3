@@ -1,17 +1,12 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.BatchInfo;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.StdoutLogHandler;
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.TestResultsSummary;
-import com.applitools.eyes.EyesRunner;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
@@ -27,7 +22,7 @@ public final class TestSeleniumVGUnification {
     public void Before(ITestContext testContext){
         runner = new VisualGridRunner(1);
 
-        webDriver = new ChromeDriver();
+        webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage");
         //webDriver.get("http://applitools-vg-test.surge.sh/test.html");
     }

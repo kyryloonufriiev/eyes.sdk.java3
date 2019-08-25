@@ -8,9 +8,9 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -24,7 +24,7 @@ public class TestSuite {
     private VisualGridRunner visualGridManager;
 
     public TestSuite() {
-        this.webDriver = new ChromeDriver();
+        this.webDriver = SeleniumUtils.createChromeDriver();
     }
 
     @BeforeClass

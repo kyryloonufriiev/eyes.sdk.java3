@@ -3,10 +3,9 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.TestResultsSummary;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -62,7 +61,7 @@ public class TestConfigurationSentCorrectlyToServer {
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         Eyes eyes = new Eyes(runner);
 
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
 
         String originalBatchSequence = System.getenv("APPLITOOLS_BATCH_SEQUENCE");
