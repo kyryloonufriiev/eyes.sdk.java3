@@ -3,8 +3,6 @@ package com.applitools.eyes;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -22,8 +20,6 @@ import java.util.List;
  * Provides common rest client functionality.
  */
 public class RestClient {
-
-    public static final int DEFAULT_MAX_PER_ROUTE = 250;
 
     /**
      * An interface used as base for anonymous classes wrapping Http Method
@@ -55,11 +51,7 @@ public class RestClient {
         ClientConfig cc = new ClientConfig();
         cc.property(ClientProperties.CONNECT_TIMEOUT, timeout);
         cc.property(ClientProperties.READ_TIMEOUT, timeout);
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultMaxPerRoute(DEFAULT_MAX_PER_ROUTE);
-
         // tell the config about the connection manager
-        cc.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
         if (abstractProxySettings != null) {
             // URI is mandatory.
             cc = cc.property(ClientProperties.PROXY_URI,
