@@ -12,7 +12,7 @@ import java.util.concurrent.TimeoutException;
 
 public class PutFuture implements IPutFuture {
 
-    private Future putFuture;
+    private Future<Response> putFuture;
     private RGridResource resource;
     private RunningRender runningRender;
     private IServerConnector serverConnector;
@@ -59,7 +59,8 @@ public class PutFuture implements IPutFuture {
         if (!this.isSentAlready) {
             while (retryCount != 0) {
                 try {
-                    this.putFuture.get(20, TimeUnit.SECONDS);
+                    Response response = this.putFuture.get(20, TimeUnit.SECONDS);
+                    response.close();
                     break;
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
@@ -84,10 +85,11 @@ public class PutFuture implements IPutFuture {
     public Boolean get(long timeout, TimeUnit unit) throws
             InterruptedException, ExecutionException, TimeoutException {
         if (!this.isSentAlready) {
-            Object responseAsObject = this.putFuture.get(timeout, unit);
-            if(responseAsObject instanceof Response)
+            Response response = this.putFuture.get(timeout, unit);
+            response.close();
             this.isSentAlready = true;
         }
+
         return true;
     }
 

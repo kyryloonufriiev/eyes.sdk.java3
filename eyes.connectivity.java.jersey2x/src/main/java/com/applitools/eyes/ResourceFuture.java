@@ -101,6 +101,7 @@ public class ResourceFuture implements IResourceFuture {
                     } else {
                         retryCount--;
                     }
+                    response.close();
                 } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     retryCount--;
