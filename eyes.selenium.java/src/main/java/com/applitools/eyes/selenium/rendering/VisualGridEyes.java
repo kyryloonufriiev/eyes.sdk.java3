@@ -56,7 +56,7 @@ public class VisualGridEyes implements IRenderingEyes {
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
-    private Timer timer = new Timer("VG_StopWatch", true);
+    private Timer timer = null;
     private final List<PropertyData> properties = new ArrayList<>();
 
     private static final String GET_ELEMENT_XPATH_JS =
@@ -504,6 +504,8 @@ public class VisualGridEyes implements IRenderingEyes {
 
             logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
 
+            timer =  new Timer("VG_StopWatch", true);
+
             timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
             String resultAsString;
             ScriptResponse.Status status = null;
@@ -582,6 +584,7 @@ public class VisualGridEyes implements IRenderingEyes {
             }
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
+        timer.cancel();
     }
 
     private void waitBeforeDomSnapshot() {
