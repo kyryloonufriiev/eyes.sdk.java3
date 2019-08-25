@@ -4,6 +4,7 @@ import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.model.RunningRender;
 import com.applitools.utils.GeneralUtils;
 
+import javax.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -11,7 +12,7 @@ import java.util.concurrent.TimeoutException;
 
 public class PutFuture implements IPutFuture {
 
-    private Future putFuture;
+    private Future<Response> putFuture;
     private RGridResource resource;
     private RunningRender runningRender;
     private IServerConnector serverConnector;
@@ -58,7 +59,8 @@ public class PutFuture implements IPutFuture {
         if (!this.isSentAlready) {
             while (retryCount != 0) {
                 try {
-                    this.putFuture.get(20, TimeUnit.SECONDS);
+                    Response response = this.putFuture.get(20, TimeUnit.SECONDS);
+                    response.close();
                     break;
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
@@ -88,7 +90,8 @@ public class PutFuture implements IPutFuture {
         if (!this.isSentAlready) {
             while (retryCount != 0) {
                 try {
-                    this.putFuture.get(timeout, unit);
+                    Response response = this.putFuture.get(timeout, unit);
+                    response.close();
                     break;
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
