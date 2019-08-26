@@ -4,6 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.TestsDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
@@ -34,8 +35,6 @@ public class TestSVGSites {
 
     private Eyes initEyes(WebDriver webDriver, String testedUrl) {
         Eyes eyes = new Eyes(visualGridRunner);
-        BatchInfo batchInfo = new BatchInfo("SVG Sites");
-        batchInfo.setId("SVGs");
         eyes.setApiKey("97ELuwdIiAilbeumIilysV8yY24tygCeRFFTYEBO7EfE110");
         Logger logger = eyes.getLogger();
         logger.log("creating WebDriver: " + testedUrl);
@@ -44,7 +43,7 @@ public class TestSVGSites {
             Configuration configuration = new Configuration();
             configuration.setAppName("Eyes Java SDK - SVG Sites");
             configuration.setTestName("testedUrl - "+testedUrl);
-            configuration.setBatch(batchInfo);
+            configuration.setBatch(TestsDataProvider.batchInfo);
             configuration.addBrowser(800, 600, BrowserType.CHROME);
             configuration.addBrowser(700, 500, BrowserType.FIREFOX);
             configuration.addBrowser(700, 500, BrowserType.IE_10);

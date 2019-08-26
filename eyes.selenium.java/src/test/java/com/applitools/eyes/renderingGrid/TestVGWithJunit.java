@@ -4,6 +4,7 @@ import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
+import com.applitools.eyes.selenium.TestsDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -38,6 +39,7 @@ public class TestVGWithJunit {
         Configuration config = eyes.getConfiguration();
         eyes = new Eyes(runner);
         config.addBrowser(1920, 1080, BrowserType.CHROME);
+        config.setBatch(TestsDataProvider.batchInfo);
         eyes.setConfiguration(config);
         eyes.setLogHandler(new FileLogger("daves.log", true ,true));
         eyes.open(driver, "d", "Untitled");

@@ -18,7 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class TestTopSites {
-    public static BatchInfo batch = new BatchInfo("TTS - config batch");
+    public static BatchInfo batch = new BatchInfo("TTS");
     private EyesRunner visualGridRunner;
 
     @BeforeClass
@@ -43,12 +43,7 @@ public class TestTopSites {
 
     private Eyes initEyes(WebDriver webDriver, String testedUrl) {
         Eyes eyes = new Eyes(visualGridRunner);
-        BatchInfo batchInfo = new BatchInfo("Top Ten Sites2");
-        batchInfo.setId("Target22");
-        eyes.setBatch(batchInfo);
-        eyes.setEnvName("TTS - migel");
         eyes.setMatchLevel(MatchLevel.LAYOUT);
-
         Logger logger = eyes.getLogger();
 
         try {
@@ -62,8 +57,8 @@ public class TestTopSites {
 
         try {
             Configuration configuration = new Configuration();
-            configuration.setTestName("Top 10 websites - " + testedUrl);
-            configuration.setAppName("Top Ten Sites");
+            configuration.setTestName("Top 5 websites - " + testedUrl);
+            configuration.setAppName("Top Five Sites");
             configuration.setBatch(TestTopSites.batch);
             configuration.setBranchName("TTS - config branch");
             configuration.setIgnoreDisplacements(true);
