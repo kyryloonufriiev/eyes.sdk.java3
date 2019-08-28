@@ -52,65 +52,50 @@ public class PutFuture implements IPutFuture {
 
     @Override
     public Boolean get() {
+        return get(20, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public Boolean get(long timeout, TimeUnit unit) {
         if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
+            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent,null);
             this.putFuture = newFuture.getPutFuture();
         }
         if (!this.isSentAlready) {
             while (retryCount != 0) {
                 try {
-                    Response response = this.putFuture.get(20, TimeUnit.SECONDS);
+                    logger.verbose("Response open.");
+                    Response response = this.putFuture.get(timeout, unit);
                     response.close();
+
+                    logger.verbose("Response closed.");
                     break;
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
-                    retryCount--;
                     logger.verbose("Entering retry");
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
+                    this.putFuture.cancel(true);
+                    retryCount--;
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException e1) {
                         GeneralUtils.logExceptionStackTrace(logger, e1);
                     }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
+                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent,null);
                     logger.log("fired retry");
                     this.putFuture = newFuture.getPutFuture();
                 }
+            }
+        }
+        if(retryCount == 0){
+            if(!isSentAlready){
+                throw new Error("Error trying to PUT Resource");
             }
         }
         this.isSentAlready = true;
         return true;
     }
 
-    @Override
-    public Boolean get(long timeout, TimeUnit unit) {
-        if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent, null);
-            this.putFuture = newFuture.getPutFuture();
-        }
-        if (!this.isSentAlready) {
-            while (retryCount != 0) {
-                try {
-                    Response response = this.putFuture.get(timeout, unit);
-                    response.close();
-                    break;
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
-                    retryCount--;
-                    logger.verbose("Entering retry");
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e1) {
-                        GeneralUtils.logExceptionStackTrace(logger, e1);
-                    }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
-                    logger.log("fired retry");
-                    this.putFuture = newFuture.getPutFuture();
-                }
-            }
-        }
-        this.isSentAlready = true;
-        return true;
-    }
 
     @Override
     public Future getPutFuture() {
