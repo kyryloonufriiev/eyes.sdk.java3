@@ -20,18 +20,18 @@ public class PutFuture implements IPutFuture {
 
     private boolean isSentAlready = false;
     private int retryCount = 5;
-    private String useraAgent;
+    private String userAgent;
 
-    public PutFuture(RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String useraAgent) {
+    public PutFuture(RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String userAgent) {
         this.resource = resource;
         this.runningRender = runningRender;
         this.serverConnector = serverConnector;
         this.logger = logger;
-        this.useraAgent = useraAgent;
+        this.userAgent = userAgent;
     }
 
-    public PutFuture(Future putFuture, RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String useraAgent) {
-        this(resource, runningRender, serverConnector, logger, useraAgent);
+    public PutFuture(Future putFuture, RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String userAgent) {
+        this(resource, runningRender, serverConnector, logger, userAgent);
         this.putFuture = putFuture;
     }
 
