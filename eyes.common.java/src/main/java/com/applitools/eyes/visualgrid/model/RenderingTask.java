@@ -175,12 +175,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             isTaskCompleted = true;
         } catch (Throwable e) {
+            logger.verbose("ERROR in Rendering");
             GeneralUtils.logExceptionStackTrace(logger, e);
             for (VisualGridTask visualGridTask : this.visualGridTaskList) {
                 visualGridTask.setExceptionAndAbort(e);
             }
         }
-        logger.verbose("Finished rendering task - exit");
+        logger.verbose("Finished rendering task - exit - " + this.dom.getUrl());
 
         return null;
     }
@@ -273,8 +274,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         return worstStatus;
     }
 
-    private List<String> getRenderIds(Collection<RunningRender> runningRenders) {
-        List<String> ids = new ArrayList<>();
+    private Set<String> getRenderIds(Collection<RunningRender> runningRenders) {
+        Set<String> ids = new HashSet<>();
         for (RunningRender runningRender : runningRenders) {
             ids.add(runningRender.getRenderId());
         }
@@ -649,7 +650,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
 
         //remove double quotes if surrounded
-        charset = charset.replaceAll( "\"", "");
+        charset = charset.replaceAll("\"", "");
 
         if (charset != null) {
             try {
@@ -677,7 +678,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         CascadingStyleSheet cascadingStyleSheet = null;
         try {
             String data = css.data;
-            if(data == null ) return;
+            if (data == null) return;
             cascadingStyleSheet = CSSReader.readFromString(data, ECSSVersion.CSS30);
             if (cascadingStyleSheet == null) {
                 logger.verbose("exit - failed to read CSS String");
@@ -880,7 +881,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void pollRenderingStatus(Map<RunningRender, RenderRequest> runningRenders) {
         logger.verbose("enter");
-        List<String> ids = getRenderIds(runningRenders.keySet());
+        Set<String> ids = getRenderIds(runningRenders.keySet());
         logger.verbose("render ids : " + ids);
         List<RenderStatusResults> renderStatusResultsList = null;
         timer.schedule(new TimeoutTask(), HOUR);
@@ -923,7 +924,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 if (renderId.equalsIgnoreCase(id)) {
                     logger.verbose("removing failed render id: " + id);
                     VisualGridTask visualGridTask = runningRenders.get(renderedRender).getVisualGridTask();
-                    visualGridTask.setRenderError(id, "too long rendering(rendering exceeded 150 sec)");
+                    visualGridTask.setRenderError(id, "too long rendering(rendering exceeded 1 hour)");
                     break;
                 }
             }
@@ -936,10 +937,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("exit");
     }
 
-    private void sampleRenderingStatus(Map<RunningRender, RenderRequest> runningRenders, List<String> ids, List<RenderStatusResults> renderStatusResultsList) {
+    private void sampleRenderingStatus(Map<RunningRender, RenderRequest> runningRenders, Set<String> ids, List<RenderStatusResults> renderStatusResultsList) {
         logger.verbose("enter - renderStatusResultsList.size: " + renderStatusResultsList.size());
 
-        for (int i = 0, j = 0; i < renderStatusResultsList.size(); i++) {
+        for (int i = 0; i < renderStatusResultsList.size(); i++) {
             RenderStatusResults renderStatusResults = renderStatusResultsList.get(i);
             if (renderStatusResults == null) {
                 continue;
@@ -950,39 +951,34 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             boolean isErrorStatus = renderStatus == RenderStatus.ERROR;
             logger.verbose("renderStatusResults - " + renderStatusResults);
             if (isRenderedStatus || isErrorStatus) {
-
-                String removedId = ids.remove(j);
-
                 for (RunningRender renderedRender : runningRenders.keySet()) {
                     String renderId = renderedRender.getRenderId();
-                    if (renderId.equalsIgnoreCase(removedId)) {
-                        VisualGridTask visualGridTask = runningRenders.get(renderedRender).getVisualGridTask();
-                        Iterator<VisualGridTask> iterator = openVisualGridTaskList.iterator();
-                        while (iterator.hasNext()) {
-                            VisualGridTask openVisualGridTask = iterator.next();
-                            if (openVisualGridTask.getRunningTest() == visualGridTask.getRunningTest()) {
-                                if (isRenderedStatus) {
-                                    logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render result: " + renderStatusResults + " to url " + this.result.getUrl());
-                                    openVisualGridTask.setRenderResult(renderStatusResults);
-                                } else {
-                                    logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render error: " + removedId + " to url " + this.result.getUrl());
-                                    openVisualGridTask.setRenderError(removedId, renderStatusResults.getError());
-                                }
-                                iterator.remove();
+                    if (!renderId.equalsIgnoreCase(renderStatusResults.getRenderId())) continue;
+                    VisualGridTask visualGridTask = runningRenders.get(renderedRender).getVisualGridTask();
+                    Iterator<VisualGridTask> iterator = openVisualGridTaskList.iterator();
+                    while (iterator.hasNext()) {
+                        VisualGridTask openVisualGridTask = iterator.next();
+                        if (openVisualGridTask.getRunningTest() == visualGridTask.getRunningTest()) {
+                            if (isRenderedStatus) {
+                                logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render result: " + renderStatusResults + " to url " + this.result.getUrl());
+                                openVisualGridTask.setRenderResult(renderStatusResults);
+                            } else {
+                                logger.verbose("setting openVisualGridTask " + openVisualGridTask + " render error: " + renderId + " to url " + this.result.getUrl());
+                                openVisualGridTask.setRenderError(renderId, renderStatusResults.getError());
                             }
+                            iterator.remove();
                         }
-                        logger.verbose("setting visualGridTask " + visualGridTask + " render result: " + renderStatusResults + " to url " + this.result.getUrl());
-                        String error = renderStatusResults.getError();
-                        if (error != null) {
-                            GeneralUtils.logExceptionStackTrace(logger, new Exception(error));
-                            visualGridTask.setRenderError(renderId, error);
-                        }
-                        visualGridTask.setRenderResult(renderStatusResults);
-                        break;
                     }
+                    logger.verbose("setting visualGridTask " + visualGridTask + " render result: " + renderStatusResults + " to url " + this.result.getUrl());
+                    String error = renderStatusResults.getError();
+                    if (error != null) {
+                        GeneralUtils.logExceptionStackTrace(logger, new Exception(error));
+                        visualGridTask.setRenderError(renderId, error);
+                    }
+                    visualGridTask.setRenderResult(renderStatusResults);
+                    ids.remove(renderId);
+                    break;
                 }
-            } else {
-                j++;
             }
         }
         logger.verbose("exit");
