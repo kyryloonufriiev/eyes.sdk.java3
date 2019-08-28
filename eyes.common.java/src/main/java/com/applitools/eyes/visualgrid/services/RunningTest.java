@@ -317,4 +317,13 @@ public class RunningTest {
     public void setTestName(String testName) {
         this.testName = testName;
     }
+
+    @Override
+    public String toString() {
+        return "RunningTest{" +
+                "isTestOpen=" + isTestOpen +
+                ", isTestClose=" + isTestClose +
+                ", isTestInExceptionMode=" + isTestInExceptionMode +
+                '}';
+    }
 }
