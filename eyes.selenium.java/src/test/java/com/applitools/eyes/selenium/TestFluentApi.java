@@ -1,16 +1,12 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.CoordinatesType;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.fluent.Target;
 
 import org.openqa.selenium.*;
 import org.testng.annotations.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Listeners(TestListener.class)
 public class TestFluentApi extends TestSetup {
@@ -144,7 +140,7 @@ public class TestFluentApi extends TestSetup {
                 .floating(new Region(10, 10, 20, 20), 3, 3, 20, 30);
         getEyes().check("Fluent - Window with floating region by region", settings);
 
-        setExpectedFloatingsRegions(new FloatingMatchSettings(10, 10, 20, 20, 3, 3, 20, 30));
+        setExpectedFloatingRegions(new FloatingMatchSettings(10, 10, 20, 20, 3, 3, 20, 30));
     }
 
     @Test

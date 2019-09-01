@@ -1,7 +1,6 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.CoordinatesType;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -89,6 +88,8 @@ public class TestFluentApi_Frames extends TestSetup {
                 .fully()
                 .layout()
                 .floating(25, new Region(200, 200, 150, 150)));
+
+        setExpectedFloatingRegions(new FloatingMatchSettings(200, 200, 150, 150, 25, 25, 25, 25));
     }
 
     @Test
@@ -118,9 +119,6 @@ public class TestFluentApi_Frames extends TestSetup {
 
     @Test
     public void TestCheckLongIFrameModal() {
-        Eyes eyes = getEyes();
-        StitchMode originalStitchMode = eyes.getStitchMode();
-        eyes.setStitchMode(StitchMode.SCROLL);
         getDriver().findElement(By.id("stretched")).click();
         WebElement frame = getDriver().findElement(By.cssSelector("#modal2 iframe"));
         getDriver().switchTo().frame(frame);
@@ -130,17 +128,40 @@ public class TestFluentApi_Frames extends TestSetup {
         Rectangle elementRect = new Rectangle(location, size);
         Region rect;
         List<ICheckSettings> targets = new ArrayList<>();
+        int bottom = elementRect.getY() + elementRect.getHeight();
         for (int i = location.getY(), c = 1; i < location.getY() + size.getHeight(); i += 5000, c++) {
-            if ((elementRect.getY() + elementRect.getHeight()) > i + 5000) {
+            if (bottom > i + 5000) {
                 rect = new Region(location.getX(), i, size.getWidth(), 5000);
             } else {
-                rect = new Region(location.getX(), i, size.getWidth(), elementRect.getY() + elementRect.getHeight() - i);
+                rect = new Region(location.getX(), i, size.getWidth(), bottom - i);
             }
             targets.add(Target.region(rect));
             //eyes_.Check("Long IFrame Modal #" + c, Target.Region(rect).Fully());
         }
-        eyes.check(targets.toArray(new ICheckSettings[0]));
-        eyes.setStitchMode(originalStitchMode);
+        getEyes().check(targets.toArray(new ICheckSettings[0]));
     }
 
+    @Test
+    public void TestCheckLongOutOfBoundsIFrameModal() {
+        getDriver().findElement(By.id("hidden_click")).click();
+        WebElement frame = getDriver().findElement(By.cssSelector("#modal3 iframe"));
+        getDriver().switchTo().frame(frame);
+        WebElement element = getDriver().findElement(By.tagName("html"));
+        Dimension size = element.getSize();
+        Point location = element.getLocation();
+        Rectangle elementRect = new Rectangle(location, size);
+        Region rect;
+        List<ICheckSettings> targets = new ArrayList<>();
+        int bottom = elementRect.getY() + elementRect.getHeight();
+        for (int i = location.getY(), c = 1; i < location.getY() + size.getHeight(); i += 5000, c++) {
+            if (bottom > i + 5000) {
+                rect = new Region(location.getX(), i, size.getWidth(), 5000);
+            } else {
+                rect = new Region(location.getX(), i, size.getWidth(), bottom - i);
+            }
+            targets.add(Target.region(rect));
+            //eyes_.Check("Long IFrame Modal #" + c, Target.Region(rect).Fully());
+        }
+        getEyes().check(targets.toArray(new ICheckSettings[0]));
+    }
 }

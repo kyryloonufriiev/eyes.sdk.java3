@@ -56,6 +56,7 @@ public class TestClassicApi extends TestSetup {
     @Test
     public void TestCheckInnerFrame() {
         getEyes().setHideScrollbars(false);
+        ((JavascriptExecutor) getDriver()).executeScript("document.documentElement.scrollTo(0,350);");
         getDriver().switchTo().defaultContent();
         getDriver().switchTo().frame(getDriver().findElement(By.name("frame1")));
         getEyes().checkFrame("frame1-1", "inner-frame");

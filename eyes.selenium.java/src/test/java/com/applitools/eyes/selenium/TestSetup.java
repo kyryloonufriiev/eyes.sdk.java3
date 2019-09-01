@@ -87,7 +87,7 @@ public abstract class TestSetup implements ITest {
 
     protected String testSuitName;
 
-    protected String testedPageUrl = "http://applitools.github.io/demo/TestPages/FramesTestPage/";
+    protected String testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
     //protected RectangleSize testedPageSize = new RectangleSize(1200, 800);
     protected RectangleSize testedPageSize = new RectangleSize(700, 460);
 
@@ -142,7 +142,7 @@ public abstract class TestSetup implements ITest {
         getTestData("testId").expectedContentRegions = new HashSet<>(Arrays.asList(expectedContentRegions));
     }
 
-    protected void setExpectedFloatingsRegions(FloatingMatchSettings... expectedFloatingsRegions) {
+    protected void setExpectedFloatingRegions(FloatingMatchSettings... expectedFloatingsRegions) {
         getTestData("testId").expectedFloatingRegions = new HashSet<>(Arrays.asList(expectedFloatingsRegions));
     }
 

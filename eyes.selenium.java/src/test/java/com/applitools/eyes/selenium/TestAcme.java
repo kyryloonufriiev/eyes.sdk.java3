@@ -16,20 +16,20 @@ public class TestAcme extends TestSetup {
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
     public TestAcme(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - Test Acme", caps, mode);
-        testedPageUrl = "file:///C:/temp/fluentexample/Account%20-%20ACME.html";
         testedPageSize = new RectangleSize(1024,768);
     }
 
-    @Test
-    public void Test(){
-        getEyes().check("main window with table",
-                Target.window()
-                        .fully()
-                        .ignore(By.className("toolbar"))
-                        .layout(By.id("orders-list-desktop"), By.className("snapshot-topic"), By.id("results-count"))
-                        .strict()
-        );
-    }
+//    @Test
+//    public void Test(){
+//        getDriver().get("file:///C:/temp/fluentexample/Account%20-%20ACME.html");
+//        getEyes().check("main window with table",
+//                Target.window()
+//                        .fully()
+//                        .ignore(By.className("toolbar"))
+//                        .layout(By.id("orders-list-desktop"), By.className("snapshot-topic"), By.id("results-count"))
+//                        .strict()
+//        );
+//    }
 
     @Test
     public void TestAcmeLogin() {
