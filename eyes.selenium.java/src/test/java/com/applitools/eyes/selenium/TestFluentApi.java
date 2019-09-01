@@ -46,24 +46,32 @@ public class TestFluentApi extends TestSetup {
     public void TestCheckWindowWithIgnoreBySelector_Fluent() {
         getEyes().check("Fluent - Window with ignore region by selector", Target.window()
                 .ignore(By.id("overflowing-div")));
+
+        setExpectedIgnoreRegions(new Region(8, 80, 304, 184));
     }
 
     @Test
     public void TestCheckWindowWithIgnoreBySelector_Centered_Fluent() {
         getEyes().check("Fluent - Window with ignore region by selector centered", Target.window()
                 .ignore(By.id("centered")));
+
+        setExpectedIgnoreRegions(new Region(122, 928, 456, 306));
     }
 
     @Test
     public void TestCheckWindowWithIgnoreBySelector_Stretched_Fluent() {
         getEyes().check("Fluent - Window with ignore region by selector stretched", Target.window()
                 .ignore(By.id("stretched")));
+
+        setExpectedIgnoreRegions(new Region(8, 1270, 690, 206));
     }
 
     @Test
     public void TestCheckWindowWithFloatingBySelector_Fluent() {
         getEyes().check("Fluent - Window with floating region by selector", Target.window()
                 .floating(By.id("overflowing-div"), 3, 3, 20, 30));
+
+        setExpectedFloatingRegions(new FloatingMatchSettings(8, 80, 304, 184, 3, 3, 20, 30));
     }
 
     @Test
@@ -125,14 +133,10 @@ public class TestFluentApi extends TestSetup {
 
     @Test
     public void TestCheckScrollableModal() {
-        Eyes eyes = getEyes();
         getDriver().findElement(By.id("centered")).click();
-        StitchMode originalStitchMode = eyes.getStitchMode();
-        eyes.setStitchMode(StitchMode.SCROLL);
-        eyes.check("Scrollable Modal", Target.region(By.id("modal-content")).fully().scrollRootElement(By.id("modal1")));
-        eyes.setStitchMode(originalStitchMode);
+        By scrollRootSelector = (stitchMode == StitchMode.CSS) ? By.id("modal-content") : By.id("modal1");
+        getEyes().check("Scrollable Modal", Target.region(By.id("modal-content")).fully().scrollRootElement(scrollRootSelector));
     }
-
 
     @Test
     public void TestCheckWindowWithFloatingByRegion_Fluent() {
@@ -150,9 +154,8 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestCheckRegionBySelectorAfterManualScroll_Fluent()
-    {
-        ((JavascriptExecutor)getDriver()).executeScript("window.scrollBy(0,900)");
+    public void TestCheckRegionBySelectorAfterManualScroll_Fluent() {
+        ((JavascriptExecutor) getDriver()).executeScript("window.scrollBy(0,900)");
         getEyes().check("Fluent - Region by selector after manual scroll", Target.region(By.id("centered")));
     }
 
