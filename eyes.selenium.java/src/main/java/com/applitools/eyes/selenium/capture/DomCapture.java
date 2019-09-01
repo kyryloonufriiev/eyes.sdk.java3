@@ -103,9 +103,9 @@ public class DomCapture {
 
     private String getFrameDom() {
         logger.verbose("Trying to get DOM from driver");
+        timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
         try {
             isCheckTimerTimedOut.set(false);
-            timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
             String resultAsString;
             ScriptResponse.Status status = null;
             ScriptResponse scriptResponse = null;
@@ -150,10 +150,12 @@ public class DomCapture {
             //noinspection UnnecessaryLocalVariable
             String inlaidString = EfficientStringReplace.efficientStringReplace(
                     separators.iframeStartToken, separators.iframeEndToken, data.get(0), framesData);
+            timer.cancel();
             return inlaidString;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        timer.cancel();
         return "";
     }
 
