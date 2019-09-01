@@ -156,15 +156,17 @@ public class TestFluentApi extends TestSetup {
     }
 
 
-//
-//    public static boolean[] booleanDP() {
-//        return new boolean[]{true, false};
-//    }
-//
-//    @Test(dataProvider = "booleanDP")
-//    public void TestIgnoreDisplacements(boolean ignoreDisplacements) {
-//        getEyes().check("Fluent - Ignore Displacements = " + ignoreDisplacements, Target.window().ignoreDisplacements(ignoreDisplacements).fully());
-//        addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);
-//    }
+    @DataProvider(name = "booleanDP")
+    public static Object[][] booleanDP() {
+        return new Object[][]{
+                {true}, {false}
+        };
+    }
+
+    @Test(dataProvider = "booleanDP")
+    public void TestIgnoreDisplacements(boolean ignoreDisplacements) {
+        getEyes().check("Fluent - Ignore Displacements = " + ignoreDisplacements, Target.window().ignoreDisplacements(ignoreDisplacements).fully());
+        addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);
+    }
 
 }

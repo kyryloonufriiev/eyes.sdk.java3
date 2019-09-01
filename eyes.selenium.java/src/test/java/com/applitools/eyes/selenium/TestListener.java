@@ -9,9 +9,12 @@ import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.GeneralUtils;
 import org.testng.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Map;
 
 public class TestListener implements ITestListener {
 
@@ -31,7 +34,7 @@ public class TestListener implements ITestListener {
         //System.out.println("onTestSuccess");
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
-            if (!afterMethodSuccess((TestSetup) instance)){
+            if (!afterMethodSuccess((TestSetup) instance)) {
                 result.setStatus(ITestResult.FAILURE);
             }
         }
@@ -42,7 +45,7 @@ public class TestListener implements ITestListener {
         //System.out.println("onTestFailure");
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
-            TestSetup testSetup = (TestSetup)instance;
+            TestSetup testSetup = (TestSetup) instance;
             GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), result.getThrowable());
             afterMethodFailure(testSetup);
         }
@@ -83,7 +86,7 @@ public class TestListener implements ITestListener {
         try {
             if (eyes.getIsOpen()) {
                 TestResults results = eyes.close();
-                if (eyes.getIsDisabled()){
+                if (eyes.getIsDisabled()) {
                     eyes.getLogger().log("eyes is disabled.");
                     return true;
                 } else if (results == null) {
@@ -96,40 +99,8 @@ public class TestListener implements ITestListener {
 
                 if (actualAppOutput.length > 0) {
                     ImageMatchSettings imageMatchSettings = actualAppOutput[0].getImageMatchSettings();
-                    FloatingMatchSettings[] floating = imageMatchSettings.getFloating();
-                    Region[] ignoreRegions = imageMatchSettings.getIgnore();
-                    Region[] layoutRegions = imageMatchSettings.getLayout();
-                    Region[] strictRegions = imageMatchSettings.getStrict();
-                    Region[] contentRegions = imageMatchSettings.getContent();
-
-                    TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData("testId");
-
-                    if (testSetup.compareExpectedRegions) {
-                        if (testData.expectedFloatingRegions.size() > 0) {
-                            HashSet<FloatingMatchSettings> floatingRegionsSet = new HashSet<>(Arrays.asList(floating));
-                            Assert.assertEquals(floatingRegionsSet, testData.expectedFloatingRegions, "Floating regions lists differ");
-                        }
-
-                        if (testData.expectedIgnoreRegions.size() > 0) {
-                            HashSet<Region> ignoreRegionsSet = new HashSet<>(Arrays.asList(ignoreRegions));
-                            Assert.assertEquals(ignoreRegionsSet, testData.expectedIgnoreRegions, "Ignore regions lists differ");
-                        }
-
-                        if (testData.expectedLayoutRegions.size() > 0) {
-                            HashSet<Region> layoutRegionsSet = new HashSet<>(Arrays.asList(layoutRegions));
-                            Assert.assertEquals(layoutRegionsSet, testData.expectedLayoutRegions, "Layout regions lists differ");
-                        }
-
-                        if (testData.expectedStrictRegions.size() > 0) {
-                            HashSet<Region> strictRegionsSet = new HashSet<>(Arrays.asList(strictRegions));
-                            Assert.assertEquals(strictRegionsSet, testData.expectedStrictRegions, "Strict regions lists differ");
-                        }
-
-                        if (testData.expectedContentRegions.size() > 0) {
-                            HashSet<Region> contentRegionsSet = new HashSet<>(Arrays.asList(contentRegions));
-                            Assert.assertEquals(contentRegionsSet, testData.expectedContentRegions, "Content regions lists differ");
-                        }
-                    }
+                    compareRegions(testSetup, imageMatchSettings);
+                    compareProperties(testSetup, imageMatchSettings);
                 }
             }
             return true;
@@ -144,6 +115,68 @@ public class TestListener implements ITestListener {
         }
     }
 
+    private void compareRegions(TestSetup testSetup, ImageMatchSettings imageMatchSettings) {
+        FloatingMatchSettings[] floating = imageMatchSettings.getFloating();
+        Region[] ignoreRegions = imageMatchSettings.getIgnore();
+        Region[] layoutRegions = imageMatchSettings.getLayout();
+        Region[] strictRegions = imageMatchSettings.getStrict();
+        Region[] contentRegions = imageMatchSettings.getContent();
+
+        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData("testId");
+
+        if (testSetup.compareExpectedRegions) {
+            if (testData.expectedFloatingRegions.size() > 0) {
+                HashSet<FloatingMatchSettings> floatingRegionsSet = new HashSet<>(Arrays.asList(floating));
+                Assert.assertEquals(floatingRegionsSet, testData.expectedFloatingRegions, "Floating regions lists differ");
+            }
+
+            if (testData.expectedIgnoreRegions.size() > 0) {
+                HashSet<Region> ignoreRegionsSet = new HashSet<>(Arrays.asList(ignoreRegions));
+                Assert.assertEquals(ignoreRegionsSet, testData.expectedIgnoreRegions, "Ignore regions lists differ");
+            }
+
+            if (testData.expectedLayoutRegions.size() > 0) {
+                HashSet<Region> layoutRegionsSet = new HashSet<>(Arrays.asList(layoutRegions));
+                Assert.assertEquals(layoutRegionsSet, testData.expectedLayoutRegions, "Layout regions lists differ");
+            }
+
+            if (testData.expectedStrictRegions.size() > 0) {
+                HashSet<Region> strictRegionsSet = new HashSet<>(Arrays.asList(strictRegions));
+                Assert.assertEquals(strictRegionsSet, testData.expectedStrictRegions, "Strict regions lists differ");
+            }
+
+            if (testData.expectedContentRegions.size() > 0) {
+                HashSet<Region> contentRegionsSet = new HashSet<>(Arrays.asList(contentRegions));
+                Assert.assertEquals(contentRegionsSet, testData.expectedContentRegions, "Content regions lists differ");
+            }
+        }
+    }
+
+    private void compareProperties(TestSetup testSetup, ImageMatchSettings imageMatchSettings) {
+        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData("testId");
+        Map<String, Object> expectedProps = testData.expectedProperties;
+
+        Class<?> imsType = ImageMatchSettings.class;
+        for (Map.Entry<String, Object> kvp : expectedProps.entrySet()) {
+            String propertyNamePath = kvp.getKey();
+            String[] properties = propertyNamePath.split(".");
+
+            Class<?> currentType = imsType;
+            Object currentObject = imageMatchSettings;
+            try {
+                for (String propName : properties) {
+                    Method getter = currentType.getMethod("get" + propName);
+                    currentObject = getter.invoke(currentObject);
+                    if (currentObject == null) break;
+                    currentType = currentObject.getClass();
+                }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), e);
+            }
+
+            Assert.assertEquals(kvp.getValue(), currentObject);
+        }
+    }
 
     @Override
     public void onStart(ITestContext context) {
