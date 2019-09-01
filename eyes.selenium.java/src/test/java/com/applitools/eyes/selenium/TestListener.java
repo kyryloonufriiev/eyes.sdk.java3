@@ -159,7 +159,7 @@ public class TestListener implements ITestListener {
         Class<?> imsType = ImageMatchSettings.class;
         for (Map.Entry<String, Object> kvp : expectedProps.entrySet()) {
             String propertyNamePath = kvp.getKey();
-            String[] properties = propertyNamePath.split(".");
+            String[] properties = propertyNamePath.split("\\.");
 
             Class<?> currentType = imsType;
             Object currentObject = imageMatchSettings;
@@ -174,7 +174,7 @@ public class TestListener implements ITestListener {
                 GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), e);
             }
 
-            Assert.assertEquals(kvp.getValue(), currentObject);
+            Assert.assertEquals(currentObject, kvp.getValue());
         }
     }
 
