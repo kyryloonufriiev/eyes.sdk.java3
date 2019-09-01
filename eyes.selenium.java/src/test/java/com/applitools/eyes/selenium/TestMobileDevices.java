@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
@@ -29,7 +30,7 @@ public class TestMobileDevices {
     private final String page;
 
     @DataProvider(name = "pages")
-    public static Object[][] fourBooleansDP() {
+    public static Object[][] pages() {
         return new Object[][]{{"mobile"}, {"desktop"}};
     }
 
@@ -89,17 +90,14 @@ public class TestMobileDevices {
         return devices.toArray(new Object[0][]);
     }
 
-    @DataProvider(name = "androidDevice")
-    public static Object[][] androidDevice() {
+    @DataProvider(name = "androidDevices")
+    public static Object[][] androidDevices() {
         List<Object[]> devices = Arrays.asList(new Object[][]{
                 {"Android Emulator", "8.0", ScreenOrientation.PORTRAIT, false},
-            });
+                {"Android Emulator", "8.0", ScreenOrientation.LANDSCAPE, true}
+        });
 
         return devices.toArray(new Object[0][]);
-    }
-    @Test(dataProvider = "IOSDevices")
-    public void TestIOSSafariCrop_SauceLabs(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully) {
-        initEyes(deviceName, platformVersion, deviceOrientation, fully, "iOS", "Safari", this.page);
     }
 
     private void initEyes(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully,
@@ -128,49 +126,53 @@ public class TestMobileDevices {
         try {
             driver = new RemoteWebDriver(new URL(sauceUrl), caps);
         } catch (MalformedURLException e) {
-            GeneralUtils.logExceptionStackTrace(eyes.getLogger(),e);
+            GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
         }
-        driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+        if (driver != null) {
+            driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 
-        TestUtils.setupLogging(eyes, testName);
+            TestUtils.setupLogging(eyes, testName);
 
-        eyes.setStitchMode(StitchMode.CSS);
+            eyes.setStitchMode(StitchMode.CSS);
 
-        eyes.addProperty("Orientation", deviceOrientation.toString());
-        eyes.addProperty("Stitched", fully ? "True" : "False");
-        runTest(fully, eyes, testName, driver, page);
+            eyes.addProperty("Orientation", deviceOrientation.toString());
+            eyes.addProperty("Stitched", fully ? "True" : "False");
+            runTest(fully, eyes, testName, driver, page);
+        } else {
+            Assert.fail("failed to initialize web driver.");
+        }
     }
 
     private void runTest(boolean fully, Eyes eyes, String testName, WebDriver driver, String page) {
-        try
-        {
-            driver.get("https://applitools.github.io/demo/TestPages/DynamicResolution/{page}.html");
+        try {
+            driver.get("https://applitools.github.io/demo/TestPages/DynamicResolution/" + page + ".html");
             eyes.open(driver, "Eyes Selenium SDK - iOS Safari Cropping", testName);
             //eyes.Check("Initial view", Target.Region(By.CssSelector("div.page")).Fully(fully).SendDom(false));
             eyes.check(Target.window().fully(fully));
             TestResults result = eyes.close();
             IServerConnector serverConnector = eyes.getServerConnector();
-            SessionId session = ((RemoteWebDriver)driver).getSessionId();
+            SessionId session = ((RemoteWebDriver) driver).getSessionId();
             serverConnector.putTestResultJsonToSauce(new PassedResult(result.isPassed()), session.toString());
-        }
-        finally
-        {
+        } finally {
             eyes.abort();
             driver.quit();
         }
     }
 
-    @Test(dataProvider = "androidDevice")
-    public void TestAndroid_SauceLabs(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully)
-    {
+    @Test(dataProvider = "IOSDevices")
+    public void TestIOSSafariCrop_SauceLabs(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully) {
+        initEyes(deviceName, platformVersion, deviceOrientation, fully, "iOS", "Safari", this.page);
+    }
+
+    @Test(dataProvider = "androidDevices")
+    public void TestAndroid_SauceLabs(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully) {
         initEyes(deviceName, platformVersion, deviceOrientation, fully, "Android", "Chrome", page);
     }
 
     private String initTestName(String deviceName, String platformVersion, ScreenOrientation deviceOrientation, boolean fully, String page) {
-        String testName = deviceName + " " +  platformVersion + " " + deviceOrientation + " " + page;
+        String testName = deviceName + " " + platformVersion + " " + deviceOrientation + " " + page;
 
-        if (fully)
-        {
+        if (fully) {
             testName += " fully";
         }
 
