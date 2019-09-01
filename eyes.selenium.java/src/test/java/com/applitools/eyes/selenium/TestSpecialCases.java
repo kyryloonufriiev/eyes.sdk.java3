@@ -24,10 +24,6 @@ public class TestSpecialCases extends TestSetup {
     @Test
     public void TestCheckRegionInAVeryBigFrameAfterManualSwitchToFrame() {
         getDriver().switchTo().frame("frame1");
-
-        WebElement element = getDriver().findElement(By.cssSelector("img"));
-        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
-
         getEyes().check("", Target.region(By.cssSelector("img")));
     }
 }

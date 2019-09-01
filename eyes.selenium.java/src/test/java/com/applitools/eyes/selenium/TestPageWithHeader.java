@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 
 @Listeners(TestListener.class)
 public class TestPageWithHeader extends TestSetup {
-    
+
     @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
     public TestPageWithHeader(Capabilities options, String mode) {
         super("Eyes Selenium SDK - Page With Header", options, mode);
