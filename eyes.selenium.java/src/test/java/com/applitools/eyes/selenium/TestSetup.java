@@ -50,13 +50,13 @@ public abstract class TestSetup implements ITest {
         private Eyes eyes;
         private WebDriver driver;
         private WebDriver webDriver;
-        private Map<String, Object> expectedProperties = new HashMap<>();
 
         public HashSet<FloatingMatchSettings> expectedFloatingRegions = new HashSet<>();
         public HashSet<Region> expectedIgnoreRegions = new HashSet<>();
         public HashSet<Region> expectedLayoutRegions = new HashSet<>();
         public HashSet<Region> expectedStrictRegions = new HashSet<>();
         public HashSet<Region> expectedContentRegions = new HashSet<>();
+        public Map<String, Object> expectedProperties = new HashMap<>();
 
         public SpecificTestContextRequirements(Eyes eyes) {
             this.eyes = eyes;
@@ -146,6 +146,12 @@ public abstract class TestSetup implements ITest {
         getTestData("testId").expectedFloatingRegions = new HashSet<>(Arrays.asList(expectedFloatingsRegions));
     }
 
+    public void addExpectedProperty(String propertyName, Object expectedValue)
+    {
+        Map<String, Object> expectedProps = getTestData("testId").expectedProperties;
+        expectedProps.put(propertyName, expectedValue);
+    }
+    
     void beforeMethod(String testName) {
         // Initialize the eyes SDK and set your private API key.
         this.testName = testName + " " + options.getBrowserName() + " (" + this.mode + ")";
