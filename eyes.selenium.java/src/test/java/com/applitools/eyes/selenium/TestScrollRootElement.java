@@ -17,26 +17,12 @@ public class TestScrollRootElement extends TestSetup {
     }
 
     @Test
-    public void TestCheckWindow_Body_Scroll() {
-        getEyes().setStitchMode(StitchMode.SCROLL);
-        getEyes().check("Body (Scroll stitching)", Target.window().scrollRootElement(By.tagName("body")).fully());
+    public void TestCheckWindow_Body() {
+        getEyes().check("Body (" + stitchMode + " stitching)", Target.window().scrollRootElement(By.tagName("body")).fully());
     }
 
     @Test
-    public void TestCheckWindow_Html_Scroll() {
-        getEyes().setStitchMode(StitchMode.SCROLL);
-        getEyes().check("Html (Scroll stitching)", Target.window().scrollRootElement(By.tagName("html")).fully());
-    }
-
-    @Test
-    public void TestCheckWindow_Body_Css() {
-        getEyes().setStitchMode(StitchMode.CSS);
-        getEyes().check("Body (Css stitching)", Target.window().scrollRootElement(By.tagName("body")).fully());
-    }
-
-    @Test
-    public void TestCheckWindow_Html_Css() {
-        getEyes().setStitchMode(StitchMode.CSS);
-        getEyes().check("Html (Css stitching)", Target.window().scrollRootElement(By.tagName("html")).fully());
+    public void TestCheckWindow_Html() {
+        getEyes().check("Html (" + stitchMode + "stitching)", Target.window().scrollRootElement(By.tagName("html")).fully());
     }
 }
