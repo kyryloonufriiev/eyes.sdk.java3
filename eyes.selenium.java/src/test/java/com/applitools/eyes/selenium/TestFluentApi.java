@@ -149,6 +149,12 @@ public class TestFluentApi extends TestSetup {
         getEyes().check("Fluent - Region by element - fully", Target.region(element).fully());
     }
 
+    @Test
+    public void TestCheckRegionBySelectorAfterManualScroll_Fluent()
+    {
+        ((JavascriptExecutor)getDriver()).executeScript("window.scrollBy(0,900)");
+        getEyes().check("Fluent - Region by selector after manual scroll", Target.region(By.id("centered")));
+    }
 
     @Test
     public void TestSimpleRegion() {
