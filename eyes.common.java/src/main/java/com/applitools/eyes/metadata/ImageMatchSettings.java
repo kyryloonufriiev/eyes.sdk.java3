@@ -45,6 +45,8 @@ public class ImageMatchSettings {
     private Integer scale;
     @JsonProperty("remainder")
     private Integer remainder;
+    @JsonProperty("ignoreDisplacements")
+    private Boolean ignoreDisplacements;
 
     @JsonProperty("matchLevel")
     public MatchLevel getMatchLevel() {
@@ -156,4 +158,13 @@ public class ImageMatchSettings {
         this.remainder = remainder;
     }
 
+    @JsonProperty("ignoreDisplacements")
+    public Boolean getIgnoreDisplacements() {
+        return ignoreDisplacements;
+    }
+
+    @JsonProperty("ignoreDisplacements")
+    public void setIgnoreDisplacements(Boolean ignoreDisplacements) {
+        this.ignoreDisplacements = ignoreDisplacements;
+    }
 }
