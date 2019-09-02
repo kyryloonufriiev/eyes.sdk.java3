@@ -49,16 +49,8 @@ public class CommUtils {
 
             HttpEntity entity = httpResponse.getEntity();
 
-//            byte[] buffer = new byte[1024];
             if (entity != null) {
                 InputStream inputStream = entity.getContent();
-//                int bytesRead;
-//                BufferedInputStream bis = new BufferedInputStream(inputStream);
-//                StringBuilder resultJson = new StringBuilder(inputStream.available());
-//                while ((bytesRead = bis.read(buffer)) != -1) {
-//                    String chunk = new String(buffer, 0, bytesRead);
-//                    resultJson.append(chunk);
-//                }
 
                 @SuppressWarnings("UnnecessaryLocalVariable")
                 Tout result = jsonMapper.readValue(inputStream, new TypeReference<Tout>() {
