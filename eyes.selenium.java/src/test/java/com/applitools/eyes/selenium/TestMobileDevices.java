@@ -3,6 +3,8 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.IServerConnector;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.CommUtils;
+import com.applitools.eyes.utils.PassedResult;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
 import com.sun.jndi.toolkit.url.Uri;
@@ -39,7 +41,7 @@ public class TestMobileDevices {
         this.page = page;
     }
 
-    @DataProvider(name = "IOSDevices")
+    @DataProvider(name = "IOSDevices", parallel = true)
     public static Object[][] IOSDevices() {
         List<Object[]> devices = Arrays.asList(new Object[][]{
                 {"iPad Pro (9.7 inch) Simulator", "12.0", ScreenOrientation.LANDSCAPE, false},
@@ -150,9 +152,9 @@ public class TestMobileDevices {
             //eyes.Check("Initial view", Target.Region(By.CssSelector("div.page")).Fully(fully).SendDom(false));
             eyes.check(Target.window().fully(fully));
             TestResults result = eyes.close();
-            IServerConnector serverConnector = eyes.getServerConnector();
+
             SessionId session = ((RemoteWebDriver) driver).getSessionId();
-            serverConnector.putTestResultJsonToSauce(new PassedResult(result.isPassed()), session.toString());
+            CommUtils.putTestResultJsonToSauceLabs(new PassedResult(result.isPassed()), session.toString());
         } finally {
             eyes.abort();
             driver.quit();

@@ -4,7 +4,6 @@
 package com.applitools.eyes;
 
 import com.applitools.IResourceUploadListener;
-import com.applitools.eyes.selenium.PassedResult;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.utils.ArgumentGuard;
@@ -15,7 +14,6 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.codec.binary.Base64;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.message.GZipEncoder;
 
 import javax.ws.rs.HttpMethod;
@@ -626,23 +624,4 @@ public class ServerConnector extends RestClient
         this.renderingInfo = renderInfo;
     }
 
-    @Override
-    public void putTestResultJsonToSauce(PassedResult passed, String sessionId) {
-        String sauce_username = System.getenv("SAUCE_USERNAME");
-        String sauce_access_key = System.getenv("SAUCE_ACCESS_KEY");
-        HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic(sauce_username, sauce_access_key);
-        WebTarget target = restClient.register(feature).target((HTTPS_SAUCELABS_COM));
-        target = target.path("rest/v1/" +sauce_username+ "/jobs/"+sessionId);
-        Invocation.Builder request = target.request(MediaType.TEXT_PLAIN);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        String json = null;
-        try {
-            json = objectMapper.writeValueAsString(passed);
-            Response response = request.put(Entity.json(json));
-        } catch (JsonProcessingException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
-        }
-    }
 }

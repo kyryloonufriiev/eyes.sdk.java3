@@ -1,7 +1,6 @@
 package com.applitools.eyes;
 
 import com.applitools.IResourceUploadListener;
-import com.applitools.eyes.selenium.PassedResult;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
 
@@ -16,7 +15,6 @@ public interface IServerConnector {
 
     String API_SESSIONS = "api/sessions";
     String RUNNING_DATA_PATH = API_SESSIONS + "/running/data";
-    String HTTPS_SAUCELABS_COM = "https://saucelabs.com/";
 
     //Rendering Grid
     String RENDER_INFO_PATH = API_SESSIONS + "/renderinfo";
@@ -175,6 +173,4 @@ public interface IServerConnector {
     IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent);
 
     void setRenderingInfo(RenderingInfo renderInfo);
-
-    void  putTestResultJsonToSauce(PassedResult passed, String sessionId);
 }
