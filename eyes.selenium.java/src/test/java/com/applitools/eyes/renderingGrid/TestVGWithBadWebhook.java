@@ -19,11 +19,12 @@ public class TestVGWithBadWebhook {
 
         BatchInfo batch = new BatchInfo("Visual Grid - Test bad webhook");
         final VisualGridRunner runner = new VisualGridRunner(10);
+
         final Eyes eyes = new Eyes(runner);
 
         Configuration config = new Configuration();
         config.setBatch(batch);
-        config.setAppName("Visual Grid Tests");
+        config.setAppName("Visual Grid Java Tests");
         config.setTestName("Bad Webhook");
         config.setViewportSize(new RectangleSize(800, 600));
 
@@ -40,8 +41,8 @@ public class TestVGWithBadWebhook {
         });
         Assert.assertNotNull(ex);
         Assert.assertNotNull(ex.getMessage());
-        Assert.assertTrue(ex.getMessage().startsWith(
-                "Render Failed for RenderBrowserInfo{ViewportSize={Width=800, Height=600}, BrowserType=CHROME, EmulationInfo=, Target='FullPage'} "),
+        Assert.assertTrue(ex.getMessage().contains(
+                "failed to run beforeCaptureScreenshot hook script"),
         "Actual string was: " + ex.getMessage());
     }
 }
