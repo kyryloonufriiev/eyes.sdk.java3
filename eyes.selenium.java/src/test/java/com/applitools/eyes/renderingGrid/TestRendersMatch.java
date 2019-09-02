@@ -16,7 +16,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TestRendersMatch {
-    Eyes eyes = null;
     private BatchInfo testRendersMatch = new BatchInfo("TestRendersMatch");
 
     @Test
@@ -28,11 +27,12 @@ public class TestRendersMatch {
                 new RectangleSize(800, 600),
                 new RectangleSize(700, 500),
                 new RectangleSize(1200, 800),
+                new RectangleSize(1600, 1200),
         };
 
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.com/helloworld");
-
+        Eyes eyes = null;
         try {
             for (RectangleSize viewport : ViewportList) {
                 eyes = initEyes(null, webDriver, viewport, "TestSuccess");
@@ -49,7 +49,9 @@ public class TestRendersMatch {
             GeneralUtils.logExceptionStackTrace(visualGridRunner.getLogger(), e);
         } finally {
             webDriver.quit();
-            eyes.abortIfNotClosed();
+            if (eyes != null) {
+                eyes.abortIfNotClosed();
+            }
         }
     }
 
@@ -58,26 +60,36 @@ public class TestRendersMatch {
         final VisualGridRunner visualGridRunner = new VisualGridRunner(10);
         visualGridRunner.setLogHandler(new FileLogger("TestRendersMatch.log", false, true));
 
-        final WebDriver webDriver = SeleniumUtils.createChromeDriver();
-
         RectangleSize[] ViewportList = {
                 new RectangleSize(800, 600),
                 new RectangleSize(700, 500),
                 new RectangleSize(1200, 800),
+                new RectangleSize(1600, 1200),
         };
-        webDriver.get("https://applitools.com/helloworld");
-        for (RectangleSize viewport : ViewportList) {
-            eyes = initEyes(null, webDriver, viewport, "TestFailure");
-            eyes.check(Target.window().fully());
-            eyes.closeAsync();
 
-            eyes = initEyes(visualGridRunner, webDriver, viewport, "TestFailure");
-            eyes.check(Target.window().fully());
-            eyes.closeAsync();
-            visualGridRunner.getAllTestResults();
+        final WebDriver webDriver = SeleniumUtils.createChromeDriver();
+        webDriver.get("https://applitools.com/helloworld");
+        Eyes eyes = null;
+        try {
+            int resultsTotal = 0;
+            for (RectangleSize viewport : ViewportList) {
+                eyes = initEyes(null, webDriver, viewport, "TestFailure");
+                eyes.check(Target.window().fully());
+                eyes.close();
+
+                eyes = initEyes(visualGridRunner, webDriver, viewport, "TestFailure");
+                eyes.check(Target.window().fully());
+                eyes.close();
+                TestResultsSummary results = visualGridRunner.getAllTestResults();
+                resultsTotal += results.getAllResults().length;
+            }
+            Assert.assertEquals(resultsTotal, 4);
+        } finally {
+            webDriver.quit();
+            if (eyes != null) {
+                eyes.abortIfNotClosed();
+            }
         }
-        webDriver.quit();
-        eyes.abortIfNotClosed();
     }
 
     private Eyes initEyes(EyesRunner runner, WebDriver driver, RectangleSize viewport, String testName) {
@@ -86,8 +98,7 @@ public class TestRendersMatch {
         Configuration sconf = new Configuration();
         sconf.setBatch(testRendersMatch);
         sconf.setViewportSize(viewport);
-        sconf.setTestName(testName);
-        sconf.setAppName("TestRendersMatch");
+        sconf.setTestName(testName).setAppName("TestRendersMatch");
         eyes.setConfiguration(sconf);
         eyes.open(driver);
         return eyes;
