@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Iterator;
 import java.util.List;
 
-public class TestResultsSummary implements Iterable<TestResultContainer>{
+public class TestResultsSummary implements Iterable<TestResultContainer> {
     private List<TestResultContainer> allResults;
     private int passed = 0;
     private int unresolved = 0;
@@ -18,7 +18,7 @@ public class TestResultsSummary implements Iterable<TestResultContainer>{
     public TestResultsSummary(List<TestResultContainer> allResults) {
         this.allResults = allResults;
         for (TestResultContainer resultContainer : allResults) {
-            if (resultContainer != null && resultContainer.getException() != null){
+            if (resultContainer != null && resultContainer.getException() != null) {
                 this.exceptions++;
             }
             TestResults result = resultContainer.getTestResults();
@@ -49,7 +49,7 @@ public class TestResultsSummary implements Iterable<TestResultContainer>{
     @Override
     public String toString() {
         return "result summary {" +
-                "\n\tall results=\n\t\t" + StringUtils.join(allResults,"\n\t\t") +
+                "\n\tall results=\n\t\t" + StringUtils.join(allResults, "\n\t\t") +
                 "\n\tpassed=" + passed +
                 "\n\tunresolved=" + unresolved +
                 "\n\tfailed=" + failed +
@@ -63,5 +63,9 @@ public class TestResultsSummary implements Iterable<TestResultContainer>{
     @Override
     public Iterator<TestResultContainer> iterator() {
         return this.allResults.iterator();
+    }
+
+    public int size() {
+        return this.allResults.size();
     }
 }

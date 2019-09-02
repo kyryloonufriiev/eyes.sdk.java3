@@ -41,6 +41,10 @@ public class RenderBrowserInfo {
         this(new RectangleSize(width, height), browserType, null);
     }
 
+    public RenderBrowserInfo(int width, int height) {
+        this(new RectangleSize(width, height), BrowserType.CHROME, null);
+    }
+
     public int getWidth() {
         if (viewportSize != null) {
             return viewportSize.getWidth();
