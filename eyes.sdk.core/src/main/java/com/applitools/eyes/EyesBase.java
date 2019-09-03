@@ -654,6 +654,10 @@ public abstract class EyesBase {
         return null;
     }
 
+    public TestResults abort() {
+        return abortIfNotClosed();
+    }
+
     protected void openLogger() {
         logger.getLogHandler().open();
     }

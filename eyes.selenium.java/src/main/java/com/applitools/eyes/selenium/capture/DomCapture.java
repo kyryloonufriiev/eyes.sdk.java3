@@ -62,6 +62,11 @@ public class DomCapture {
         driver = (EyesWebDriver) eyes.getDriver();
     }
 
+    public DomCapture(Logger logger, EyesWebDriver driver) {
+        this.logger = logger;
+        this.driver = driver;
+        mServerConnector = driver.getEyes().getServerConnector();
+    }
 
     public String getFullWindowDom() {
         long currentTimeMillis = System.currentTimeMillis();
