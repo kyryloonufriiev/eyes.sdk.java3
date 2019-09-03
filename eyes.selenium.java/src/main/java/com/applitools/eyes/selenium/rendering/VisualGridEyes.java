@@ -287,6 +287,12 @@ public class VisualGridEyes implements IRenderingEyes {
         return futures;
     }
 
+    public void abortAsync() {
+        for (RunningTest runningTest : testList) {
+            runningTest.abortIfNotClosed();
+        }
+    }
+
     public boolean getIsOpen() {
         return !isEyesClosed();
     }
