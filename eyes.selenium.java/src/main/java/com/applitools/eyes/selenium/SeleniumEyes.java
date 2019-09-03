@@ -43,7 +43,7 @@ import java.util.*;
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase {
+public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     private FrameChain originalFC;
     private WebElement scrollRootElement;
@@ -228,7 +228,7 @@ public class SeleniumEyes extends EyesBase {
      * @return the web driver
      * @throws EyesException the eyes exception
      */
-    protected WebDriver open(WebDriver driver) throws EyesException {
+    public WebDriver open(WebDriver driver) throws EyesException {
         openLogger();
         this.cachedAUTSessionId = null;
 
@@ -604,7 +604,7 @@ public class SeleniumEyes extends EyesBase {
     }
 
     @Override
-    public void setIsDisabled(boolean disabled) {
+    public void setIsDisabled(Boolean disabled) {
         super.setIsDisabled(disabled);
     }
 

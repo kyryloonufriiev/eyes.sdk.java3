@@ -400,7 +400,7 @@ public class VisualGridRunner extends EyesRunner {
         logger.verbose("enter");
         Map<IRenderingEyes, Collection<Future<TestResultContainer>>> allFutures = new HashMap<>();
         for (IRenderingEyes eyes : allEyes) {
-            Collection<Future<TestResultContainer>> futureList = eyes.close(false);
+            Collection<Future<TestResultContainer>> futureList = eyes.close();
             Collection<Future<TestResultContainer>> futures = allFutures.get(eyes);
             if (futures != null && !futures.isEmpty()) {
                 futureList.addAll(futures);

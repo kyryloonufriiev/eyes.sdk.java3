@@ -18,7 +18,6 @@ public class SeleniumEyesCompileTest {
     private Region region = new Region(10, 10, 10, 10);
     private WebElement webElement = null;
     private String tag = "tag";
-    ;
     private By selector = null;
     private String[] strs = new String[1];
     private MouseAction action = null;
@@ -478,11 +477,6 @@ public class SeleniumEyesCompileTest {
     @Test
     public void testGetDriver() {
         eyes.getDriver();
-    }
-
-    @Test
-    public void testGetOriginalFC() {
-        eyes.getOriginalFC();
     }
 
     @Test

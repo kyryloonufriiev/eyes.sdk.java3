@@ -19,7 +19,7 @@ public interface IRenderingEyes {
 
     ScoreTask getBestScoreTaskForOpen();
 
-    Collection<Future<TestResultContainer>> close(boolean throwException);
+    Collection<Future<TestResultContainer>> close();
 
     Logger getLogger();
 
