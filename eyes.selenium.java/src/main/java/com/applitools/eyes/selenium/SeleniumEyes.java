@@ -405,6 +405,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         getConfigSetter().setForceFullPageScreenshot(originalForceFPS);
     }
 
+    public void abortAsync() {
+        this.abortIfNotClosed();
+    }
     private void matchRegions(Dictionary<Integer, GetRegion> getRegions,
                               Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary,
                               ICheckSettings[] checkSettings) {
