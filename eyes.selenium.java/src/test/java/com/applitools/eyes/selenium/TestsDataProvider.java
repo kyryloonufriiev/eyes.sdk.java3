@@ -16,6 +16,9 @@ import java.util.List;
 
 public class TestsDataProvider {
     public final static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
+    public final static String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
+    public final static String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
+    public final static String SAUCE_SELENIUM_URL = "https://ondemand.saucelabs.com:443/wd/hub";
 
     @DataProvider(name = "booleanDP")
     public static Object[][] booleanDP() {

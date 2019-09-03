@@ -1,13 +1,11 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.IServerConnector;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.CommUtils;
 import com.applitools.eyes.utils.PassedResult;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
-import com.sun.jndi.toolkit.url.Uri;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -24,11 +22,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.applitools.eyes.selenium.TestsDataProvider.*;
+
 
 public class TestMobileDevices {
-    private static final String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
-    private static final String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
-
     private final String page;
 
     @DataProvider(name = "pages")
@@ -123,7 +120,7 @@ public class TestMobileDevices {
 
         caps.setCapability("name", testName + " (" + eyes.getFullAgentId() + ")");
 
-        String sauceUrl = "http://ondemand.saucelabs.com/wd/hub";
+        String sauceUrl = SAUCE_SELENIUM_URL;
         WebDriver driver = null;
         try {
             driver = new RemoteWebDriver(new URL(sauceUrl), caps);
