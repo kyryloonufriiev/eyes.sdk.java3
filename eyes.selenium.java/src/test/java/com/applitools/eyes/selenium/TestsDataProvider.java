@@ -17,6 +17,12 @@ import java.util.List;
 public class TestsDataProvider {
     public final static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
 
+    @DataProvider(name = "booleanDP")
+    public static Object[][] booleanDP() {
+        return new Object[][]{
+                {true}, {false}
+        };
+    }
 
     @DataProvider(parallel = true)
     public static Object[][] dp() {
