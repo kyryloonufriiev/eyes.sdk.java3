@@ -19,6 +19,13 @@ public final class Location implements Cloneable {
         this.y = y;
     }
 
+    /**
+     * Creates an empty Location instance. Used mainly for deserialization.
+     */
+    public Location() {
+        this.x = 0;
+        this.y = 0;
+    }
 
     @Override
     public boolean equals(Object obj) {

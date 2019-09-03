@@ -9,15 +9,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"id", "size", "hasDom", "location", "rectangle"})
+@JsonPropertyOrder({"id", "size", "hasDom", "location"})
 public class Image {
 
     @JsonProperty("id")
     private String id;
     @JsonProperty("size")
     private RectangleSize size;
-    @JsonProperty("rectangle")
-    private Region rectangle;
     @JsonProperty("location")
     private Location location;
     @JsonProperty("hasDom")
@@ -41,16 +39,6 @@ public class Image {
     @JsonProperty("size")
     public void setSize(RectangleSize size) {
         this.size = size;
-    }
-
-    @JsonProperty("rectangle")
-    public Region getRectangle() {
-        return rectangle;
-    }
-
-    @JsonProperty("rectangle")
-    public void setRectangle(Region rectangle) {
-        this.rectangle = rectangle;
     }
 
     @JsonProperty("location")
