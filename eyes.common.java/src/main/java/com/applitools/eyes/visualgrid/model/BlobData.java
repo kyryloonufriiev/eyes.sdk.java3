@@ -1,7 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
 
-import java.net.URI;
 import java.util.Arrays;
 
 public class BlobData {
