@@ -1,6 +1,8 @@
 package com.applitools.eyes.renderingGrid;
 
+import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -13,7 +15,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class TestBadSelectors {
-    VisualGridRunner runner = new VisualGridRunner(5);
+    EyesRunner runner = null;
     @DataProvider(name="booleanDP")
     public Object[] dp() {
         return new Object[]{Boolean.TRUE, Boolean.FALSE};
@@ -22,8 +24,9 @@ public class TestBadSelectors {
     @Test(dataProvider = "booleanDP")
     public void TestCheckRegionWithBadSelector(boolean useVisualGrid)
     {
+        runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = new ChromeDriver();
-        final Eyes eyes = new Eyes();
+        final Eyes eyes = new Eyes(runner);
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
         String suffix = useVisualGrid ? "_VG" : "";
@@ -43,8 +46,9 @@ public class TestBadSelectors {
     @Test(dataProvider = "booleanDP")
     public void TestCheckRegionWithBadIgnoreSelector(boolean useVisualGrid)
     {
+        runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = new ChromeDriver();
-        final Eyes eyes = new Eyes();
+        final Eyes eyes = new Eyes(runner);
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
         String suffix = useVisualGrid ? "_VG" : "";
@@ -60,8 +64,9 @@ public class TestBadSelectors {
 
     @Test(dataProvider = "booleanDP")
     public void TestCheckRegionWithBadSelectorBeforeValidCheck(boolean useVisualGrid) {
+        runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = new ChromeDriver();
-        final Eyes eyes = new Eyes();
+        final Eyes eyes = new Eyes(runner);
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
         String suffix = useVisualGrid ? "_VG" : "";
