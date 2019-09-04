@@ -7,9 +7,9 @@ import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -26,7 +26,7 @@ public class TestDoubleOpenClose {
     public void TestDoubleOpenCheckClose(boolean useVisualGrid)
     {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
-        final WebDriver driver = new ChromeDriver();
+        final WebDriver driver = SeleniumUtils.createChromeDriver();
         final Eyes eyes = new Eyes(runner);
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
@@ -50,7 +50,7 @@ public class TestDoubleOpenClose {
     public void TestDoubleOpenCheckCloseAsync(boolean useVisualGrid)
     {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
-        final WebDriver driver = new ChromeDriver();
+        final WebDriver driver = SeleniumUtils.createChromeDriver();
         final Eyes eyes = new Eyes(runner);
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
@@ -74,7 +74,7 @@ public class TestDoubleOpenClose {
     public void TestDoubleOpenCheckCloseWithDifferentInstances(boolean useVisualGrid)
     {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
-        final WebDriver driver = new ChromeDriver();
+        final WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
         String suffix = useVisualGrid ? "_VG" : "";
@@ -103,7 +103,7 @@ public class TestDoubleOpenClose {
     public void TestDoubleOpenCheckCloseAsyncWithDifferentInstances(boolean useVisualGrid)
     {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
-        final WebDriver driver = new ChromeDriver();
+        final WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
         String suffix = useVisualGrid ? "_VG" : "";
@@ -131,7 +131,7 @@ public class TestDoubleOpenClose {
     public void TestDoubleCheckDontGetAllResults(boolean useVisualGrid)
     {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
-        final WebDriver driver = new ChromeDriver();
+        final WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
         String suffix = useVisualGrid ? "_VG" : "";

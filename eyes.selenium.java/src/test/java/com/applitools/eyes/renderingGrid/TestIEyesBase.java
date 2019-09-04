@@ -7,9 +7,9 @@ import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -44,21 +44,18 @@ public abstract class TestIEyesBase {
         };
     }
 
-    protected TestIEyesBase(String fixtureName)
-    {
+    protected TestIEyesBase(String fixtureName) {
         LogPath = TestUtils.initLogPath(fixtureName);
         logHandler = TestUtils.initLogger(fixtureName, LogPath);
     }
 
 
     @Test(dataProvider = "TTS")
-    public void Test(String testedUrl, MatchLevel matchLevel)
-    {
-        WebDriver webDriver = new ChromeDriver();
-        Logger logger = null;
+    public void Test(String testedUrl, MatchLevel matchLevel) {
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
+        Logger logger;
         Eyes eyes = null;
-        try
-        {
+        try {
             webDriver.get(testedUrl);
             eyes = initEyes(webDriver, testedUrl);
             eyes.setSaveNewTests(false);
@@ -71,10 +68,8 @@ public abstract class TestIEyesBase {
             logger.verbose(String.format("calling eyes_.Close() (test: %s)", testedUrl));
             TestResults results = eyes.close(false);
             validateResults(eyes, results);
-        }
-        finally
-        {
-            if(eyes != null) {
+        } finally {
+            if (eyes != null) {
                 eyes.abort();
             }
             webDriver.quit();
@@ -83,8 +78,7 @@ public abstract class TestIEyesBase {
 
     abstract void validateResults(Eyes eyes, TestResults results);
 
-    protected ICheckSettings getCheckSettings()
-    {
+    protected ICheckSettings getCheckSettings() {
         return Target.window();
     }
 
