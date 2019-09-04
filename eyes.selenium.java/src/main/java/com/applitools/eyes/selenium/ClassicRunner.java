@@ -13,7 +13,7 @@ public class ClassicRunner extends EyesRunner {
 
     @Override
     public TestResultsSummary getAllTestResults(){
-        return getAllTestResults(false);
+        return getAllTestResults(true);
     }
 
     @Override
