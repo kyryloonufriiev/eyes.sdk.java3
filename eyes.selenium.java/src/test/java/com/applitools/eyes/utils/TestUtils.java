@@ -95,19 +95,32 @@ public class TestUtils {
         return jsonMapper.readValue(srStr, SessionResults.class);
     }
 
+    public static Object getFinalStatic(java.lang.Class klass, String fieldName) throws Exception {
+        Field field = klass.getDeclaredField(fieldName);
+        return getFinalStatic(field);
+    }
+
+    public static Object getFinalStatic(Field field) throws Exception {
+        makeFieldAccessible(field);
+        return field.get(null);
+    }
+
     public static void setFinalStatic(java.lang.Class klass, String fieldName, Object newValue) throws Exception {
         Field field = klass.getDeclaredField(fieldName);
         setFinalStatic(field, newValue);
     }
 
     public static void setFinalStatic(Field field, Object newValue) throws Exception {
+        makeFieldAccessible(field);
+        field.set(null, newValue);
+    }
+
+    private static void makeFieldAccessible(Field field) throws NoSuchFieldException, IllegalAccessException {
         field.setAccessible(true);
 
         Field modifiersField = Field.class.getDeclaredField("modifiers");
         modifiersField.setAccessible(true);
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        field.set(null, newValue);
     }
 
     public static List<Object[]> generatePermutationsList(List<List<Object>> lists) {
