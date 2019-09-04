@@ -1,11 +1,13 @@
 package com.applitools.eyes.utils;
 
-import com.applitools.eyes.*;
+import com.applitools.eyes.FileLogger;
+import com.applitools.eyes.LogHandler;
+import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.Eyes;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -43,21 +45,17 @@ public class TestUtils {
     public static LogHandler initLogger() {
         return initLogger(Thread.currentThread().getStackTrace()[2].getMethodName());
     }
+    public static LogHandler initLogger(String testName, String logPath) {
+        if (!TestUtils.runOnCI)
+        {
+            String path = logPath != null ? logPath : initLogPath(testName);
+            return new FileLogger(path + File.separator + "log.log", false, true);
+        }
+        return new StdoutLogHandler();
+    }
 
     public static LogHandler initLogger(String methodName) {
         return initLogger(methodName, null);
-    }
-
-    public static LogHandler initLogger(String methodName, String path) {
-        LogHandler logHandler;
-        path = (path == null) ? logsPath : path;
-        if (!TestUtils.runOnCI && path != null) {
-            path = initLogPath(methodName);
-            logHandler = new FileLogger(path + File.separator + "log.log", false, true);
-        } else {
-            logHandler = new StdoutLogHandler(true);
-        }
-        return logHandler;
     }
 
     public static void setupLogging(Eyes eyes) {
