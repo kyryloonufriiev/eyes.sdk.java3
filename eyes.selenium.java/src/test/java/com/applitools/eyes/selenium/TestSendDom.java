@@ -6,7 +6,6 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
-import com.applitools.eyes.selenium.capture.DomCapture;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.utils.CommUtils;
@@ -41,7 +40,7 @@ public final class TestSendDom {
         }
         Eyes eyes = new Eyes();
         try {
-            eyes.setBatch(TestsDataProvider.batchInfo);
+            eyes.setBatch(TestDataProvider.batchInfo);
             EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver, "Test Send DOM", testName);
             //DomCapture domCapture = new DomCapture(logger, eyesWebDriver);
             eyes.checkWindow();
@@ -131,7 +130,7 @@ public final class TestSendDom {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/DomTest/dom_capture.html");
         Eyes eyes = new Eyes();
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         try {
             eyes.open(webDriver, "Test SendDom", "Test SendDom", new RectangleSize(1000, 700));
             eyes.check("region", Target.region(By.cssSelector("#scroll1")));
@@ -149,7 +148,7 @@ public final class TestSendDom {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.com/helloworld");
         Eyes eyes = new Eyes();
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         eyes.setLogHandler(TestUtils.initLogger());
         eyes.setSendDom(false);
         try {

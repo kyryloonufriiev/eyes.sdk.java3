@@ -4,7 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.TestsDataProvider;
+import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.*;
@@ -50,7 +50,7 @@ public class TestMissingContentSites {
             Configuration configuration = new Configuration();
             configuration.setTestName(testedUrl);
             configuration.setAppName("Java SDK");
-            configuration.setBatch(TestsDataProvider.batchInfo);
+            configuration.setBatch(TestDataProvider.batchInfo);
             configuration.addBrowser(1200, 800, BrowserType.CHROME);
             configuration.addBrowser(1200, 800, BrowserType.EDGE);
 //            configuration.addDeviceEmulation(emulation);

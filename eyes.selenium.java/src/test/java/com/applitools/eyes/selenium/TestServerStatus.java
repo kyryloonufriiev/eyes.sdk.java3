@@ -1,6 +1,5 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -25,7 +24,7 @@ public class TestServerStatus {
         eyes.open(webDriver,
                 TestServerStatus.class.getSimpleName(),
                 TestServerStatus.class.getSimpleName(), new RectangleSize(800, 600));
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         try {
             eyes.check("TestSessionSummary_Status_Failed" + uuid, Target.window().fully(false));
             eyes.close(false);

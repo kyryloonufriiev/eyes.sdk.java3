@@ -104,7 +104,7 @@ public abstract class TestSetup implements ITest {
 
         String batchId = System.getenv("APPLITOOLS_BATCH_ID");
         if (batchId != null) {
-            TestsDataProvider.batchInfo.setId(batchId);
+            TestDataProvider.batchInfo.setId(batchId);
         }
 
         this.runner = this.useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
@@ -199,7 +199,7 @@ public abstract class TestSetup implements ITest {
         }
         //string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         driver.get(testedPageUrl);
-        eyes.getLogger().log(testName + ": " + TestsDataProvider.batchInfo.getName());
+        eyes.getLogger().log(testName + ": " + TestDataProvider.batchInfo.getName());
 
         testData.setWrappedDriver(driver);
         testData.setDriver(webDriver);
@@ -216,7 +216,7 @@ public abstract class TestSetup implements ITest {
         eyes.setHideScrollbars(true);
         eyes.setStitchMode(this.stitchMode);
         eyes.setSaveNewTests(false);
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }

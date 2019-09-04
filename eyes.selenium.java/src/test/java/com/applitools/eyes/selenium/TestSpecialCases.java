@@ -3,14 +3,12 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.selenium.fluent.Target;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
 import org.testng.annotations.*;
 
 @Listeners(TestListener.class)
 public class TestSpecialCases extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestSpecialCases(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - Special Cases", caps, mode);
         testedPageUrl = "http://applitools.github.io/demo/TestPages/WixLikeTestPage/index.html";

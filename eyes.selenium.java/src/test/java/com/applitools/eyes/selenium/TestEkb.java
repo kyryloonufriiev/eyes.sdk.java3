@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 @Listeners(TestListener.class)
 public class TestEkb extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestEkb(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - Applitools EKB", caps, mode);
         testedPageUrl = "https://www.applitools.com/docs/topics/working-with-test-batches/working-with-test-batches.html";

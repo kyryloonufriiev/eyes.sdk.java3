@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 @SuppressWarnings("SpellCheckingInspection")
 public class TestAcme extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestAcme(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - Test Acme", caps, mode);
         testedPageSize = new RectangleSize(1024,768);

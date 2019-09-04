@@ -11,7 +11,7 @@ import org.testng.annotations.*;
 @Listeners(TestListener.class)
 public class TestFluentApi extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestFluentApi(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - Fluent API", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";
@@ -166,7 +166,7 @@ public class TestFluentApi extends TestSetup {
 
 
 
-    @Test(dataProvider = "booleanDP", dataProviderClass = TestsDataProvider.class)
+    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestIgnoreDisplacements(boolean ignoreDisplacements) {
         getEyes().check("Fluent - Ignore Displacements = " + ignoreDisplacements, Target.window().ignoreDisplacements(ignoreDisplacements).fully());
         addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);

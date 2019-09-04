@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 
 @Listeners(TestListener.class)
 public class TestDuplicates extends TestSetup {
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestDuplicates(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - Duplicates", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/VisualGridTestPage/duplicates.html";

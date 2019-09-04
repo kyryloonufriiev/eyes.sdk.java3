@@ -14,7 +14,7 @@ import java.util.List;
 @Listeners(TestListener.class)
 public class TestFluentApi_Frames extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestFluentApi_Frames(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - Fluent API", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";

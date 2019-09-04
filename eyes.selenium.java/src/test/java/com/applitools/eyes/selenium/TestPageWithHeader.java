@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 @Listeners(TestListener.class)
 public class TestPageWithHeader extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestPageWithHeader(Capabilities options, String mode) {
         super("Eyes Selenium SDK - Page With Header", options, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/PageWithHeader/index.html";

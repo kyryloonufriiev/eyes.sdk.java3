@@ -4,7 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.TestsDataProvider;
+import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.visualgrid.model.ChromeEmulationInfo;
@@ -63,7 +63,7 @@ class TestVGDemo
         conf.setTestName("Java VisualGrid demo")   // Set test name
                 .setAppName("Demo app");             // Set app name
 
-        conf.setBatch(TestsDataProvider.batchInfo);
+        conf.setBatch(TestDataProvider.batchInfo);
         // Add browsers with different viewports
         conf.addBrowser(800, 600, BrowserType.CHROME);
         conf.addBrowser(700, 500, BrowserType.FIREFOX);

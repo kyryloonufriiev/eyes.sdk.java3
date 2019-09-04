@@ -13,7 +13,7 @@ public class TestServerConnector {
     public void TestDelete() {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         Eyes eyes = new Eyes();
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         try {
             WebDriver driver = eyes.open(webDriver,
                     "TestSessionConnector", "TestSessionConnector",

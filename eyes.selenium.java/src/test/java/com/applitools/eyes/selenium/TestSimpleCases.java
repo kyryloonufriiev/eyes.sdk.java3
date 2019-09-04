@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 @Listeners(TestListener.class)
 public class TestSimpleCases extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestSimpleCases(Capabilities options, String mode) {
         super("Eyes Selenium SDK - Simple Test Cases", options, mode);
         testedPageSize = new RectangleSize(1024, 600);

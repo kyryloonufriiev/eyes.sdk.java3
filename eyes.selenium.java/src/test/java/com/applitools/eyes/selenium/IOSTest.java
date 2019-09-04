@@ -86,7 +86,7 @@ public class IOSTest {
         Eyes eyes = new Eyes();
         eyes.setServerConnector(new ServerConnector());
 
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
 
         DesiredCapabilities caps = DesiredCapabilities.iphone();
 

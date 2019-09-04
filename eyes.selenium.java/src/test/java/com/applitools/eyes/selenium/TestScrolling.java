@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.applitools.eyes.selenium.TestsDataProvider.SAUCE_ACCESS_KEY;
-import static com.applitools.eyes.selenium.TestsDataProvider.SAUCE_SELENIUM_URL;
-import static com.applitools.eyes.selenium.TestsDataProvider.SAUCE_USERNAME;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_SELENIUM_URL;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
 
 public class TestScrolling {
 
@@ -42,7 +42,7 @@ public class TestScrolling {
         return driver;
     }
 
-    @Test(dataProvider = "booleanDP", dataProviderClass = TestsDataProvider.class)
+    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestWebAppScrolling(boolean useEmulation) {
         WebDriver driver;
         if (useEmulation) {
@@ -75,7 +75,7 @@ public class TestScrolling {
         Eyes eyes = new Eyes();
         try {
             TestUtils.setupLogging(eyes);
-            eyes.setBatch(TestsDataProvider.batchInfo);
+            eyes.setBatch(TestDataProvider.batchInfo);
             EyesWebDriver eyesDriver = (EyesWebDriver) eyes.open(driver, "TestScrolling", "TestWebAppScrolling");
 
             WebElement contentElement = driver.findElement(By.className("content"));
@@ -98,7 +98,7 @@ public class TestScrolling {
         }
     }
 
-    @Test(dataProvider = "booleanDP", dataProviderClass = TestsDataProvider.class)
+    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestWebAppScrolling2(boolean useEmulation) {
         WebDriver driver;
         if (useEmulation) {
@@ -130,7 +130,7 @@ public class TestScrolling {
         Eyes eyes = new Eyes();
         try {
             TestUtils.setupLogging(eyes);
-            eyes.setBatch(TestsDataProvider.batchInfo);
+            eyes.setBatch(TestDataProvider.batchInfo);
             eyes.open(driver, "TestScrolling", "TestWebAppScrolling2");
             eyes.setStitchMode(StitchMode.CSS);
             eyes.check("big page on mobile", Target.window().fully());
@@ -141,7 +141,7 @@ public class TestScrolling {
         }
     }
 
-    @Test(dataProvider = "booleanDP", dataProviderClass = TestsDataProvider.class)
+    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestWebAppScrolling3(boolean useEmulation) {
         WebDriver driver;
         if (useEmulation) {
@@ -175,7 +175,7 @@ public class TestScrolling {
         Eyes eyes = new Eyes();
         try {
             TestUtils.setupLogging(eyes);
-            eyes.setBatch(TestsDataProvider.batchInfo);
+            eyes.setBatch(TestDataProvider.batchInfo);
             eyes.open(driver, "TestScrolling", "TestWebAppScrolling3");
             eyes.check("long page on mobile", Target.region(By.cssSelector("div.page")).fully(false).sendDom(false));
             eyes.close();

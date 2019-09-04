@@ -26,7 +26,7 @@ public final class TestCounts {
     @Test
     public void Test_VGTestsCount_1() {
         TestObjects testObjects = InitEyes_();
-        testObjects.eyes.setBatch(TestsDataProvider.batchInfo);
+        testObjects.eyes.setBatch(TestDataProvider.batchInfo);
         try {
             testObjects.eyes.open(testObjects.webDriver, "Test Count", "Test_VGTestsCount_1", new RectangleSize(640, 480));
             testObjects.eyes.check("Test", Target.window());
@@ -44,7 +44,7 @@ public final class TestCounts {
         TestObjects testObjects = InitEyes_();
         try {
             Configuration conf = new Configuration();
-            conf.setBatch(TestsDataProvider.batchInfo);
+            conf.setBatch(TestDataProvider.batchInfo);
             conf.addBrowser(new RenderBrowserInfo(900, 600));
             conf.addBrowser(new RenderBrowserInfo(1024, 768));
             testObjects.eyes.setConfiguration(conf);
@@ -64,7 +64,7 @@ public final class TestCounts {
         TestObjects testObjects = InitEyes_();
         try {
             Configuration conf = new Configuration();
-            conf.setBatch(TestsDataProvider.batchInfo);
+            conf.setBatch(TestDataProvider.batchInfo);
             conf.addBrowser(new RenderBrowserInfo(900, 600));
             conf.addBrowser(new RenderBrowserInfo(1024, 768));
             conf.setAppName("Test Count").setTestName("Test_VGTestsCount_3");
@@ -85,7 +85,7 @@ public final class TestCounts {
         TestObjects testObjects = InitEyes_();
         try {
             Configuration conf = new Configuration();
-            conf.setBatch(TestsDataProvider.batchInfo);
+            conf.setBatch(TestDataProvider.batchInfo);
             conf.setAppName("Test Count").setTestName("Test_VGTestsCount_4");
             testObjects.eyes.setConfiguration(conf);
             testObjects.eyes.open(testObjects.webDriver);
@@ -104,7 +104,7 @@ public final class TestCounts {
         TestObjects testObjects = InitEyes_();
         try {
             Configuration conf = new Configuration();
-            conf.setBatch(TestsDataProvider.batchInfo);
+            conf.setBatch(TestDataProvider.batchInfo);
             conf.addBrowser(new RenderBrowserInfo(900, 600));
             conf.addBrowser(new RenderBrowserInfo(1024, 768));
             testObjects.eyes.setConfiguration(conf);

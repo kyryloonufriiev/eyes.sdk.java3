@@ -15,7 +15,7 @@ public class TestSeleniumEyesWithNullRunner {
     @BeforeClass
     public void beforeClass(){
         eyes = new Eyes(null);
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         driver = SeleniumUtils.createChromeDriver();
         driver.get(testedPageUrl);
     }

@@ -36,7 +36,7 @@ public class AndroidTest {
     public void TestAndroidChromeCrop(String deviceName, String deviceOrientation, String platformVersion, boolean fully) throws MalformedURLException {
         Eyes eyes = new Eyes();
 
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
 
         // This is your api key, make sure you use it in all your tests.
         DesiredCapabilities caps = DesiredCapabilities.iphone();

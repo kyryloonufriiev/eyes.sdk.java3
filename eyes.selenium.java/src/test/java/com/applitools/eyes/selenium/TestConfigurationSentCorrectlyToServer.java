@@ -70,8 +70,8 @@ public class TestConfigurationSentCorrectlyToServer {
 
         String effectiveSequenceName = sequenceName != null ? sequenceName : sequenceNameEnvVar;
 
-        BatchInfo batchInfo = new BatchInfo(TestsDataProvider.batchInfo.getName() + "_" + effectiveSequenceName, Calendar.getInstance());
-        batchInfo.setId(TestsDataProvider.batchInfo.getId() + "_" + effectiveSequenceName);
+        BatchInfo batchInfo = new BatchInfo(TestDataProvider.batchInfo.getName() + "_" + effectiveSequenceName, Calendar.getInstance());
+        batchInfo.setId(TestDataProvider.batchInfo.getId() + "_" + effectiveSequenceName);
 
         if (sequenceName != null) {
             batchInfo.setSequenceName(sequenceName);

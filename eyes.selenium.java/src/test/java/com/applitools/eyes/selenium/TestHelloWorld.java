@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 
 public final class TestHelloWorld {
 
-    @Test(dataProvider = "booleanDP", dataProviderClass = TestsDataProvider.class)
+    @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void HelloWorldTest(boolean useVisualGrid)
     {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();

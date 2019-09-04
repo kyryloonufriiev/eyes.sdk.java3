@@ -1,6 +1,5 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.TestUtils;
 import io.appium.java_client.MobileBy;
@@ -31,7 +30,7 @@ public class MobileNativeTests {
         String testName = Thread.currentThread().getStackTrace()[2].getMethodName();
         TestUtils.setupLogging(eyes, testName);
         setCapabilities(eyes, capabilities, testName);
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         return eyes;
     }
 
@@ -112,7 +111,7 @@ public class MobileNativeTests {
         Eyes eyes = new Eyes();
         setCapabilities(eyes, caps, "iOSNativeAppTest");
         TestUtils.setupLogging(eyes);
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
 
         WebDriver driver = new IOSDriver(new URL(appiumServerUrl), caps);
 

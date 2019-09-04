@@ -4,7 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.TestsDataProvider;
+import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
@@ -43,7 +43,7 @@ public class TestSVGSites {
             Configuration configuration = new Configuration();
             configuration.setAppName("Eyes Java SDK - SVG Sites");
             configuration.setTestName("testedUrl - "+testedUrl);
-            configuration.setBatch(TestsDataProvider.batchInfo);
+            configuration.setBatch(TestDataProvider.batchInfo);
             configuration.addBrowser(800, 600, BrowserType.CHROME);
             configuration.addBrowser(700, 500, BrowserType.FIREFOX);
             configuration.addBrowser(700, 500, BrowserType.IE_10);

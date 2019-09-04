@@ -1,9 +1,8 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.FileLogger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.TestsDataProvider;
+import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
@@ -27,7 +26,7 @@ public class TestVGExceptionInRegion {
         eyes.setLogHandler(TestUtils.initLogger("VGExcep.log"));
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
         Configuration configuration = new Configuration();
-        configuration.setBatch(TestsDataProvider.batchInfo);
+        configuration.setBatch(TestDataProvider.batchInfo);
 //        configuration.setWaitBeforeScreenshots(600);
         driver.get("http://google.com");
         eyes.setConfiguration(configuration);

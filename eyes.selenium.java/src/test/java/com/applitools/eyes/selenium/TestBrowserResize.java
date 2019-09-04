@@ -21,7 +21,7 @@ public class TestBrowserResize {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/DynamicResolution/desktop.html");
         Eyes eyes = new Eyes();
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         try {
             eyes.open(webDriver, "Browser Size Test", "Browser Size Test", new RectangleSize(640, 480));
             eyes.check("Test 1", Target.window());

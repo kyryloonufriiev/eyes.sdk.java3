@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestsDataProvider {
+public class TestDataProvider {
     public final static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
     public final static String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
     public final static String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");

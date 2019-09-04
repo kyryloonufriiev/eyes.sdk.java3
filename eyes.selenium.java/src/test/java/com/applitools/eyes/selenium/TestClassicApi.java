@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 @Listeners(TestListener.class)
 public class TestClassicApi extends TestSetup {
 
-    @Factory(dataProvider = "dp", dataProviderClass = TestsDataProvider.class)
+    @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)
     public TestClassicApi(Capabilities caps, String mode) {
         super("Eyes Selenium SDK - Classic API", caps, mode);
         testedPageUrl = "https://applitools.github.io/demo/TestPages/FramesTestPage/";

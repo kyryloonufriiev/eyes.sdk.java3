@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.applitools.eyes.selenium.TestsDataProvider.*;
+import static com.applitools.eyes.selenium.TestDataProvider.*;
 
 
 public class TestMobileDevices {
@@ -103,7 +103,7 @@ public class TestMobileDevices {
                           String platformName, String browserName, String page) {
         Eyes eyes = new Eyes();
 
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
 
         DesiredCapabilities caps = new DesiredCapabilities();
 

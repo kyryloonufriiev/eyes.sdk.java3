@@ -5,7 +5,7 @@ import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.TestsDataProvider;
+import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
@@ -41,7 +41,7 @@ public final class TestRenderingGridServiceWithJsHook {
 
         try {
             Configuration configuration = new Configuration();
-            configuration.setBatch(TestsDataProvider.batchInfo);
+            configuration.setBatch(TestDataProvider.batchInfo);
             configuration.setTestName("Visual Grid With Web Hook");
             configuration.setAppName("RenderingGridIntegration");
             configuration.addBrowser(400, 300, BrowserType.CHROME);
@@ -70,7 +70,7 @@ public final class TestRenderingGridServiceWithJsHook {
 
         try {
             Configuration configuration = new Configuration();
-            configuration.setBatch(TestsDataProvider.batchInfo);
+            configuration.setBatch(TestDataProvider.batchInfo);
             configuration.setTestName("Vans Gallery page");
             configuration.setAppName("RenderingGridIntegration");
             configuration.addBrowser(1200, 800, BrowserType.CHROME, null);

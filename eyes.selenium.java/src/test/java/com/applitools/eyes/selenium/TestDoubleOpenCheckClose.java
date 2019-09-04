@@ -10,8 +10,8 @@ import org.testng.annotations.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.applitools.eyes.selenium.TestsDataProvider.SAUCE_ACCESS_KEY;
-import static com.applitools.eyes.selenium.TestsDataProvider.SAUCE_USERNAME;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
 
 public class TestDoubleOpenCheckClose {
     @Test
@@ -19,7 +19,7 @@ public class TestDoubleOpenCheckClose {
         Eyes eyes = new Eyes();
         TestUtils.setupLogging(eyes);
         eyes.setSendDom(false);
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
 
         //*************
         DesiredCapabilities capabilities = new DesiredCapabilities();
