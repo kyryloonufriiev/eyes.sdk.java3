@@ -96,13 +96,26 @@ public class TestUtils {
     }
 
     public static Object getFinalStatic(java.lang.Class klass, String fieldName) throws Exception {
-        Field field = klass.getDeclaredField(fieldName);
-        return getFinalStatic(field);
+        return getFieldValue(klass, null, fieldName);
     }
 
     public static Object getFinalStatic(Field field) throws Exception {
+        return getFieldValue(field, (Object)null);
+    }
+
+    public static Object getFieldValue(Object instance, String fieldName) throws Exception {
+        Field field = instance.getClass().getDeclaredField(fieldName);
+        return getFieldValue(field, instance);
+    }
+
+    public static Object getFieldValue(java.lang.Class klass, Object instance, String fieldName) throws Exception {
+        Field field = klass.getDeclaredField(fieldName);
+        return getFieldValue(field, instance);
+    }
+
+    public static Object getFieldValue(Field field, Object instance) throws Exception {
         makeFieldAccessible(field);
-        return field.get(null);
+        return field.get(instance);
     }
 
     public static void setFinalStatic(java.lang.Class klass, String fieldName, Object newValue) throws Exception {
