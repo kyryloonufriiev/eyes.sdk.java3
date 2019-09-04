@@ -7,7 +7,7 @@ import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
@@ -91,7 +91,7 @@ public class TestIEyesVG extends TestIEyesBase {
             TestResults testResults = testResultContainer.getTestResults();
             SessionResults sessionResults = null;
             try {
-                sessionResults = EyesSeleniumUtils.getSessionResults(runner.getApiKey(), testResults);
+                sessionResults = TestUtils.getSessionResults(runner.getApiKey(), testResults);
             } catch (IOException e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }

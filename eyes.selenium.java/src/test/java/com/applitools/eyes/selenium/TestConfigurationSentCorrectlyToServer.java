@@ -4,6 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -110,7 +111,7 @@ public class TestConfigurationSentCorrectlyToServer {
         TestResults results = eyes.close(false);
         SessionResults sessionResults = null;
         try {
-            sessionResults = EyesSeleniumUtils.getSessionResults(eyes.getApiKey(), results);
+            sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
         } catch (IOException e) {
             e.printStackTrace();
         }

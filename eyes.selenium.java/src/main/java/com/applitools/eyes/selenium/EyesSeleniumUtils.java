@@ -736,23 +736,5 @@ public class EyesSeleniumUtils {
         return region.getSize();
     }
 
-    public static SessionResults getSessionResults(String apiKey, TestResults results) throws java.io.IOException {
-        String apiSessionUrl = results.getApiUrls().getSession();
-        URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
-                .queryParam("format", "json")
-                .queryParam("AccessToken", results.getSecretToken())
-                .queryParam("apiKey", apiKey)
-                .build();
-
-        Client client = ClientBuilder.newClient();
-        String srStr = client.target(apiSessionUri)
-                .request(MediaType.APPLICATION_JSON)
-                .get(String.class);
-
-        ObjectMapper jsonMapper = new ObjectMapper();
-        jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        return jsonMapper.readValue(srStr, SessionResults.class);
-    }
 }
 

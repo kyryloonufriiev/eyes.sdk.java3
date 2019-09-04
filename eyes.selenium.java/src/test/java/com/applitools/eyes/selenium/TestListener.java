@@ -6,6 +6,7 @@ import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
 import org.testng.*;
 
@@ -93,7 +94,7 @@ public class TestListener implements ITestListener {
                     eyes.getLogger().verbose("no results returned from eyes.close()");
                     return true;
                 }
-                SessionResults resultObject = EyesSeleniumUtils.getSessionResults(eyes.getApiKey(), results);
+                SessionResults resultObject = TestUtils.getSessionResults(eyes.getApiKey(), results);
 
                 ActualAppOutput[] actualAppOutput = resultObject.getActualAppOutput();
 

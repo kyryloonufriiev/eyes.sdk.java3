@@ -177,7 +177,7 @@ public final class TestSendDom {
     private static boolean getHasDom(IEyesBase eyes, TestResults results) {
         SessionResults sessionResults = null;
         try {
-            sessionResults = EyesSeleniumUtils.getSessionResults(eyes.getApiKey(), results);
+            sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
         } catch (IOException e) {
             GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
         }

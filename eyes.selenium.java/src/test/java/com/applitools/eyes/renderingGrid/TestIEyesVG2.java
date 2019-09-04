@@ -8,7 +8,7 @@ import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.Image;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.WebDriver;
@@ -49,7 +49,7 @@ public class TestIEyesVG2 extends TestIEyesBase{
     {
         SessionResults sessionResults = null;
         try {
-            sessionResults = EyesSeleniumUtils.getSessionResults(eyes.getApiKey(), results);
+            sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
         } catch (IOException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
