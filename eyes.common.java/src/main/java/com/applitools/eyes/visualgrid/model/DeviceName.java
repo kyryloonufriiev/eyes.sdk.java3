@@ -6,7 +6,7 @@ public enum DeviceName {
     iPhone_4("iPhone 4"),
     iPhone_5SE("iPhone 5/SE"),
     iPhone_6_7_8("iPhone 6/7/8"),
-    iPhone6_7_8_Plus("iPhone 6/7/8 Plus"),
+    iPhone_6_7_8_Plus("iPhone 6/7/8 Plus"),
     iPhone_X("iPhone X"),
     iPad("iPad"),
     iPad_Pro("iPad Pro"),
