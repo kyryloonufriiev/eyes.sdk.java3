@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.ContentType;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 
 public class CommUtils {
 
@@ -90,8 +92,16 @@ public class CommUtils {
     }
 
     public static <Tin, Tout> Tout putJson(String url, Tin data, HttpAuth creds) {
+        return jsonRequest(url, data, creds, new HttpPut());
+    }
+
+    public static <Tin, Tout> Tout postJson(String url, Tin data, HttpAuth creds) {
+        return jsonRequest(url, data, creds, new HttpPost());
+    }
+
+    public static <Tin, Tout> Tout jsonRequest(String url, Tin data, HttpAuth creds, HttpEntityEnclosingRequestBase request) {
         try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
-            HttpPut request = new HttpPut(url);
+            request.setURI(new URI(url));
             setCredentials(creds, request);
             String json = createJsonString(data);
             request.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
