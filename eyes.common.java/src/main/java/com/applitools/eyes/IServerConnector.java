@@ -152,7 +152,9 @@ public interface IServerConnector {
      * @param userAgent the userAgent to send to server
      * @return true if resource was uploaded
      */
-    IPutFuture renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, IResourceUploadListener listener);
+    IPutFuture renderAsyncPutResource(RunningRender runningRender, RGridResource resource, String userAgent, IResourceUploadListener listener);
+
+    boolean renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, IResourceUploadListener listener);
 
     /**
      * Get the rendering status for current render

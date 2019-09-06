@@ -53,7 +53,7 @@ public class PutFuture implements IPutFuture {
     @Override
     public Boolean get() {
         if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent,null);
+            IPutFuture newFuture = serverConnector.renderAsyncPutResource(runningRender, resource, userAgent,null);
             this.putFuture = newFuture.getPutFuture();
         }
         if (!this.isSentAlready) {
@@ -70,7 +70,7 @@ public class PutFuture implements IPutFuture {
                     } catch (InterruptedException e1) {
                         GeneralUtils.logExceptionStackTrace(logger, e1);
                     }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent,null);
+                    IPutFuture newFuture = serverConnector.renderAsyncPutResource(runningRender, resource, userAgent,null);
                     logger.log("fired retry");
                     this.putFuture = newFuture.getPutFuture();
                 }
@@ -83,7 +83,7 @@ public class PutFuture implements IPutFuture {
     @Override
     public Boolean get(long timeout, TimeUnit unit) {
         if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent ,null);
+            IPutFuture newFuture = serverConnector.renderAsyncPutResource(runningRender, resource, userAgent ,null);
             this.putFuture = newFuture.getPutFuture();
         }
         if (!this.isSentAlready) {
@@ -100,7 +100,7 @@ public class PutFuture implements IPutFuture {
                     } catch (InterruptedException e1) {
                         GeneralUtils.logExceptionStackTrace(logger, e1);
                     }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent, null);
+                    IPutFuture newFuture = serverConnector.renderAsyncPutResource(runningRender, resource, userAgent, null);
                     logger.log("fired retry");
                     this.putFuture = newFuture.getPutFuture();
                 }

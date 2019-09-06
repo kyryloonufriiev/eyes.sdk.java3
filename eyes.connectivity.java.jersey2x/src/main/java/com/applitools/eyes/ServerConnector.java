@@ -529,7 +529,44 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IPutFuture renderPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
+    public boolean renderPutResource(RunningRender runningRender, RGridResource resource, String userAgent, IResourceUploadListener listener) {
+        ArgumentGuard.notNull(runningRender, "runningRender");
+        ArgumentGuard.notNull(resource, "resource");
+        byte[] content = resource.getContent();
+
+        String hash = resource.getSha256();
+        String renderId = runningRender.getRenderId();
+        logger.verbose("resource hash:" + hash + " ; url: " + resource.getUrl() + " ; render id: " + renderId);
+
+        WebTarget target = buildRestClient(30 * 1000, getProxy()).target(renderingInfo.getServiceUrl())
+                .path(RESOURCES_SHA_256 + hash)
+                .queryParam("render-id", renderId);
+
+        String contentType = resource.getContentType();
+        Invocation.Builder request = target.request(contentType);
+        request.header("X-Auth-Token", renderingInfo.getAccessToken());
+        request.header("User-Agent", userAgent);
+        Entity entity = null;
+        if (contentType != null) {
+            entity = Entity.entity(content, contentType);
+
+        }
+        else{
+            entity = Entity.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        }
+        final Response response = request.put(entity);
+        int status = response.getStatus();
+        if(status <300 && status > 199){
+            logger.verbose("Put sync success");
+            response.close();
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    public IPutFuture renderAsyncPutResource(final RunningRender runningRender, final RGridResource resource, String userAgent, final IResourceUploadListener listener) {
         ArgumentGuard.notNull(runningRender, "runningRender");
         ArgumentGuard.notNull(resource, "resource");
         byte[] content = resource.getContent();
