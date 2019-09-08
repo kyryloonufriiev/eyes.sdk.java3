@@ -22,7 +22,7 @@ public class TestImagesApi_OpenWithSize {
     public void setup(Method method) {
         eyes = new Eyes();
 
-        LogHandler logHandler = new StdoutLogHandler(true);
+        LogHandler logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
 
         eyes.setBatch(batchInfo);
