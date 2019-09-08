@@ -31,7 +31,7 @@ public class Test_VG_USA_Today {
     @BeforeClass
     public void beforeClass() {
         renderingManager = new VisualGridRunner(10);
-        renderingManager.setLogHandler(new StdoutLogHandler(true));
+        renderingManager.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         FileLogger logHandler = new FileLogger("Oran.log", false, true);
         renderingManager.setLogHandler(logHandler);
         renderingManager.getLogger().log("enter");

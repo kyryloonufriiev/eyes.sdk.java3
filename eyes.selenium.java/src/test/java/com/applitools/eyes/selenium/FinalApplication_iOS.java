@@ -5,6 +5,7 @@ import java.awt.AWTException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -49,7 +50,7 @@ public class FinalApplication_iOS {
         eyes.setDebugScreenshotsPrefix("IOS_10_0_Safari_10_0_");
 
         //VisualGridEyes.setImageCut(new FixedCutProvider(URL_BAR_SIZE,NAVIGATION_BAR_SIZE, 0, 0));
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         driver= eyes.open(driver, "sample", "IOS");
         try {
             driver.get("http://atom:mota@lgi-www-sat.trimm.net/test/ziggo/title-with-icon.html");

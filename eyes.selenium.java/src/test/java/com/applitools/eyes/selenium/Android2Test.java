@@ -59,7 +59,7 @@ public class Android2Test {
 
         WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         String testName = String.format("%s %s %s", deviceName, platformVersion, deviceOrientation);
         if (fully) {
@@ -86,7 +86,7 @@ public class Android2Test {
 
     @Test
     public void setUp() throws IOException {
-        StdoutLogHandler LOG = new StdoutLogHandler();
+        StdoutLogHandler LOG = new StdoutLogHandler(TestUtils.verboseLogs);
         Eyes eyes = new Eyes();
         //eyes.setServerUrl(APPLITOOLS_SERVER_URL);
         // StitchMode SCROLL will fail as well (with nullpointer exception)

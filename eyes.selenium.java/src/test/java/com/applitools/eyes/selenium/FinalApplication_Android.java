@@ -5,6 +5,8 @@ import com.applitools.eyes.StdoutLogHandler;
 import java.awt.AWTException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -55,7 +57,7 @@ public class FinalApplication_Android {
         eyes.setSaveNewTests(false);
         eyes.setForceFullPageScreenshot(true);
         eyes.setImageCut(new FixedCutProvider(URL_BAR_SIZE, NAVIGATION_BAR_SIZE, 0, 0));
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         driver = eyes.open(driver, "sample2", "titleicon5");
         try {

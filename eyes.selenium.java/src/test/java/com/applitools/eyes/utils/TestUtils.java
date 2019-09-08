@@ -28,6 +28,7 @@ public class TestUtils {
     public final static boolean runHeadless = runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_RUN_HEADLESS"));
     public final static String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
     public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
+    public final static boolean verboseLogs = !runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_VERBOSE_LOGS"));
 
     public static String initLogPath() {
         return initLogPath(Thread.currentThread().getStackTrace()[2].getMethodName());
@@ -51,7 +52,7 @@ public class TestUtils {
             String path = logPath != null ? logPath : initLogPath(testName);
             return new FileLogger(path + File.separator + "log.log", false, true);
         }
-        return new StdoutLogHandler();
+        return new StdoutLogHandler(verboseLogs);
     }
 
     public static LogHandler initLogger(String methodName) {
@@ -71,7 +72,7 @@ public class TestUtils {
             eyes.setDebugScreenshotsPrefix(methodName + "_");
             eyes.setSaveDebugScreenshots(true);
         } else {
-            logHandler = new StdoutLogHandler(true);
+            logHandler = new StdoutLogHandler(verboseLogs);
         }
         eyes.setLogHandler(logHandler);
     }

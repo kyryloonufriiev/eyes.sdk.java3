@@ -53,7 +53,7 @@ public class AndroidTest {
         String sauceUrl = "http://ondemand.saucelabs.com/wd/hub";
         WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         String testName = String.format("%s %s %s", deviceName, platformVersion, deviceOrientation);
         if (fully) {

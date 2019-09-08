@@ -5,6 +5,7 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -28,7 +29,7 @@ public class CheckRegionInFrameOffsetTest {
 
         LogHandler logHandler;
         //logHandler = new FileLogger("c:\\temp\\logs\\Java\\TestElement.log", true, true);
-        logHandler = new StdoutLogHandler(true);
+        logHandler = new StdoutLogHandler(TestUtils.verboseLogs);
         eyes.setLogHandler(logHandler);
 
 //        VisualGridEyes.setDebugScreenshotsPath("c:\\temp\\logs");

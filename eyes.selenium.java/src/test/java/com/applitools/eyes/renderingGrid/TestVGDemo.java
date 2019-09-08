@@ -7,6 +7,7 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.ChromeEmulationInfo;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
@@ -51,7 +52,7 @@ class TestVGDemo
         runner = new VisualGridRunner(10);
 
         // Set StdOut log handler with regular verbosity.
-        runner.setLogHandler(new StdoutLogHandler(false));
+        runner.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         // Create Eyes object with the runner, meaning it'll be a Visual Grid eyes.
         eyes = new Eyes(runner);

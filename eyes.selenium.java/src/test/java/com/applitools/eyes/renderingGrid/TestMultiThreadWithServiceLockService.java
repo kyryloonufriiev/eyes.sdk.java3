@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.CompletableTask;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
@@ -38,7 +39,7 @@ public final class TestMultiThreadWithServiceLockService {
     public void Before(ITestContext testContext) {
         concurrentOpenSessions = 3;
         renderingManager = new VisualGridRunner(concurrentOpenSessions, openerLock, checkerLock, closerLock, renderLock);
-        renderingManager.setLogHandler(new StdoutLogHandler(true));
+        renderingManager.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage");

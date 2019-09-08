@@ -7,6 +7,7 @@ import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
@@ -22,9 +23,9 @@ public class TestMissingContentSites {
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
-//        visualGridRunner.setLogHandler(new StdoutLogHandler(true));
+//        visualGridRunner.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         FileLogger logHandler = new FileLogger("missingContent.log", false, true);
-        visualGridRunner.setLogHandler(logHandler);
+        visualGridRunner.setLogHandler(TestUtils.initLogger());
         visualGridRunner.getLogger().log("enter");
     }
 

@@ -22,7 +22,7 @@ public class TestVGWithFailedRenders {
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
-//        visualGridRunner.setLogHandler(new StdoutLogHandler(true));
+//        visualGridRunner.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         FileLogger logHandler = new FileLogger("eyes.log", false, true);
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");

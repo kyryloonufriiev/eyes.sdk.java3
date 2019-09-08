@@ -6,6 +6,7 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
@@ -26,7 +27,7 @@ public class TestIgnoreDisplacements {
 
         eyes.setConfiguration(configuration);
 
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         // Navigate the browser to the "hello world!" web-site.
         driver.get("https://applitools.com/helloworld");
 

@@ -7,7 +7,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -78,7 +77,8 @@ public class IOSTest {
 
 
         //return returnValue.toArray(new Object[0][]);
-        return new Object[][]{{"iPhone 5s Simulator", "landscape", "10.0", true}};
+        //return new Object[][]{{"iPhone 5s Simulator", "landscape", "10.0", true}};
+        return new Object[][]{{"iPhone XR Simulator", "portrait", "12.2", true}};
     }
 
     @Test(dataProvider = "data")
@@ -90,7 +90,6 @@ public class IOSTest {
 
         DesiredCapabilities caps = DesiredCapabilities.iphone();
 
-        caps.setCapability("appiumVersion", "1.7.2");
         caps.setCapability("deviceName", deviceName);
         caps.setCapability("deviceOrientation", deviceOrientation);
         caps.setCapability("platformVersion", platformVersion);
@@ -119,7 +118,7 @@ public class IOSTest {
             eyes.setSaveDebugScreenshots(true);
             eyes.setDebugScreenshotsPath(logPath);
         } else {
-            eyes.setLogHandler(new StdoutLogHandler(true));
+            eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
         }
 
         eyes.setStitchMode(StitchMode.SCROLL);
@@ -128,7 +127,7 @@ public class IOSTest {
         eyes.addProperty("Stitched", fully ? "True" : "False");
 
         try {
-            driver.get("https://www.applitools.com/customers");
+            driver.get("https://applitools.github.io/demo/TestPages/PageWithHeader/index.html");
             eyes.open(driver, "Eyes Selenium SDK - iOS Safari Cropping", testName);
             eyes.check("Initial view", Target.region(By.cssSelector("body")).fully(fully));
             eyes.close();

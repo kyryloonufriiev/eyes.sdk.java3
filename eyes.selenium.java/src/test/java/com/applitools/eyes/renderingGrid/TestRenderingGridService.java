@@ -28,7 +28,7 @@ public final class TestRenderingGridService {
     @BeforeMethod
     public void Before(ITestContext testContext) {
         renderingManager = new VisualGridRunner(3);
-        renderingManager.setLogHandler(new StdoutLogHandler(true));
+        renderingManager.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         String path = TestUtils.initLogPath("TestRenderingGridService");
         FileDebugResourceWriter fileDebugResourceWriter = new FileDebugResourceWriter(renderingManager.getLogger(), path, null, null);

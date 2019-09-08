@@ -6,6 +6,7 @@ import com.applitools.eyes.Region;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import org.openqa.selenium.*;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class Charter2 {
 
         Eyes eyes = new Eyes();
 
-        eyes.setLogHandler(new StdoutLogHandler(true));
+        eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         try {
             WebDriver eyesDriver = eyes.open(driver, "Hello World!", "My first Selenium C# test!", new RectangleSize(800, 680));

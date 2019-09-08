@@ -6,6 +6,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.DeviceName;
 import com.applitools.eyes.visualgrid.model.ScreenOrientation;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -14,17 +15,13 @@ import org.openqa.selenium.WebDriver;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
-import java.io.File;
-
 public class TestRenderingGridServiceVans {
     private VisualGridRunner renderingManager;
 
     @BeforeClass
     public void beforeClass() {
         renderingManager = new VisualGridRunner(40);
-        renderingManager.setLogHandler(new StdoutLogHandler(true));
-        FileLogger logHandler = new FileLogger("eyes.log", false, true);
-        renderingManager.setLogHandler(logHandler);
+        renderingManager.setLogHandler(TestUtils.initLogger("vans"));
         renderingManager.getLogger().log("enter");
         renderingManager.setServerUrl("https://eyes.applitools.com/");
     }

@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterClass;
@@ -30,7 +31,7 @@ public class TestSuite {
     @BeforeClass
     public void before_VisualGrid() {
         visualGridManager = new VisualGridRunner(4);
-        visualGridManager.setLogHandler(new StdoutLogHandler(true));
+        visualGridManager.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         visualGridManager.setServerUrl("https://fabricdemoeyes.applitools.com/");
         visualGridManager.setApiKey(System.getenv("FABRICAM_DEMO_EYES_API_KEY"));

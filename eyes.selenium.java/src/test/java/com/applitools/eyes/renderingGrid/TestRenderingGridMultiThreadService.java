@@ -9,6 +9,7 @@ import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
+import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
@@ -27,7 +28,7 @@ public final class TestRenderingGridMultiThreadService {
     @BeforeMethod
     public void Before(ITestContext testContext) {
         renderingManager = new VisualGridRunner(1);
-        renderingManager.setLogHandler(new StdoutLogHandler(true));
+        renderingManager.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
         webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage");
