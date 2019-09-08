@@ -6,12 +6,15 @@ import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
+import com.applitools.eyes.selenium.capture.DomCapture;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.utils.CommUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
@@ -58,12 +61,24 @@ public final class TestSendDom {
         }
     }
 
-    /*
+
     class DomInterceptingEyes extends SeleniumEyes {
         private String domJson;
 
         public DomInterceptingEyes() {
-            super(new ConfigurationProviderForTesting(), new ClassicRunner());
+            super(new ISeleniumConfigurationProvider() {
+                private Configuration configuration = new Configuration();
+
+                @Override
+                public IConfigurationGetter get() {
+                    return this.configuration;
+                }
+
+                @Override
+                public IConfigurationSetter set() {
+                    return this.configuration;
+                }
+            }, new ClassicRunner());
         }
 
         public String getDomJson() {
@@ -82,25 +97,31 @@ public final class TestSendDom {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DomInterceptingEyes eyes = new DomInterceptingEyes();
-        eyes.setBatch(TestsDataProvider.batchInfo);
+        eyes.setBatch(TestDataProvider.batchInfo);
         IConfigurationSetter config = eyes.getConfigSetter();
-        config.setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024,768));
+        config.setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
         EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
         try {
             eyes.check("Window", Target.window().fully());
             String actualDomJsonString = eyes.getDomJson();
-            String expectedDomJson = CommonUtils.ReadResourceFile("Applitools.Selenium.Tests.Resources.expected_dom1.json");
+
             TestResults results = eyes.close(false);
             boolean hasDom = getHasDom(eyes, results);
             Assert.assertTrue(hasDom);
-
-            Assert.assertEquals(actualDomJsonString, expectedDomJson);
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/expected_dom1.json"));
+                JsonNode actual = mapper.readTree(actualDomJsonString);
+                JsonNode expected = mapper.readTree(expectedDomJson);
+                Assert.assertTrue(actual.equals(expected));
+            } catch (IOException e) {
+                GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
+            }
         } finally {
             eyes.abort();
             webDriver.quit();
         }
     }
-
 
     //@Test
     public void TestSendDOM_Simple_HTML() {
@@ -123,7 +144,6 @@ public final class TestSendDom {
             webDriver.quit();
         }
     }
-*/
 
     @Test
     public void TestSendDOM_Selector() {
@@ -187,7 +207,7 @@ public final class TestSendDom {
     }
 
     private String getExpectedDomFromUrl(String domUrl) {
-        String expectedDomJsonString  = CommUtils.getString(domUrl);
+        String expectedDomJsonString = CommUtils.getString(domUrl);
         return expectedDomJsonString;
     }
 }
