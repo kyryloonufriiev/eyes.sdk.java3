@@ -20,7 +20,7 @@ public class TestDataProvider {
     public final static String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
     public final static String SAUCE_SELENIUM_URL = "https://ondemand.saucelabs.com:443/wd/hub";
 
-    @DataProvider(name = "booleanDP")
+    @DataProvider(name = "booleanDP", parallel = true)
     public static Object[][] booleanDP() {
         return new Object[][]{
                 {true}, {false}
