@@ -16,8 +16,4 @@ dependency-reduced-pom.xml
 # Cross-SDK Features description files
 src/test/java/features
 eyes.selenium.java/src/main/node_resources/node_modules/
-eyes.selenium.java/src/main/resources/captureDom.js
-eyes.selenium.java/src/main/resources/processPage.js
-eyes.selenium.java/src/main/resources/processPageAndSerialize.js
-eyes.selenium.java/src/main/resources/processResource.js
 /eyes.selenium.java/src/test/java/com/applitools/eyes/edgeCases/
