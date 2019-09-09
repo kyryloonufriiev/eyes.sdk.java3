@@ -16,9 +16,14 @@ import java.util.List;
 
 public class TestDataProvider {
     public final static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
+
     public final static String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
     public final static String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
     public final static String SAUCE_SELENIUM_URL = "https://ondemand.saucelabs.com:443/wd/hub";
+
+    public final static String BROWSERSTACK_USERNAME = System.getenv("BROWSERSTACK_USERNAME");
+    public final static String BROWSERSTACK_ACCESS_KEY = System.getenv("BROWSERSTACK_ACCESS_KEY");
+    public final static String BROWSERSTACK_SELENIUM_URL = "http://hub-cloud.browserstack.com/wd/hub/";
 
     @DataProvider(name = "booleanDP", parallel = true)
     public static Object[][] booleanDP() {
