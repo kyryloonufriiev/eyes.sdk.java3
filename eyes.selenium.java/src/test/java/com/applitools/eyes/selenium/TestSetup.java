@@ -162,8 +162,7 @@ public abstract class TestSetup implements ITest {
         if (this.runner instanceof VisualGridRunner) {
             testName += "_VG";
         }
-
-        if (this.stitchMode == StitchMode.SCROLL) {
+        else if (this.stitchMode == StitchMode.SCROLL) {
             testName += "_Scroll";
         }
 
