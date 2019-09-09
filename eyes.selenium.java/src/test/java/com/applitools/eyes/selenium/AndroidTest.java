@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_SELENIUM_URL;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
+
 public class AndroidTest {
     @DataProvider(parallel = true)
     public static Object[][] data() {
@@ -47,11 +51,10 @@ public class AndroidTest {
         caps.setCapability("platformName", "Android");
         caps.setCapability("browserName", "Chrome");
 
-        caps.setCapability("username", System.getenv("SAUCE_USERNAME"));
-        caps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
+        caps.setCapability("username",  SAUCE_USERNAME);
+        caps.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
-        String sauceUrl = "http://ondemand.saucelabs.com/wd/hub";
-        WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
+        WebDriver driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
         eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 

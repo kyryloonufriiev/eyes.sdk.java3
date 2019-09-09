@@ -10,6 +10,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
 
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_SELENIUM_URL;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
+
 public class iOSNativeTest {
 
     public static void main(String[] args) throws Exception {
@@ -24,13 +28,10 @@ public class iOSNativeTest {
         capabilities.setCapability("clearSystemFiles", true);
         capabilities.setCapability("noReset", true);
 
-        final String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
-        final String SAUCE_ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
         capabilities.setCapability("username", SAUCE_USERNAME);
         capabilities.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
-        final String url = "https://ondemand.saucelabs.com:443/wd/hub";
-        WebDriver driver = new IOSDriver(new URL(url), capabilities);
+        WebDriver driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
 
         // Initialize the VisualGridEyes SDK and set your private API key.
         Eyes eyes = new Eyes();

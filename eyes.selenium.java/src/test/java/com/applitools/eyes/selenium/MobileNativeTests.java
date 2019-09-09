@@ -14,14 +14,16 @@ import org.testng.annotations.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_SELENIUM_URL;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
+
 @org.testng.annotations.Test()
 public class MobileNativeTests {
 
-    private String appiumServerUrl = "http://ondemand.saucelabs.com/wd/hub";
-
     private void setCapabilities(Eyes eyes, DesiredCapabilities capabilities, String methodName) {
-        capabilities.setCapability("username", System.getenv("SAUCE_USERNAME"));
-        capabilities.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
+        capabilities.setCapability("username",  SAUCE_USERNAME);
+        capabilities.setCapability("accesskey", SAUCE_ACCESS_KEY);
         capabilities.setCapability("name", methodName);
     }
 
@@ -48,7 +50,7 @@ public class MobileNativeTests {
 
         Eyes eyes = initEyes(capabilities);
 
-        WebDriver driver = new AndroidDriver(new URL(appiumServerUrl), capabilities);
+        WebDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "Android Native App 1");
@@ -78,7 +80,7 @@ public class MobileNativeTests {
 
         Eyes eyes = initEyes(capabilities);
 
-        AndroidDriver<AndroidElement> driver = new AndroidDriver<>(new URL(appiumServerUrl), capabilities);
+        AndroidDriver<AndroidElement> driver = new AndroidDriver<>(new URL(SAUCE_SELENIUM_URL), capabilities);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "Android Native App 2");
@@ -113,7 +115,7 @@ public class MobileNativeTests {
         TestUtils.setupLogging(eyes);
         eyes.setBatch(TestDataProvider.batchInfo);
 
-        WebDriver driver = new IOSDriver(new URL(appiumServerUrl), caps);
+        WebDriver driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), caps);
 
         try {
             eyes.open(driver, "Mobile Native Tests", "iOS Native App");
