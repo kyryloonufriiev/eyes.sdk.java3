@@ -52,7 +52,7 @@ public class PutFuture implements IPutFuture {
 
     @Override
     public Boolean get() {
-        return get(20, TimeUnit.SECONDS);
+        return get(1, TimeUnit.MINUTES);
     }
 
     @Override
@@ -62,9 +62,8 @@ public class PutFuture implements IPutFuture {
                 try {
                     logger.verbose("Response open. - "+this.resource.getUrl());
                     Response response = this.putFuture.get(timeout, unit);
-                    response.close();
 
-                    logger.verbose("Response closed.- "+this.resource.getUrl());
+                    logger.verbose("Got PutFuture Response .- "+this.resource.getUrl());
                     break;
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     logger.verbose("Entering retry");
