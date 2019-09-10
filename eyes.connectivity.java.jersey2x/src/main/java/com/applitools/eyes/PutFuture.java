@@ -57,18 +57,14 @@ public class PutFuture implements IPutFuture {
 
     @Override
     public Boolean get(long timeout, TimeUnit unit) {
-        if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent,null);
-            this.putFuture = newFuture.getPutFuture();
-        }
         if (!this.isSentAlready) {
             while (retryCount != 0) {
                 try {
-                    logger.verbose("Response open.");
+                    logger.verbose("Response open. - "+this.resource.getUrl());
                     Response response = this.putFuture.get(timeout, unit);
                     response.close();
 
-                    logger.verbose("Response closed.");
+                    logger.verbose("Response closed.- "+this.resource.getUrl());
                     break;
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     logger.verbose("Entering retry");
@@ -89,7 +85,7 @@ public class PutFuture implements IPutFuture {
         }
         if(retryCount == 0){
             if(!isSentAlready){
-                throw new Error("Error trying to PUT Resource");
+                throw new Error("Error trying to PUT Resource - "+resource.getUrl());
             }
         }
         this.isSentAlready = true;
