@@ -17,6 +17,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_SELENIUM_URL;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
+
 public class IOSTest {
 
     @DataProvider(parallel = true)
@@ -96,8 +100,8 @@ public class IOSTest {
         caps.setCapability("platformName", "iOS");
         caps.setCapability("browserName", "Safari");
 
-        caps.setCapability("username", System.getenv("SAUCE_USERNAME"));
-        caps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
+        caps.setCapability("username",  SAUCE_USERNAME);
+        caps.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
         String testName = String.format("%s %s %s", deviceName, platformVersion, deviceOrientation);
         if (fully) {
@@ -106,8 +110,7 @@ public class IOSTest {
 
         caps.setCapability("name", testName + " (" + eyes.getFullAgentId() + ")");
 
-        String sauceUrl = "http://ondemand.saucelabs.com/wd/hub";
-        WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
+        WebDriver driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
 
         if (!TestUtils.runOnCI) {

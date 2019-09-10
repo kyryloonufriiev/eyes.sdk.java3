@@ -14,15 +14,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_SELENIUM_URL;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
+
 /**
  *
  * @author mohamedabdulkadar.m
  */
 public class FinalApplication_Android {
-    public static final String USERNAME =  System.getenv("SAUCE_USERNAME");
-    public static final String ACCESS_KEY = System.getenv("SAUCE_ACCESS_KEY");
     static WebDriver driver;
-    public static final String URL = "http://" + USERNAME + ":" + ACCESS_KEY + "@ondemand.saucelabs.com:80/wd/hub";
     static WebElement wb;
     static long start = System.currentTimeMillis();
     static long stop;
@@ -48,7 +49,10 @@ public class FinalApplication_Android {
         caps.setCapability("browserName", "Browser");
         caps.setCapability("platformVersion", "4.4");
         caps.setCapability("platformName", "Android");
-        driver = new RemoteWebDriver(new URL(URL), caps);
+        caps.setCapability("username", SAUCE_USERNAME);
+        caps.setCapability("accessKey", SAUCE_ACCESS_KEY);
+
+        driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), caps);
         System.out.println("caps finished");
         function();
     }

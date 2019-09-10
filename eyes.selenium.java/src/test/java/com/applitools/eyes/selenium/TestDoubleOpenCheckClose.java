@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_SELENIUM_URL;
 import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
 
 public class TestDoubleOpenCheckClose {
@@ -34,8 +35,7 @@ public class TestDoubleOpenCheckClose {
         capabilities.setCapability("username", SAUCE_USERNAME);
         capabilities.setCapability("accessKey", SAUCE_ACCESS_KEY);
 
-        String urlValue = "https://ondemand.saucelabs.com:443/wd/hub";
-        WebDriver driver = new RemoteWebDriver(new URL(urlValue), capabilities);
+        WebDriver driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
         //*************
 
         try
@@ -68,7 +68,7 @@ public class TestDoubleOpenCheckClose {
         capabilities2.setCapability("platformName", "iOS");
         capabilities2.setCapability("browserName", "Safari");
 
-        driver = new RemoteWebDriver(new URL(urlValue), capabilities2);
+        driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), capabilities2);
 
         try
         {

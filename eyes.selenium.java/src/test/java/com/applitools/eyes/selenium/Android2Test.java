@@ -19,10 +19,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-public class Android2Test {
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_SELENIUM_URL;
+import static com.applitools.eyes.selenium.TestDataProvider.SAUCE_USERNAME;
 
-    private String  sauceUrl = "http://ondemand.saucelabs.com/wd/hub";
-    private String  SAUCE_LABS_URL = "http://ondemand.saucelabs.com/wd/hub";
+public class Android2Test {
 
     @DataProvider(parallel = true)
     public static Object[][] data() {
@@ -53,11 +54,11 @@ public class Android2Test {
         caps.setCapability("platformName", "Android");
         caps.setCapability("browserName", "Chrome");
 
-        caps.setCapability("username", System.getenv("SAUCE_USERNAME"));
-        caps.setCapability("accesskey", System.getenv("SAUCE_ACCESS_KEY"));
+        caps.setCapability("username",  SAUCE_USERNAME);
+        caps.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
 
-        WebDriver driver = new RemoteWebDriver(new URL(sauceUrl), caps);
+        WebDriver driver = new RemoteWebDriver(new URL(SAUCE_SELENIUM_URL), caps);
         driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
         eyes.setLogHandler(new StdoutLogHandler(TestUtils.verboseLogs));
 
@@ -86,7 +87,6 @@ public class Android2Test {
 
     @Test
     public void setUp() throws IOException {
-        StdoutLogHandler LOG = new StdoutLogHandler(TestUtils.verboseLogs);
         Eyes eyes = new Eyes();
         //eyes.setServerUrl(APPLITOOLS_SERVER_URL);
         // StitchMode SCROLL will fail as well (with nullpointer exception)
@@ -100,12 +100,10 @@ public class Android2Test {
         capabilities.setCapability("platformVersion", "6.0");
         capabilities.setCapability("name", "Minimal test");
         //capabilities.setCapability("tunnelIdentifier", SAUCE_LABS_TUNNEL_IDENTIFIER);
-        String sauce_username = System.getenv("SAUCE_USERNAME");
-        capabilities.setCapability("username", sauce_username);
-        String sauce_access_key = System.getenv("SAUCE_ACCESS_KEY");
-        capabilities.setCapability("accesskey", sauce_access_key);
+        capabilities.setCapability("username", SAUCE_USERNAME);
+        capabilities.setCapability("accesskey", SAUCE_ACCESS_KEY);
 
-        WebDriver driver = new AppiumDriver<>(new URL(SAUCE_LABS_URL), capabilities);
+        WebDriver driver = new AppiumDriver<>(new URL(SAUCE_SELENIUM_URL), capabilities);
 
         //works
         //driver = new RemoteWebDriver(new URL(new URL(SAUCE_LABS_URL), capabilities);
