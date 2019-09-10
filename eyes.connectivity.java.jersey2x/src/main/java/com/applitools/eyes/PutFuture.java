@@ -20,18 +20,18 @@ public class PutFuture implements IPutFuture {
 
     private boolean isSentAlready = false;
     private int retryCount = 5;
-    private String useraAgent;
+    private String userAgent;
 
-    public PutFuture(RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String useraAgent) {
+    public PutFuture(RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String userAgent) {
         this.resource = resource;
         this.runningRender = runningRender;
         this.serverConnector = serverConnector;
         this.logger = logger;
-        this.useraAgent = useraAgent;
+        this.userAgent = userAgent;
     }
 
-    public PutFuture(Future putFuture, RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String useraAgent) {
-        this(resource, runningRender, serverConnector, logger, useraAgent);
+    public PutFuture(Future putFuture, RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String userAgent) {
+        this(resource, runningRender, serverConnector, logger, userAgent);
         this.putFuture = putFuture;
     }
 
@@ -52,60 +52,40 @@ public class PutFuture implements IPutFuture {
 
     @Override
     public Boolean get() {
-        if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
-            this.putFuture = newFuture.getPutFuture();
-        }
+        return get(20, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public Boolean get(long timeout, TimeUnit unit) {
         if (!this.isSentAlready) {
             while (retryCount != 0) {
                 try {
-                    Response response = this.putFuture.get(20, TimeUnit.SECONDS);
+                    logger.verbose("Response open. - "+this.resource.getUrl());
+                    Response response = this.putFuture.get(timeout, unit);
                     response.close();
+
+                    logger.verbose("Response closed.- "+this.resource.getUrl());
                     break;
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
-                    retryCount--;
                     logger.verbose("Entering retry");
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
+                    this.putFuture.cancel(true);
+                    retryCount--;
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException e1) {
                         GeneralUtils.logExceptionStackTrace(logger, e1);
                     }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
+                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent,null);
                     logger.log("fired retry");
                     this.putFuture = newFuture.getPutFuture();
                 }
             }
         }
-        this.isSentAlready = true;
-        return true;
-    }
-
-    @Override
-    public Boolean get(long timeout, TimeUnit unit) {
-        if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent, null);
-            this.putFuture = newFuture.getPutFuture();
-        }
-        if (!this.isSentAlready) {
-            while (retryCount != 0) {
-                try {
-                    Response response = this.putFuture.get(timeout, unit);
-                    response.close();
-                    break;
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
-                    retryCount--;
-                    logger.verbose("Entering retry");
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e1) {
-                        GeneralUtils.logExceptionStackTrace(logger, e1);
-                    }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, useraAgent,null);
-                    logger.log("fired retry");
-                    this.putFuture = newFuture.getPutFuture();
-                }
+        if(retryCount == 0){
+            if(!isSentAlready){
+                throw new Error("Error trying to PUT Resource - "+resource.getUrl());
             }
         }
         this.isSentAlready = true;
