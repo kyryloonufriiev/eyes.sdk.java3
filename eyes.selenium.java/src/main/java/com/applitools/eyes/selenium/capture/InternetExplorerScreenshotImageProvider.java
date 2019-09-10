@@ -32,12 +32,25 @@ public class InternetExplorerScreenshotImageProvider implements ImageProvider {
     }
 
     public BufferedImage getImage() {
+        logger.verbose("Getting current position...");
+        Location loc;
+        double scaleRatio = eyes.getDevicePixelRatio();
+
+        FrameChain currentFrameChain = ((EyesWebDriver) eyes.getDriver()).getFrameChain();
+        PositionProvider positionProvider = null;
+        if (currentFrameChain.size() == 0) {
+            positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, eyes.getDriver().findElement(By.tagName("html")));
+            loc = positionProvider.getCurrentPosition();
+        } else {
+            loc = currentFrameChain.getDefaultContentScrollPosition();
+        }
+        Location scaledLoc = loc.scale(scaleRatio);
+
         logger.verbose("Getting screenshot as base64...");
         String screenshot64 = tsInstance.getScreenshotAs(OutputType.BASE64);
         logger.verbose("Done getting base64! Creating BufferedImage...");
         BufferedImage image = ImageUtils.imageFromBase64(screenshot64);
 
-        double scaleRatio = eyes.getDevicePixelRatio();
         RectangleSize originalViewportSize = eyes.getViewportSize();
         RectangleSize viewportSize = originalViewportSize.scale(scaleRatio);
 
@@ -45,23 +58,12 @@ public class InternetExplorerScreenshotImageProvider implements ImageProvider {
             //Damn IE driver returns full page screenshot even when not asked to!
             logger.verbose("seems IE returned full page screenshot rather than only the viewport.");
             eyes.getDebugScreenshotsProvider().save(image, "IE");
-            if (eyes.getIsCutProviderExplicitlySet()) {
-                return image;
+            if (!eyes.getIsCutProviderExplicitlySet()) {
+                image = ImageUtils.cropImage(logger, image, new Region(scaledLoc, viewportSize));
             }
-
-            Location loc;
-            FrameChain currentFrameChain = ((EyesWebDriver) eyes.getDriver()).getFrameChain();
-
-            if (currentFrameChain.size() == 0) {
-                PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, eyes.getDriver().findElement(By.tagName("html")));
-                loc = positionProvider.getCurrentPosition();
-            } else {
-                loc = currentFrameChain.getDefaultContentScrollPosition();
-            }
-
-            loc = loc.scale(scaleRatio);
-
-            image = ImageUtils.cropImage(logger, image, new Region(loc, viewportSize));
+        }
+        if (positionProvider != null) {
+            positionProvider.setPosition(loc);
         }
         return image;
     }
