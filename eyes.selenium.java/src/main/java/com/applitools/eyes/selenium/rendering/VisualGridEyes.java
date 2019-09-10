@@ -618,7 +618,7 @@ public class VisualGridEyes implements IRenderingEyes, ISeleniumEyes {
             logger.verbose("added check tasks  (" + checkSettingsInternal.toString() + ")");
 
             this.renderingGridRunner.check((ICheckSettings) checkSettingsInternal, debugResourceWriter, scriptResult,
-                    this.VGEyesConnector, visualGridTaskList, openVisualGridTasks, resultAsString,
+                    createVGEyesConnector(getConfigGetter().getBrowsersInfo().get(0)), visualGridTaskList, openVisualGridTasks, resultAsString,
                     new VisualGridRunner.RenderListener() {
                         @Override
                         public void onRenderSuccess() {
