@@ -551,11 +551,23 @@ public class ServerConnector extends RestClient
         if (contentType != null) {
             entity = Entity.entity(content, contentType);
 
-        }
-        else{
+        } else {
             entity = Entity.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         }
-        final Future<Response> future = request.async().put(entity);
+        final Future<Response> future;
+        future = request.async().put(entity, new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                logger.verbose("PUT callback  success");
+                response.close();
+                logger.verbose("Response closed");
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                logger.verbose("PUT callback failed");
+            }
+        });
         logger.verbose("future created.");
         PutFuture putFuture = new PutFuture(future, resource, runningRender, this, logger, userAgent);
         return putFuture;
