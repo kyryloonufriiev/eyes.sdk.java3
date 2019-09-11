@@ -30,7 +30,7 @@ public class TestMobileDevices {
 
     @DataProvider(name = "pages")
     public static Object[][] pages() {
-        return new Object[][]{{"mobile"}, {"desktop"}};
+        return new Object[][]{{"mobile"}, {"desktop"}, {"scrolled_mobile"}};
     }
 
     @Factory(dataProvider = "pages")
@@ -89,7 +89,7 @@ public class TestMobileDevices {
         return devices.toArray(new Object[0][]);
     }
 
-    @DataProvider(name = "androidDevices")
+    @DataProvider(name = "androidDevices", parallel = true)
     public static Object[][] androidDevices() {
         List<Object[]> devices = Arrays.asList(new Object[][]{
                 {"Android Emulator", "8.0", ScreenOrientation.PORTRAIT, false},
