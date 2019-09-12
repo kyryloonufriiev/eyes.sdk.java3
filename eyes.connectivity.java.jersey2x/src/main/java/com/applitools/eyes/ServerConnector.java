@@ -79,7 +79,9 @@ public class ServerConnector extends RestClient
      * @return The currently set API key or {@code null} if no key is set.
      */
     public String getApiKey() {
-        return this.apiKey != null ? this.apiKey : System.getenv("APPLITOOLS_API_KEY");
+        String apiKey = this.apiKey != null ? this.apiKey : System.getenv("APPLITOOLS_API_KEY");
+        apiKey = apiKey == null ? System.getenv("bamboo_APPLITOOLS_API_KEY") : apiKey;
+        return apiKey;
     }
 
     /**

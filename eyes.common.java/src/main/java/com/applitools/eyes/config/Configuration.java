@@ -7,9 +7,9 @@ import java.net.URI;
 public class Configuration implements IConfigurationSetter, IConfigurationGetter {
     private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
 
-    private String branchName = System.getenv("APPLITOOLS_BRANCH");
-    private String parentBranchName = System.getenv("APPLITOOLS_PARENT_BRANCH");
-    private String baselineBranchName = System.getenv("APPLITOOLS_BASELINE_BRANCH");
+    private String branchName = System.getenv("APPLITOOLS_BRANCH") == null ? System.getenv("bamboo_APPLITOOLS_BRANCH"): System.getenv("APPLITOOLS_BRANCH");
+    private String parentBranchName = System.getenv("APPLITOOLS_PARENT_BRANCH") == null ?System.getenv("bamboo_APPLITOOLS_PARENT_BRANCH") :  System.getenv("APPLITOOLS_PARENT_BRANCH");
+    private String baselineBranchName = System.getenv("APPLITOOLS_BASELINE_BRANCH") == null ? System.getenv("bamboo_APPLITOOLS_BASELINE_BRANCH") : System.getenv("APPLITOOLS_BASELINE_BRANCH") ;
     private String agentId;
     private String environmentName;
     private Boolean saveDiffs;
