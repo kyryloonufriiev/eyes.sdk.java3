@@ -1,5 +1,6 @@
 package com.applitools.eyes.config;
 
+import com.applitools.AccessibilityLevel;
 import com.applitools.eyes.*;
 
 import java.net.URI;
@@ -58,4 +59,6 @@ public interface IConfigurationGetter {
     MatchLevel getMatchLevel();
 
     boolean getIgnoreDisplacements();
+
+    AccessibilityLevel getAccessibilityValidation();
 }

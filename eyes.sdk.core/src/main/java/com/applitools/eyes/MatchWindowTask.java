@@ -5,6 +5,7 @@ package com.applitools.eyes;
 
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
+import com.applitools.eyes.config.IConfigurationGetter;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
@@ -174,6 +175,26 @@ public class MatchWindowTask {
         imageMatchSettings.setLayoutRegions(convertSimpleRegions(checkSettingsInternal.getLayoutRegions(), imageMatchSettings.getLayoutRegions()));
         imageMatchSettings.setStrictRegions(convertSimpleRegions(checkSettingsInternal.getStrictRegions(), imageMatchSettings.getStrictRegions()));
         imageMatchSettings.setFloatingRegions(convertFloatingRegions(checkSettingsInternal.getFloatingRegions(), imageMatchSettings.getFloatingRegions()));
+        imageMatchSettings.setAccessibility(convertAccessibilityRegions(checkSettingsInternal.GetAccessibilityRegions(), imageMatchSettings.getAccessibility()));
+    }
+
+    private AccessibilityRegionByRectangle[] convertAccessibilityRegions(IGetAccessibilityRegion[] accessibilityRegions, AccessibilityRegionByRectangle[] currentRegions)
+    {
+        List<AccessibilityRegionByRectangle> mutableRegions = new ArrayList<>();
+        if (currentRegions != null)
+        {
+            mutableRegions.addAll(Arrays.asList(currentRegions));
+        }
+
+        for (IGetAccessibilityRegion getRegions : accessibilityRegions)
+        {
+            if (getRegions instanceof AccessibilityRegionByRectangle)
+            {
+                mutableRegions.addAll(getRegions.getRegions(null, null));
+            }
+        }
+
+        return mutableRegions.toArray(new AccessibilityRegionByRectangle[0]);
     }
 
     private static Region[] convertSimpleRegions(GetRegion[] simpleRegions, Region[] currentRegions)
@@ -409,6 +430,7 @@ public class MatchWindowTask {
             collectSimpleRegions(checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
         }
+
         return imageMatchSettings;
     }
     /**
@@ -422,11 +444,13 @@ public class MatchWindowTask {
         ImageMatchSettings imageMatchSettings = null;
         if (checkSettingsInternal != null)
         {
-            MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : eyes.getConfigGetter().getDefaultMatchSettings().getMatchLevel();
+            IConfigurationGetter config = eyes.getConfigGetter();
+            MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : config.getDefaultMatchSettings().getMatchLevel();
             imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false );
-            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
+            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : config.getIgnoreCaret());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : eyes.getConfigGetter().getIgnoreDisplacements() );
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : config.getIgnoreDisplacements() );
+            imageMatchSettings.setAccessibilityLevel(config.getAccessibilityValidation());
         }
         return imageMatchSettings;
     }

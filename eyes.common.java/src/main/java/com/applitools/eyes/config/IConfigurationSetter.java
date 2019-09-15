@@ -1,5 +1,6 @@
 package com.applitools.eyes.config;
 
+import com.applitools.AccessibilityLevel;
 import com.applitools.eyes.*;
 
 public interface IConfigurationSetter {
@@ -58,4 +59,5 @@ public interface IConfigurationSetter {
 
         IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements);
 
+    void setAccessibilityValidation(AccessibilityLevel accessibilityValidation);
 }

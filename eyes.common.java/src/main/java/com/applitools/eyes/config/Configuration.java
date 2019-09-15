@@ -1,5 +1,6 @@
 package com.applitools.eyes.config;
 
+import com.applitools.AccessibilityLevel;
 import com.applitools.eyes.*;
 
 import java.net.URI;
@@ -32,6 +33,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
     private FailureReports failureReports = FailureReports.ON_CLOSE;
+    private AccessibilityLevel accessibilityValidation = AccessibilityLevel.None;
 
     public Configuration(IConfigurationGetter other) {
         this.branchName = other.getBranchName();
@@ -65,6 +67,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
             this.defaultMatchSettings.setMatchLevel(other.getMatchLevel());
         }
         this.ignoreDisplacements = other.getIgnoreDisplacements();
+        this.accessibilityValidation = other.getAccessibilityValidation();
     }
 
     public Configuration() {
@@ -412,5 +415,15 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
         this.ignoreDisplacements = isIgnoreDisplacements;
         return this;
+    }
+
+    @Override
+    public AccessibilityLevel getAccessibilityValidation() {
+        return accessibilityValidation;
+    }
+
+    @Override
+    public void setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
+        this.accessibilityValidation = accessibilityValidation;
     }
 }

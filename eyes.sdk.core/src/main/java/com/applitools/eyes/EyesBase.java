@@ -38,7 +38,7 @@ import java.util.Queue;
 /**
  * Applitools Eyes Base for Java API .
  */
-public abstract class EyesBase {
+public abstract class EyesBase implements IEyesBase{
 
     protected static final int USE_DEFAULT_TIMEOUT = -1;
     private static final int MAX_ITERATION = 10;
