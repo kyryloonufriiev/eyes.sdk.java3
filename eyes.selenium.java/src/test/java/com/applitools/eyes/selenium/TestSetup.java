@@ -57,6 +57,7 @@ public abstract class TestSetup implements ITest {
         public HashSet<Region> expectedStrictRegions = new HashSet<>();
         public HashSet<Region> expectedContentRegions = new HashSet<>();
         public Map<String, Object> expectedProperties = new HashMap<>();
+        public HashSet<AccessibilityRegionByRectangle> expectedAccessibilityRegions = new HashSet<AccessibilityRegionByRectangle>();
 
         public SpecificTestContextRequirements(Eyes eyes) {
             this.eyes = eyes;
@@ -225,6 +226,11 @@ public abstract class TestSetup implements ITest {
     @Override
     public String getTestName() {
         return testName;
+    }
+
+    protected void setExpectedAccessibilityRegions(AccessibilityRegionByRectangle[] accessibilityRegions)
+    {
+        this.testDataByTestId.get("testId").expectedAccessibilityRegions = new HashSet<>(Arrays.asList(accessibilityRegions));
     }
 
     @Override

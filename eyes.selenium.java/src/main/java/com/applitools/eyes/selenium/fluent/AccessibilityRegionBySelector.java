@@ -22,7 +22,7 @@ public class AccessibilityRegionBySelector implements IGetAccessibilityRegion, I
     }
 
     @Override
-    public List<AccessibilityRegionByRectangle> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
+    public List<AccessibilityRegionByRectangle> getRegions(IEyesBase eyesBase, EyesScreenshot screenshot) {
         List<WebElement> elements = ((SeleniumEyes) eyesBase).getDriver().findElements(selector);
         List<AccessibilityRegionByRectangle> retVal = new ArrayList<>();
         for (WebElement element : elements)

@@ -1493,5 +1493,8 @@ public abstract class EyesBase implements IEyesBase{
 
     protected abstract <T extends IConfigurationSetter> T getConfigSetter();
 
-
+    @Override
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
 }

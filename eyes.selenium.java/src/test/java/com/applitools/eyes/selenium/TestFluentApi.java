@@ -1,6 +1,9 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.AccessibilityLevel;
 import com.applitools.ICheckSettings;
+import com.applitools.eyes.AccessibilityRegionByRectangle;
+import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -172,4 +175,19 @@ public class TestFluentApi extends TestSetup {
         addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);
     }
 
+    @Test
+    public void TestAccessibilityRegions()
+    {
+        Configuration config = getEyes().getConfiguration();
+        config.setAccessibilityValidation(AccessibilityLevel.AAA);
+        getEyes().setConfiguration(config);
+        getEyes().check(Target.window().accessibility(By.className("ignore"), AccessibilityRegionType.DisabledOrInactive));
+        setExpectedAccessibilityRegions(new AccessibilityRegionByRectangle[]{
+                new AccessibilityRegionByRectangle(122, 928, 456, 306, AccessibilityRegionType.DisabledOrInactive),
+                new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.DisabledOrInactive),
+                new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.DisabledOrInactive)}
+        );
+        addExpectedProperty("AccessibilityLevel", AccessibilityLevel.AAA);
+    }
 }
+

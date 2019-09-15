@@ -69,6 +69,10 @@ public class TestEyes extends EyesBase {
         return this.configuration;
     }
 
+    @Override
+    public void setIsDisabled(Boolean isDisabled) {
+        this.setIsDisabled(isDisabled);
+    }
 }
 
 

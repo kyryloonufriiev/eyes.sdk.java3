@@ -20,7 +20,7 @@ public class AccessibilityRegionByElement implements IGetAccessibilityRegion, IG
     }
 
     @Override
-    public List<AccessibilityRegionByRectangle> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
+    public List<AccessibilityRegionByRectangle> getRegions(IEyesBase eyesBase, EyesScreenshot screenshot) {
         Point p = element.getLocation();
         Location pTag = screenshot.convertLocation(new Location(p.x, p.y), CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
 

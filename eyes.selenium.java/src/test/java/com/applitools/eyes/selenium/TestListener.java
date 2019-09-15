@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.AccessibilityRegionByRectangle;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.TestResults;
@@ -125,6 +126,7 @@ public class TestListener implements ITestListener {
 
         TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData("testId");
 
+        compareAccessibilityRegionsList(imageMatchSettings.getAccessibility(), testData.expectedAccessibilityRegions, "Accessibility");
         if (testSetup.compareExpectedRegions) {
             if (testData.expectedFloatingRegions.size() > 0) {
                 HashSet<FloatingMatchSettings> floatingRegionsSet = new HashSet<>(Arrays.asList(floating));
@@ -187,6 +189,23 @@ public class TestListener implements ITestListener {
     @Override
     public void onFinish(ITestContext context) {
         //System.out.println("onFinish");
+    }
+
+
+    private void compareAccessibilityRegionsList(AccessibilityRegionByRectangle[] actualRegions, HashSet<AccessibilityRegionByRectangle> expectedRegions, String type)
+    {
+        HashSet<AccessibilityRegionByRectangle> expectedRegionsClone = new HashSet<>(expectedRegions);
+        if (expectedRegions.size() > 0)
+        {
+            for (AccessibilityRegionByRectangle region : actualRegions)
+            {
+                if (!expectedRegionsClone.remove(region))
+                {
+                    Assert.fail(String.format("actual %s region %s not found in expected regions list", type, region));
+                }
+            }
+            Assert.assertEquals(expectedRegionsClone.size(), 0, "not all expected regions found in actual regions list.");
+        }
     }
 
 }

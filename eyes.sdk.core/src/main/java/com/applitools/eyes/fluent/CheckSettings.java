@@ -537,5 +537,10 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return clone;
     }
 
+    protected void accessibility(IGetAccessibilityRegion accessibilityRegionProvider)
+    {
+        accessibilityRegions.add(accessibilityRegionProvider);
+    }
+
 
 }
