@@ -368,6 +368,7 @@ public class VisualGridRunner extends EyesRunner {
         logger.verbose("releasing allEyes");
         eyes.setListener(eyesListener);
         logger.verbose("concurrencyLock.notify()");
+        this.addBatch(eyes.getBatchId(), eyes.getBatchCloser());
     }
 
     private void startServices() {
@@ -392,11 +393,11 @@ public class VisualGridRunner extends EyesRunner {
     }
 
 
-    public TestResultsSummary getAllTestResults() {
+    public TestResultsSummary getAllTestResultsImpl() {
         return getAllTestResults(true);
     }
 
-    public TestResultsSummary getAllTestResults(boolean throwException) {
+    public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
         logger.verbose("enter");
         Map<IRenderingEyes, Collection<Future<TestResultContainer>>> allFutures = new HashMap<>();
         for (IRenderingEyes eyes : allEyes) {

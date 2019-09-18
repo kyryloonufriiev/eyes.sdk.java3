@@ -26,6 +26,8 @@ public class BatchInfo {
     private final String name;
     @JsonProperty("startedAt")
     private String startedAt;
+    @JsonProperty("notifyOnCompletion")
+    private boolean notifyOnCompletion = false;
 
     /**
      * Creates a new BatchInfo instance.
@@ -142,5 +144,15 @@ public class BatchInfo {
         if(! (obj instanceof BatchInfo)) return false;
         BatchInfo other = (BatchInfo) obj;
         return this.id.equals(other.id) && this.name.equals(other.name) && this.sequenceName.equals(other.sequenceName) && this.startedAt. equals(other.startedAt);
+    }
+
+    @JsonProperty("notifyOnCompletion")
+    public boolean isNotifyOnCompletion() {
+        return notifyOnCompletion;
+    }
+
+    @JsonProperty("notifyOnCompletion")
+    public void setNotifyOnCompletion(boolean notifyOnCompletion) {
+        this.notifyOnCompletion = notifyOnCompletion;
     }
 }
