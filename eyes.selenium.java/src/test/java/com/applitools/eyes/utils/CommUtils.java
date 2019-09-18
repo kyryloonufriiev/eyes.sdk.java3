@@ -1,8 +1,10 @@
 package com.applitools.eyes.utils;
 
+import com.applitools.eyes.BatchInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
@@ -130,5 +132,18 @@ public class CommUtils {
             e.printStackTrace();
         }
         return json;
+    }
+
+    public static boolean isBatchOpen(String batchId, String serverUrl, String apikey) {
+        try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
+            String url = String.format("%sapi/sessions/batches/%s/bypointerid?apikey=%s", serverUrl, batchId, apikey);
+            HttpGet request = new HttpGet(url);
+
+            HttpResponse httpResponse = httpClient.execute(request);
+            return httpResponse.getStatusLine().getStatusCode() == 200;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
