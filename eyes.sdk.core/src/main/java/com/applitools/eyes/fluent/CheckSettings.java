@@ -341,7 +341,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
-    public IGetAccessibilityRegion[] GetAccessibilityRegions() {
+    public IGetAccessibilityRegion[] getAccessibilityRegions() {
         return this.accessibilityRegions.toArray(new IGetAccessibilityRegion[0]);
     }
 
@@ -463,6 +463,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.scriptHooks.putAll(this.scriptHooks);
         clone.enablePatterns = (this.enablePatterns);
         clone.ignoreDisplacements = (this.ignoreDisplacements);
+        clone.accessibilityRegions = this.accessibilityRegions;
         clone.useDom = (this.useDom);
     }
 

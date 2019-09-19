@@ -34,8 +34,8 @@ public class AccessibilityRegionByRectangle implements IGetAccessibilityRegion {
     }
 
     public AccessibilityRegionByRectangle(Region region, AccessibilityRegionType regionType) {
-        this.region = region;
         this.type = regionType;
+        this.setRegion(region);
     }
 
     public Region getRegion() {
@@ -51,7 +51,25 @@ public class AccessibilityRegionByRectangle implements IGetAccessibilityRegion {
     }
 
 
+    public int getLeft() {
+        return left;
+    }
 
+    public int getTop() {
+        return top;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public AccessibilityRegionType getType() {
+        return type;
+    }
 
     public List<AccessibilityRegionByRectangle> GetRegions(IEyesBase eyesBase, EyesScreenshot screenshot) {
         return Arrays.asList(this);

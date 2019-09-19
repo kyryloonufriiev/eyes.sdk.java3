@@ -35,5 +35,5 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
 
     Boolean isIgnoreDisplacements();
 
-    IGetAccessibilityRegion[] GetAccessibilityRegions();
+    IGetAccessibilityRegion[] getAccessibilityRegions();
 }
