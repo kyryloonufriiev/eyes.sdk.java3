@@ -40,18 +40,16 @@ public final class TestBatchAPI {
         eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
                 new RectangleSize(1200, 800));
 
-        boolean batchBeforeDelete = CommUtils.isBatchOpen(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
+        BatchInfo batchBeforeDelete = CommUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
 
-        Assert.assertTrue(batchBeforeDelete);
+        Assert.assertFalse(batchBeforeDelete.isCompleted());
 
         eyes.closeAsync();
 
         driver.quit();
 
         runner.getAllTestResults(false);
-        boolean batchAfterClose = CommUtils.isBatchOpen(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
-        Assert.assertFalse(batchAfterClose);
-
-
+        BatchInfo batch = CommUtils.getBatch(batchInfo.getId(), eyes.getServerUrl().toString(), eyes.getApiKey());
+        Assert.assertTrue(batch.isCompleted());
     }
 }

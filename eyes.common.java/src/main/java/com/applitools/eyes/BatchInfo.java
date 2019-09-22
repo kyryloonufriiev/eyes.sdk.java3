@@ -3,6 +3,8 @@ package com.applitools.eyes;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.applitools.utils.Iso8610CalendarSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -28,6 +30,9 @@ public class BatchInfo {
     private String startedAt;
     @JsonProperty("notifyOnCompletion")
     private boolean notifyOnCompletion = false;
+
+    @JsonProperty("isCompleted")
+    private boolean isCompleted = false;
 
     /**
      * Creates a new BatchInfo instance.
@@ -154,5 +159,15 @@ public class BatchInfo {
     @JsonProperty("notifyOnCompletion")
     public void setNotifyOnCompletion(boolean notifyOnCompletion) {
         this.notifyOnCompletion = notifyOnCompletion;
+    }
+
+    @JsonIgnore
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    @JsonInclude
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
     }
 }
