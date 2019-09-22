@@ -42,6 +42,7 @@ public interface IServerConnector {
 
 
     void setProxy(AbstractProxySettings proxySettings);
+
     AbstractProxySettings getProxy();
 
     /**

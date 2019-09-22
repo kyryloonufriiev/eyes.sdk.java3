@@ -44,9 +44,9 @@ public class AccessibilityRegionByRectangle implements IGetAccessibilityRegion {
 
     public void setRegion(Region region) {
         this.region = region;
-        this.left =   region.getLeft();
-        this.top =    region.getTop();
-        this.width =  region.getWidth();
+        this.left = region.getLeft();
+        this.top = region.getTop();
+        this.width = region.getWidth();
         this.height = region.getHeight();
     }
 
@@ -78,6 +78,41 @@ public class AccessibilityRegionByRectangle implements IGetAccessibilityRegion {
     @Override
     public List<AccessibilityRegionByRectangle> getRegions(IEyesBase eyesBase, EyesScreenshot screenshot) {
         return Arrays.asList(this);
+    }
+
+    @Override
+    public String toString() {
+        return "AccessibilityRegionByRectangle{" +
+                "left=" + left +
+                ", top=" + top +
+                ", width=" + width +
+                ", height=" + height +
+                ", type=" + type +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return left * 30000 + top * 2000 + width * 500 + height;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (!(other instanceof AccessibilityRegionByRectangle)) {
+            return false;
+        }
+        AccessibilityRegionByRectangle otherRegion = (AccessibilityRegionByRectangle) other;
+
+        boolean result =
+                otherRegion.width == width &&
+                        otherRegion.height == height &&
+                        otherRegion.left == left &&
+                        otherRegion.top == top &&
+                        otherRegion.type == type;
+        return result;
     }
 }
 

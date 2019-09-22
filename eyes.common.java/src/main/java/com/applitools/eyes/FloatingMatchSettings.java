@@ -44,8 +44,11 @@ public class FloatingMatchSettings {
                 otherFMS.width == width &&
                 otherFMS.height == height &&
                 otherFMS.left == left &&
-                otherFMS.top == top;
-
+                otherFMS.top == top &&
+                otherFMS.maxDownOffset == maxDownOffset  &&
+                otherFMS.maxLeftOffset == maxLeftOffset &&
+                otherFMS.maxRightOffset == maxRightOffset &&
+                otherFMS.maxUpOffset == maxUpOffset;
         return result;
     }
 }

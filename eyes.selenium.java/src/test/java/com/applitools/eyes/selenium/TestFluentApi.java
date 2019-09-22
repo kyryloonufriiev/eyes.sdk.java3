@@ -181,11 +181,11 @@ public class TestFluentApi extends TestSetup {
         Configuration config = getEyes().getConfiguration();
         config.setAccessibilityValidation(AccessibilityLevel.AAA);
         getEyes().setConfiguration(config);
-        getEyes().check(Target.window().accessibility(By.className("ignore"), AccessibilityRegionType.DisabledOrInactive));
+        getEyes().check(Target.window().accessibility(By.className("ignore"), AccessibilityRegionType.LargeText));
         setExpectedAccessibilityRegions(new AccessibilityRegionByRectangle[]{
-                new AccessibilityRegionByRectangle(122, 928, 456, 306, AccessibilityRegionType.DisabledOrInactive),
-                new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.DisabledOrInactive),
-                new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.DisabledOrInactive)}
+                new AccessibilityRegionByRectangle(122, 928, 456, 306, AccessibilityRegionType.LargeText),
+                new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.LargeText),
+                new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.LargeText)}
         );
         addExpectedProperty("AccessibilityLevel", AccessibilityLevel.AAA);
     }

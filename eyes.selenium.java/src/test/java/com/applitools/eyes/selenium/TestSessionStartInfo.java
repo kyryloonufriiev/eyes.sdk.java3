@@ -33,7 +33,7 @@ public class TestSessionStartInfo {
         batchInfo.setId("someBatchId");
         ImageMatchSettings ims = new ImageMatchSettings();
         ims.setMatchLevel(MatchLevel.STRICT);
-        AccessibilityRegionByRectangle[] accessibilityValidation = {new AccessibilityRegionByRectangle(10, 20, 30, 40, AccessibilityRegionType.Logo)};
+        AccessibilityRegionByRectangle[] accessibilityValidation = {new AccessibilityRegionByRectangle(10, 20, 30, 40, AccessibilityRegionType.GraphicalObject)};
         ims.setAccessibility(accessibilityValidation);
         ims.setAccessibilityLevel(AccessibilityLevel.AA);
         ims.setFloatingRegions(new FloatingMatchSettings[]{new FloatingMatchSettings(22, 32, 42, 52, 5, 10, 15, 20)});
