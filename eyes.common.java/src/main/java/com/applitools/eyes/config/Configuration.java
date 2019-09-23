@@ -33,7 +33,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
     private FailureReports failureReports = FailureReports.ON_CLOSE;
-    private AccessibilityLevel accessibilityValidation = AccessibilityLevel.None;
+    private AccessibilityLevel accessibilityValidation = null;
 
     public Configuration(IConfigurationGetter other) {
         this.branchName = other.getBranchName();
@@ -419,11 +419,13 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
 
     @Override
     public AccessibilityLevel getAccessibilityValidation() {
-        return accessibilityValidation;
+        AccessibilityLevel level = getDefaultMatchSettings().getAccessibilityLevel();
+        return accessibilityValidation == null ? level : accessibilityValidation;
     }
 
     @Override
-    public void setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
+    public IConfigurationSetter setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
         this.accessibilityValidation = accessibilityValidation;
+        return this;
     }
 }

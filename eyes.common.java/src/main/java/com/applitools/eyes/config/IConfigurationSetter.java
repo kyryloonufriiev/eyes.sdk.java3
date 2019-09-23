@@ -57,7 +57,7 @@ public interface IConfigurationSetter {
 
     IConfigurationSetter setMatchLevel(MatchLevel matchLevel);
 
-        IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements);
+    IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements);
 
-    void setAccessibilityValidation(AccessibilityLevel accessibilityValidation);
+    IConfigurationSetter setAccessibilityValidation(AccessibilityLevel accessibilityValidation);
 }

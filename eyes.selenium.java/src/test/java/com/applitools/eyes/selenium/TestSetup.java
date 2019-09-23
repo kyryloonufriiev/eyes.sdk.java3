@@ -190,6 +190,9 @@ public abstract class TestSetup implements ITest {
         TestUtils.setupLogging(eyes, testName + "_" + options.getPlatform());
 
         eyes.getLogger().log("navigating to URL: " + testedPageUrl);
+
+        beforeOpen(eyes);
+
         WebDriver driver;
         try {
             driver = eyes.open(webDriver, this.testSuitName, testName, testedPageSize);
@@ -222,6 +225,8 @@ public abstract class TestSetup implements ITest {
         }
         return eyes;
     }
+
+    protected void beforeOpen(Eyes eyes){};
 
     @Override
     public String getTestName() {

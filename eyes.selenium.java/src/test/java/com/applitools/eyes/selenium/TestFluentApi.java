@@ -168,7 +168,6 @@ public class TestFluentApi extends TestSetup {
     }
 
 
-
     @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestIgnoreDisplacements(boolean ignoreDisplacements) {
         getEyes().check("Fluent - Ignore Displacements = " + ignoreDisplacements, Target.window().ignoreDisplacements(ignoreDisplacements).fully());
@@ -176,8 +175,7 @@ public class TestFluentApi extends TestSetup {
     }
 
     @Test
-    public void TestAccessibilityRegions()
-    {
+    public void TestAccessibilityRegions() {
         Configuration config = getEyes().getConfiguration();
         config.setAccessibilityValidation(AccessibilityLevel.AAA);
         getEyes().setConfiguration(config);
@@ -189,5 +187,10 @@ public class TestFluentApi extends TestSetup {
         );
         addExpectedProperty("AccessibilityLevel", AccessibilityLevel.AAA);
     }
-}
 
+    @Override
+    protected void beforeOpen(Eyes eyes) {
+        eyes.getDefaultMatchSettings().setAccessibilityLevel(AccessibilityLevel.AAA);
+    }
+
+}

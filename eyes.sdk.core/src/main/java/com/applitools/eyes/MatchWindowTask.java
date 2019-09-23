@@ -3,6 +3,7 @@
  */
 package com.applitools.eyes;
 
+import com.applitools.AccessibilityLevel;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.IConfigurationGetter;
@@ -98,8 +99,7 @@ public class MatchWindowTask {
                                     String tag, boolean ignoreMismatch,
                                     ICheckSettingsInternal checkSettingsInternal,
                                     ImageMatchSettings imageMatchSettings,
-                                    EyesBase eyes, String source)
-    {
+                                    EyesBase eyes, String source) {
         EyesScreenshot screenshot = appOutput.getScreenshot(checkSettingsInternal);
 
         collectSimpleRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
@@ -138,8 +138,7 @@ public class MatchWindowTask {
                                     ImageMatchSettings imageMatchSettings,
                                     List<? extends IRegion> regions,
                                     List<VisualGridSelector[]> regionSelectors,
-                                    EyesBase eyes, String renderId, String source)
-    {
+                                    EyesBase eyes, String renderId, String source) {
         EyesScreenshot screenshot = appOutput.getScreenshot(checkSettingsInternal);
         String agentSetupStr = (String) eyes.getAgentSetup();
 
@@ -155,13 +154,12 @@ public class MatchWindowTask {
                                      String tag, boolean ignoreMismatch,
                                      ImageMatchSettings imageMatchSettings,
                                      String agentSetupStr, String renderId,
-                                     String source)
-    {
+                                     String source) {
         // Prepare match data.
         MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]),
                 ignoreMismatch, false, false, false, imageMatchSettings, source, renderId);
 
-        MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]),appOutput.getAppOutput(), tag,
+        MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput.getAppOutput(), tag,
                 ignoreMismatch, options, agentSetupStr, renderId);
 
 
@@ -169,8 +167,7 @@ public class MatchWindowTask {
         return serverConnector.matchWindow(runningSession, data);
     }
 
-    private void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal)
-    {
+    private void collectRegions(ImageMatchSettings imageMatchSettings, ICheckSettingsInternal checkSettingsInternal) {
         imageMatchSettings.setIgnoreRegions(convertSimpleRegions(checkSettingsInternal.getIgnoreRegions(), imageMatchSettings.getIgnoreRegions()));
         imageMatchSettings.setContentRegions(convertSimpleRegions(checkSettingsInternal.getContentRegions(), imageMatchSettings.getContentRegions()));
         imageMatchSettings.setLayoutRegions(convertSimpleRegions(checkSettingsInternal.getLayoutRegions(), imageMatchSettings.getLayoutRegions()));
@@ -179,18 +176,14 @@ public class MatchWindowTask {
         imageMatchSettings.setAccessibility(convertAccessibilityRegions(checkSettingsInternal.getAccessibilityRegions(), imageMatchSettings.getAccessibility()));
     }
 
-    private AccessibilityRegionByRectangle[] convertAccessibilityRegions(IGetAccessibilityRegion[] accessibilityRegions, AccessibilityRegionByRectangle[] currentRegions)
-    {
+    private AccessibilityRegionByRectangle[] convertAccessibilityRegions(IGetAccessibilityRegion[] accessibilityRegions, AccessibilityRegionByRectangle[] currentRegions) {
         List<AccessibilityRegionByRectangle> mutableRegions = new ArrayList<>();
-        if (currentRegions != null)
-        {
+        if (currentRegions != null) {
             mutableRegions.addAll(Arrays.asList(currentRegions));
         }
 
-        for (IGetAccessibilityRegion getRegions : accessibilityRegions)
-        {
-            if (getRegions instanceof AccessibilityRegionByRectangle)
-            {
+        for (IGetAccessibilityRegion getRegions : accessibilityRegions) {
+            if (getRegions instanceof AccessibilityRegionByRectangle) {
                 mutableRegions.addAll(getRegions.getRegions(null, null));
             }
         }
@@ -198,18 +191,14 @@ public class MatchWindowTask {
         return mutableRegions.toArray(new AccessibilityRegionByRectangle[0]);
     }
 
-    private static Region[] convertSimpleRegions(GetRegion[] simpleRegions, Region[] currentRegions)
-    {
+    private static Region[] convertSimpleRegions(GetRegion[] simpleRegions, Region[] currentRegions) {
         List<Region> mutableRegions = new ArrayList<>();
-        if (currentRegions != null)
-        {
+        if (currentRegions != null) {
             Collections.addAll(mutableRegions, currentRegions);
         }
 
-        for (GetRegion getRegions : simpleRegions)
-        {
-            if (getRegions instanceof SimpleRegionByRectangle)
-            {
+        for (GetRegion getRegions : simpleRegions) {
+            if (getRegions instanceof SimpleRegionByRectangle) {
                 mutableRegions.addAll(getRegions.getRegions(null, null));
             }
         }
@@ -217,18 +206,14 @@ public class MatchWindowTask {
         return mutableRegions.toArray(new Region[0]);
     }
 
-    private FloatingMatchSettings[] convertFloatingRegions(GetFloatingRegion[] floatingRegions, FloatingMatchSettings[] currentRegions)
-    {
+    private FloatingMatchSettings[] convertFloatingRegions(GetFloatingRegion[] floatingRegions, FloatingMatchSettings[] currentRegions) {
         List<FloatingMatchSettings> mutableRegions = new ArrayList<>();
-        if (currentRegions != null)
-        {
+        if (currentRegions != null) {
             Collections.addAll(mutableRegions, currentRegions);
         }
 
-        for (GetFloatingRegion getRegions : floatingRegions)
-        {
-            if (getRegions instanceof FloatingRegionByRectangle)
-            {
+        for (GetFloatingRegion getRegions : floatingRegions) {
+            if (getRegions instanceof FloatingRegionByRectangle) {
                 mutableRegions.addAll(getRegions.getRegions(null, null));
             }
         }
@@ -270,8 +255,7 @@ public class MatchWindowTask {
         Location location = Location.ZERO;
 
         // If target element location available
-        if (mutableRegions.get(5).size() > 0)
-        {
+        if (mutableRegions.get(5).size() > 0) {
             location = mutableRegions.get(5).get(0).getLocation();
         }
 
@@ -305,14 +289,12 @@ public class MatchWindowTask {
 
         List<AccessibilityRegionByRectangle> accessibilityRegions = new ArrayList<>();
         VisualGridSelector[] visualGridSelectors = regionSelectors.get(5);
-        for (int i = 0; i < visualGridSelectors.length; i++)
-        {
+        for (int i = 0; i < visualGridSelectors.length; i++) {
             MutableRegion mr = mutableRegions.get(5).get(i);
             if (mr.getArea() == 0) continue;
             VisualGridSelector vgs = visualGridSelectors[i];
 
-            if (vgs.getCategory() instanceof IGetAccessibilityRegionType)
-            {
+            if (vgs.getCategory() instanceof IGetAccessibilityRegionType) {
                 IGetAccessibilityRegionType gar = (IGetAccessibilityRegionType) vgs.getCategory();
                 AccessibilityRegionByRectangle accessibilityRegion = new AccessibilityRegionByRectangle(
                         mr.getLeft() - location.getX(),
@@ -327,13 +309,11 @@ public class MatchWindowTask {
     }
 
     private static MutableRegion[] filterEmptyEntries(List<MutableRegion> list, Location location) {
-        for (int i = list.size() - 1; i >= 0; i--)
-        {
+        for (int i = list.size() - 1; i >= 0; i--) {
             MutableRegion mutableRegion = list.get(i);
-            if (mutableRegion.getArea() == 0){
+            if (mutableRegion.getArea() == 0) {
                 list.remove(i);
-            }
-            else{
+            } else {
                 mutableRegion.offset(-location.getX(), -location.getY());
             }
         }
@@ -342,8 +322,8 @@ public class MatchWindowTask {
 
 
     private static void collectSimpleRegions(ICheckSettingsInternal checkSettingsInternal,
-                                              ImageMatchSettings imageMatchSettings, EyesBase eyes,
-                                              EyesScreenshot screenshot) {
+                                             ImageMatchSettings imageMatchSettings, EyesBase eyes,
+                                             EyesScreenshot screenshot) {
         imageMatchSettings.setIgnoreRegions(collectSimpleRegions(eyes, screenshot, checkSettingsInternal.getIgnoreRegions()));
         imageMatchSettings.setStrictRegions(collectSimpleRegions(eyes, screenshot, checkSettingsInternal.getStrictRegions()));
         imageMatchSettings.setLayoutRegions(collectSimpleRegions(eyes, screenshot, checkSettingsInternal.getLayoutRegions()));
@@ -351,7 +331,7 @@ public class MatchWindowTask {
     }
 
     private static Region[] collectSimpleRegions(EyesBase eyes,
-                                                           EyesScreenshot screenshot, GetRegion[] regionProviders) {
+                                                 EyesScreenshot screenshot, GetRegion[] regionProviders) {
         List<List<Region>> mutableRegions = new ArrayList<>();
         for (GetRegion regionProvider : regionProviders) {
             mutableRegions.add(regionProvider.getRegions(eyes, screenshot));
@@ -457,21 +437,20 @@ public class MatchWindowTask {
 
         return imageMatchSettings;
     }
+
     /**
      * Build match settings by merging the check settings and the default match settings.
      *
      * @param checkSettingsInternal the settings to match the image by.
      * @return Merged match settings.
      */
-    public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesBase eyes)
-    {
+    public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesBase eyes) {
         ImageMatchSettings imageMatchSettings = null;
-        if (checkSettingsInternal != null)
-        {
+        if (checkSettingsInternal != null) {
             IConfigurationGetter config = eyes.getConfigGetter();
             MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : config.getDefaultMatchSettings().getMatchLevel();
-            imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false );
-            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : config.getIgnoreCaret());
+            imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false);
+            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : config.getIgnoreCaret());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
             imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : config.getIgnoreDisplacements() );
             imageMatchSettings.setAccessibilityLevel(config.getAccessibilityValidation());
@@ -573,12 +552,10 @@ public class MatchWindowTask {
     }
 
     private static void collectAccessibilityRegions(ICheckSettingsInternal checkSettingsInternal,
-                                                     ImageMatchSettings imageMatchSettings, EyesBase eyes,
-                                                     EyesScreenshot screenshot)
-    {
+                                                    ImageMatchSettings imageMatchSettings, EyesBase eyes,
+                                                    EyesScreenshot screenshot) {
         List<AccessibilityRegionByRectangle> accessibilityRegions = new ArrayList<>();
-        for (IGetAccessibilityRegion regionProvider : checkSettingsInternal.getAccessibilityRegions())
-        {
+        for (IGetAccessibilityRegion regionProvider : checkSettingsInternal.getAccessibilityRegions()) {
             accessibilityRegions.addAll(regionProvider.getRegions(eyes, screenshot));
         }
         imageMatchSettings.setAccessibility(accessibilityRegions.toArray(new AccessibilityRegionByRectangle[0]));
