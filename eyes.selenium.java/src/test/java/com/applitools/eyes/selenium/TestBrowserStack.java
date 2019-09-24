@@ -1,6 +1,5 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.utils.GeneralUtils;
@@ -12,9 +11,9 @@ import org.testng.annotations.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.applitools.eyes.selenium.TestDataProvider.BROWSERSTACK_ACCESS_KEY;
-import static com.applitools.eyes.selenium.TestDataProvider.BROWSERSTACK_SELENIUM_URL;
-import static com.applitools.eyes.selenium.TestDataProvider.BROWSERSTACK_USERNAME;
+import static com.applitools.eyes.selenium.TestsDataProvider.BROWSERSTACK_ACCESS_KEY;
+import static com.applitools.eyes.selenium.TestsDataProvider.BROWSERSTACK_SELENIUM_URL;
+import static com.applitools.eyes.selenium.TestsDataProvider.BROWSERSTACK_USERNAME;
 
 public class TestBrowserStack {
 

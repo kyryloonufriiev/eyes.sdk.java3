@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TestDataProvider {
+public class TestsDataProvider {
     public final static BatchInfo batchInfo = new BatchInfo("Java3 Tests");
 
     public final static String SAUCE_USERNAME = System.getenv("SAUCE_USERNAME");
@@ -24,6 +24,9 @@ public class TestDataProvider {
     public final static String BROWSERSTACK_USERNAME = System.getenv("BROWSERSTACK_USERNAME");
     public final static String BROWSERSTACK_ACCESS_KEY = System.getenv("BROWSERSTACK_ACCESS_KEY");
     public final static String BROWSERSTACK_SELENIUM_URL = "http://hub-cloud.browserstack.com/wd/hub/";
+
+    public final static boolean runOnCI = System.getenv("CI") != null;
+    public final static boolean runHeadless = runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_RUN_HEADLESS"));
 
     @DataProvider(name = "booleanDP", parallel = true)
     public static Object[][] booleanDP() {
