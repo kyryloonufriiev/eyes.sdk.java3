@@ -21,6 +21,8 @@ public class ImageProviderFactory {
                 }
             } else if (ua.getBrowser().equals(BrowserNames.Safari)) {
                 return new SafariScreenshotImageProvider(eyes, logger, tsInstance, ua);
+            } else if (ua.getBrowser().equals(BrowserNames.IE)) {
+                return new InternetExplorerScreenshotImageProvider(eyes, logger, tsInstance, ua);
             }
         }
         return new TakesScreenshotImageProvider(logger, tsInstance);
