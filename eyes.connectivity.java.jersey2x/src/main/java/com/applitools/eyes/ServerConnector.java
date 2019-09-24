@@ -644,6 +644,11 @@ public class ServerConnector extends RestClient
 
     @Override
     public void closeBatch(String batchId) {
+        if ("true".equalsIgnoreCase(System.getenv("APPLITOOLS_DONT_CLOSE_BATCHES")))
+        {
+            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Doing nothing.");
+            return;
+        }
         ArgumentGuard.notNull(batchId, "batchId");
         this.logger.verbose("called with " + batchId);
 
