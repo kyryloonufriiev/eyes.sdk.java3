@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.ImageMatchSettings;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.visualgrid.model.*;
 
@@ -32,6 +33,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration {
         this.hideCaret = other.getHideCaret();
         this.isRenderingConfig = other.isRenderingConfig();
         this.browsersInfo.addAll(other.getBrowsersInfo());
+        this.defaultMatchSettings = new ImageMatchSettings(other.defaultMatchSettings);
     }
 
     public Configuration() {

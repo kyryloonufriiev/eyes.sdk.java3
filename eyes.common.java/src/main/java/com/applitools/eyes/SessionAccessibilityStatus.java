@@ -5,7 +5,7 @@ import com.applitools.AccessibilityLevel;
 public class SessionAccessibilityStatus {
         private  AccessibilityStatus status;
 
-    private AccessibilityLevel definitions;
+    private AccessibilityLevel level;
 
     public AccessibilityStatus getStatus() {
         return status;
@@ -15,20 +15,17 @@ public class SessionAccessibilityStatus {
         this.status = status;
     }
 
-    public AccessibilityLevel getDefinitions() {
-        return definitions;
+    public AccessibilityLevel getLevel() {
+        return level;
     }
 
-    public void setDefinitions(AccessibilityLevel definitions) {
-        this.definitions = definitions;
+    public void setLevel(AccessibilityLevel level) {
+        this.level = level;
     }
 
     public enum AccessibilityStatus
     {
-        None,
-
-        Valid,
-
-        Violation,
+        Passed,
+        Failed
     }
 }

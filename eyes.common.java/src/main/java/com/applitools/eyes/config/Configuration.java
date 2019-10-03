@@ -21,7 +21,7 @@ public class Configuration {
     protected String testName;
     protected RectangleSize viewportSize;
     protected boolean ignoreDisplacements = false;
-    private ImageMatchSettings defaultMatchSettings = new ImageMatchSettings();
+    protected ImageMatchSettings defaultMatchSettings = new ImageMatchSettings();
     private int matchTimeout = DEFAULT_MATCH_TIMEOUT;
     private String hostApp;
     private String hostOS;

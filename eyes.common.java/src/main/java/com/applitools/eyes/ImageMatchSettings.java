@@ -38,6 +38,22 @@ public class ImageMatchSettings {
         this(MatchLevel.STRICT, null, false);
     }
 
+    public ImageMatchSettings(ImageMatchSettings other) {
+        this.matchLevel = other.matchLevel;
+        this.exact = other.exact;
+        this.ignoreCaret = other.ignoreCaret;
+        this.ignoreRegions = other.ignoreRegions;
+        this.layoutRegions = other.layoutRegions;
+        this.strictRegions = other.strictRegions;
+        this.contentRegions = other.contentRegions;
+        this.floatingMatchSettings = other.floatingMatchSettings;
+        this.useDom = other.useDom;
+        this.enablePatterns = other.enablePatterns;
+        this.ignoreDisplacements = other.ignoreDisplacements;
+        this.accessibility = other.accessibility;
+        this.accessibilityLevel = other.accessibilityLevel;
+    }
+
     /**
      *
      * @return The "strictness" level of the match.

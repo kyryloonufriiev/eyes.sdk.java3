@@ -2,8 +2,6 @@ package com.applitools.eyes;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
@@ -1273,8 +1271,8 @@ public abstract class EyesBase extends EyesBaseConfig implements IEyesBase{
         }
         ensureViewportSize();
 
-        Configuration configGetter = getConfiguration();
-        BatchInfo testBatch = configGetter.getBatch();
+        Configuration configuration = getConfiguration();
+        BatchInfo testBatch = configuration.getBatch();
         if (testBatch == null) {
             logger.verbose("No batch set");
             getConfiguration().setBatch(new BatchInfo(null));
@@ -1289,11 +1287,11 @@ public abstract class EyesBase extends EyesBaseConfig implements IEyesBase{
         logger.verbose("Application environment is " + appEnv);
 
         String appName = getAppName();
-        sessionStartInfo = new SessionStartInfo(getFullAgentId(), configGetter.getSessionType(), appName,
-                null, getTestName(), configGetter.getBatch(), getBaselineEnvName(),
-                configGetter.getEnvironmentName(), getAppEnvironment(), configGetter.getDefaultMatchSettings(),
-                configGetter.getBranchName(),
-                configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(), properties);
+        sessionStartInfo = new SessionStartInfo(getFullAgentId(), configuration.getSessionType(), appName,
+                null, getTestName(), configuration.getBatch(), getBaselineEnvName(),
+                configuration.getEnvironmentName(), getAppEnvironment(), configuration.getDefaultMatchSettings(),
+                configuration.getBranchName(),
+                configuration.getParentBranchName(), configuration.getBaselineBranchName(), configuration.getSaveDiffs(), properties);
 
         logger.verbose("Starting server session...");
         runningSession = serverConnector.startSession(sessionStartInfo);
