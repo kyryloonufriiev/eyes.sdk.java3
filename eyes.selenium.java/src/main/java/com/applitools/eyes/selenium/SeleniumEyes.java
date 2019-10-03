@@ -95,6 +95,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Should stitch content boolean.
+     *
      * @return the boolean
      */
     public boolean shouldStitchContent() {
@@ -108,6 +109,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     public interface WebDriverAction {
         /**
          * Drive.
+         *
          * @param driver the driver
          */
         void drive(WebDriver driver);
@@ -135,6 +137,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Gets driver.
+     *
      * @return the driver
      */
     public WebDriver getDriver() {
@@ -143,6 +146,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Gets original fc.
+     *
      * @return the original fc
      */
     public FrameChain getOriginalFC() {
@@ -151,6 +155,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Gets current frame position provider.
+     *
      * @return the current frame position provider
      */
     public PositionProvider getCurrentFramePositionProvider() {
@@ -159,6 +164,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Gets region to check.
+     *
      * @return the region to check
      */
     public Region getRegionToCheck() {
@@ -167,6 +173,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Sets region to check.
+     *
      * @param regionToCheck the region to check
      */
     public void setRegionToCheck(Region regionToCheck) {
@@ -176,6 +183,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Turns on/off the automatic scrolling to a region being checked by
      * {@code checkRegion}.
+     *
      * @param shouldScroll Whether to automatically scroll to a region being validated.
      */
     public void setScrollToRegion(boolean shouldScroll) {
@@ -188,6 +196,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Gets scroll to region.
+     *
      * @return Whether to automatically scroll to a region being validated.
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -197,6 +206,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Gets rotation.
+     *
      * @return The image rotation model.
      */
     public ImageRotation getRotation() {
@@ -205,6 +215,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Sets rotation.
+     *
      * @param rotation The image rotation model.
      */
     public void setRotation(ImageRotation rotation) {
@@ -224,6 +235,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Open web driver.
+     *
      * @param driver the driver
      * @return the web driver
      * @throws EyesException the eyes exception
@@ -266,8 +278,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     }
 
     private void ensureViewportSize() {
-        if (this.getConfigGetter().getViewportSize() == null) {
-            this.getConfigSetter().setViewportSize(driver.getDefaultContentViewportSize());
+        if (this.getConfiguration().getViewportSize() == null) {
+            this.getConfiguration().setViewportSize(driver.getDefaultContentViewportSize());
         }
     }
 
@@ -289,6 +301,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Gets scroll root element.
+     *
      * @return the scroll root element
      */
     public WebElement getScrollRootElement() {
@@ -304,7 +317,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     private PositionProvider createPositionProvider(WebElement scrollRootElement) {
         // Setting the correct position provider.
-        StitchMode stitchMode = getConfigGetter().getStitchMode();
+        StitchMode stitchMode = getConfiguration().getStitchMode();
         logger.verbose("initializing position provider. stitchMode: " + stitchMode);
         switch (stitchMode) {
             case CSS:
@@ -327,6 +340,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * See {@link #checkWindow(int, String)}.
      * Default match timeout is used.
+     *
      * @param tag An optional tag to be associated with the snapshot.
      */
     public void checkWindow(String tag) {
@@ -336,6 +350,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Takes a snapshot of the application under test and matches it with
      * the expected output.
+     *
      * @param matchTimeout The amount of time to retry matching (Milliseconds).
      * @param tag          An optional tag to be associated with the snapshot.
      * @throws TestFailedException Thrown if a mismatch is detected and
@@ -348,6 +363,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Takes multiple screenshots at once (given all <code>ICheckSettings</code> objects are on the same level).
+     *
      * @param checkSettings Multiple <code>ICheckSettings</code> object representing different regions in the viewport.
      */
     public void check(ICheckSettings... checkSettings) {
@@ -356,14 +372,14 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
             return;
         }
 
-        Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+        Boolean forceFullPageScreenshot = getConfiguration().getForceFullPageScreenshot();
         boolean originalForceFPS = forceFullPageScreenshot == null ? false : forceFullPageScreenshot;
 
         if (checkSettings.length > 1) {
-            getConfigSetter().setForceFullPageScreenshot(true);
+            getConfiguration().setForceFullPageScreenshot(true);
         }
 
-        logger.verbose(getConfigGetter().toString());
+        logger.verbose(getConfiguration().toString());
 
         Dictionary<Integer, GetRegion> getRegions = new Hashtable<>();
         Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary = new Hashtable<>();
@@ -402,12 +418,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         setPositionProvider(createPositionProvider());
 
         matchRegions(getRegions, checkSettingsInternalDictionary, checkSettings);
-        getConfigSetter().setForceFullPageScreenshot(originalForceFPS);
+        getConfiguration().setForceFullPageScreenshot(originalForceFPS);
     }
 
     public void abortAsync() {
         this.abortIfNotClosed();
     }
+
     private void matchRegions(Dictionary<Integer, GetRegion> getRegions,
                               Dictionary<Integer, ICheckSettingsInternal> checkSettingsInternalDictionary,
                               ICheckSettings[] checkSettings) {
@@ -418,13 +435,13 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
         Region bBox = findBoundingBox(getRegions, checkSettings);
 
-        MatchWindowTask mwt = new MatchWindowTask(logger, serverConnector, runningSession, getConfigGetter().getMatchTimeout(), this);
+        MatchWindowTask mwt = new MatchWindowTask(logger, serverConnector, runningSession, getConfiguration().getMatchTimeout(), this);
 
         ScaleProviderFactory scaleProviderFactory = updateScalingParams();
         FullPageCaptureAlgorithm algo = createFullPageCaptureAlgorithm(scaleProviderFactory);
 
         Object activeElement = null;
-        if (getConfigGetter().getHideCaret()) {
+        if (getConfiguration().getHideCaret()) {
             try {
                 activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
             } catch (WebDriverException e) {
@@ -475,7 +492,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
             }
         }
 
-        if (getConfigGetter().getHideCaret() && activeElement != null) {
+        if (getConfiguration().getHideCaret() && activeElement != null) {
             try {
                 driver.executeScript("arguments[0].focus();", activeElement);
             } catch (WebDriverException e) {
@@ -590,6 +607,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Check.
+     *
      * @param name          the name
      * @param checkSettings the check settings
      */
@@ -609,6 +627,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     @Override
     public void setIsDisabled(Boolean disabled) {
         super.setIsDisabled(disabled);
+    }
+
+    @Override
+    protected Configuration getConfiguration() {
+        return this.configurationProvider.getConfiguration();
     }
 
     @Override
@@ -638,6 +661,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Check.
+     *
      * @param checkSettings the check settings
      */
     public void check(ICheckSettings checkSettings) {
@@ -649,7 +673,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         ArgumentGuard.notNull(checkSettings, "checkSettings");
         ArgumentGuard.notOfType(checkSettings, ISeleniumCheckTarget.class, "checkSettings");
 
-        logger.verbose(getConfigGetter().toString());
+        logger.verbose(getConfiguration().toString());
 
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         ISeleniumCheckTarget seleniumCheckTarget = (checkSettings instanceof ISeleniumCheckTarget) ? (ISeleniumCheckTarget) checkSettings : null;
@@ -757,6 +781,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Check frame fluent match result.
+     *
      * @param name          the name
      * @param checkSettings the check settings
      * @param source
@@ -1044,6 +1069,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Updates the state of scaling related parameters.
+     *
      * @return the scale provider factory
      */
     protected ScaleProviderFactory updateScalingParams() {
@@ -1088,6 +1114,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Gets current frame scroll root element.
+     *
      * @return the current frame scroll root element
      */
     public WebElement getCurrentFrameScrollRootElement() {
@@ -1109,6 +1136,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Verifies the current frame.
+     *
      * @param matchTimeout The amount of time to retry matching. (Milliseconds)
      * @param tag          An optional tag to be associated with the snapshot.
      */
@@ -1144,6 +1172,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * See {@link #checkFrame(String, int, String)}.
      * {@code tag} defaults to {@code null}. Default match timeout is used.
+     *
      * @param frameNameOrId the frame name or id
      */
     public void checkFrame(String frameNameOrId) {
@@ -1153,6 +1182,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * See {@link #checkFrame(String, int, String)}.
      * Default match timeout is used.
+     *
      * @param frameNameOrId the frame name or id
      * @param tag           the tag
      */
@@ -1163,6 +1193,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Matches the frame given as parameter, by switching into the frame and
      * using stitching to get an image of the frame.
+     *
      * @param frameNameOrId The name or id of the frame to check. (The same                      name/id as would be used in a call to                      driver.switchTo().frame()).
      * @param matchTimeout  The amount of time to retry matching. (Milliseconds)
      * @param tag           An optional tag to be associated with the match.
@@ -1174,6 +1205,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * See {@link #checkFrame(int, int, String)}.
      * {@code tag} defaults to {@code null}. Default match timeout is used.
+     *
      * @param frameIndex the frame index
      */
     public void checkFrame(int frameIndex) {
@@ -1183,6 +1215,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * See {@link #checkFrame(int, int, String)}.
      * Default match timeout is used.
+     *
      * @param frameIndex the frame index
      * @param tag        the tag
      */
@@ -1193,6 +1226,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Matches the frame given as parameter, by switching into the frame and
      * using stitching to get an image of the frame.
+     *
      * @param frameIndex   The index of the frame to switch to. (The same index                     as would be used in a call to                     driver.switchTo().frame()).
      * @param matchTimeout The amount of time to retry matching. (Milliseconds)
      * @param tag          An optional tag to be associated with the match.
@@ -1214,6 +1248,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
      * See {@link #checkFrame(WebElement, int, String)}.
      * {@code tag} defaults to {@code null}.
      * Default match timeout is used.
+     *
      * @param frameReference the frame reference
      */
     public void checkFrame(WebElement frameReference) {
@@ -1223,6 +1258,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * See {@link #checkFrame(WebElement, int, String)}.
      * Default match timeout is used.
+     *
      * @param frameReference the frame reference
      * @param tag            the tag
      */
@@ -1233,6 +1269,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Matches the frame given as parameter, by switching into the frame and
      * using stitching to get an image of the frame.
+     *
      * @param frameReference The element which is the frame to switch to. (as                       would be used in a call to                       driver.switchTo().frame() ).
      * @param matchTimeout   The amount of time to retry matching (milliseconds).
      * @param tag            An optional tag to be associated with the match.
@@ -1244,6 +1281,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Matches the frame given by the frames path, by switching into the frame
      * and using stitching to get an image of the frame.
+     *
      * @param framePath    The path to the frame to check. This is a list of                     frame names/IDs (where each frame is nested in the                     previous frame).
      * @param matchTimeout The amount of time to retry matching (milliseconds).
      * @param tag          An optional tag to be associated with the match.
@@ -1260,6 +1298,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Switches into the given frame, takes a snapshot of the application under
      * test and matches a region specified by the given selector.
+     *
      * @param framePath     The path to the frame to check. This is a list of                      frame names/IDs (where each frame is nested in the previous frame).
      * @param selector      A Selector specifying the region to check.
      * @param matchTimeout  The amount of time to retry matching (milliseconds).
@@ -1311,7 +1350,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
             String displayStyle = eyesElement.getComputedStyle("display");
 
-            if (getConfigGetter().getHideScrollbars()) {
+            if (getConfiguration().getHideScrollbars()) {
                 originalOverflow = eyesElement.getOverflow();
                 eyesElement.setOverflow("hidden");
             }
@@ -1371,6 +1410,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Takes a snapshot of the application under test and matches a specific
      * element with the expected region output.
+     *
      * @param element      The element to check.
      * @param matchTimeout The amount of time to retry matching. (Milliseconds)
      * @param tag          An optional tag to be associated with the snapshot.
@@ -1383,6 +1423,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * See {@link #checkElement(By, String)}.
      * {@code tag} defaults to {@code null}.
+     *
      * @param selector the selector
      */
     public void checkElement(By selector) {
@@ -1392,6 +1433,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * See {@link #checkElement(By, int, String)}.
      * Default match timeout is used.
+     *
      * @param selector the selector
      * @param tag      the tag
      */
@@ -1402,6 +1444,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     /**
      * Takes a snapshot of the application under test and matches an element
      * specified by the given selector with the expected region output.
+     *
      * @param selector     Selects the element to check.
      * @param matchTimeout The amount of time to retry matching. (Milliseconds)
      * @param tag          An optional tag to be associated with the screenshot.
@@ -1413,6 +1456,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Adds a mouse trigger.
+     *
      * @param action  Mouse action.
      * @param control The control on which the trigger is activated (context relative coordinates).
      * @param cursor  The cursor's position relative to the control.
@@ -1440,6 +1484,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Adds a mouse trigger.
+     *
      * @param action  Mouse action.
      * @param element The WebElement on which the click was called.
      */
@@ -1480,6 +1525,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Adds a keyboard trigger.
+     *
      * @param control The control's context-relative region.
      * @param text    The trigger's text.
      */
@@ -1505,6 +1551,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
     /**
      * Adds a keyboard trigger.
+     *
      * @param element The element for which we sent keys.
      * @param text    The trigger's text.
      */
@@ -1555,10 +1602,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
      * {@inheritDoc}
      */
     @Override
-    protected IConfigurationSetter setViewportSize(RectangleSize size) {
+    protected Configuration setViewportSize(RectangleSize size) {
         if (viewportSizeHandler instanceof ReadOnlyPropertyHandler) {
             logger.verbose("Ignored (viewport size given explicitly)");
-            return getConfigSetter();
+            return getConfiguration();
         }
 
         if (!EyesSeleniumUtils.isMobileDevice(driver)) {
@@ -1578,7 +1625,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         }
 
         viewportSizeHandler.set(new RectangleSize(size.getWidth(), size.getHeight()));
-        return getConfigSetter();
+        return getConfiguration();
     }
 
     /**
@@ -1609,7 +1656,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         if (EyesSeleniumUtils.isMobileDevice(driver)) {
             return new FrameChain(logger);
         }
-        if (getConfigGetter().getHideScrollbars() || (getConfigGetter().getStitchMode() == StitchMode.CSS && stitchContent)) {
+        if (getConfiguration().getHideScrollbars() || (getConfiguration().getStitchMode() == StitchMode.CSS && stitchContent)) {
             FrameChain originalFC = driver.getFrameChain().clone();
             FrameChain fc = driver.getFrameChain().clone();
             Frame frame = fc.peek();
@@ -1644,7 +1691,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         if (EyesSeleniumUtils.isMobileDevice(driver)) {
             return;
         }
-        if (getConfigGetter().getHideScrollbars() || (getConfigGetter().getStitchMode() == StitchMode.CSS && stitchContent)) {
+        if (getConfiguration().getHideScrollbars() || (getConfiguration().getStitchMode() == StitchMode.CSS && stitchContent)) {
             ((EyesTargetLocator) driver.switchTo()).frames(frameChain);
             FrameChain originalFC = frameChain.clone();
             FrameChain fc = frameChain.clone();
@@ -1715,11 +1762,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         EyesWebDriverScreenshot result;
 
         Object activeElement = null;
-        if (getConfigGetter().getHideCaret() && !isMobileDevice) {
+        if (getConfiguration().getHideCaret() && !isMobileDevice) {
             activeElement = driver.executeScript("var activeElement = document.activeElement; activeElement && activeElement.blur(); return activeElement;");
         }
 
-        Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+        Boolean forceFullPageScreenshot = getConfiguration().getForceFullPageScreenshot();
         if (forceFullPageScreenshot == null) forceFullPageScreenshot = false;
         if (checkFrameOrElement && !isMobileDevice) {
             result = getFrameOrElementScreenshot(scaleProviderFactory, originalFrameChain, switchTo);
@@ -1729,7 +1776,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
             result = getElementScreenshot(scaleProviderFactory, switchTo);
         }
 
-        if (getConfigGetter().getHideCaret() && activeElement != null) {
+        if (getConfiguration().getHideCaret() && activeElement != null) {
             switchTo.frames(originalFrameChain);
             driver.executeScript("arguments[0].focus();", activeElement);
         }
@@ -1862,7 +1909,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
     }
 
     private long getWaitBeforeScreenshots() {
-        return getConfigGetter().getWaitBeforeScreenshots();
+        return getConfiguration().getWaitBeforeScreenshots();
     }
 
     private void markElementForLayoutRCA(PositionProvider elemPositionProvider) {
@@ -1882,11 +1929,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         PositionProvider originProvider = ScrollPositionProviderFactory.getScrollPositionProvider(userAgent, logger, jsExecutor, scrollRootElement);
 
         return new FullPageCaptureAlgorithm(logger, regionPositionCompensation,
-                getConfigGetter().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
+                getConfiguration().getWaitBeforeScreenshots(), debugScreenshotsProvider, screenshotFactory,
                 originProvider,
                 scaleProviderFactory,
                 cutProviderHandler.get(),
-                getConfigGetter().getStitchOverlap(),
+                getConfiguration().getStitchOverlap(),
                 imageProvider);
     }
 
@@ -2034,6 +2081,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         class WebDriverInfo {
             /**
              * Gets name.
+             *
              * @return the name
              */
             public String getName() {
@@ -2042,6 +2090,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
             /**
              * Gets capabilities.
+             *
              * @return the capabilities
              */
             public Capabilities getCapabilities() {
@@ -2060,6 +2109,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
         /**
          * Gets selenium session id.
+         *
          * @return the selenium session id
          */
         public String getSeleniumSessionId() {
@@ -2068,6 +2118,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
         /**
          * Gets web driver.
+         *
          * @return the web driver
          */
         public WebDriverInfo getWebDriver() {
@@ -2076,6 +2127,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
         /**
          * Gets device pixel ratio.
+         *
          * @return the device pixel ratio
          */
         public double getDevicePixelRatio() {
@@ -2084,6 +2136,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
         /**
          * Gets cut provider.
+         *
          * @return the cut provider
          */
         public String getCutProvider() {
@@ -2092,6 +2145,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
         /**
          * Gets scale provider.
+         *
          * @return the scale provider
          */
         public String getScaleProvider() {
@@ -2100,26 +2154,29 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
 
         /**
          * Gets stitch mode.
+         *
          * @return the stitch mode
          */
         public StitchMode getStitchMode() {
-            return SeleniumEyes.this.getConfigGetter().getStitchMode();
+            return SeleniumEyes.this.getConfiguration().getStitchMode();
         }
 
         /**
          * Gets hide scrollbars.
+         *
          * @return the hide scrollbars
          */
         public boolean getHideScrollbars() {
-            return SeleniumEyes.this.getConfigGetter().getHideScrollbars();
+            return SeleniumEyes.this.getConfiguration().getHideScrollbars();
         }
 
         /**
          * Gets force full page screenshot.
+         *
          * @return the force full page screenshot
          */
         public boolean getForceFullPageScreenshot() {
-            Boolean forceFullPageScreenshot = getConfigGetter().getForceFullPageScreenshot();
+            Boolean forceFullPageScreenshot = getConfiguration().getForceFullPageScreenshot();
             if (forceFullPageScreenshot == null) return false;
             return forceFullPageScreenshot;
         }
@@ -2130,8 +2187,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         return new EyesSeleniumAgentSetup();
     }
 
+
     /**
      * Gets server connector.
+     *
      * @return the server connector
      */
     public IServerConnector getServerConnector() {
@@ -2143,15 +2202,12 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         return !EyesSeleniumUtils.isMobileDevice(driver) && super.isSendDom();
     }
 
-    @Override
-    public IConfigurationGetter getConfigGetter() {
-        return configurationProvider.get();
+    public boolean getForceFullPageScreenshot() {
+        Boolean forceFullPageScreenshot = getConfiguration().isForceFullPageScreenshot();
+        return forceFullPageScreenshot == null ? false : forceFullPageScreenshot;
     }
 
-    @Override
-    protected IConfigurationSetter getConfigSetter() {
-        return this.configurationProvider.set();
+    public void setForceFullPageScreenshot(boolean forceFullPageScreenshot) {
+        getConfiguration().setForceFullPageScreenshot(forceFullPageScreenshot);
     }
-
-
 }

@@ -11,7 +11,6 @@ import org.testng.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -122,7 +121,7 @@ public class TestListener implements ITestListener {
         Region[] strictRegions = imageMatchSettings.getStrict();
         Region[] contentRegions = imageMatchSettings.getContent();
 
-        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData("testId");
+        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData();
 
         if (testSetup.compareExpectedRegions) {
             if (testData.expectedAccessibilityRegions.size() > 0) {
@@ -157,7 +156,7 @@ public class TestListener implements ITestListener {
     }
 
     private void compareProperties(TestSetup testSetup, ImageMatchSettings imageMatchSettings) {
-        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData("testId");
+        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData();
         Map<String, Object> expectedProps = testData.expectedProperties;
 
         Class<?> imsType = ImageMatchSettings.class;

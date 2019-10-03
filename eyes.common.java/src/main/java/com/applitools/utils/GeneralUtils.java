@@ -3,7 +3,7 @@ package com.applitools.utils;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.selenium.Configuration;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -329,7 +329,7 @@ public class GeneralUtils {
         return null;
     }
 
-    public static boolean configureSendDom(ICheckSettingsInternal checkSettingsInternal, IConfigurationGetter configGetter) {
+    public static boolean configureSendDom(ICheckSettingsInternal checkSettingsInternal, Configuration configGetter) {
         Boolean sendDomFormCheckSettings = checkSettingsInternal.isSendDom();
         Boolean sendDomFromConfig = configGetter.isSendDom()  == null ? true : configGetter.isSendDom();
         if ((sendDomFormCheckSettings != null && sendDomFormCheckSettings) || (sendDomFormCheckSettings == null && sendDomFromConfig) ) {

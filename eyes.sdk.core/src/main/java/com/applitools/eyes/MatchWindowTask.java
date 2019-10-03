@@ -6,7 +6,7 @@ package com.applitools.eyes;
 import com.applitools.AccessibilityLevel;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
@@ -30,10 +30,10 @@ public class MatchWindowTask {
     private int defaultRetryTimeout;
 
     protected Logger logger;
-    protected IServerConnector serverConnector;
-    protected RunningSession runningSession;
-    protected AppOutputProvider appOutputProvider;
-    protected MatchResult matchResult;
+    private IServerConnector serverConnector;
+    private RunningSession runningSession;
+    private AppOutputProvider appOutputProvider;
+    private MatchResult matchResult;
     protected EyesBase eyes;
 
     protected MatchWindowTask() {
@@ -447,7 +447,7 @@ public class MatchWindowTask {
     public static ImageMatchSettings createImageMatchSettings(ICheckSettingsInternal checkSettingsInternal, EyesBase eyes) {
         ImageMatchSettings imageMatchSettings = null;
         if (checkSettingsInternal != null) {
-            IConfigurationGetter config = eyes.getConfigGetter();
+            Configuration config = eyes.getConfiguration();
             MatchLevel matchLevel = checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : config.getDefaultMatchSettings().getMatchLevel();
             imageMatchSettings = new ImageMatchSettings(matchLevel, null, checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : false);
             imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : config.getIgnoreCaret());

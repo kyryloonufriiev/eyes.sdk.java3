@@ -46,7 +46,7 @@ public class TestResults {
     private SessionUrls apiUrls;
     private StepInfo[] stepsInfo;
     private IServerConnector serverConnector;
-    public SessionAccessibilityStatus AccessibilityStatus;
+    public SessionAccessibilityStatus accessibilityStatus;
 
     public StepInfo[] getStepsInfo() {
         return stepsInfo;
@@ -414,11 +414,11 @@ public class TestResults {
     }
 
     public SessionAccessibilityStatus getAccessibilityStatus() {
-        return AccessibilityStatus;
+        return accessibilityStatus;
     }
 
     public void setAccessibilityStatus(SessionAccessibilityStatus accessibilityStatus) {
-        AccessibilityStatus = accessibilityStatus;
+        this.accessibilityStatus = accessibilityStatus;
     }
 
     @Override

@@ -1936,21 +1936,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
         return null;
     }
 
-    @Override
-    public IConfigurationGetter get() {
-        return configuration;
-    }
-
-    @Override
-    public IConfigurationSetter set() {
-        return configuration;
-    }
-
-
-    public Configuration getConfiguration() {
-        return new Configuration(configuration);
-    }
-
     public void setConfiguration(Configuration configuration) {
         ArgumentGuard.notNull(configuration, "configuration");
         String apiKey = configuration.getApiKey();
@@ -1975,5 +1960,10 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
         } else {
             seleniumEyes.close(false);
         }
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return this.configuration;
     }
 }

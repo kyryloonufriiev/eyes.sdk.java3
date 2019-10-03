@@ -83,7 +83,7 @@ public class SafariScreenshotImageProvider implements ImageProvider {
                 logger.verbose("device not found in list. returning original image.");
             }
         } else {
-            Boolean forceFullPageScreenshot = eyes.getConfigGetter().getForceFullPageScreenshot();
+            Boolean forceFullPageScreenshot = eyes.getForceFullPageScreenshot();
             if (forceFullPageScreenshot != null && !forceFullPageScreenshot) {
 
                 Location loc;

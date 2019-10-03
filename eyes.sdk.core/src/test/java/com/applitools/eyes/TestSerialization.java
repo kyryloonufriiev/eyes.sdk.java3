@@ -2,8 +2,6 @@ package com.applitools.eyes;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.Target;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -270,7 +268,7 @@ public class TestSerialization {
     public void test_ImageMatchSettings_Serialization_Global(boolean ignoreCaret, boolean useDom, boolean enablePatterns, boolean ignoreDisplacements) throws JsonProcessingException {
         ICheckSettings settings = Target.window().fully().useDom(useDom).enablePatterns(enablePatterns).ignoreCaret(ignoreCaret);
         TestEyes eyes = new TestEyes();
-        Configuration configuration = eyes.getConfigSetter();
+        Configuration configuration = eyes.getConfiguration();
         configuration.setIgnoreDisplacements(ignoreDisplacements);
         eyes.setConfiguration(configuration);
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings((ICheckSettingsInternal)settings, eyes);

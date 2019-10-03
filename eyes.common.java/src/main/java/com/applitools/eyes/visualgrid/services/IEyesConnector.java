@@ -2,8 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
-import com.applitools.eyes.config.IConfigurationSetter;
-import com.applitools.eyes.selenium.IConfigurationGetter;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.visualgrid.model.*;
 
 import java.net.URI;
@@ -14,17 +13,17 @@ import java.util.List;
 public interface IEyesConnector {
     void log(String massage);
 
-    IConfigurationSetter setProxy(AbstractProxySettings proxy);
+    Configuration setProxy(AbstractProxySettings proxy);
 
     void setLogHandler(LogHandler logHandler);
 
-    IConfigurationSetter setServerUrl(String serverUrl) throws URISyntaxException;
+    Configuration setServerUrl(String serverUrl) throws URISyntaxException;
 
     URI getServerUrl();
 
-    void open(IConfigurationGetter configProvider, String appName, String testName);
+    void open(Configuration configProvider);
 
-    TestResults close(boolean throwExceptionOn);
+    TestResults close(boolean throwExceptionOn, Configuration configuration);
 
     TestResults abortIfNotClosed();
 
@@ -40,23 +39,23 @@ public interface IEyesConnector {
 
     IResourceFuture createResourceFuture(RGridResource rg);
 
-    MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
+    MatchResult matchWindow(Configuration configuration, String resultImageURL, String domLocation, ICheckSettings checkSettings,
                             List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
                             String renderId, String source);
 
     void setRenderInfo(RenderingInfo renderingInfo);
 
-    IConfigurationSetter setBatch(BatchInfo batchInfo);
+    Configuration setBatch(BatchInfo batchInfo);
 
     void setUserAgent(String userAgent);
 
     String getApiKey();
 
-    IConfigurationSetter setApiKey(String apiKey);
+    Configuration setApiKey(String apiKey);
 
-    void setBranchName(String branchName);
+    Configuration setBranchName(String branchName);
 
-    void setParentBranchName(String parentBranchName);
+    Configuration setParentBranchName(String parentBranchName);
 
     void setDevice(String device);
 

@@ -4,7 +4,7 @@ import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.DiffsFoundException;
-import com.applitools.eyes.selenium.IConfigurationGetter;
+import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
@@ -24,7 +24,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
     public enum TaskType {OPEN, CHECK, CLOSE, ABORT}
 
-    private IConfigurationGetter configurationGetter;
+    private Configuration configuration;
     private TestResults testResults;
 
     private IEyesConnector eyesConnector;
@@ -51,9 +51,9 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
     }
 
-    public VisualGridTask(IConfigurationGetter seleniumConfigurationProvider, TestResults testResults, IEyesConnector eyesConnector, TaskType type, TaskListener runningTestListener,
+    public VisualGridTask(Configuration configuration, TestResults testResults, IEyesConnector eyesConnector, TaskType type, TaskListener runningTestListener,
                           ICheckSettings checkSettings, RunningTest runningTest, List<VisualGridSelector[]> regionSelectors, String source) {
-        this.configurationGetter = seleniumConfigurationProvider;
+        this.configuration = configuration;
         this.testResults = testResults;
         this.eyesConnector = eyesConnector;
         this.type = type;
@@ -102,7 +102,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         //eyesConnector.setUserAgent(craftUserAgent(browserInfo));
                         eyesConnector.setDeviceSize(browserInfo.getViewportSize());
                     }
-                    eyesConnector.open(configurationGetter, runningTest.getAppName(), runningTest.getTestName());
+                    eyesConnector.open(configuration);
                     logger.verbose("Eyes Open Done.");
                     break;
 
@@ -140,14 +140,14 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         }
                     }
 
-                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions, this.regionSelectors, location, renderResult.getRenderId(), source);
+                    eyesConnector.matchWindow(configuration, imageLocation, domLocation, (ICheckSettings) checkSettings, regions, this.regionSelectors, location, renderResult.getRenderId(), source);
                     logger.verbose("match done");
                     break;
 
                 case CLOSE:
                     logger.verbose("VisualGridTask.run close task");
                     try {
-                        testResults = eyesConnector.close(true);
+                        testResults = eyesConnector.close(true, configuration);
                     } catch (Throwable e) {
                         GeneralUtils.logExceptionStackTrace(logger, e);
                         if (e instanceof DiffsFoundException) {

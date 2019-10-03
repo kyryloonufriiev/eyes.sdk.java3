@@ -3,10 +3,8 @@ package com.applitools.eyes.selenium.rendering;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.config.*;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import com.applitools.eyes.selenium.IConfigurationGetter;
-import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
@@ -18,18 +16,16 @@ import java.util.List;
 
 class EyesConnector extends EyesBase implements IEyesConnector {
 
-    private final ISeleniumConfigurationProvider configProvider;
     private RenderBrowserInfo browserInfo;
     private String userAgent;
     private String device;
     private RectangleSize deviceSize;
-    private IConfigurationGetter configurationGetter;
     private String appName;
     private String testName;
+    private com.applitools.eyes.config.Configuration configuration;
 
-    public EyesConnector(ISeleniumConfigurationProvider configProvider, List<PropertyData> properties, RenderBrowserInfo browserInfo) {
-        this.configProvider = configProvider;
-        configurationGetter = configProvider.get();
+    public EyesConnector(com.applitools.eyes.config.Configuration configuration, List<PropertyData> properties, RenderBrowserInfo browserInfo) {
+        this.configuration = configuration;
         this.browserInfo = browserInfo;
         if (properties != null) {
             for (PropertyData property : properties) {
@@ -42,15 +38,19 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     /**
      * ﻿Starts a new test without setting the viewport size of the AUT.
      * @param config
-     * @param appName
-     * @param testName
      */
-    public void open(IConfigurationGetter config, String appName, String testName) {
-        this.configurationGetter = config;
-        this.appName = appName;
-        this.testName = testName;
+    public void open(Configuration config) {
+        this.configuration = config;
+        this.appName = config.getAppName();
+        this.testName = config.getTestName();
         logger.verbose("opening EyesConnector with viewport size: " + browserInfo.getViewportSize());
         openBase();
+    }
+
+    @Override
+    public TestResults close(boolean throwExceptionOn, Configuration configuration) {
+        this.configuration = configuration;
+        return this.close(throwExceptionOn);
     }
 
     @Override
@@ -80,17 +80,17 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     }
 
     @Override
-    public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
+    public MatchResult matchWindow(Configuration configuration, String resultImageURL, String domLocation, ICheckSettings checkSettings,
                                    List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
                                    String renderId, String source) {
 
+        this.configuration = configuration;
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         if(checkSettingsInternal.getStitchContent() == null){
             checkSettings.fully();
         }
 
-
-        MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfigGetter().getMatchTimeout(), this);
+        MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, configuration.getMatchTimeout(), this);
 
         ImageMatchSettings imageMatchSettings = matchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
 
@@ -125,9 +125,9 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     }
 
     @Override
-    protected IConfigurationSetter setViewportSize(RectangleSize size) {
+    protected Configuration setViewportSize(RectangleSize size) {
         logger.log("WARNING setViewportSize() was called in Visual-Grid context");
-        return getConfigSetter();
+        return (Configuration) this.configuration;
     }
 
     @Override
@@ -148,16 +148,6 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     @Override
     protected String getAUTSessionId() {
         return null;
-    }
-
-    @Override
-    protected <T extends com.applitools.eyes.config.IConfigurationGetter> T getConfigGetter() {
-        return (T) configurationGetter;
-    }
-
-    @Override
-    protected <T extends IConfigurationSetter> T getConfigSetter() {
-        return (T) configurationGetter;
     }
 
     public void setRenderInfo(RenderingInfo renderInfo) {
@@ -183,26 +173,6 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     @Override
     public String tryCaptureDom() {
         return null;
-    }
-
-    @Override
-    public IConfigurationSetter setApiKey(String apiKey) {
-        return super.setApiKey(apiKey);
-    }
-
-    @Override
-    public IConfigurationSetter setServerUrl(URI serverUrl) {
-        return super.setServerUrl(serverUrl);
-    }
-
-    @Override
-    public void setBranchName(String branchName) {
-        getConfigSetter().setBranchName(branchName);
-    }
-
-    @Override
-    public void setParentBranchName(String parentBranchName) {
-        getConfigSetter().setParentBranchName(parentBranchName);
     }
 
     @Override
@@ -272,7 +242,7 @@ class EyesConnector extends EyesBase implements IEyesConnector {
         if (baselineEnvName != null) {
             return baselineEnvName;
         }
-        return getConfigGetter().getBaselineEnvName();
+        return configuration.getBaselineEnvName();
     }
 
     @Override
@@ -281,7 +251,14 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     }
 
     @Override
+    protected com.applitools.eyes.config.Configuration getConfiguration() {
+        return this.configuration;
+    }
+
+    @Override
     protected String getTestName() {
         return this.testName;
     }
+
+
 }
