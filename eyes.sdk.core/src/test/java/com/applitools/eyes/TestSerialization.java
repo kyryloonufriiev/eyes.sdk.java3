@@ -257,7 +257,7 @@ public class TestSerialization {
         String actualSerialization = jsonMapper.writeValueAsString(ims);
 
         String expectedSerialization = String.format(
-                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
+                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"accessibility\":[],\"accessibilityLevel\":\"None\",\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
                 ignoreCaret, useDom, enablePatterns, ignoreDisplacements);
 
         Assert.assertEquals(actualSerialization,
@@ -276,7 +276,7 @@ public class TestSerialization {
         String actualSerialization = jsonMapper.writeValueAsString(imageMatchSettings);
 
         String expectedSerialization = String.format(
-                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
+                "{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":%s,\"useDom\":%s,\"enablePatterns\":%s,\"ignoreDisplacements\":%s,\"accessibility\":[],\"accessibilityLevel\":\"None\",\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null}",
                 ignoreCaret, useDom, enablePatterns, ignoreDisplacements);
 
         Assert.assertEquals(actualSerialization,
@@ -308,7 +308,7 @@ public class TestSerialization {
 
         String actualSerialization = jsonMapper.writeValueAsString(ssi);
 
-        String expectedSerialization = "{\"agentId\":\"some agent\",\"sessionType\":\"SEQUENTIAL\",\"appIdOrName\":\"my app\",\"verId\":\"1.0.0\",\"scenarioIdOrName\":\"some scenario\",\"batchInfo\":{\"id\":\"37a587aa-17d0-4e86-bf0e-566656a84dda\",\"batchSequenceName\":null,\"name\":\"batch name\",\"startedAt\":\"2017-07-02T05:22:21Z\"},\"baselineEnvName\":\"some baseline name\",\"environmentName\":\"env name\",\"environment\":{\"inferred\":null,\"os\":null,\"hostingApp\":null,\"displaySize\":null,\"deviceInfo\":null,\"osInfo\":null,\"hostingAppInfo\":null},\"branchName\":\"some branch name\",\"parentBranchName\":\"some parent branch name\",\"baselineBranchName\":\"some baseline branch name\",\"saveDiffs\":false,\"defaultMatchSettings\":{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":false,\"useDom\":false,\"enablePatterns\":false,\"ignoreDisplacements\":false,\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null},\"properties\":[{\"name\":\"property name\",\"value\":\"property value\"},{\"name\":null,\"value\":null}]}";
+        String expectedSerialization = "{\"agentId\":\"some agent\",\"sessionType\":\"SEQUENTIAL\",\"appIdOrName\":\"my app\",\"verId\":\"1.0.0\",\"scenarioIdOrName\":\"some scenario\",\"batchInfo\":{\"id\":\"37a587aa-17d0-4e86-bf0e-566656a84dda\",\"batchSequenceName\":null,\"name\":\"batch name\",\"startedAt\":\"2017-07-02T05:22:21Z\"},\"baselineEnvName\":\"some baseline name\",\"environmentName\":\"env name\",\"environment\":{\"inferred\":null,\"os\":null,\"hostingApp\":null,\"displaySize\":null,\"deviceInfo\":null,\"osInfo\":null,\"hostingAppInfo\":null},\"branchName\":\"some branch name\",\"parentBranchName\":\"some parent branch name\",\"baselineBranchName\":\"some baseline branch name\",\"saveDiffs\":false,\"defaultMatchSettings\":{\"matchLevel\":\"STRICT\",\"exact\":null,\"ignoreCaret\":false,\"useDom\":false,\"enablePatterns\":false,\"ignoreDisplacements\":false,\"accessibility\":[],\"accessibilityLevel\":\"None\",\"Ignore\":null,\"Layout\":null,\"Strict\":null,\"Content\":null,\"Floating\":null},\"properties\":[{\"name\":\"property name\",\"value\":\"property value\"},{\"name\":null,\"value\":null}]}";
 
         Assert.assertEquals(actualSerialization,
                 expectedSerialization, "SessionStartInfo serialization does not match!");
