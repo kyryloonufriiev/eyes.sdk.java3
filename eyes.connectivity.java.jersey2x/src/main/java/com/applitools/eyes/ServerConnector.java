@@ -68,6 +68,7 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the API key of your applitools Eyes account.
+     *
      * @param apiKey The api key to set.
      */
     public void setApiKey(String apiKey) {
@@ -84,6 +85,7 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the proxy settings to be used by the rest client.
+     *
      * @param proxySettings The proxy settings to be used by the rest client.
      *                      If {@code null} then no proxy is set.
      */
@@ -106,6 +108,7 @@ public class ServerConnector extends RestClient
 
     /**
      * Sets the current server URL used by the rest client.
+     *
      * @param serverUrl The URI of the rest server.
      */
     @SuppressWarnings("UnusedDeclaration")
@@ -128,6 +131,7 @@ public class ServerConnector extends RestClient
      * Starts a new running session in the agent. Based on the given parameters,
      * this running session will either be linked to an existing session, or to
      * a completely new session.
+     *
      * @param sessionStartInfo The start parameters for the session.
      * @return RunningSession object which represents the current running
      * session
@@ -187,6 +191,7 @@ public class ServerConnector extends RestClient
 
     /**
      * Stops the running session.
+     *
      * @param runningSession The running session to be stopped.
      * @return TestResults object for the stopped running session
      * @throws EyesException For invalid status codes, or if response parsing
@@ -254,6 +259,7 @@ public class ServerConnector extends RestClient
     /**
      * Matches the current window (held by the WebDriver) to the expected
      * window.
+     *
      * @param runningSession The current agent's running session.
      * @param matchData      Encapsulation of a capture taken from the application.
      * @return The results of the window matching.
@@ -607,8 +613,8 @@ public class ServerConnector extends RestClient
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
                     for (int i = 0; i < renderStatusResults.length; i++) {
                         RenderStatusResults renderStatusResult = renderStatusResults[i];
-                        if(renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR){
-                            logger.verbose("error on render id - "+renderStatusResult);
+                        if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
+                            logger.verbose("error on render id - " + renderStatusResult);
                         }
                     }
                     return Arrays.asList(renderStatusResults);
@@ -634,6 +640,22 @@ public class ServerConnector extends RestClient
     @Override
     public void setRenderingInfo(RenderingInfo renderInfo) {
         this.renderingInfo = renderInfo;
+    }
+
+    @Override
+    public void closeBatch(String batchId) {
+        if ("true".equalsIgnoreCase(System.getenv("APPLITOOLS_DONT_CLOSE_BATCHES")))
+        {
+            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Doing nothing.");
+            return;
+        }
+        ArgumentGuard.notNull(batchId, "batchId");
+        this.logger.verbose("called with " + batchId);
+
+        String url = String.format(CLOSE_BATCH, batchId);
+        WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
+        Response delete = target.request().delete();
+        logger.verbose("delete batch is done with "+delete.getStatus() + " status");
     }
 
 }

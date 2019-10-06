@@ -972,6 +972,17 @@ public class VisualGridEyes implements IRenderingEyes, ISeleniumEyes {
         return allTestResults;
     }
 
+    @Override
+    public IBatchCloser getBatchCloser() {
+        return this.testList.get(0).getBatchCloser();
+    }
+
+    @Override
+    public String getBatchId() {
+        return this.getConfigGetter().getBatch().getId();
+    }
+
+
     public EyesWebDriver getDriver() {
         return webDriver;
     }

@@ -1,8 +1,13 @@
 package com.applitools.eyes.utils;
 
+import com.applitools.eyes.BatchInfo;
+import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
@@ -11,6 +16,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.brotli.dec.BrotliInputStream;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -130,5 +136,31 @@ public class CommUtils {
             e.printStackTrace();
         }
         return json;
+    }
+
+    public static BatchInfo getBatch(String batchId, String serverUrl, String apikey) {
+        BatchInfo batchInfo = null;
+        try (CloseableHttpClient httpClient = HttpClients.custom().build()) {
+            String url = String.format("%sapi/sessions/batches/%s/bypointerid?apikey=%s", serverUrl, batchId, apikey);
+            HttpGet request = new HttpGet(url);
+
+            HttpResponse response = httpClient.execute(request);
+            batchInfo = null;
+            if (response.getStatusLine().getStatusCode() == 200) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper = objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                byte[] bytes = new byte[0];
+                try {
+                    bytes = IOUtils.toByteArray(response.getEntity().getContent());
+                    String s = new String(bytes, "UTF-8");
+                    System.out.println(s);
+                } catch (IOException e) {
+                }
+                batchInfo = objectMapper.readValue(bytes, BatchInfo.class);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return batchInfo;
     }
 }

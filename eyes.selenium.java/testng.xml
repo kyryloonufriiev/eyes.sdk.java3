@@ -13,6 +13,7 @@
             <class name="com.applitools.eyes.selenium.TestSpecialCases" />
             <class name="com.applitools.eyes.selenium.TestClassicRunner" />
             <class name="com.applitools.eyes.selenium.TestBatchSequenceName" />
+            <class name="com.applitools.eyes.selenium.TestBatchAPI" />
             <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner" />
         </classes>
     </test>

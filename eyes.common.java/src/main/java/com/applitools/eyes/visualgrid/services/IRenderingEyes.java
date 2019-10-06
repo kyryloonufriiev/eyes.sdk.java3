@@ -1,5 +1,6 @@
 package com.applitools.eyes.visualgrid.services;
 
+import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.TestResultContainer;
 
@@ -24,6 +25,10 @@ public interface IRenderingEyes {
     Logger getLogger();
 
     List<TestResultContainer> getAllTestResults();
+
+    IBatchCloser getBatchCloser();
+
+    String getBatchId();
 
     interface EyesListener{
 

@@ -2,6 +2,8 @@ package com.applitools.eyes.visualgrid.services;
 
 
 import com.applitools.ICheckSettings;
+import com.applitools.eyes.IBatchCloser;
+import com.applitools.eyes.IServerConnector;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
@@ -75,6 +77,10 @@ public class RunningTest {
 
     public boolean isCloseTaskIssued() {
         return closeTask != null;
+    }
+
+    public IBatchCloser getBatchCloser() {
+        return (IBatchCloser) this.eyes;
     }
 
     public interface RunningTestListener {
@@ -322,4 +328,5 @@ public class RunningTest {
                 ", isTestInExceptionMode=" + isTestInExceptionMode +
                 '}';
     }
+
 }

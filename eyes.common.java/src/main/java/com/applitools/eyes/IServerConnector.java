@@ -21,6 +21,7 @@ public interface IServerConnector {
     String RESOURCES_SHA_256 = "/resources/sha256/";
     String RENDER_STATUS = "/render-status";
     String RENDER = "/render";
+    String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
 
     int TIMEOUT = 1000 * 60 * 5; // 5 Minutes
     String API_PATH = "/" + API_SESSIONS + "/running";
@@ -174,4 +175,6 @@ public interface IServerConnector {
     IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent);
 
     void setRenderingInfo(RenderingInfo renderInfo);
+
+    void closeBatch(String batchId);
 }

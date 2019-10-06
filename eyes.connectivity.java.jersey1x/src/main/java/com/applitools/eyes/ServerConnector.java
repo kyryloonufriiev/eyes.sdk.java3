@@ -316,7 +316,7 @@ public class ServerConnector extends RestClient
         // Getting the screenshot's bytes (notice this can be either
         // compressed/uncompressed form).
         byte[] screenshot = new byte[0];
-            String screenshot64 = matchData.getAppOutput().getScreenshot64();
+        String screenshot64 = matchData.getAppOutput().getScreenshot64();
         if (screenshot64 != null) {
             screenshot = DatatypeConverter.parseBase64Binary(
                     screenshot64);
@@ -609,8 +609,8 @@ public class ServerConnector extends RestClient
                     RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
                     for (int i = 0; i < renderStatusResults.length; i++) {
                         RenderStatusResults renderStatusResult = renderStatusResults[i];
-                        if(renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR){
-                            logger.verbose("error on render id - "+renderStatusResult);
+                        if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
+                            logger.verbose("error on render id - " + renderStatusResult);
                         }
                     }
                     return Arrays.asList(renderStatusResults);
@@ -634,6 +634,17 @@ public class ServerConnector extends RestClient
     @Override
     public void setRenderingInfo(RenderingInfo renderInfo) {
         this.renderingInfo = renderInfo;
+    }
+
+    @Override
+    public void closeBatch(String batchId) {
+        ArgumentGuard.notNull(batchId, "batchId");
+        this.logger.verbose("called with " + batchId);
+
+        String url = String.format(CLOSE_BATCH, batchId);
+        WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path(url);
+        ClientResponse delete = target.delete(ClientResponse.class);
+        logger.verbose("delete batch is done with " + delete.getStatus() + " status");
     }
 
 }

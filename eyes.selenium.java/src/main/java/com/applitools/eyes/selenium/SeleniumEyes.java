@@ -43,7 +43,7 @@ import java.util.*;
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
+public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchCloser {
 
     private FrameChain originalFC;
     private WebElement scrollRootElement;
@@ -100,6 +100,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
      */
     public boolean shouldStitchContent() {
         return stitchContent;
+    }
+
+    @Override
+    public void closeBatch(String batchId) {
+        this.serverConnector.closeBatch(batchId);
     }
 
     /**
@@ -274,6 +279,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes {
         this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
 
         this.driver.setRotation(rotation);
+        this.runner.addBatch(this.getConfigGetter().getBatch().getId(), this);
         return this.driver;
     }
 
