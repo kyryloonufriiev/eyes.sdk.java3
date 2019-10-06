@@ -279,7 +279,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
 
         this.driver.setRotation(rotation);
-        this.runner.addBatch(this.getConfigGetter().getBatch().getId(), this);
+        this.runner.addBatch(this.getConfiguration().getBatch().getId(), this);
         return this.driver;
     }
 

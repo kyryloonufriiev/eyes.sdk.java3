@@ -979,7 +979,7 @@ public class VisualGridEyes implements IRenderingEyes, ISeleniumEyes {
 
     @Override
     public String getBatchId() {
-        return this.getConfigGetter().getBatch().getId();
+        return this.configProvider.getConfiguration().getBatch().getId();
     }
 
 
