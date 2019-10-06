@@ -14,4 +14,4 @@ before_script:
   - env webdriver.chrome.driver=/home/travis/build/
 
 script:
-  - mvn test
+  - mvn test -e
