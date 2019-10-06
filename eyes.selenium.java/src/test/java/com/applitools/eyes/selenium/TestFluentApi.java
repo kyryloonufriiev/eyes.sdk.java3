@@ -1,6 +1,9 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.AccessibilityLevel;
 import com.applitools.ICheckSettings;
+import com.applitools.eyes.AccessibilityRegionByRectangle;
+import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.Region;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -165,11 +168,29 @@ public class TestFluentApi extends TestSetup {
     }
 
 
-
     @Test(dataProvider = "booleanDP", dataProviderClass = TestDataProvider.class)
     public void TestIgnoreDisplacements(boolean ignoreDisplacements) {
         getEyes().check("Fluent - Ignore Displacements = " + ignoreDisplacements, Target.window().ignoreDisplacements(ignoreDisplacements).fully());
         addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);
+    }
+
+    @Test
+    public void TestAccessibilityRegions() {
+        Configuration config = getEyes().getConfiguration();
+        config.setAccessibilityValidation(AccessibilityLevel.AAA);
+        getEyes().setConfiguration(config);
+        getEyes().check(Target.window().accessibility(By.className("ignore"), AccessibilityRegionType.LargeText));
+        setExpectedAccessibilityRegions(new AccessibilityRegionByRectangle[]{
+                new AccessibilityRegionByRectangle(122, 928, 456, 306, AccessibilityRegionType.LargeText),
+                new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.LargeText),
+                new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.LargeText)}
+        );
+        addExpectedProperty("AccessibilityLevel", AccessibilityLevel.AAA);
+    }
+
+    @Override
+    protected void beforeOpen(Eyes eyes) {
+        eyes.getDefaultMatchSettings().setAccessibilityLevel(AccessibilityLevel.AAA);
     }
 
 }

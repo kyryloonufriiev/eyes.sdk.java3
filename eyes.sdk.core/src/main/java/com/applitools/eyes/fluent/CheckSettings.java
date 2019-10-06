@@ -1,14 +1,10 @@
 package com.applitools.eyes.fluent;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.MatchLevel;
-import com.applitools.eyes.Region;
+import com.applitools.eyes.*;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The Match settings object to use in the various Eyes.Check methods.
@@ -33,6 +29,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     protected Boolean useDom;
     protected Map<String, String> scriptHooks = new HashMap<>();
     protected Boolean ignoreDisplacements;
+    protected List<IGetAccessibilityRegion> accessibilityRegions = new ArrayList<>();
 
     protected CheckSettings() { }
 
@@ -344,6 +341,11 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     }
 
     @Override
+    public IGetAccessibilityRegion[] getAccessibilityRegions() {
+        return this.accessibilityRegions.toArray(new IGetAccessibilityRegion[0]);
+    }
+
+    @Override
     public Boolean isUseDom() {
         return useDom != null ? useDom : Boolean.FALSE;
     }
@@ -461,6 +463,7 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         clone.scriptHooks.putAll(this.scriptHooks);
         clone.enablePatterns = (this.enablePatterns);
         clone.ignoreDisplacements = (this.ignoreDisplacements);
+        clone.accessibilityRegions = this.accessibilityRegions;
         clone.useDom = (this.useDom);
     }
 
@@ -516,4 +519,29 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
     public ICheckSettings ignoreDisplacements() {
         return this.ignoreDisplacements(true);
     }
+
+    protected void accessibility_(IGetAccessibilityRegion accessibilityRegionProvider)
+    {
+        this.accessibilityRegions.add(accessibilityRegionProvider);
+    }
+
+    protected void accessibility_(Region rect, AccessibilityRegionType regionType)
+    {
+        accessibility_(new AccessibilityRegionByRectangle(rect, regionType));
+    }
+
+
+    @Override
+    public ICheckSettings accessibility(Region region, AccessibilityRegionType regionType) {
+        CheckSettings clone = clone();
+        clone.accessibility_(region, regionType);
+        return clone;
+    }
+
+    protected void accessibility(IGetAccessibilityRegion accessibilityRegionProvider)
+    {
+        accessibilityRegions.add(accessibilityRegionProvider);
+    }
+
+
 }

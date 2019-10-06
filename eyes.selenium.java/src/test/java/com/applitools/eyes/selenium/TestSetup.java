@@ -57,6 +57,7 @@ public abstract class TestSetup implements ITest {
         public HashSet<Region> expectedStrictRegions = new HashSet<>();
         public HashSet<Region> expectedContentRegions = new HashSet<>();
         public Map<String, Object> expectedProperties = new HashMap<>();
+        public HashSet<AccessibilityRegionByRectangle> expectedAccessibilityRegions = new HashSet<AccessibilityRegionByRectangle>();
 
         public SpecificTestContextRequirements(Eyes eyes) {
             this.eyes = eyes;
@@ -110,45 +111,45 @@ public abstract class TestSetup implements ITest {
         this.runner = this.useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
     }
 
-    public SpecificTestContextRequirements getTestData(Object testId) {
-        return this.testDataByTestId.get(testId);
+    public SpecificTestContextRequirements getTestData() {
+        return this.testDataByTestId.get(Thread.currentThread().getId());
     }
 
     public WebDriver getDriver() {
-        return getTestData("testId").getWrappedDriver();
+        return getTestData().getWrappedDriver();
     }
 
     protected WebDriver getWebDriver() {
-        return getTestData("testId").getWebDriver();
+        return getTestData().getWebDriver();
     }
 
     public Eyes getEyes() {
-        return getTestData("testId").getEyes();
+        return getTestData().getEyes();
     }
 
     protected void setExpectedIgnoreRegions(Region... expectedIgnoreRegions) {
-        getTestData("testId").expectedIgnoreRegions = new HashSet<>(Arrays.asList(expectedIgnoreRegions));
+        getTestData().expectedIgnoreRegions = new HashSet<>(Arrays.asList(expectedIgnoreRegions));
     }
 
     protected void setExpectedLayoutRegions(Region... expectedLayoutRegions) {
-        getTestData("testId").expectedLayoutRegions = new HashSet<>(Arrays.asList(expectedLayoutRegions));
+        getTestData().expectedLayoutRegions = new HashSet<>(Arrays.asList(expectedLayoutRegions));
     }
 
     protected void setExpectedStrictRegions(Region... expectedStrictRegions) {
-        getTestData("testId").expectedStrictRegions = new HashSet<>(Arrays.asList(expectedStrictRegions));
+        getTestData().expectedStrictRegions = new HashSet<>(Arrays.asList(expectedStrictRegions));
     }
 
     protected void setExpectedContentRegions(Region... expectedContentRegions) {
-        getTestData("testId").expectedContentRegions = new HashSet<>(Arrays.asList(expectedContentRegions));
+        getTestData().expectedContentRegions = new HashSet<>(Arrays.asList(expectedContentRegions));
     }
 
     protected void setExpectedFloatingRegions(FloatingMatchSettings... expectedFloatingsRegions) {
-        getTestData("testId").expectedFloatingRegions = new HashSet<>(Arrays.asList(expectedFloatingsRegions));
+        getTestData().expectedFloatingRegions = new HashSet<>(Arrays.asList(expectedFloatingsRegions));
     }
 
     public void addExpectedProperty(String propertyName, Object expectedValue)
     {
-        Map<String, Object> expectedProps = getTestData("testId").expectedProperties;
+        Map<String, Object> expectedProps = getTestData().expectedProperties;
         expectedProps.put(propertyName, expectedValue);
     }
     
@@ -157,7 +158,7 @@ public abstract class TestSetup implements ITest {
         this.testName = testName + " " + options.getBrowserName() + " (" + this.mode + ")";
         Eyes eyes = initEyes();
         SpecificTestContextRequirements testData = new SpecificTestContextRequirements(eyes);
-        testDataByTestId.put("testId", testData);
+        testDataByTestId.put(Thread.currentThread().getId(), testData);
 
         if (this.runner instanceof VisualGridRunner) {
             testName += "_VG";
@@ -189,6 +190,9 @@ public abstract class TestSetup implements ITest {
         TestUtils.setupLogging(eyes, testName + "_" + options.getPlatform());
 
         eyes.getLogger().log("navigating to URL: " + testedPageUrl);
+
+        beforeOpen(eyes);
+
         WebDriver driver;
         try {
             driver = eyes.open(webDriver, this.testSuitName, testName, testedPageSize);
@@ -222,9 +226,16 @@ public abstract class TestSetup implements ITest {
         return eyes;
     }
 
+    protected void beforeOpen(Eyes eyes){};
+
     @Override
     public String getTestName() {
         return testName;
+    }
+
+    protected void setExpectedAccessibilityRegions(AccessibilityRegionByRectangle[] accessibilityRegions)
+    {
+        this.getTestData().expectedAccessibilityRegions = new HashSet<>(Arrays.asList(accessibilityRegions));
     }
 
     @Override

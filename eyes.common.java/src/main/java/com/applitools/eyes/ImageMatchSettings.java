@@ -1,5 +1,6 @@
 package com.applitools.eyes;
 
+import com.applitools.AccessibilityLevel;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
@@ -10,14 +11,16 @@ public class ImageMatchSettings {
     private MatchLevel matchLevel;
     private ExactMatchSettings exact;
     private boolean ignoreCaret;
-    private Region ignoreRegions[];
-    private Region layoutRegions[];
-    private Region strictRegions[];
-    private Region contentRegions[];
-    private FloatingMatchSettings floatingMatchSettings[];
+    private Region[] ignoreRegions;
+    private Region[] layoutRegions;
+    private Region[] strictRegions;
+    private Region[] contentRegions;
+    private FloatingMatchSettings[] floatingMatchSettings;
     private boolean useDom;
     public boolean enablePatterns;
     public boolean ignoreDisplacements;
+    private AccessibilityRegionByRectangle[] accessibility = new AccessibilityRegionByRectangle[0];
+    private AccessibilityLevel accessibilityLevel = AccessibilityLevel.None;
 
     public ImageMatchSettings(MatchLevel matchLevel, ExactMatchSettings exact, boolean useDom) {
         this.matchLevel = matchLevel;
@@ -33,6 +36,22 @@ public class ImageMatchSettings {
      */
     public ImageMatchSettings() {
         this(MatchLevel.STRICT, null, false);
+    }
+
+    public ImageMatchSettings(ImageMatchSettings other) {
+        this.matchLevel = other.matchLevel;
+        this.exact = other.exact;
+        this.ignoreCaret = other.ignoreCaret;
+        this.ignoreRegions = other.ignoreRegions;
+        this.layoutRegions = other.layoutRegions;
+        this.strictRegions = other.strictRegions;
+        this.contentRegions = other.contentRegions;
+        this.floatingMatchSettings = other.floatingMatchSettings;
+        this.useDom = other.useDom;
+        this.enablePatterns = other.enablePatterns;
+        this.ignoreDisplacements = other.ignoreDisplacements;
+        this.accessibility = other.accessibility;
+        this.accessibilityLevel = other.accessibilityLevel;
     }
 
     /**
@@ -203,5 +222,21 @@ public class ImageMatchSettings {
 
     public boolean isIgnoreDisplacements() {
         return ignoreDisplacements;
+    }
+
+    public void setAccessibility(AccessibilityRegionByRectangle[] accessibilityValidation) {
+        this.accessibility = accessibilityValidation;
+    }
+
+    public AccessibilityLevel getAccessibilityLevel() {
+        return accessibilityLevel;
+    }
+
+    public void setAccessibilityLevel(AccessibilityLevel accessibilityLevel) {
+        this.accessibilityLevel = accessibilityLevel;
+    }
+
+    public AccessibilityRegionByRectangle[] getAccessibility() {
+        return accessibility;
     }
 }

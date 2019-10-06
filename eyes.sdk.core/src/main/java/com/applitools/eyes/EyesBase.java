@@ -1,8 +1,7 @@
 package com.applitools.eyes;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
@@ -38,7 +37,7 @@ import java.util.Queue;
 /**
  * Applitools Eyes Base for Java API .
  */
-public abstract class EyesBase {
+public abstract class EyesBase extends EyesBaseConfig implements IEyesBase{
 
     protected static final int USE_DEFAULT_TIMEOUT = -1;
     private static final int MAX_ITERATION = 10;
@@ -56,9 +55,6 @@ public abstract class EyesBase {
     protected PropertyHandler<CutProvider> cutProviderHandler;
     protected PropertyHandler<PositionProvider> positionProviderHandler;
 
-    // Will be checked <b>before</b> any argument validation. If true,
-    // all method will immediately return without performing any action.
-    private boolean isDisabled;
     protected Logger logger;
 
     private boolean isOpen;
@@ -75,7 +71,7 @@ public abstract class EyesBase {
 
     public EyesBase() {
 
-        if (isDisabled) {
+        if (getIsDisabled()) {
             userInputs = null;
             return;
         }
@@ -156,13 +152,13 @@ public abstract class EyesBase {
      * Sets the API key of your applitools Eyes account.
      * @param apiKey The api key to set.
      */
-    public IConfigurationSetter setApiKey(String apiKey) {
+    public Configuration setApiKey(String apiKey) {
         ArgumentGuard.notNull(apiKey, "apiKey");
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
         serverConnector.setApiKey(apiKey);
-        return this.getConfigSetter();
+        return this.getConfiguration();
     }
 
     /**
@@ -181,9 +177,9 @@ public abstract class EyesBase {
      * @param serverUrl The URI of the rest server, or {@code null} to use
      *                  the default server.
      */
-    public IConfigurationSetter setServerUrl(String serverUrl) {
+    public Configuration setServerUrl(String serverUrl) {
         setServerUrl(URI.create(serverUrl));
-        return this.getConfigSetter();
+        return this.getConfiguration();
     }
 
     /**
@@ -191,7 +187,7 @@ public abstract class EyesBase {
      * @param serverUrl The URI of the rest server, or {@code null} to use
      *                  the default server.
      */
-    public IConfigurationSetter setServerUrl(URI serverUrl) {
+    public Configuration setServerUrl(URI serverUrl) {
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
@@ -200,7 +196,7 @@ public abstract class EyesBase {
         } else {
             serverConnector.setServerUrl(serverUrl);
         }
-        return this.getConfigSetter();
+        return this.getConfiguration();
     }
 
     /**
@@ -218,13 +214,13 @@ public abstract class EyesBase {
      * @param abstractProxySettings The proxy settings to be used by the rest client.
      *                              If {@code null} then no proxy is set.
      */
-    public IConfigurationSetter setProxy(AbstractProxySettings abstractProxySettings) {
+    public Configuration setProxy(AbstractProxySettings abstractProxySettings) {
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
-        getConfigSetter().setProxy(abstractProxySettings);
+        getConfiguration().setProxy(abstractProxySettings);
         serverConnector.setProxy(abstractProxySettings);
-        return getConfigSetter();
+        return getConfiguration();
     }
 
     /**
@@ -238,27 +234,12 @@ public abstract class EyesBase {
         return serverConnector.getProxy();
     }
 
-    /**
-     * @param isDisabled If true, all interactions with this API will be
-     *                   silently ignored.
-     */
-    public void setIsDisabled(boolean isDisabled) {
-        this.isDisabled = isDisabled;
-    }
-
-    /**
-     * @return Whether eyes is disabled.
-     */
-    public boolean getIsDisabled() {
-        return isDisabled;
-    }
-
 
     /**
      * Clears the user inputs list.
      */
     protected void clearUserInputs() {
-        if (isDisabled) {
+        if (getIsDisabled()) {
             return;
         }
         userInputs.clear();
@@ -268,7 +249,7 @@ public abstract class EyesBase {
      * @return User inputs collected between {@code checkWindowBase} invocations.
      */
     protected Trigger[] getUserInputs() {
-        if (isDisabled) {
+        if (getIsDisabled()) {
             return null;
         }
         Trigger[] result = new Trigger[userInputs.size()];
@@ -285,7 +266,7 @@ public abstract class EyesBase {
      * user given agent id.
      */
     public String getFullAgentId() {
-        String agentId = getConfigGetter().getAgentId();
+        String agentId = getConfiguration().getAgentId();
         if (agentId == null) {
             return getBaseAgentId();
         }
@@ -461,7 +442,7 @@ public abstract class EyesBase {
      */
     public TestResults close(boolean throwEx) {
         try {
-            if (isDisabled) {
+            if (getIsDisabled()) {
                 logger.verbose("Ignored");
                 return null;
             }
@@ -483,8 +464,8 @@ public abstract class EyesBase {
             boolean isNewSession = runningSession.getIsNewSession();
 
             logger.verbose("Ending server session...");
-            boolean save = (isNewSession && getConfigGetter().getSaveNewTests())
-                    || (!isNewSession && getConfigGetter().getSaveFailedTests());
+            boolean save = (isNewSession && getConfiguration().getSaveNewTests())
+                    || (!isNewSession && getConfiguration().getSaveFailedTests());
             logger.verbose("Automatically save test? " + String.valueOf(save));
             TestResults results = serverConnector.stopSession(runningSession, false, save);
 
@@ -544,7 +525,7 @@ public abstract class EyesBase {
      */
     protected void closeResponseTime(boolean isDeadlineExceeded) {
         try {
-            if (isDisabled) {
+            if (getIsDisabled()) {
                 logger.verbose("Ignored");
             }
 
@@ -564,7 +545,7 @@ public abstract class EyesBase {
             String sessionResultsUrl = runningSession.getUrl();
 
             logger.verbose("Ending server session...");
-            boolean save = (isNewSession && getConfigGetter().getSaveNewTests());
+            boolean save = (isNewSession && getConfiguration().getSaveNewTests());
 
             logger.verbose("Automatically save test? " + String.valueOf(save));
             TestResults results =
@@ -619,7 +600,7 @@ public abstract class EyesBase {
      */
     public TestResults abortIfNotClosed() {
         try {
-            if (isDisabled) {
+            if (getIsDisabled()) {
                 logger.verbose("Ignored");
                 return null;
             }
@@ -774,7 +755,7 @@ public abstract class EyesBase {
 
     protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal) {
         String domUrl = null;
-        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfigGetter())) {
+        if (GeneralUtils.configureSendDom(checkSettingsInternal, (com.applitools.eyes.selenium.Configuration) getConfiguration())) {
             try {
                 String domJson = tryCaptureDom();
                 domUrl = tryPostDomSnapshot(domJson);
@@ -804,7 +785,7 @@ public abstract class EyesBase {
         MatchResult result;
         ICheckSettingsInternal checkSettingsInternal = (checkSettings instanceof ICheckSettingsInternal) ? (ICheckSettingsInternal) checkSettings : null;
 
-        ImageMatchSettings defaultMatchSettings = getConfigGetter().getDefaultMatchSettings();
+        ImageMatchSettings defaultMatchSettings = getConfiguration().getDefaultMatchSettings();
 
         // Update retry timeout if it wasn't specified.
         int retryTimeout = -1;
@@ -851,7 +832,7 @@ public abstract class EyesBase {
             logger.log(String.format("Mismatch! (%s)", tag));
         }
 
-        if (getConfigGetter().getFailureReports() == FailureReports.IMMEDIATE) {
+        if (getFailureReports() == FailureReports.IMMEDIATE) {
             throw new TestFailedException(String.format(
                     "Mismatch found in '%s' of '%s'",
                     sessionStartInfo.getScenarioIdOrName(),
@@ -959,7 +940,7 @@ public abstract class EyesBase {
      */
     protected void openBase(String appName, String testName,
                             RectangleSize viewportSize, SessionType sessionType) {
-        if (isDisabled) {
+        if (getIsDisabled()) {
             logger.verbose("Ignored");
             return;
         }
@@ -971,18 +952,18 @@ public abstract class EyesBase {
         // If there's no default application name, one must be provided for the current test.
         if (getAppName() == null) {
             ArgumentGuard.notNull(appName, "appName");
-            this.getConfigSetter().setAppName(appName);
+            this.getConfiguration().setAppName(appName);
         }
 
         ArgumentGuard.notNull(testName, "testName");
-        this.getConfigSetter().setTestName(testName);
+        this.getConfiguration().setTestName(testName);
 
         logger.log("Agent = " + getFullAgentId());
         logger.verbose(String.format("openBase('%s', '%s', '%s')", appName,
                 testName, viewportSize));
 
-        getConfigSetter().setSessionType(sessionType != null ? sessionType : SessionType.SEQUENTIAL);
-        getConfigSetter().setViewportSize(viewportSize);
+        getConfiguration().setSessionType(sessionType != null ? sessionType : SessionType.SEQUENTIAL);
+        getConfiguration().setViewportSize(viewportSize);
 
         openBase();
     }
@@ -992,7 +973,7 @@ public abstract class EyesBase {
         int retry = 0;
         do {
             try {
-                if (isDisabled) {
+                if (getIsDisabled()) {
                     logger.verbose("Ignored");
                     return;
                 }
@@ -1042,7 +1023,7 @@ public abstract class EyesBase {
     }
 
     protected RectangleSize getViewportSizeForOpen() {
-        return getConfigGetter().getViewportSize();
+        return getConfiguration().getViewportSize();
     }
 
     protected void ensureRunningSession() {
@@ -1060,7 +1041,7 @@ public abstract class EyesBase {
                 logger,
                 serverConnector,
                 runningSession,
-                getConfigGetter().getMatchTimeout(),
+                getConfiguration().getMatchTimeout(),
                 this,
                 // A callback which will call getAppOutput
                 new AppOutputProvider() {
@@ -1085,9 +1066,9 @@ public abstract class EyesBase {
     private void logOpenBase() {
         logger.log(String.format("Eyes server URL is '%s'", serverConnector.getServerUrl()));
         logger.verbose(String.format("Timeout = '%d'", serverConnector.getTimeout()));
-        logger.log(String.format("matchTimeout = '%d' ", getConfigGetter().getMatchTimeout()));
-        logger.log(String.format("Default match settings = '%s' ", getConfigGetter().getDefaultMatchSettings()));
-        logger.log(String.format("FailureReports = '%s' ", getConfigGetter().getFailureReports()));
+        logger.log(String.format("matchTimeout = '%d' ", getConfiguration().getMatchTimeout()));
+        logger.log(String.format("Default match settings = '%s' ", getConfiguration().getDefaultMatchSettings()));
+        logger.log(String.format("FailureReports = '%s' ", getFailureReports()));
     }
 
     private void validateSessionOpen() {
@@ -1098,16 +1079,6 @@ public abstract class EyesBase {
             throw new EyesException(errMsg);
         }
     }
-
-    /**
-     * @return The viewport size of the AUT.
-     */
-    protected abstract RectangleSize getViewportSize();
-
-    /**
-     * @param size The required viewport size.
-     */
-    protected abstract IConfigurationSetter setViewportSize(RectangleSize size);
 
     /**
      * Define the viewport size as {@code size} without doing any actual action on the
@@ -1126,6 +1097,15 @@ public abstract class EyesBase {
         viewportSizeHandler = new ReadOnlyPropertyHandler<>(logger,
                 new RectangleSize(explicitViewportSize.getWidth(), explicitViewportSize.getHeight()));
         this.isViewportSizeSet = true;
+    }
+
+    public SessionType getSessionType() {
+        return getConfiguration().getSessionType();
+    }
+
+    public Configuration setSessionType(SessionType sessionType) {
+        getConfiguration().setSessionType(sessionType);
+        return getConfiguration();
     }
 
     /**
@@ -1157,7 +1137,7 @@ public abstract class EyesBase {
      * @param trigger The trigger to add to the user inputs list.
      */
     protected void addUserInput(Trigger trigger) {
-        if (isDisabled) {
+        if (getIsDisabled()) {
             return;
         }
         ArgumentGuard.notNull(trigger, "trigger");
@@ -1268,12 +1248,12 @@ public abstract class EyesBase {
         AppEnvironment appEnv = new AppEnvironment();
 
         // If hostOS isn't set, we'll try and extract and OS ourselves.
-        if (getConfigGetter().getHostOS() != null) {
-            appEnv.setOs(getConfigGetter().getHostOS());
+        if (getConfiguration().getHostOS() != null) {
+            appEnv.setOs(getConfiguration().getHostOS());
         }
 
-        if (getConfigGetter().getHostApp() != null) {
-            appEnv.setHostingApp(getConfigGetter().getHostApp());
+        if (getConfiguration().getHostApp() != null) {
+            appEnv.setHostingApp(getConfiguration().getHostApp());
         }
 
         appEnv.setInferred(getInferredEnvironment());
@@ -1291,11 +1271,11 @@ public abstract class EyesBase {
         }
         ensureViewportSize();
 
-        IConfigurationGetter configGetter = getConfigGetter();
-        BatchInfo testBatch = configGetter.getBatch();
+        Configuration configuration = getConfiguration();
+        BatchInfo testBatch = configuration.getBatch();
         if (testBatch == null) {
             logger.verbose("No batch set");
-            getConfigSetter().setBatch(new BatchInfo(null));
+            getConfiguration().setBatch(new BatchInfo(null));
         } else {
             logger.verbose("Batch is " + testBatch);
         }
@@ -1307,11 +1287,11 @@ public abstract class EyesBase {
         logger.verbose("Application environment is " + appEnv);
 
         String appName = getAppName();
-        sessionStartInfo = new SessionStartInfo(getFullAgentId(), configGetter.getSessionType(), appName,
-                null, getTestName(), configGetter.getBatch(), getBaselineEnvName(),
-                configGetter.getEnvironmentName(), getAppEnvironment(), configGetter.getDefaultMatchSettings(),
-                configGetter.getBranchName(),
-                configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(), properties);
+        sessionStartInfo = new SessionStartInfo(getFullAgentId(), configuration.getSessionType(), appName,
+                null, getTestName(), configuration.getBatch(), getBaselineEnvName(),
+                configuration.getEnvironmentName(), getAppEnvironment(), configuration.getDefaultMatchSettings(),
+                configuration.getBranchName(),
+                configuration.getParentBranchName(), configuration.getBaselineBranchName(), configuration.getSaveDiffs(), properties);
 
         logger.verbose("Starting server session...");
         runningSession = serverConnector.startSession(sessionStartInfo);
@@ -1326,18 +1306,6 @@ public abstract class EyesBase {
             logger.log("--- Test started - " + testInfo);
             shouldMatchWindowRunOnceOnTimeout = false;
         }
-    }
-
-    protected String getTestName() {
-        return getConfigGetter().getTestName();
-    }
-
-    protected String getAppName() {
-        return getConfigGetter().getAppName();
-    }
-
-    protected String getBaselineEnvName() {
-        return getConfigGetter().getBaselineEnvName();
     }
 
     public Object getAgentSetup() {
@@ -1455,15 +1423,6 @@ public abstract class EyesBase {
 
     protected abstract String getAUTSessionId();
 
-    public Boolean isSendDom() {
-        return getConfigGetter().isSendDom();
-    }
-
-    public IConfigurationSetter setSendDom(boolean isSendDom) {
-        this.getConfigSetter().setSendDom(isSendDom);
-        return getConfigSetter();
-    }
-
     public RenderingInfo getRenderingInfo() {
         if (this.renderInfo != null) {
             return this.renderInfo;
@@ -1471,27 +1430,5 @@ public abstract class EyesBase {
         this.renderInfo = this.serverConnector.getRenderInfo();
         return this.renderInfo;
     }
-
-    /**
-     * Sets the batch in which context future tests will run or {@code null}
-     * if tests are to run standalone.
-     * @param batch The batch info to set.
-     */
-    public IConfigurationSetter setBatch(BatchInfo batch) {
-        if (isDisabled) {
-            logger.verbose("Ignored");
-            return getConfigSetter();
-        }
-
-        logger.verbose("setBatch(" + batch + ")");
-
-        this.getConfigSetter().setBatch(batch);
-        return getConfigSetter();
-    }
-
-    protected abstract <T extends IConfigurationGetter> T getConfigGetter();
-
-    protected abstract <T extends IConfigurationSetter> T getConfigSetter();
-
 
 }

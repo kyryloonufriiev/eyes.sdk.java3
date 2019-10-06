@@ -1,8 +1,6 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.FloatingMatchSettings;
-import com.applitools.eyes.Region;
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
@@ -13,7 +11,6 @@ import org.testng.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -118,14 +115,19 @@ public class TestListener implements ITestListener {
 
     private void compareRegions(TestSetup testSetup, ImageMatchSettings imageMatchSettings) {
         FloatingMatchSettings[] floating = imageMatchSettings.getFloating();
+        AccessibilityRegionByRectangle[] accessibility = imageMatchSettings.getAccessibility();
         Region[] ignoreRegions = imageMatchSettings.getIgnore();
         Region[] layoutRegions = imageMatchSettings.getLayout();
         Region[] strictRegions = imageMatchSettings.getStrict();
         Region[] contentRegions = imageMatchSettings.getContent();
 
-        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData("testId");
+        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData();
 
         if (testSetup.compareExpectedRegions) {
+            if (testData.expectedAccessibilityRegions.size() > 0) {
+                HashSet<AccessibilityRegionByRectangle> accessibilityRegionSet = new HashSet<>(Arrays.asList(accessibility));
+                Assert.assertEquals(accessibilityRegionSet, testData.expectedAccessibilityRegions, "Accessibility regions lists differ");
+            }
             if (testData.expectedFloatingRegions.size() > 0) {
                 HashSet<FloatingMatchSettings> floatingRegionsSet = new HashSet<>(Arrays.asList(floating));
                 Assert.assertEquals(floatingRegionsSet, testData.expectedFloatingRegions, "Floating regions lists differ");
@@ -154,7 +156,7 @@ public class TestListener implements ITestListener {
     }
 
     private void compareProperties(TestSetup testSetup, ImageMatchSettings imageMatchSettings) {
-        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData("testId");
+        TestSetup.SpecificTestContextRequirements testData = testSetup.getTestData();
         Map<String, Object> expectedProps = testData.expectedProperties;
 
         Class<?> imsType = ImageMatchSettings.class;

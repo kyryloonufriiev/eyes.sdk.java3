@@ -46,6 +46,7 @@ public class TestResults {
     private SessionUrls apiUrls;
     private StepInfo[] stepsInfo;
     private IServerConnector serverConnector;
+    public SessionAccessibilityStatus accessibilityStatus;
 
     public StepInfo[] getStepsInfo() {
         return stepsInfo;
@@ -410,6 +411,14 @@ public class TestResults {
 
     public void delete(){
         serverConnector.deleteSession(this);
+    }
+
+    public SessionAccessibilityStatus getAccessibilityStatus() {
+        return accessibilityStatus;
+    }
+
+    public void setAccessibilityStatus(SessionAccessibilityStatus accessibilityStatus) {
+        this.accessibilityStatus = accessibilityStatus;
     }
 
     @Override

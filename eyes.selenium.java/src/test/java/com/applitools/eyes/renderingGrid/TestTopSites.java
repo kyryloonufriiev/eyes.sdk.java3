@@ -24,7 +24,7 @@ public class TestTopSites {
     @BeforeClass
     public void beforeClass() {
         visualGridRunner = new VisualGridRunner(10);
-        LogHandler logHandler = TestUtils.initLogger("TestTopSites");
+        LogHandler logHandler = new FileLogger("eyes.log", false, true);//TestUtils.initLogger("TestTopSites");
         visualGridRunner.setLogHandler(logHandler);
         visualGridRunner.getLogger().log("enter");
     }

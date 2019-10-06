@@ -70,12 +70,7 @@ public final class TestSendDom {
                 private Configuration configuration = new Configuration();
 
                 @Override
-                public IConfigurationGetter get() {
-                    return this.configuration;
-                }
-
-                @Override
-                public IConfigurationSetter set() {
+                public Configuration getConfiguration() {
                     return this.configuration;
                 }
             }, new ClassicRunner());
@@ -98,7 +93,7 @@ public final class TestSendDom {
         webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
-        IConfigurationSetter config = eyes.getConfigSetter();
+        Configuration config = eyes.getConfiguration();
         config.setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
         EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
         try {

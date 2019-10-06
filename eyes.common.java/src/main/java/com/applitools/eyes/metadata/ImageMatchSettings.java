@@ -1,5 +1,7 @@
 package com.applitools.eyes.metadata;
 
+import com.applitools.AccessibilityLevel;
+import com.applitools.eyes.AccessibilityRegionByRectangle;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.Region;
@@ -47,6 +49,10 @@ public class ImageMatchSettings {
     private Integer remainder;
     @JsonProperty("ignoreDisplacements")
     private Boolean ignoreDisplacements;
+    @JsonProperty("accessibility")
+    private AccessibilityRegionByRectangle[] accessibility = new AccessibilityRegionByRectangle[0];
+    @JsonProperty("accessibilityLevel")
+    private AccessibilityLevel accessibilityLevel = AccessibilityLevel.None;
 
     @JsonProperty("matchLevel")
     public MatchLevel getMatchLevel() {
@@ -166,5 +172,22 @@ public class ImageMatchSettings {
     @JsonProperty("ignoreDisplacements")
     public void setIgnoreDisplacements(Boolean ignoreDisplacements) {
         this.ignoreDisplacements = ignoreDisplacements;
+    }
+
+    @JsonProperty("accessibilityLevel")
+    public AccessibilityLevel getAccessibilityLevel() {
+        return accessibilityLevel;
+    }
+    @JsonProperty("accessibilityLevel")
+    public void setAccessibilityLevel(AccessibilityLevel accessibilityLevel) {
+        this.accessibilityLevel = accessibilityLevel;
+    }
+    @JsonProperty("accessibility")
+    public AccessibilityRegionByRectangle[] getAccessibility() {
+        return accessibility;
+    }
+    @JsonProperty("accessibility")
+    public void setAccessibility(AccessibilityRegionByRectangle[] accessibilityValidation) {
+        this.accessibility = accessibilityValidation;
     }
 }

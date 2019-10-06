@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.ImageMatchSettings;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.visualgrid.model.*;
 
@@ -8,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Configuration extends com.applitools.eyes.config.Configuration implements IConfigurationGetter, IConfigurationSetter {
+public class Configuration extends com.applitools.eyes.config.Configuration {
 
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
     private Boolean forceFullPageScreenshot;
@@ -23,7 +24,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();
 
     @SuppressWarnings("IncompleteCopyConstructor")
-    public Configuration(IConfigurationGetter other) {
+    public Configuration(Configuration other) {
         super(other);
         this.forceFullPageScreenshot = other.getForceFullPageScreenshot();
         this.waitBeforeScreenshots = other.getWaitBeforeScreenshots();
@@ -32,6 +33,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
         this.hideCaret = other.getHideCaret();
         this.isRenderingConfig = other.isRenderingConfig();
         this.browsersInfo.addAll(other.getBrowsersInfo());
+        this.defaultMatchSettings = new ImageMatchSettings(other.defaultMatchSettings);
     }
 
     public Configuration() {
@@ -61,18 +63,18 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
         this.setAppName(appName);
     }
 
-    @Override
+
     public Boolean getForceFullPageScreenshot() {
         return forceFullPageScreenshot;
     }
 
-    @Override
+
     public int getWaitBeforeScreenshots() {
         return waitBeforeScreenshots;
     }
 
-    @Override
-    public IConfigurationSetter setWaitBeforeScreenshots(int waitBeforeScreenshots) {
+
+    public Configuration setWaitBeforeScreenshots(int waitBeforeScreenshots) {
         if (waitBeforeScreenshots <= 0) {
             this.waitBeforeScreenshots = DEFAULT_WAIT_BEFORE_SCREENSHOTS;
         } else {
@@ -81,60 +83,60 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
         return this;
     }
 
-    @Override
+
     public StitchMode getStitchMode() {
         return stitchMode;
     }
 
-    @Override
-    public IConfigurationSetter setStitchMode(StitchMode stitchMode) {
+
+    public Configuration setStitchMode(StitchMode stitchMode) {
         this.stitchMode = stitchMode;
         return this;
     }
 
-    @Override
+
     public boolean getHideScrollbars() {
         return hideScrollbars;
     }
 
-    @Override
-    public IConfigurationSetter setHideScrollbars(boolean hideScrollbars) {
+
+    public Configuration setHideScrollbars(boolean hideScrollbars) {
         this.hideScrollbars = hideScrollbars;
         return this;
     }
 
-    @Override
+
     public boolean getHideCaret() {
         return hideCaret;
     }
 
-    @Override
-    public IConfigurationSetter setHideCaret(boolean hideCaret) {
+
+    public Configuration setHideCaret(boolean hideCaret) {
         this.hideCaret = hideCaret;
         return this;
     }
 
-    @Override
-    public IConfigurationSetter addBrowsers(RenderBrowserInfo... browsersInfo) {
+
+    public Configuration addBrowsers(RenderBrowserInfo... browsersInfo) {
         this.browsersInfo.addAll(Arrays.asList(browsersInfo));
         return this;
     }
 
-    @Override
-    public IConfigurationSetter addBrowser(RenderBrowserInfo browserInfo) {
+
+    public Configuration addBrowser(RenderBrowserInfo browserInfo) {
         addBrowserInfo(browserInfo);
         return this;
     }
 
-    @Override
-    public IConfigurationSetter addBrowser(int width, int height, BrowserType browserType, String baselineEnvName) {
+
+    public Configuration addBrowser(int width, int height, BrowserType browserType, String baselineEnvName) {
         RenderBrowserInfo browserInfo = new RenderBrowserInfo(width, height, browserType, baselineEnvName);
         addBrowser(browserInfo);
         return this;
     }
 
-    @Override
-    public IConfigurationSetter addBrowser(int width, int height, BrowserType browserType) {
+
+    public Configuration addBrowser(int width, int height, BrowserType browserType) {
         return addBrowser(width, height, browserType, baselineEnvName);
     }
 
@@ -142,32 +144,8 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
         this.browsersInfo.add(browserInfo);
     }
 
-    @Override
-    public IConfigurationSetter addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation) {
-        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, orientation);
-        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
-        addBrowserInfo(browserInfo);
-        return this;
-    }
 
-    @Override
-    public IConfigurationSetter addDeviceEmulation(DeviceName deviceName) {
-        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, ScreenOrientation.PORTRAIT);
-        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
-        addBrowserInfo(browserInfo);
-        return this;
-    }
-
-    @Override
-    public IConfigurationSetter addDeviceEmulation(DeviceName deviceName, String baselineEnvName) {
-        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, ScreenOrientation.PORTRAIT);
-        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
-        addBrowserInfo(browserInfo);
-        return this;
-    }
-
-    @Override
-    public IConfigurationSetter addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation, String baselineEnvName) {
+    public Configuration addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation) {
         EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, orientation);
         RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
         addBrowserInfo(browserInfo);
@@ -175,23 +153,47 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     }
 
 
-//    @Override
-//    public IConfigurationSetter addDeviceEmulation(int width, int height) {
+    public Configuration addDeviceEmulation(DeviceName deviceName) {
+        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, ScreenOrientation.PORTRAIT);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
+        addBrowserInfo(browserInfo);
+        return this;
+    }
+
+
+    public Configuration addDeviceEmulation(DeviceName deviceName, String baselineEnvName) {
+        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, ScreenOrientation.PORTRAIT);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
+        addBrowserInfo(browserInfo);
+        return this;
+    }
+
+
+    public Configuration addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation, String baselineEnvName) {
+        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, orientation);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
+        addBrowserInfo(browserInfo);
+        return this;
+    }
+
+
+//
+//    public Configuration addDeviceEmulation(int width, int height) {
 //        EmulationBaseInfo emulationInfo = new EmulationDevice(width, height, 1, null);
 //        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
 //        addBrowserInfo(browserInfo);
 //        return this;
 //    }
 //
-//    @Override
-//    public IConfigurationSetter addDeviceEmulation(int width, int height, double scaleFactor) {
+//
+//    public Configuration addDeviceEmulation(int width, int height, double scaleFactor) {
 //        EmulationDevice emulationInfo = new EmulationDevice(width, height, scaleFactor, null);
 //        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
 //        addBrowserInfo(browserInfo);
 //        return this;
 //    }
 
-    @Override
+
     public List<RenderBrowserInfo> getBrowsersInfo() {
         if (browsersInfo != null && !browsersInfo.isEmpty()) {
             return browsersInfo;
@@ -204,8 +206,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
         return browsersInfo;
     }
 
-    @Override
-    public IConfigurationSetter setBrowsersInfo(List<RenderBrowserInfo> browsersInfo) {
+    public Configuration setBrowsersInfo(List<RenderBrowserInfo> browsersInfo) {
         this.browsersInfo = browsersInfo;
         return this;
     }
@@ -216,7 +217,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
     }
 
     @Override
-    public IConfigurationSetter setTestName(String testName) {
+    public Configuration setTestName(String testName) {
         this.testName = testName;
         return this;
     }
@@ -235,24 +236,24 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
         return super.viewportSize;
     }
 
-    @Override
+
     public Boolean isForceFullPageScreenshot() {
         return forceFullPageScreenshot;
     }
 
-    @Override
-    public IConfigurationSetter setForceFullPageScreenshot(boolean forceFullPageScreenshot) {
+
+    public Configuration setForceFullPageScreenshot(boolean forceFullPageScreenshot) {
         this.forceFullPageScreenshot = forceFullPageScreenshot;
         return this;
     }
 
-    @Override
+
     public boolean isRenderingConfig() {
         return isRenderingConfig;
     }
 
-    @Override
-    public IConfigurationSetter setRenderingConfig(boolean renderingConfig) {
+
+    public Configuration setRenderingConfig(boolean renderingConfig) {
         isRenderingConfig = renderingConfig;
         return this;
     }
@@ -267,7 +268,7 @@ public class Configuration extends com.applitools.eyes.config.Configuration impl
                 "\n\thideCaret = " + hideCaret;
     }
 
-    public IConfigurationSetter setIgnoreDisplacements(boolean ignoreDisplacements) {
+    public Configuration setIgnoreDisplacements(boolean ignoreDisplacements) {
         super.setIgnoreDisplacements(ignoreDisplacements);
         return this;
     }

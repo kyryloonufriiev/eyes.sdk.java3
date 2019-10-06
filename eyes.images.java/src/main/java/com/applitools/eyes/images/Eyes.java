@@ -6,8 +6,6 @@ package com.applitools.eyes.images;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.events.ValidationResult;
 import com.applitools.eyes.exceptions.TestFailedException;
@@ -20,7 +18,7 @@ import com.applitools.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
 
-public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurationSetter {
+public class Eyes extends EyesBase {
 
     private String title;
     private EyesImagesScreenshot screenshot;
@@ -112,7 +110,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      * {@code tag} defaults to {@code null}.
      */
     public boolean checkImage(BufferedImage image) {
-        return checkImage(image, null);
+        return checkImage(image, getEnvironmentName());
     }
 
     /**
@@ -294,36 +292,14 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return viewportSizeHandler.get();
     }
 
-    @Override
-    public SessionType getSessionType() {
-        return config.getSessionType();
-    }
-
-    @Override
-    public FailureReports getFailureReports() {
-        return config.getFailureReports();
-    }
-
     /**
      * Set the viewport size.
      * @param size The required viewport size.
      */
     @Override
-    public IConfigurationSetter setViewportSize(RectangleSize size) {
+    public Configuration setViewportSize(RectangleSize size) {
         ArgumentGuard.notNull(size, "size");
         viewportSizeHandler.set(new RectangleSize(size.getWidth(), size.getHeight()));
-        return config;
-    }
-
-    @Override
-    public IConfigurationSetter setSessionType(SessionType sessionType) {
-        config.setSessionType(sessionType);
-        return config;
-    }
-
-    @Override
-    public IConfigurationSetter setFailureReports(FailureReports failureReports) {
-        config.setFailureReports(failureReports);
         return config;
     }
 
@@ -427,86 +403,11 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     }
 
     /**
-     * @param appName The name of the application under test.
-     */
-    public IConfigurationSetter setAppName(String appName) {
-        this.config.setAppName(appName);
-        return config;
-    }
-
-    @Override
-    public IConfigurationSetter setTestName(String testName) {
-
-        return config.setTestName(testName);
-    }
-
-    /**
-     * @return The name of the application under test.
-     */
-    public String getAppName() {
-        return config.getAppName();
-    }
-
-    @Override
-    public String getTestName() {
-        return getConfigGetter().getTestName();
-    }
-
-    /**
-     * Sets the branch in which the baseline for subsequent test runs resides.
-     * If the branch does not already exist it will be created under the
-     * specified parent branch (see {@link #setParentBranchName}).
-     * Changes to the baseline or model of a branch do not propagate to other
-     * branches.
-     * @param branchName Branch name or {@code null} to specify the default branch.
-     */
-    public IConfigurationSetter setBranchName(String branchName) {
-        this.config.setBranchName(branchName);
-        return config;
-    }
-
-    @Override
-    public IConfigurationSetter setAgentId(String agentId) {
-
-        return config;
-    }
-
-    /**
-     * @return The current branch (see {@link #setBranchName(String)}).
-     */
-    public String getBranchName() {
-        return config.getBranchName();
-    }
-
-    @Override
-    public String getAgentId() {
-        return null;
-    }
-
-    /**
      * Sets the branch under which new branches are created. (see {@link
      * #setBranchName(String)}.
      * @param branchName Branch name or {@code null} to specify the default branch.
      */
-    public IConfigurationSetter setParentBranchName(String branchName) {
-        this.config.setParentBranchName(branchName);
-        return config;
-    }
-
-    /**
-     * @return The name of the current parent branch under which new branches
-     * will be created. (see {@link #setParentBranchName(String)}).
-     */
-    public String getParentBranchName() {
-        return config.getParentBranchName();
-    }
-
-    /**
-     * Sets the branch under which new branches are created. (see {@link
-     * #setBranchName(String)}.
-     * @param branchName Branch name or {@code null} to specify the default branch.
-     */
-    public IConfigurationSetter setBaselineBranchName(String branchName) {
+    public Configuration setBaselineBranchName(String branchName) {
         this.config.setBaselineBranchName(branchName);
         return config;
     }
@@ -520,90 +421,11 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     }
 
     /**
-     * Automatically save differences as a baseline.
-     * @param saveDiffs Sets whether to automatically save differences as baseline.
-     */
-    public IConfigurationSetter setSaveDiffs(Boolean saveDiffs) {
-        this.config.setSaveDiffs(saveDiffs);
-        return config;
-    }
-
-    /**
-     * Returns whether to automatically save differences as a baseline.
-     * @return Whether to automatically save differences as baseline.
-     */
-    public Boolean getSaveDiffs() {
-        return this.config.getSaveDiffs();
-    }
-
-    /**
-     * Sets the maximum time (in ms) a match operation tries to perform a match.
-     * @param ms Total number of ms to wait for a match.
-     */
-    public IConfigurationSetter setMatchTimeout(int ms) {
-        final int MIN_MATCH_TIMEOUT = 500;
-        if (getIsDisabled()) {
-            logger.verbose("Ignored");
-            return config;
-        }
-
-        logger.verbose("Setting match timeout to: " + ms);
-        if ((ms != 0) && (MIN_MATCH_TIMEOUT > ms)) {
-            throw new IllegalArgumentException("Match timeout must be set in milliseconds, and must be > " +
-                    MIN_MATCH_TIMEOUT);
-        }
-
-        this.config.setMatchTimeout(ms);
-
-        return config;
-    }
-
-    /**
-     * @return The maximum time in ms {@link #checkWindowBase
-     * (RegionProvider, String, boolean, int)} waits for a match.
-     */
-    public int getMatchTimeout() {
-        return this.config.getMatchTimeout();
-    }
-
-    /**
-     * Set whether or not new tests are saved by default.
-     * @param saveNewTests True if new tests should be saved by default. False otherwise.
-     */
-    public IConfigurationSetter setSaveNewTests(boolean saveNewTests) {
-        this.config.setSaveNewTests(saveNewTests);
-        return config;
-    }
-
-    /**
-     * @return True if new tests are saved by default.
-     */
-    public boolean getSaveNewTests() {
-        return config.getSaveNewTests();
-    }
-
-    /**
-     * Set whether or not failed tests are saved by default.
-     * @param saveFailedTests True if failed tests should be saved by default, false otherwise.
-     */
-    public IConfigurationSetter setSaveFailedTests(boolean saveFailedTests) {
-        this.config.setSaveFailedTests(saveFailedTests);
-        return config;
-    }
-
-    /**
-     * @return True if failed tests are saved by default.
-     */
-    public boolean getSaveFailedTests() {
-        return config.getSaveFailedTests();
-    }
-
-    /**
      * Sets the batch in which context future tests will run or {@code null}
      * if tests are to run standalone.
      * @param batch The batch info to set.
      */
-    public IConfigurationSetter setBatch(BatchInfo batch) {
+    public Configuration setBatch(BatchInfo batch) {
         if (getIsDisabled()) {
             logger.verbose("Ignored");
             return config;
@@ -615,190 +437,6 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return config;
     }
 
-    @Override
-    protected <T extends IConfigurationGetter> T getConfigGetter() {
-        return (T) config;
-    }
-
-    @Override
-    protected <T extends IConfigurationSetter> T getConfigSetter() {
-        return (T) config;
-    }
-
-    /**
-     * @return The currently set batch info.
-     */
-    public BatchInfo getBatch() {
-        return config.getBatch();
-    }
-
-
-    /**
-     * Updates the match settings to be used for the session.
-     * @param defaultMatchSettings The match settings to be used for the session.
-     */
-    public IConfigurationSetter setDefaultMatchSettings(ImageMatchSettings
-                                                defaultMatchSettings) {
-        ArgumentGuard.notNull(defaultMatchSettings, "defaultMatchSettings");
-        config.setDefaultMatchSettings(defaultMatchSettings);
-        return config;
-    }
-
-    /**
-     * @return The match settings used for the session.
-     */
-    public ImageMatchSettings getDefaultMatchSettings() {
-        return config.getDefaultMatchSettings();
-    }
-
-    /**
-     * This function is deprecated. Please use {@link #setDefaultMatchSettings} instead.
-     * <p>
-     * The test-wide match level to use when checking application screenshot
-     * with the expected output.
-     * @param matchLevel The match level setting.
-     * @return The match settings used for the session.
-     * @see com.applitools.eyes.MatchLevel
-     */
-    public IConfigurationSetter setMatchLevel(MatchLevel matchLevel) {
-        config.getDefaultMatchSettings().setMatchLevel(matchLevel);
-        return config;
-    }
-
-    @Override
-    public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
-        this.config.setIgnoreDisplacements(isIgnoreDisplacements);
-        return config;
-    }
-
-    /**
-     * @return The test-wide match level.
-     * @deprecated Please use{@link #getDefaultMatchSettings} instead.
-     */
-    public MatchLevel getMatchLevel() {
-        return config.getDefaultMatchSettings().getMatchLevel();
-    }
-
-    @Override
-    public boolean getIgnoreDisplacements() {
-        return config.getIgnoreDisplacements();
-    }
-
-    /**
-     * @return Whether to ignore or the blinking caret or not when comparing images.
-     */
-    public boolean getIgnoreCaret() {
-        Boolean ignoreCaret = config.getDefaultMatchSettings().getIgnoreCaret();
-        return ignoreCaret == null ? true : ignoreCaret;
-    }
-
-    /**
-     * Sets the ignore blinking caret value.
-     * @param value The ignore value.
-     */
-    public IConfigurationSetter setIgnoreCaret(boolean value) {
-        config.getDefaultMatchSettings().setIgnoreCaret(value);
-        return config;
-    }
-
-    /**
-     * Returns the stitching overlap in pixels.
-     */
-    public int getStitchOverlap() {
-        return config.getStitchOverlap();
-    }
-
-    /**
-     * Sets the stitching overlap in pixels.
-     * @param pixels The width (in pixels) of the overlap.
-     */
-    public IConfigurationSetter setStitchOverlap(int pixels) {
-        this.config.setStitchOverlap(pixels);
-        return config;
-    }
-
-    /**
-     * @param hostOS The host OS running the AUT.
-     */
-    public IConfigurationSetter setHostOS(String hostOS) {
-
-        logger.log("Host OS: " + hostOS);
-
-        if (hostOS == null || hostOS.isEmpty()) {
-            this.config.setHostOS(null);
-        } else {
-            config.setHostOS(hostOS.trim());
-        }
-        return config;
-    }
-
-    /**
-     * @return get the host OS running the AUT.
-     */
-    public String getHostOS() {
-        return config.getHostOS();
-    }
-
-    /**
-     * @param hostApp The application running the AUT (e.g., Chrome).
-     */
-    public IConfigurationSetter setHostApp(String hostApp) {
-
-        logger.log("Host App: " + hostApp);
-
-        if (hostApp == null || hostApp.isEmpty()) {
-            this.config.setHostApp(null);
-        } else {
-            this.config.setHostApp(hostApp.trim());
-        }
-        return config;
-    }
-
-    /**
-     * @return The application name running the AUT.
-     */
-    public String getHostApp() {
-        return config.getHostApp();
-    }
-
-    /**
-     * @param baselineName If specified, determines the baseline to compare
-     *                     with and disables automatic baseline inference.
-     * @deprecated Only available for backward compatibility. See {@link #setBaselineEnvName(String)}.
-     */
-    public void setBaselineName(String baselineName) {
-        setBaselineEnvName(baselineName);
-    }
-
-    /**
-     * @return The baseline name, if specified.
-     * @deprecated Only available for backward compatibility. See {@link #getBaselineEnvName()}.
-     */
-    @SuppressWarnings("UnusedDeclaration")
-    public String getBaselineName() {
-        return getBaselineEnvName();
-    }
-
-    /**
-     * If not {@code null}, determines the name of the environment of the baseline.
-     * @param baselineEnvName The name of the baseline's environment.
-     */
-    public IConfigurationSetter setBaselineEnvName(String baselineEnvName) {
-
-        logger.log("Baseline environment name: " + baselineEnvName);
-
-        if (baselineEnvName == null || baselineEnvName.isEmpty()) {
-            this.config.setBaselineEnvName(null);
-        } else {
-            this.config.setBaselineEnvName(baselineEnvName.trim());
-        }
-        return config;
-    }
-
-    @Override
-    public IConfigurationSetter setEnvironmentName(String environmentName) {
-        return config;
-    }
 
     /**
      * If not {@code null}, determines the name of the environment of the baseline.
@@ -806,35 +444,6 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
      */
     public String getBaselineEnvName() {
         return config.getBaselineEnvName();
-    }
-
-    @Override
-    public String getEnvironmentName() {
-        return null;
-    }
-
-
-    /**
-     * If not {@code null} specifies a name for the environment in which the application under test is running.
-     * @param envName The name of the environment of the baseline.
-     */
-    public void setEnvName(String envName) {
-
-        logger.log("Environment name: " + envName);
-
-        if (envName == null || envName.isEmpty()) {
-            this.config.setEnvironmentName(null);
-        } else {
-            this.config.setEnvironmentName(envName.trim());
-        }
-    }
-
-    /**
-     * If not {@code null} specifies a name for the environment in which the application under test is running.
-     * @return The name of the environment of the baseline, or {@code null} if no such name was set.
-     */
-    public String getEnvName() {
-        return config.getEnvironmentName();
     }
 
 
