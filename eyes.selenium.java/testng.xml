@@ -2,8 +2,7 @@
 
 <suite name="Suite1" verbose="1" parallel="tests">
     <listeners>
-        <listener class-name="com.applitools.eyes.selenium.SendTestResultsListener"></listener>
-        <listener class-name="com.applitools.eyes.selenium.MethodListener"></listener>
+        <listener class-name="com.applitools.eyes.selenium.MethodListener"/>
     </listeners>
 
     <test name="Test_WEB" parallel="instances">
