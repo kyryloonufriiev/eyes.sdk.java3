@@ -26,11 +26,13 @@ public class MethodListener implements IInvokedMethodListener2 {
 
     @Override
     public void afterInvocation(IInvokedMethod iInvokedMethod, ITestResult iTestResult, ITestContext iTestContext) {
-        JsonObject resultJson = getResultJson(iTestResult);
-        try {
-            CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
-        } catch (Throwable t) {
-            CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
+        if (iInvokedMethod.isTestMethod()) {
+            JsonObject resultJson = getResultJson(iTestResult);
+            try {
+                CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
+            } catch (Throwable t) {
+                CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
+            }
         }
     }
 

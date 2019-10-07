@@ -1,5 +1,7 @@
 package com.applitools.eyes;
 
+import com.applitools.utils.GeneralUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +32,11 @@ public abstract class EyesRunner {
     private void deleteAllBatches() {
         for (String batch : batchesServerConnectorsMap.keySet()) {
             IBatchCloser connector = batchesServerConnectorsMap.get(batch);
-            connector.closeBatch(batch);
+            try {
+                connector.closeBatch(batch);
+            } catch (Throwable e) {
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
         }
     }
 
