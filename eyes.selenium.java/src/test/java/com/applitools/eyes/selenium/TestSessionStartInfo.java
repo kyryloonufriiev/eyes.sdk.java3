@@ -1,19 +1,10 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.AccessibilityLevel;
+import com.applitools.eyes.AccessibilityLevel;
 import com.applitools.eyes.*;
-import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Factory;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 

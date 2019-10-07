@@ -1,6 +1,6 @@
 package com.applitools.eyes.config;
 
-import com.applitools.AccessibilityLevel;
+import com.applitools.eyes.AccessibilityLevel;
 import com.applitools.eyes.*;
 
 import java.net.URI;

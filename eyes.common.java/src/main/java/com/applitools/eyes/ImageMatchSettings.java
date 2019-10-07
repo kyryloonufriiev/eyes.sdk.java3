@@ -1,6 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.AccessibilityLevel;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 

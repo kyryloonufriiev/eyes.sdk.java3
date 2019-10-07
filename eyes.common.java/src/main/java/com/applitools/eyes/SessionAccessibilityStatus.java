@@ -1,7 +1,5 @@
 package com.applitools.eyes;
 
-import com.applitools.AccessibilityLevel;
-
 public class SessionAccessibilityStatus {
         private  AccessibilityStatus status;
 

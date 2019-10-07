@@ -3,7 +3,6 @@
  */
 package com.applitools.eyes;
 
-import com.applitools.AccessibilityLevel;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.Configuration;

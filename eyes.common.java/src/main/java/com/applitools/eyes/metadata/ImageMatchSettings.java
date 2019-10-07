@@ -1,6 +1,6 @@
 package com.applitools.eyes.metadata;
 
-import com.applitools.AccessibilityLevel;
+import com.applitools.eyes.AccessibilityLevel;
 import com.applitools.eyes.AccessibilityRegionByRectangle;
 import com.applitools.eyes.FloatingMatchSettings;
 import com.applitools.eyes.MatchLevel;

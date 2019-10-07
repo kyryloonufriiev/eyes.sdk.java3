@@ -1,6 +1,6 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.AccessibilityLevel;
+import com.applitools.eyes.AccessibilityLevel;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.AccessibilityRegionByRectangle;
 import com.applitools.eyes.AccessibilityRegionType;
