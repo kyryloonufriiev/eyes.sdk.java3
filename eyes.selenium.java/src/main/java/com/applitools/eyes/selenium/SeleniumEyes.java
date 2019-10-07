@@ -107,6 +107,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         this.serverConnector.closeBatch(batchId);
     }
 
+    public StitchMode getStitchMode() {
+        return getConfiguration().getStitchMode();
+    }
+
     /**
      * The interface Web driver action.
      */

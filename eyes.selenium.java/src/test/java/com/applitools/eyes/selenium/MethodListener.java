@@ -20,7 +20,13 @@ public class MethodListener implements IInvokedMethodListener2 {
     @Override
     public void beforeInvocation(IInvokedMethod iInvokedMethod, ITestResult iTestResult, ITestContext iTestContext) {
         if (suiteId.get() == null) {
-            suiteId.set(UUID.randomUUID().toString().substring(0, 8));
+            String travisCommit = System.getenv("TRAVIS_COMMIT");
+            System.out.println("Unified report: travis commit is " + travisCommit);
+            if (travisCommit == null || travisCommit.isEmpty()) {
+                suiteId.set(UUID.randomUUID().toString().substring(0, 12));
+            } else {
+                suiteId.set(travisCommit);
+            }
         }
     }
 
@@ -28,6 +34,7 @@ public class MethodListener implements IInvokedMethodListener2 {
     public void afterInvocation(IInvokedMethod iInvokedMethod, ITestResult iTestResult, ITestContext iTestContext) {
         if (iInvokedMethod.isTestMethod()) {
             JsonObject resultJson = getResultJson(iTestResult);
+            System.out.println("Unified report: sending JSON to report " + resultJson.toString());
             try {
                 CommUtils.postJson("http://sdk-test-results.herokuapp.com/result", new Gson().fromJson(resultJson, Map.class), null);
             } catch (Throwable t) {
@@ -55,6 +62,10 @@ public class MethodListener implements IInvokedMethodListener2 {
         JsonObject finalJsonObject = new JsonObject();
         finalJsonObject.addProperty("sdk", "java");
         finalJsonObject.addProperty("id", suiteId.get());
+        String isTravis = System.getenv("TRAVIS");
+        if (!Boolean.parseBoolean(isTravis)){
+            finalJsonObject.addProperty("sandbox", true);
+        }
         finalJsonObject.add("results", resultsJsonArray);
         return finalJsonObject;
     }

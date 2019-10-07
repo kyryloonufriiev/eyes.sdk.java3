@@ -233,6 +233,7 @@ public class MatchWindowTask {
         mutableRegions.add(new ArrayList<MutableRegion>()); // Strict Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Content Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Floating Regions
+        mutableRegions.add(new ArrayList<MutableRegion>()); // Accessibility Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Target Element Location
 
         for (IRegion region : regions) {
