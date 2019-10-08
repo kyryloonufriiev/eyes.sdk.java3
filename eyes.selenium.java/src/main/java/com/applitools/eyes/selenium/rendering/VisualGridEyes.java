@@ -649,7 +649,9 @@ public class VisualGridEyes implements IRenderingEyes, ISeleniumEyes {
             }
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        timer.cancel();
+        finally {
+            timer.cancel();
+        }
     }
 
     private void waitBeforeDomSnapshot() {
