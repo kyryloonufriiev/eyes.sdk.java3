@@ -275,7 +275,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
     public Collection<Future<TestResultContainer>> close() {
         if (!validateEyes()) return new ArrayList<>();
-        return closeAndReturnResults(true);
+        return closeAndReturnResults(false);
     }
 
     public Collection<Future<TestResultContainer>> abortIfNotClosed() {
@@ -342,7 +342,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
 
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         if (throwException && exception != null) {
@@ -917,5 +917,15 @@ public class VisualGridEyes implements IRenderingEyes {
 
     public EyesWebDriver getDriver() {
         return webDriver;
+    }
+
+    @Override
+    public IBatchCloser getBatchCloser() {
+        return this.testList.get(0).getBatchCloser();
+    }
+
+    @Override
+    public String getBatchId() {
+        return this.getConfigGetter().getBatch().getId();
     }
 }

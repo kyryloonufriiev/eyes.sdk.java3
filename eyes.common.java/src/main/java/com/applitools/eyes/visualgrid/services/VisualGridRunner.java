@@ -40,7 +40,7 @@ public class VisualGridRunner extends EyesRunner {
 
     private RateLimiter rateLimiter;
     private String serverUrl;
-    private static final String DEFAULT_API_KEY = System.getenv("APPLITOOLS_API_KEY") == null ? System.getenv("bamboo_APPLITOOLS_API_KEY") : System.getenv("APPLITOOLS_API_KEY");
+    private static final String DEFAULT_API_KEY = System.getenv("APPLITOOLS_API_KEY");
     private String apiKey = DEFAULT_API_KEY;
     private boolean isDisabled;
     private boolean isServicesOn = false;
@@ -368,16 +368,17 @@ public class VisualGridRunner extends EyesRunner {
         logger.verbose("releasing allEyes");
         eyes.setListener(eyesListener);
         logger.verbose("concurrencyLock.notify()");
+        this.addBatch(eyes.getBatchId(), eyes.getBatchCloser());
     }
 
     private void startServices() {
         logger.verbose("enter");
         setServicesOn(true);
+        this.servicesGroup.setDaemon(true);
         this.eyesOpenerService.start();
         this.eyesCloserService.start();
         this.renderingGridService.start();
         this.eyesCheckerService.start();
-        this.servicesGroup.setDaemon(false);
         logger.verbose("exit");
     }
 
@@ -392,15 +393,15 @@ public class VisualGridRunner extends EyesRunner {
     }
 
 
-    public TestResultsSummary getAllTestResults() {
+    public TestResultsSummary getAllTestResultsImpl() {
         return getAllTestResults(true);
     }
 
-    public TestResultsSummary getAllTestResults(boolean throwException) {
+    public TestResultsSummary getAllTestResultsImpl(boolean throwException) {
         logger.verbose("enter");
         Map<IRenderingEyes, Collection<Future<TestResultContainer>>> allFutures = new HashMap<>();
         for (IRenderingEyes eyes : allEyes) {
-            Collection<Future<TestResultContainer>> futureList = eyes.close(false);
+            Collection<Future<TestResultContainer>> futureList = eyes.close();
             Collection<Future<TestResultContainer>> futures = allFutures.get(eyes);
             if (futures != null && !futures.isEmpty()) {
                 futureList.addAll(futures);

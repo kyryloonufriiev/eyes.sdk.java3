@@ -16,7 +16,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
-class EyesConnector extends EyesBase implements IEyesConnector {
+class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
 
     private final ISeleniumConfigurationProvider configProvider;
     private RenderBrowserInfo browserInfo;
@@ -283,5 +283,10 @@ class EyesConnector extends EyesBase implements IEyesConnector {
     @Override
     protected String getTestName() {
         return this.testName;
+    }
+
+    @Override
+    public void closeBatch(String batchId) {
+        this.serverConnector.closeBatch(batchId);
     }
 }

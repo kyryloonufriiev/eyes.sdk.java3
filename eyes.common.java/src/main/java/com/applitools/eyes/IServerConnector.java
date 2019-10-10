@@ -15,6 +15,7 @@ public interface IServerConnector {
 
     String API_SESSIONS = "api/sessions";
     String RUNNING_DATA_PATH = API_SESSIONS + "/running/data";
+    String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
 
     //Rendering Grid
     String RENDER_INFO_PATH = API_SESSIONS + "/renderinfo";
@@ -173,4 +174,6 @@ public interface IServerConnector {
     IResourceFuture createResourceFuture(RGridResource gridResource, String userAgent);
 
     void setRenderingInfo(RenderingInfo renderInfo);
+
+    void closeBatch(String batchId);
 }

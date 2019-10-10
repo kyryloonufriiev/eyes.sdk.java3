@@ -2,6 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 
 import com.applitools.ICheckSettings;
+import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
@@ -32,7 +33,6 @@ public class RunningTest {
     private String appName;
     private String testName;
     private Throwable error;
-
     public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
         this.eyes = eyes;
         this.browserInfo = browserInfo;
@@ -61,6 +61,10 @@ public class RunningTest {
             this.isCloseTaskIssued.set(true);
         }
         return taskToFutureMapping.get(closeTask);
+    }
+
+    public IBatchCloser getBatchCloser() {
+        return (IBatchCloser) this.eyes;
     }
 
     private void removeAllCheckTasks() {

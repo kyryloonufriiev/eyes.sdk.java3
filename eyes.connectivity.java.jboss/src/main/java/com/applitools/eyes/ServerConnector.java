@@ -640,4 +640,9 @@ public class ServerConnector extends RestClient
         this.renderingInfo = renderInfo;
     }
 
+    @Override
+    public void closeBatch(String batchId) {
+
+    }
+
 }

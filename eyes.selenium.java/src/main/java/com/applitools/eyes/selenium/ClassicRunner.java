@@ -3,7 +3,9 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ClassicRunner extends EyesRunner {
 
@@ -12,12 +14,12 @@ public class ClassicRunner extends EyesRunner {
     private Error exception;
 
     @Override
-    public TestResultsSummary getAllTestResults(){
-        return getAllTestResults(false);
+    public TestResultsSummary getAllTestResultsImpl(){
+        return getAllTestResults(true);
     }
 
     @Override
-    public TestResultsSummary getAllTestResults(boolean shouldThrowException) {
+    public TestResultsSummary getAllTestResultsImpl(boolean shouldThrowException) {
         if (shouldThrowException && exception != null)
         {
             throw exception;

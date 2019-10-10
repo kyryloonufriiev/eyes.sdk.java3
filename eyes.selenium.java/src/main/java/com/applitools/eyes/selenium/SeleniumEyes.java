@@ -43,7 +43,7 @@ import java.util.*;
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase implements IDriverProvider {
+public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchCloser {
 
     private FrameChain originalFC;
     private WebElement scrollRootElement;
@@ -262,6 +262,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider {
         this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
 
         this.driver.setRotation(rotation);
+        this.runner.addBatch(this.getConfigGetter().getBatch().getId(), this);
         return this.driver;
     }
 
@@ -750,6 +751,11 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider {
         getSessionEventHandlers().validationEnded(getAUTSessionId(), validationInfo.getValidationId(), validationResult);
 
         logger.verbose("check - done!");
+    }
+
+    @Override
+    public void closeBatch(String batchId) {
+        this.serverConnector.closeBatch(batchId);
     }
 
     /**
