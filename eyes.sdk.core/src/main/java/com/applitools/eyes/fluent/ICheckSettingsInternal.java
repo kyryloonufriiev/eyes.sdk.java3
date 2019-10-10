@@ -1,6 +1,7 @@
 package com.applitools.eyes.fluent;
 
 import com.applitools.ICheckSettings;
+import com.applitools.eyes.IGetAccessibilityRegion;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInternal {
@@ -33,4 +34,6 @@ public interface ICheckSettingsInternal extends com.applitools.ICheckSettingsInt
     Boolean isSendDom();
 
     Boolean isIgnoreDisplacements();
+
+    IGetAccessibilityRegion[] getAccessibilityRegions();
 }

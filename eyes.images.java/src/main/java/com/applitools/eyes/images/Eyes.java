@@ -671,6 +671,11 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
         return config;
     }
 
+    @Override
+    public Configuration setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
+        return this.config.setAccessibilityValidation(accessibilityValidation);
+    }
+
     /**
      * @return The test-wide match level.
      * @deprecated Please use{@link #getDefaultMatchSettings} instead.
@@ -682,6 +687,11 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     @Override
     public boolean getIgnoreDisplacements() {
         return config.getIgnoreDisplacements();
+    }
+
+    @Override
+    public AccessibilityLevel getAccessibilityValidation() {
+        return config.getAccessibilityValidation();
     }
 
     /**

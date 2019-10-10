@@ -20,7 +20,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     protected String testName;
     protected RectangleSize viewportSize;
     protected boolean ignoreDisplacements = false;
-    private ImageMatchSettings defaultMatchSettings = new ImageMatchSettings();
+    protected ImageMatchSettings defaultMatchSettings = new ImageMatchSettings();
     private int matchTimeout = DEFAULT_MATCH_TIMEOUT;
     private String hostApp;
     private String hostOS;
@@ -32,6 +32,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
     private FailureReports failureReports = FailureReports.ON_CLOSE;
+    private AccessibilityLevel accessibilityValidation;
 
     public Configuration(IConfigurationGetter other) {
         this.branchName = other.getBranchName();
@@ -65,6 +66,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
             this.defaultMatchSettings.setMatchLevel(other.getMatchLevel());
         }
         this.ignoreDisplacements = other.getIgnoreDisplacements();
+        this.accessibilityValidation = other.getAccessibilityValidation();
     }
 
     public Configuration() {
@@ -411,6 +413,18 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     @Override
     public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
         this.ignoreDisplacements = isIgnoreDisplacements;
+        return this;
+    }
+
+    @Override
+    public AccessibilityLevel getAccessibilityValidation() {
+        AccessibilityLevel level = getDefaultMatchSettings().getAccessibilityLevel();
+        return level;
+    }
+
+    @Override
+    public Configuration setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
+        this.getDefaultMatchSettings().setAccessibilityLevel(accessibilityValidation);
         return this;
     }
 }

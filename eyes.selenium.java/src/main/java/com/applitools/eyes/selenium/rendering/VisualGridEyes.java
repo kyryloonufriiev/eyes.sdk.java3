@@ -821,12 +821,14 @@ public class VisualGridEyes implements IRenderingEyes {
         GetRegion[] strictRegions = settings.getStrictRegions();
         GetRegion[] contentRegions = settings.getContentRegions();
         GetFloatingRegion[] floatingRegions = settings.getFloatingRegions();
+        IGetAccessibilityRegion[] accessibilityRegions = settings.getAccessibilityRegions();
 
         List<WebElementRegion> ignoreElements = getElementsFromRegions(Arrays.asList(ignoreRegions));
         List<WebElementRegion> layoutElements = getElementsFromRegions(Arrays.asList(layoutRegions));
         List<WebElementRegion> strictElements = getElementsFromRegions(Arrays.asList(strictRegions));
         List<WebElementRegion> contentElements = getElementsFromRegions(Arrays.asList(contentRegions));
         List<WebElementRegion> floatingElements = getElementsFromRegions(Arrays.asList(floatingRegions));
+        List<WebElementRegion> accessibilityElements = getElementsFromRegions(Arrays.asList(accessibilityRegions));
 
 
         ISeleniumCheckTarget iSeleniumCheckTarget = (ISeleniumCheckTarget) csInternal;
@@ -843,7 +845,7 @@ public class VisualGridEyes implements IRenderingEyes {
         List<WebElementRegion> targetElementList = new ArrayList<>();
         targetElementList.add(target);
         //noinspection UnnecessaryLocalVariable,unchecked
-        List<WebElementRegion>[] lists = new List[]{ignoreElements, layoutElements, strictElements, contentElements, floatingElements, targetElementList};
+        List<WebElementRegion>[] lists = new List[]{ignoreElements, layoutElements, strictElements, contentElements, floatingElements, accessibilityElements, targetElementList};
         return lists;
     }
 

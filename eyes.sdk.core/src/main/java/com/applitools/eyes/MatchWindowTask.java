@@ -103,6 +103,7 @@ public class MatchWindowTask {
 
         collectSimpleRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
         collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
+        collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
 
         String agentSetupStr = "";
         if (eyes != null) {
@@ -174,6 +175,22 @@ public class MatchWindowTask {
         imageMatchSettings.setLayoutRegions(convertSimpleRegions(checkSettingsInternal.getLayoutRegions(), imageMatchSettings.getLayoutRegions()));
         imageMatchSettings.setStrictRegions(convertSimpleRegions(checkSettingsInternal.getStrictRegions(), imageMatchSettings.getStrictRegions()));
         imageMatchSettings.setFloatingRegions(convertFloatingRegions(checkSettingsInternal.getFloatingRegions(), imageMatchSettings.getFloatingRegions()));
+        imageMatchSettings.setAccessibility(convertAccessibilityRegions(checkSettingsInternal.getAccessibilityRegions(), imageMatchSettings.getAccessibility()));
+    }
+
+    private AccessibilityRegionByRectangle[] convertAccessibilityRegions(IGetAccessibilityRegion[] accessibilityRegions, AccessibilityRegionByRectangle[] currentRegions) {
+        List<AccessibilityRegionByRectangle> mutableRegions = new ArrayList<>();
+        if (currentRegions != null) {
+            mutableRegions.addAll(Arrays.asList(currentRegions));
+        }
+
+        for (IGetAccessibilityRegion getRegions : accessibilityRegions) {
+            if (getRegions instanceof AccessibilityRegionByRectangle) {
+                mutableRegions.addAll(getRegions.getRegions(null, null));
+            }
+        }
+
+        return mutableRegions.toArray(new AccessibilityRegionByRectangle[0]);
     }
 
     private static Region[] convertSimpleRegions(GetRegion[] simpleRegions, Region[] currentRegions)
@@ -227,6 +244,7 @@ public class MatchWindowTask {
         mutableRegions.add(new ArrayList<MutableRegion>()); // Strict Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Content Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Floating Regions
+        mutableRegions.add(new ArrayList<MutableRegion>()); // Accessibility Regions
         mutableRegions.add(new ArrayList<MutableRegion>()); // Target Element Location
 
         for (IRegion region : regions) {
@@ -280,6 +298,26 @@ public class MatchWindowTask {
             }
         }
         imageMatchSettings.setFloatingRegions(floatingMatchSettings.toArray(new FloatingMatchSettings[0]));
+
+        List<AccessibilityRegionByRectangle> accessibilityRegions = new ArrayList<>();
+        VisualGridSelector[] visualGridSelectors = regionSelectors.get(5);
+        for (int i = 0; i < visualGridSelectors.length; i++) {
+            MutableRegion mr = mutableRegions.get(5).get(i);
+            if (mr.getArea() == 0) continue;
+            VisualGridSelector vgs = visualGridSelectors[i];
+
+            if (vgs.getCategory() instanceof IGetAccessibilityRegionType) {
+                IGetAccessibilityRegionType gar = (IGetAccessibilityRegionType) vgs.getCategory();
+                AccessibilityRegionByRectangle accessibilityRegion = new AccessibilityRegionByRectangle(
+                        mr.getLeft() - location.getX(),
+                        mr.getTop() - location.getY(),
+                        mr.getWidth(),
+                        mr.getHeight(),
+                        gar.getAccessibilityRegionType());
+                accessibilityRegions.add(accessibilityRegion);
+            }
+        }
+        imageMatchSettings.setAccessibility(accessibilityRegions.toArray(new AccessibilityRegionByRectangle[0]));
     }
 
     private static MutableRegion[] filterEmptyEntries(List<MutableRegion> list, Location location) {
@@ -408,6 +446,7 @@ public class MatchWindowTask {
         if (imageMatchSettings != null) {
             collectSimpleRegions(checkSettingsInternal, imageMatchSettings, screenshot);
             collectFloatingRegions(checkSettingsInternal, imageMatchSettings, eyesBase, screenshot);
+            collectAccessibilityRegions(checkSettingsInternal, imageMatchSettings, eyes, screenshot);
         }
         return imageMatchSettings;
     }
@@ -427,6 +466,7 @@ public class MatchWindowTask {
             imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret()!= null ? checkSettingsInternal.getIgnoreCaret() : eyes.getConfigGetter().getIgnoreCaret());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns());
             imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : eyes.getConfigGetter().getIgnoreDisplacements() );
+            imageMatchSettings.setAccessibilityLevel(eyes.getConfigGetter().getAccessibilityValidation());
         }
         return imageMatchSettings;
     }
@@ -522,6 +562,17 @@ public class MatchWindowTask {
 
     public Region getLastScreenshotBounds() {
         return lastScreenshotBounds;
+    }
+
+    private static void collectAccessibilityRegions(ICheckSettingsInternal checkSettingsInternal,
+                                                    ImageMatchSettings imageMatchSettings, EyesBase eyes,
+                                                    EyesScreenshot screenshot) {
+        List<AccessibilityRegionByRectangle> accessibilityRegions = new ArrayList<>();
+        for (IGetAccessibilityRegion regionProvider : checkSettingsInternal.getAccessibilityRegions()) {
+            accessibilityRegions.addAll(regionProvider.getRegions((IDriverProvider) eyes, screenshot));
+        }
+        imageMatchSettings.setAccessibility(accessibilityRegions.toArray(new AccessibilityRegionByRectangle[0]));
+
     }
 
 }

@@ -43,7 +43,7 @@ import java.util.*;
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase {
+public class SeleniumEyes extends EyesBase implements IDriverProvider {
 
     private FrameChain originalFC;
     private WebElement scrollRootElement;

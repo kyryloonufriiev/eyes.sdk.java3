@@ -1,5 +1,6 @@
 package com.applitools;
 
+import com.applitools.eyes.AccessibilityRegionType;
 import com.applitools.eyes.MatchLevel;
 import com.applitools.eyes.Region;
 
@@ -173,4 +174,6 @@ public interface ICheckSettings {
     ICheckSettings ignoreDisplacements(boolean ignoreDisplacements);
 
     ICheckSettings ignoreDisplacements();
+
+    ICheckSettings accessibility(Region region, AccessibilityRegionType regionType);
 }

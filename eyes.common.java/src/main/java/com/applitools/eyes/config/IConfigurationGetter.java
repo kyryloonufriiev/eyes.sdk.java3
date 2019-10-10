@@ -58,4 +58,7 @@ public interface IConfigurationGetter {
     MatchLevel getMatchLevel();
 
     boolean getIgnoreDisplacements();
+
+    AccessibilityLevel getAccessibilityValidation();
+
 }
