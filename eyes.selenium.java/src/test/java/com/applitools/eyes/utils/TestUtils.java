@@ -1,15 +1,20 @@
 package com.applitools.eyes.utils;
 
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.LogHandler;
-import com.applitools.eyes.NullLogHandler;
-import com.applitools.eyes.StdoutLogHandler;
+import com.applitools.eyes.*;
+import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.Eyes;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +29,24 @@ public class TestUtils {
 
     public static String initLogPath() {
         return initLogPath(Thread.currentThread().getStackTrace()[2].getMethodName());
+    }
+    public static SessionResults getSessionResults(String apiKey, TestResults results) throws java.io.IOException {
+        String apiSessionUrl = results.getApiUrls().getSession();
+        URI apiSessionUri = UriBuilder.fromUri(apiSessionUrl)
+                .queryParam("format", "json")
+                .queryParam("AccessToken", results.getSecretToken())
+                .queryParam("apiKey", apiKey)
+                .build();
+
+        Client client = ClientBuilder.newClient();
+        String srStr = client.target(apiSessionUri)
+                .request(MediaType.APPLICATION_JSON)
+                .get(String.class);
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+        jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        return jsonMapper.readValue(srStr, SessionResults.class);
     }
 
     public static String initLogPath(String methodName) {
