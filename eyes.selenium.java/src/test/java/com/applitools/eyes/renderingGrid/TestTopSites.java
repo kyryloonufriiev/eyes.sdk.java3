@@ -37,7 +37,7 @@ public class TestTopSites {
     @DataProvider(name = "dp", parallel = true)
     public static Object[][] dp() {
         return new Object[][]{
-                {"https://amazon.com"},
+                {"https://wix.com"},
 //                {"https://ebay.com"},
                 {"https://twitter.com"},
                 {"https://wikipedia.org"},

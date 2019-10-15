@@ -24,4 +24,8 @@ public interface IResourceFuture extends Future<RGridResource>{
     RGridResource get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException;
 
     String getUrl();
+
+    void setResource(RGridResource rgResource);
+
+    void setResponseFuture(Future responseFuture);
 }

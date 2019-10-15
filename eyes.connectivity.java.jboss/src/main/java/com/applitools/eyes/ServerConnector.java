@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.brotli.dec.BrotliInputStream;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.*;
@@ -22,6 +24,7 @@ import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -383,10 +386,56 @@ public class ServerConnector extends RestClient
 
         request.header("User-Agent", userAgent);
 
-        Future<Response> future = request.async().get();
+        final IResourceFuture newFuture = new ResourceFuture(url.toString(), logger, this, userAgent);
 
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        IResourceFuture newFuture = new ResourceFuture(future, url.toString(), logger, this, userAgent);
+        Future<Response> responseFuture = request.async().get(new InvocationCallback<Response>() {
+            @Override
+            public void completed(Response response) {
+                logger.verbose("GET callback  success");
+                int status = response.getStatus();
+                List<String> contentLengthHeaders = response.getStringHeaders().get("Content-length");
+                int contentLength = 0;
+                if (contentLengthHeaders != null) {
+                    contentLength = Integer.parseInt(contentLengthHeaders.get(0));
+                    logger.verbose("Content Length: " + contentLength);
+                }
+
+                logger.verbose("downloading url - : " + url);
+
+                if (status == 404) {
+                    logger.verbose("Status 404 on url - " + url);
+                }
+
+                if ((status == 200 || status == 201)) {
+                    logger.verbose("response: " + response);
+                    byte[] content = downloadFile(response);
+
+                    String contentType = Utils.getResponseContentType(response);
+                    String contentEncoding = Utils.getResponseContentEncoding(response);
+                    if (contentEncoding != null && contentEncoding.contains("gzip")) {
+                        try {
+                            content = GeneralUtils.getUnGzipByteArrayOutputStream(content);
+                        } catch (IOException e) {
+                            GeneralUtils.logExceptionStackTrace(logger, e);
+                        }
+                    }
+                    RGridResource rgResource = new RGridResource(url.toString(), contentType, content, logger, "ResourceFuture");
+
+                    newFuture.setResource(rgResource);
+
+                }
+                response.close();
+                logger.verbose("Response closed");
+            }
+
+            @Override
+            public void failed(Throwable throwable) {
+                logger.verbose("PUT callback failed");
+            }
+        });
+
+        newFuture.setResponseFuture(responseFuture);
+
         return newFuture;
     }
 
@@ -656,6 +705,22 @@ public class ServerConnector extends RestClient
         WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
         Response delete = target.request().delete();
         logger.verbose("delete batch is done with "+delete.getStatus() + " status");
+    }
+
+    private byte[] downloadFile(Response response) {
+
+        InputStream inputStream = response.readEntity(InputStream.class);
+        Object contentEncoding = response.getHeaders().getFirst("Content-Encoding");
+        byte[] bytes = new byte[0];
+        try {
+            if ("br".equalsIgnoreCase((String) contentEncoding)) {
+                inputStream = new BrotliInputStream(inputStream);
+            }
+            bytes = IOUtils.toByteArray(inputStream);
+        } catch (IOException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+        return bytes;
     }
 
 }
