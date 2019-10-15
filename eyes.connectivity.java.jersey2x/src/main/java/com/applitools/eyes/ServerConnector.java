@@ -78,8 +78,8 @@ public class ServerConnector extends RestClient
      * @return The currently set API key or {@code null} if no key is set.
      */
     public String getApiKey() {
-        String apiKey = this.apiKey != null ? this.apiKey : System.getenv("APPLITOOLS_API_KEY");
-        apiKey = apiKey == null ? System.getenv("bamboo_APPLITOOLS_API_KEY") : apiKey;
+        String apiKey = this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
+        apiKey = apiKey == null ? GeneralUtils.getEnvString("bamboo_APPLITOOLS_API_KEY") : apiKey;
         return apiKey;
     }
 
@@ -639,8 +639,8 @@ public class ServerConnector extends RestClient
 
     @Override
     public void closeBatch(String batchId) {
-        String dontCloseBatchesStr = System.getenv("APPLITOOLS_DONT_CLOSE_BATCHES");
-        dontCloseBatchesStr = dontCloseBatchesStr != null ? dontCloseBatchesStr : System.getenv("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES");
+        String dontCloseBatchesStr = GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES");
+        dontCloseBatchesStr = dontCloseBatchesStr != null ? dontCloseBatchesStr : GeneralUtils.getEnvString("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES");
         if (Boolean.parseBoolean(dontCloseBatchesStr))
         {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");

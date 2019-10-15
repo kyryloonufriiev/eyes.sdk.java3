@@ -88,7 +88,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         this.userAgent = userAgent;
         this.regionSelectors = regionSelectors;
         this.listeners.add(listener);
-        String renderingGridForcePut = System.getenv("APPLITOOLS_RENDERING_GRID_FORCE_PUT");
+        String renderingGridForcePut = GeneralUtils.getEnvString("APPLITOOLS_RENDERING_GRID_FORCE_PUT");
         this.isForcePutNeeded = new AtomicBoolean(renderingGridForcePut != null && renderingGridForcePut.equalsIgnoreCase("true"));
     }
 

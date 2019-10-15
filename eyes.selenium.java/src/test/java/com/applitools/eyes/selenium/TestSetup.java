@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
+import com.applitools.utils.GeneralUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -32,7 +33,7 @@ public abstract class TestSetup implements ITest {
     //protected RectangleSize testedPageSize = new RectangleSize(1200, 800);
     protected RectangleSize testedPageSize = new RectangleSize(700, 460);
 
-    private String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
+    private String logsPath = GeneralUtils.getEnvString("APPLITOOLS_LOGS_PATH");
 
     protected Capabilities caps;
     private DesiredCapabilities desiredCaps = new DesiredCapabilities();

@@ -40,7 +40,7 @@ public class VisualGridRunner extends EyesRunner {
 
     private RateLimiter rateLimiter;
     private String serverUrl;
-    private static final String DEFAULT_API_KEY = System.getenv("APPLITOOLS_API_KEY");
+    private static final String DEFAULT_API_KEY = GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
     private String apiKey = DEFAULT_API_KEY;
     private boolean isDisabled;
     private boolean isServicesOn = false;

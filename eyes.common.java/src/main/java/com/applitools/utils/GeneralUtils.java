@@ -348,4 +348,8 @@ public class GeneralUtils {
         }
         return encoded;
     }
+
+    public static String getEnvString(String applitools_env) {
+        return System.getenv(applitools_env) == null ? System.getenv("bamboo_" + applitools_env) : System.getenv(applitools_env);
+    }
 }

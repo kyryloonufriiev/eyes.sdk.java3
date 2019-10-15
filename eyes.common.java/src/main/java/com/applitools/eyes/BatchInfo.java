@@ -42,10 +42,10 @@ public class BatchInfo {
      */
     public BatchInfo(String name, Calendar startedAt) {
         ArgumentGuard.notNull(startedAt, "startedAt");
-        String envVarBatchId = System.getenv("APPLITOOLS_BATCH_ID");
-        String envSequenceName = System.getenv("APPLITOOLS_BATCH_SEQUENCE");
+        String envVarBatchId = GeneralUtils.getEnvString("APPLITOOLS_BATCH_ID");
+        String envSequenceName = GeneralUtils.getEnvString("APPLITOOLS_BATCH_SEQUENCE");
         this.id = envVarBatchId != null ? envVarBatchId : UUID.randomUUID().toString();
-        this.name = name != null ? name : System.getenv("APPLITOOLS_BATCH_NAME");
+        this.name = name != null ? name : GeneralUtils.getEnvString("APPLITOOLS_BATCH_NAME");
         this.sequenceName = envSequenceName;
         this.startedAt = GeneralUtils.toISO8601DateTime(startedAt);
     }
