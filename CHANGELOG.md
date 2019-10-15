@@ -1,3 +1,8 @@
+## [3.158.1] - 2019-10-10
+### Added 
+- Batch close & notification support for JBoss and Jersey1x.
+### Fixed
+- Batch close now checks for bamboo_ prefix for env var.
 
 ## [3.158.0] - 2019-10-10
 ### Added 
