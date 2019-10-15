@@ -642,7 +642,20 @@ public class ServerConnector extends RestClient
 
     @Override
     public void closeBatch(String batchId) {
+        String dontCloseBatchesStr = GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES");
+        dontCloseBatchesStr = dontCloseBatchesStr != null ? dontCloseBatchesStr : GeneralUtils.getEnvString("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES");
+        if (Boolean.parseBoolean(dontCloseBatchesStr))
+        {
+            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
+            return;
+        }
+        ArgumentGuard.notNull(batchId, "batchId");
+        this.logger.verbose("called with " + batchId);
 
+        String url = String.format(CLOSE_BATCH, batchId);
+        WebTarget target = restClient.target(serverUrl).path(url).queryParam("apiKey", getApiKey());
+        Response delete = target.request().delete();
+        logger.verbose("delete batch is done with "+delete.getStatus() + " status");
     }
 
 }
