@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Provides an API for communication with the Applitools agent
  */
-@SuppressWarnings("WeakerAccess")
 public class ServerConnector extends RestClient
         implements IServerConnector {
 
