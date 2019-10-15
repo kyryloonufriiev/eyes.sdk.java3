@@ -640,9 +640,11 @@ public class ServerConnector extends RestClient
 
     @Override
     public void closeBatch(String batchId) {
-        if ("true".equalsIgnoreCase(System.getenv("APPLITOOLS_DONT_CLOSE_BATCHES")))
+        String dontCloseBatchesStr = System.getenv("APPLITOOLS_DONT_CLOSE_BATCHES");
+        dontCloseBatchesStr = dontCloseBatchesStr != null ? dontCloseBatchesStr : System.getenv("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES");
+        if (Boolean.parseBoolean(dontCloseBatchesStr))
         {
-            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Doing nothing.");
+            logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
         ArgumentGuard.notNull(batchId, "batchId");
