@@ -562,7 +562,7 @@ public class ServerConnector extends RestClient
 
         String contentType = resource.getContentType();
         AsyncWebResource.Builder builder;
-        if (contentType != null) {
+        if (contentType != null && !"None".equalsIgnoreCase(contentType)) {
             builder = target.entity(content, contentType);
 
         } else {

@@ -598,7 +598,7 @@ public class ServerConnector extends RestClient
         request.header("X-Auth-Token", renderingInfo.getAccessToken());
         request.header("User-Agent", userAgent);
         Entity entity = null;
-        if (contentType != null) {
+        if (contentType != null && !"None".equalsIgnoreCase(contentType)) {
             entity = Entity.entity(content, contentType);
 
         } else {

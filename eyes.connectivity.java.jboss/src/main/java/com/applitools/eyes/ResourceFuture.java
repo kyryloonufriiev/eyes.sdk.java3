@@ -74,7 +74,6 @@ public class ResourceFuture implements IResourceFuture {
 
                 } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
-                    retryCount--;
                     logger.verbose("Entering retry for - " + url);
                     try {
                         Thread.sleep(300);
@@ -83,6 +82,9 @@ public class ResourceFuture implements IResourceFuture {
                     } catch (MalformedURLException malformedUrlException) {
                         GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);
                     }
+                }
+                finally {
+                    retryCount--;
                 }
             }
 
