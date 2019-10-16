@@ -4,6 +4,8 @@
 package com.applitools.eyes;
 
 import com.applitools.IResourceUploadListener;
+import com.applitools.eyes.visualgrid.PutFuture;
+import com.applitools.eyes.visualgrid.ResourceFuture;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
@@ -20,7 +22,9 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.async.TypeListener;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.commons.io.IOUtils;
+import org.brotli.dec.BrotliInputStream;
 
+import javax.jws.WebParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -29,6 +33,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -403,15 +408,68 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IResourceFuture downloadResource(URL uri, String userAgent) {
+    public IResourceFuture downloadResource(final URL url, String userAgent) {
         Client client = RestClient.buildRestClient(getTimeout(), getProxy());
-        AsyncWebResource target = client.asyncResource(uri.toString());
+
+        AsyncWebResource target = client.asyncResource(url.toString());
 
         AsyncWebResource.Builder request = target.accept(MediaType.WILDCARD);
 
         request.header("User-Agent", userAgent);
-        Future<ClientResponse> future = request.get(ClientResponse.class);
-        IResourceFuture newFuture = new ResourceFuture(future, uri.toString(), logger, this, userAgent);
+
+        final IResourceFuture newFuture = new ResourceFuture(url.toString(), logger, this, userAgent);
+
+        Future<ClientResponse> responseFuture =  request.get(new TypeListener<ClientResponse>(ClientResponse.class) {
+
+            public void onComplete(Future<ClientResponse> future) {
+                logger.verbose("GET callback  success");
+
+                ClientResponse response = null;
+                try {
+                    response = future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
+                int status = response.getStatus();
+                List<String> contentLengthHeaders = response.getHeaders().get("Content-length");
+                int contentLength = 0;
+                if (contentLengthHeaders != null) {
+                    contentLength = Integer.parseInt(contentLengthHeaders.get(0));
+                    logger.verbose("Content Length: " + contentLength);
+                }
+
+                logger.verbose("downloading url - : " + url);
+
+                if (status == 404) {
+                    logger.verbose("Status 404 on url - " + url);
+                }
+
+                if ((status == 200 || status == 201)) {
+                    logger.verbose("response: " + response);
+                    byte[] content = downloadFile(response);
+
+                    String contentType = Utils.getResponseContentType(response);
+                    String contentEncoding = Utils.getResponseContentEncoding(response);
+                    if (contentEncoding != null && contentEncoding.contains("gzip")) {
+                        try {
+                            content = GeneralUtils.getUnGzipByteArrayOutputStream(content);
+                        } catch (IOException e) {
+                            GeneralUtils.logExceptionStackTrace(logger, e);
+                        }
+                    }
+                    RGridResource rgResource = new RGridResource(url.toString(), contentType, content, logger, "ResourceFuture");
+
+                    newFuture.setResource(rgResource);
+
+                }
+                response.close();
+                logger.verbose("Response closed");
+            }
+
+        });
+
+        newFuture.setResponseFuture(responseFuture);
+
         return newFuture;
     }
 
@@ -651,5 +709,21 @@ public class ServerConnector extends RestClient
         String url = String.format(CLOSE_BATCH, batchId);
         WebResource target = restClient.resource(serverUrl).path(url).queryParam("apiKey", getApiKey());
         target.delete();
+    }
+
+    private byte[] downloadFile(ClientResponse response) {
+
+        InputStream inputStream = response.getEntity(InputStream.class);
+        Object contentEncoding = response.getHeaders().getFirst("Content-Encoding");
+        byte[] bytes = new byte[0];
+        try {
+            if ("br".equalsIgnoreCase((String) contentEncoding)) {
+                inputStream = new BrotliInputStream(inputStream);
+            }
+            bytes = IOUtils.toByteArray(inputStream);
+        } catch (IOException e) {
+            GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+        return bytes;
     }
 }

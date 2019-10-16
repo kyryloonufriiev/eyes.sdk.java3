@@ -1,10 +1,12 @@
-package com.applitools.eyes;
+package com.applitools.eyes.visualgrid;
 
+import com.applitools.eyes.IPutFuture;
+import com.applitools.eyes.IServerConnector;
+import com.applitools.eyes.Logger;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.eyes.visualgrid.model.RunningRender;
 import com.applitools.utils.GeneralUtils;
 
-import javax.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -12,15 +14,15 @@ import java.util.concurrent.TimeoutException;
 
 public class PutFuture implements IPutFuture {
 
-    private Future<Response> putFuture;
+    private Future putFuture;
     private RGridResource resource;
     private RunningRender runningRender;
     private IServerConnector serverConnector;
     private Logger logger;
-    private String userAgent;
 
     private boolean isSentAlready = false;
     private int retryCount = 5;
+    private String userAgent;
 
     public PutFuture(RGridResource resource, RunningRender runningRender, IServerConnector serverConnector, Logger logger, String userAgent) {
         this.resource = resource;
@@ -52,19 +54,25 @@ public class PutFuture implements IPutFuture {
 
     @Override
     public Boolean get() {
-        if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent,null);
-            this.putFuture = newFuture.getPutFuture();
-        }
+        return get(1, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public Boolean get(long timeout, TimeUnit unit) {
         if (!this.isSentAlready) {
             while (retryCount != 0) {
                 try {
-                    Response response = this.putFuture.get(20, TimeUnit.SECONDS);
+                    logger.verbose("Response open. - "+this.resource.getUrl());
+                    this.putFuture.get(timeout, unit);
+
+                    logger.verbose("Got PutFuture Response .- "+this.resource.getUrl());
                     break;
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
-                    retryCount--;
                     logger.verbose("Entering retry");
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
+                    this.putFuture.cancel(true);
+                    retryCount--;
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException e1) {
@@ -76,34 +84,9 @@ public class PutFuture implements IPutFuture {
                 }
             }
         }
-        this.isSentAlready = true;
-        return true;
-    }
-
-    @Override
-    public Boolean get(long timeout, TimeUnit unit) {
-        if (this.putFuture == null) {
-            IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent ,null);
-            this.putFuture = newFuture.getPutFuture();
-        }
-        if (!this.isSentAlready) {
-            while (retryCount != 0) {
-                try {
-                    this.putFuture.get(timeout, unit);
-                    break;
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    logger.verbose(e.getMessage() + " on hash: " + resource.getSha256());
-                    retryCount--;
-                    logger.verbose("Entering retry");
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e1) {
-                        GeneralUtils.logExceptionStackTrace(logger, e1);
-                    }
-                    IPutFuture newFuture = serverConnector.renderPutResource(runningRender, resource, userAgent, null);
-                    logger.log("fired retry");
-                    this.putFuture = newFuture.getPutFuture();
-                }
+        if(retryCount == 0){
+            if(!isSentAlready){
+                throw new Error("Error trying to PUT Resource - "+resource.getUrl());
             }
         }
         this.isSentAlready = true;

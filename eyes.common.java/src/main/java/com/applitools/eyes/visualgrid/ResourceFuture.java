@@ -1,10 +1,11 @@
-package com.applitools.eyes;
+package com.applitools.eyes.visualgrid;
 
+import com.applitools.eyes.IServerConnector;
+import com.applitools.eyes.Logger;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.model.RGridResource;
 import com.applitools.utils.GeneralUtils;
 
-import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Future;
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ResourceFuture implements IResourceFuture {
 
-    private Future<Response> responseFuture;
+    private Future responseFuture;
     private String url;
     private Logger logger;
     private IServerConnector serverConnector;
@@ -64,13 +65,7 @@ public class ResourceFuture implements IResourceFuture {
             int retryCount = 3;
             while (this.rgResource == null && retryCount > 0) {
                 try {
-                    Response response = responseFuture.get();
-                    int status = response.getStatus();
-
-                    if (status == 404) {
-                        logger.verbose("Status 404 on url - " + url);
-                        retryCount--;
-                    }
+                    responseFuture.get();
 
                 } catch (Throwable e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);

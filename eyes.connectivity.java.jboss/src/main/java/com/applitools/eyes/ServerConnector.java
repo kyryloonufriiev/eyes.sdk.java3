@@ -4,6 +4,8 @@
 package com.applitools.eyes;
 
 import com.applitools.IResourceUploadListener;
+import com.applitools.eyes.visualgrid.PutFuture;
+import com.applitools.eyes.visualgrid.ResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.utils.ArgumentGuard;
@@ -372,8 +374,6 @@ public class ServerConnector extends RestClient
                 }
             }
         });
-
-
     }
 
     @Override
