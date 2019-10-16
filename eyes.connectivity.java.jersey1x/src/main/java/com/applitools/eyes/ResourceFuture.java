@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ResourceFuture implements IResourceFuture {
 
-    private Future<ClientResponse> future;
+    private Future<ClientResponse> responseFuture;
     private String url;
     private Logger logger;
     private IServerConnector serverConnector;
@@ -24,7 +24,7 @@ public class ResourceFuture implements IResourceFuture {
     private String userAgent;
 
     public ResourceFuture(Future<ClientResponse> future, String url, Logger logger, IServerConnector serverConnector, String userAgent) {
-        this.future = future;
+        this.responseFuture = future;
         this.url = url;
         this.logger = logger;
         this.serverConnector = serverConnector;
@@ -41,17 +41,17 @@ public class ResourceFuture implements IResourceFuture {
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        return future.cancel(mayInterruptIfRunning);
+        return responseFuture.cancel(mayInterruptIfRunning);
     }
 
     @Override
     public boolean isCancelled() {
-        return future.isCancelled();
+        return responseFuture.isCancelled();
     }
 
     @Override
     public boolean isDone() {
-        return future.isDone();
+        return responseFuture.isDone();
     }
 
     @Override
@@ -59,10 +59,10 @@ public class ResourceFuture implements IResourceFuture {
         logger.verbose("entering");
         synchronized (url) {
             logger.verbose("enter - this.rgResource: " + this.rgResource);
-            if (this.future == null) {
+            if (this.responseFuture == null) {
                 try {
                     IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent);
-                    this.future = ((ResourceFuture) newFuture).future;
+                    this.responseFuture = ((ResourceFuture) newFuture).responseFuture;
                 } catch (MalformedURLException malformedUrlException) {
                     GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);
                 }
@@ -70,7 +70,7 @@ public class ResourceFuture implements IResourceFuture {
             int retryCount = 3;
             while (this.rgResource == null && retryCount > 0) {
                 try {
-                    ClientResponse response = this.future.get(15, TimeUnit.SECONDS);
+                    ClientResponse response = this.responseFuture.get(15, TimeUnit.SECONDS);
                     int status = response.getStatus();
                     List<String> contentLengthHeaders = response.getHeaders().get("Content-length");
                     int contentLength = 0;
@@ -105,7 +105,7 @@ public class ResourceFuture implements IResourceFuture {
                     try {
                         Thread.sleep(300);
                         IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent);
-                        this.future = ((ResourceFuture) newFuture).future;
+                        this.responseFuture = ((ResourceFuture) newFuture).responseFuture;
                     } catch (MalformedURLException malformedUrlException) {
                         GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);
                     }
@@ -142,5 +142,15 @@ public class ResourceFuture implements IResourceFuture {
     @Override
     public String getUrl() {
         return this.url;
+    }
+
+    @Override
+    public void setResource(RGridResource rgResource) {
+        this.rgResource = rgResource;
+    }
+
+    @Override
+    public void setResponseFuture(Future responseFuture) {
+        this.responseFuture = responseFuture;
     }
 }

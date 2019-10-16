@@ -56,7 +56,7 @@ public class VisualGridEyes implements IRenderingEyes {
     private UserAgent userAgent = null;
     private RectangleSize viewportSize;
     private AtomicBoolean isCheckTimerTimedOut = new AtomicBoolean(false);
-    private Timer timer = new Timer("VG_StopWatch", true);
+    private Timer timer = null;
     private final List<PropertyData> properties = new ArrayList<>();
 
     private static final String GET_ELEMENT_XPATH_JS =
@@ -503,7 +503,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
 
             logger.verbose("Dom extraction starting   (" + checkSettingsInternal.toString() + ")");
-
+            timer = new Timer("VG_Check_StopWatch", true);
             timer.schedule(new TimeoutTask(), DOM_EXTRACTION_TIMEOUT);
             String resultAsString;
             ScriptResponse.Status status = null;
@@ -512,6 +512,7 @@ public class VisualGridEyes implements IRenderingEyes {
                 resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + "return __processPageAndPoll();");
                 try {
                     scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
+                    logger.verbose("Dom extraction polling...");
                     status = scriptResponse.getStatus();
                 } catch (IOException e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
@@ -581,6 +582,11 @@ public class VisualGridEyes implements IRenderingEyes {
                 runningTest.setTestInExceptionMode(error);
             }
             GeneralUtils.logExceptionStackTrace(logger, e);
+        }
+        finally{
+            if (timer != null) {
+                timer.cancel();
+            }
         }
     }
 
