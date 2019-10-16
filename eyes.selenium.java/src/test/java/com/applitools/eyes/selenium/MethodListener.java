@@ -25,7 +25,7 @@ public class MethodListener implements IInvokedMethodListener2 {
             if (travisCommit == null || travisCommit.isEmpty()) {
                 suiteId.set(UUID.randomUUID().toString().substring(0, 12));
             } else {
-                suiteId.set(travisCommit);
+                suiteId.set(travisCommit.substring(0, 12));
             }
         }
     }
@@ -62,8 +62,8 @@ public class MethodListener implements IInvokedMethodListener2 {
         JsonObject finalJsonObject = new JsonObject();
         finalJsonObject.addProperty("sdk", "java");
         finalJsonObject.addProperty("id", suiteId.get());
-        String isTravis = System.getenv("TRAVIS");
-        if (!Boolean.parseBoolean(isTravis)){
+        String travisGitTag = System.getenv("TRAVIS_TAG");
+        if (travisGitTag == null || !travisGitTag.contains("RELEASE_CANDIDATE-")){
             finalJsonObject.addProperty("sandbox", true);
         }
         finalJsonObject.add("results", resultsJsonArray);
