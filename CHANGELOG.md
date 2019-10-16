@@ -1,3 +1,8 @@
+## [3.158.2] - 2019-10-10
+### Fixed
+- Updated accessibility enums (experimental).
+
+
 ## [3.158.1] - 2019-10-10
 ### Added 
 - Batch close & notification support for JBoss and Jersey1x.
