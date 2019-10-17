@@ -15,6 +15,8 @@
             <class name="com.applitools.eyes.selenium.TestBatchSequenceName" />
             <class name="com.applitools.eyes.selenium.TestBatchAPI" />
             <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner" />
+            <class name="com.applitools.eyes.selenium.TestAcme" />
+            <class name="com.applitools.eyes.selenium.TestDuplicates" />
         </classes>
     </test>
     <test name="Test_VG" parallel="instances">
