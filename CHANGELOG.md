@@ -1,4 +1,4 @@
-## [3.158.3] - 2019-10-10
+## [3.158.3] - 2019-10-19
 ### Fixed
 - DOM-Snapshot correct close of resource download response.
 
