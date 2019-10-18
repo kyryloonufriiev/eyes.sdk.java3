@@ -1,7 +1,10 @@
+## [3.158.3] - 2019-10-10
+### Fixed
+- DOM-Snapshot correct close of resource download response.
+
 ## [3.158.2] - 2019-10-10
 ### Fixed
 - Updated accessibility enums (experimental).
-
 
 ## [3.158.1] - 2019-10-10
 ### Added 
