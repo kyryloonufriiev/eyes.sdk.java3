@@ -61,10 +61,6 @@ public class RestClient {
         cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECT_TIMEOUT, timeout);
         cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_READ_TIMEOUT, timeout);
 
-        final ThreadSafeClientConnManager manager=new ThreadSafeClientConnManager();
-
-
-
         if (abstractProxySettings != null) {
             URI uri = URI.create(abstractProxySettings.getUri());
             UriBuilder uriBuilder = UriBuilder.fromUri(uri);
@@ -92,8 +88,7 @@ public class RestClient {
                 cc.getProperties().put(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD, password);
             }
 
-            ApacheHttpClient4Handler handler = new ApacheHttpClient4Handler(new DefaultHttpClient(manager), null, false);
-            ApacheHttpClient4 client = new ApacheHttpClient4(handler);
+            ApacheHttpClient4 client = ApacheHttpClient4.create(cc);
             return client;
         } else {
             // We ignore the proxy settings
