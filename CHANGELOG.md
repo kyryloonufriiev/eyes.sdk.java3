@@ -1,3 +1,7 @@
+## [3.158.4] - 2019-10-23
+### Fixed
+- Jersey1x proxy.
+
 ## [3.158.3] - 2019-10-19
 ### Fixed
 - DOM-Snapshot correct close of resource download response.
