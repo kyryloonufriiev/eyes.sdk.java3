@@ -220,6 +220,7 @@ public abstract class TestSetup implements ITest {
         eyes.setStitchMode(this.stitchMode);
         eyes.setSaveNewTests(false);
         eyes.setBatch(TestDataProvider.batchInfo);
+        eyes.setBranchName("master");
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }
