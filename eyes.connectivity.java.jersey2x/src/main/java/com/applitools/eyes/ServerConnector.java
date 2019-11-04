@@ -21,7 +21,10 @@ import org.brotli.dec.BrotliInputStream;
 import org.glassfish.jersey.message.GZipEncoder;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.*;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
@@ -396,8 +399,7 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IResourceFuture downloadResource(final URL url, String userAgent) {
-
+    public IResourceFuture downloadResource(final URL url, String userAgent, ResourceFuture resourceFuture) {
         WebTarget target = restClient.target(url.toString());
 
         Invocation.Builder request = target.request(MediaType.WILDCARD);
