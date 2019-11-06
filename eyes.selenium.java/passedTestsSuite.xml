@@ -2,9 +2,22 @@
 
 <suite name="Suite1" verbose="1" parallel="tests">
 
+    <test name="TestClassicApi">
+        <parameter name="dont_run" value="TestCheckInnerFrame+CSS" />
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestClassicApi"></class>
+        </classes>
+    </test>
+
+    <test name="TestAcme">
+        <parameter name="dont_run" value="TestAcmeLogin+SCROLL" />
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestAcme" />
+        </classes>
+    </test>
+
     <test name="Test_WEB" parallel="instances">
         <classes>
-            <class name="com.applitools.eyes.selenium.TestClassicApi" />
             <class name="com.applitools.eyes.selenium.TestFluentApi" />
             <class name="com.applitools.eyes.selenium.TestFluentApi_Frames" />
             <class name="com.applitools.eyes.selenium.TestSpecialCases" />
@@ -12,7 +25,6 @@
             <class name="com.applitools.eyes.selenium.TestBatchSequenceName" />
             <class name="com.applitools.eyes.selenium.TestBatchAPI" />
             <class name="com.applitools.eyes.selenium.TestSeleniumEyesWithNullRunner" />
-            <class name="com.applitools.eyes.selenium.TestAcme" />
             <class name="com.applitools.eyes.selenium.TestDuplicates" />
             <class name="com.applitools.eyes.selenium.TestPageWithHeader" />
             <class name="com.applitools.eyes.selenium.TestScrollRootElement" />
