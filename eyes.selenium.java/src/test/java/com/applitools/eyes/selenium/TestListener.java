@@ -123,7 +123,11 @@ public class TestListener implements ITestListener {
                 } catch (Throwable e) {
                     if (e instanceof TestFailedException) {
                         TestFailedException testException = (TestFailedException) e;
-                        JsonObject json = createExtraDataJson(methodName, testException.getTestResults());
+                        String testMode = "";
+                        try {
+                            testMode = ((TestSetup)iTestResult.getInstance()).mode;
+                        } catch (Throwable t){}
+                        JsonObject json = createExtraDataJson(methodName, testException.getTestResults(), testMode);
                         CommUtils.postJson("http://sdk-test-results.herokuapp.com/extra_test_data", new Gson().fromJson(json, Map.class), null);
                     }
                     sendTestResluts(iTestResult, false);
@@ -160,14 +164,14 @@ public class TestListener implements ITestListener {
         }
     }
 
-    private JsonObject createExtraDataJson(String methodName, TestResults results) {
+    private JsonObject createExtraDataJson(String methodName, TestResults results, String mode) {
         JsonObject finalJsonObject = new JsonObject();
         finalJsonObject.addProperty("sdk", "java");
         JsonArray extraDataJsonArr = new JsonArray();
         finalJsonObject.add("extra_data", extraDataJsonArr);
         JsonObject innerResultsJsonObject = new JsonObject();
         innerResultsJsonObject.addProperty("test_name", methodName);
-        innerResultsJsonObject.addProperty("data", results.getUrl());
+        innerResultsJsonObject.addProperty("data", results.getUrl() + " mode: " + mode);
         extraDataJsonArr.add(innerResultsJsonObject);
         return finalJsonObject;
     }
