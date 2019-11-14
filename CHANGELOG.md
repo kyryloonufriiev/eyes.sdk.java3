@@ -1,3 +1,4 @@
+## [3.158.6] - 2019-11-13
 ### Fixed
 -Fixed connection pool hanging with DomCapture. [Trello 1144](https://trello.com/c/Aex0NkjK) 
 
