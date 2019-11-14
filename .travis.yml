@@ -22,8 +22,8 @@ jobs:
         - env webdriver.chrome.driver=/home/travis/build/
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
         - git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
-        - git fetch $RELEASE_BRANCH;
-        - git checkout $RELEASE_BRANCH;
+        - git fetch develop;
+        - git checkout develop;
         - mvn versions:set -DnewVersion=$SDK_VERSION;
         - mvn versions:commit;
         - git add --all;
