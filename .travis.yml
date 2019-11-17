@@ -31,6 +31,10 @@ jobs:
         - git commit -m 'update pom version'
         - git push origin HEAD:$RELEASE_BRANCH
         - echo $RELEASE_BRANCH
+        - chmod +x ./extractChangeLog.sh
+        - CHANGELOG_RESULT=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md")
+        - CHANGELOG=$([ -z "$CHANGELOG_RESULT" ] && echo "There is no change log for version $SDK_VERSION" || echo "$CHANGELOG_RESULT")
+        - echo $CHANGELOG
 #        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
 #          git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
 #          git fetch $RELEASE_BRANCH;
@@ -52,7 +56,8 @@ jobs:
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
           echo "DEPLOY";
           chmod +x ./extractChangeLog.sh;
-          CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+          CHANGELOG_RESULT=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+          CHANGELOG=$([ -z "$CHANGELOG_RESULT" ] && echo "There is no change log for version $SDK_VERSION" || echo "$CHANGELOG_RESULT");
           echo $CHANGELOG;
           chmod +x ./sendMail.sh;
           TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
