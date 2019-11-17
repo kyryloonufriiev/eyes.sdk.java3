@@ -7,9 +7,6 @@ dist: trusty
 addons:
   chrome: stable
 
-git:
-  depth: false
-
 # env variables
 # $RELEASE_BRANCH
 # $GITHUB_TOKEN
@@ -24,14 +21,16 @@ jobs:
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - env webdriver.chrome.driver=/home/travis/build/
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
-        - git fetch develop;
-        - git checkout develop;
-        - mvn versions:set -DnewVersion=$SDK_VERSION;
-        - mvn versions:commit;
-        - git add --all;
-        - git commit -m 'update pom version';
-        - git push origin $RELEASE_BRANCH;
+        - echo $SDK_VERSION
+        - git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}
+        - echo "$GITHUB_TOKEN" | cut -c1-5
+        - echo $TRAVIS_REPO_SLUG
+        - mvn versions:set -DnewVersion=$SDK_VERSION
+        - mvn versions:commit
+        - git add --all
+        - git commit -m 'update pom version'
+        - git push origin HEAD:$RELEASE_BRANCH
+        - echo $RELEASE_BRANCH
 #        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
 #          git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
 #          git fetch $RELEASE_BRANCH;
