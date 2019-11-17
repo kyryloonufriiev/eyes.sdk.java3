@@ -29,7 +29,7 @@ jobs:
         - mvn versions:commit
         - git add --all
         - git commit -m 'update pom version'
-        - git push origin HEAD:$RELEASE_BRANCH
+        - git push origin $RELEASE_BRANCH
         - echo $RELEASE_BRANCH
 #        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
 #          git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
@@ -53,7 +53,9 @@ jobs:
           echo "DEPLOY";
           chmod +x ./extractChangeLog.sh;
           CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+          echo $CHANGELOG
           chmod +x ./sendMail.sh;
           TEST_COVERAGE_GAP=$(cat testCoverageGap.txt)
+          echo $TEST_COVERAGE_GAP
           ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
           fi
