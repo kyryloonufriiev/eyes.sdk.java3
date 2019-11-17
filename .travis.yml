@@ -29,7 +29,7 @@ jobs:
         - mvn versions:commit
         - git add --all
         - git commit -m 'update pom version'
-        - git push origin $RELEASE_BRANCH
+        - git push origin HEAD:$RELEASE_BRANCH;
         - echo $RELEASE_BRANCH
 #        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
 #          git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
