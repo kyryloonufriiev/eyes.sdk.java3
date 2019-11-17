@@ -12,30 +12,37 @@
     <parent>
         <groupId>com.applitools</groupId>
         <artifactId>eyes-sdk-java3-parent</artifactId>
-        <version>3.158.5</version>
+        <version>3.38.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-common-java3</artifactId>
-            <version>3.158.5</version>
+            <version>3.38.5</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>3.158.5</version>
+            <version>3.38.5</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>[3.141.0, 3.141.59]</version>
+            <version>3.14.0</version>
         </dependency>
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
-            <version>[5.0.1, 7.0]</version>
+            <version>[5.0.1, 6.0]</version>
         </dependency>
         <dependency>
             <groupId>com.helger</groupId>
