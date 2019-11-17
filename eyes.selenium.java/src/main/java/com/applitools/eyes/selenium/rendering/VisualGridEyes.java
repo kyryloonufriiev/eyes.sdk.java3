@@ -575,7 +575,7 @@ public class VisualGridEyes implements IRenderingEyes {
                     }, regionsXPaths, userAgent);
             logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
             switchTo.frames(originalFC);
-        } catch (IllegalArgumentException | EyesException | InterruptedException e) {
+        } catch (Throwable e) {
             Error error = new Error(e);
             abort(e);
             for (RunningTest runningTest : testList) {
