@@ -40,8 +40,10 @@ jobs:
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
           echo "DEPLOY";
           chmod +x ./extractChangeLog.sh;
-          CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+          TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
+          CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION" || echo "$TMP_CHANGELOG");
+          echo $CHANGELOG;
           chmod +x ./sendMail.sh;
-          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt)
+          TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
           ./sendMail.sh "$SDK" "$TRAVIS_TAG" "$CHANGELOG" "$TEST_COVERAGE_GAP";
           fi
