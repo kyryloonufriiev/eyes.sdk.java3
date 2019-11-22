@@ -1,3 +1,4 @@
+## [3.158.8] - 2019-11-22
 ### Fixed
 - Calling updated methods in DOM Snapshot. [Trello 375](https://trello.com/c/elkaV9Dm)
 
