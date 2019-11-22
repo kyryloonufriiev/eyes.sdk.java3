@@ -1,10 +1,15 @@
+## [3.158.7] - 2019-11-22
+### Fixed
+- Updated DOM snapshot script. [Trello 375](https://trello.com/c/elkaV9Dm)
+
+
 ## [3.158.6] - 2019-11-13
 ### Fixed
--Fixed connection pool hanging with DomCapture. [Trello 1144](https://trello.com/c/Aex0NkjK) 
+- Fixed connection pool hanging with DomCapture. [Trello 1144](https://trello.com/c/Aex0NkjK) 
 
 ## [3.158.5] - 2019-11-08
 ### Fixed
--CSS scrolling in chrome 78. [Trello 1206](https://trello.com/c/euVqe1Sv) 
+- CSS scrolling in chrome 78. [Trello 1206](https://trello.com/c/euVqe1Sv) 
 
 ## [3.158.4] - 2019-10-23
 ### Fixed
