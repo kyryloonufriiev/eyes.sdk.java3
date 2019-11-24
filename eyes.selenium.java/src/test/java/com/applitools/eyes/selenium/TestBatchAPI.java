@@ -30,16 +30,16 @@ public final class TestBatchAPI {
             eyes = new Eyes(runner);
             eyes.setLogHandler(new FileLogger("runnerTest.log", false, true));
 //        eyes.setLogHandler(new StdoutLogHandler(true));
-            eyes.setServerUrl("https://eyesfabric4eyes.applitools.com/");
 //        eyes.setProxy(new ProxySettings("http://127.0.0.1:8888"));
 
-            // Switch sendDom flag on
-            eyes.setSendDom(true);
-            eyes.setStitchMode(StitchMode.CSS);
-            batchInfo = new BatchInfo("Runner Testing");
-            eyes.setBatch(batchInfo);
-            eyes.setApiKey("CAE7aS103TDz7XyegELya3tHpEIXTFi0gBBwvgq104PSHIU110");
-            // Navigate the browser to the "hello world!" web-site.
+        // Switch sendDom flag on
+        eyes.setSendDom(true);
+        eyes.setStitchMode(StitchMode.CSS);
+        batchInfo = new BatchInfo("Runner Testing");
+        eyes.setBatch(batchInfo);
+        // Navigate the browser to the "hello world!" web-site.
+//        eyes.setProxy(new ProxySettings("http://127.0.0.1:8888"));
+
 //        driver.get("https://applitools.com/helloworld");
 
             eyes.open(driver, "Applitools Eyes Java SDK", "Classic Runner Test",
