@@ -121,5 +121,14 @@
             </class>
         </classes>
     </test>
+    <test name="TestBatchAPI">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestBatchAPI">
+                <methods>
+                    <include name="testCloseBatch"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 
 </suite>
