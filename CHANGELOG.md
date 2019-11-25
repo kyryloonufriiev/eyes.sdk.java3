@@ -1,6 +1,6 @@
 ### Fixed
--Fixed ensuring eyes open before check. [Trello 722](https://trello.com/c/JgXaAhPo)
--Fixed creation of new Rest client when closing batches. [Trello 1327](https://trello.com/c/Jdoj8AQ9) 
+- Fixed ensuring eyes open before check. [Trello 722](https://trello.com/c/JgXaAhPo)
+- Fixed creation of new Rest client when closing batches. [Trello 1327](https://trello.com/c/Jdoj8AQ9) 
 
 ## [3.158.8] - 2019-11-22
 ### Fixed
