@@ -596,7 +596,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
             logger.log(String.format("check('%s', %s): Ignored", name, checkSettings));
             return;
         }
-
+        ArgumentGuard.isValidState(isOpen, "Eyes not open");
         ArgumentGuard.notNull(checkSettings, "checkSettings");
         if (name != null) {
             checkSettings = checkSettings.withName(name);
