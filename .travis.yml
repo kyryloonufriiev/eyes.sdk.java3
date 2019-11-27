@@ -21,18 +21,21 @@ jobs:
         - unzip chromedriver_linux64.zip -d /home/travis/build/
         - env webdriver.chrome.driver=/home/travis/build/
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE- ]]; then
+        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
           mvn versions:set -DnewVersion=$SDK_VERSION;
           mvn versions:commit;
           git add --all;
           git commit -m 'update pom version';
           git push origin HEAD:$RELEASE_BRANCH;
-          sed -i 's/devTestsSuite.xml/regressionTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
-        - mvn test -e -X
+        - if [[ $TRAVIS_TAG =~ ^FULL_COVERAGE_TESTS ]]; then
+          sed -i 's/regressionTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
+          fi
+        - chmod +x ./runTests.sh
+        - ./runTests.sh
     - stage: deploy
-      if: tag =~ ^RELEASE_CANDIDATE- AND fork == false
+      if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:
         #         save the email of the person who did this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"

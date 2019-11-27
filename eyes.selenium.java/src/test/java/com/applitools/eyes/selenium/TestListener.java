@@ -276,7 +276,7 @@ public class TestListener implements ITestListener {
         finalJsonObject.addProperty("sdk", "java");
         finalJsonObject.addProperty("id", suiteId.get());
         String travisGitTag = System.getenv("TRAVIS_TAG");
-        if (travisGitTag == null || !travisGitTag.contains("RELEASE_CANDIDATE-")){
+        if (travisGitTag == null || !travisGitTag.contains("RELEASE_CANDIDATE")){
             finalJsonObject.addProperty("sandbox", true);
         }
         finalJsonObject.add("results", resultsJsonArray);
