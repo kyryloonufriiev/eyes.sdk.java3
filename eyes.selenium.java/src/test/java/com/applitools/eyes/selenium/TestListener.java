@@ -57,6 +57,8 @@ public class TestListener implements ITestListener {
             if (!afterMethodSuccess((TestSetup) instance, result.getMethod().getMethodName(), result)) {
                 result.setStatus(ITestResult.FAILURE);
             }
+        } else {
+            sendTestResluts(result, result.isSuccess());
         }
     }
 
@@ -68,6 +70,9 @@ public class TestListener implements ITestListener {
             TestSetup testSetup = (TestSetup) instance;
             GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), result.getThrowable());
             afterMethodFailure(testSetup, result);
+        } else {
+            sendTestResluts(result, result.isSuccess());
+            sendExtraData(result.getMethod().getMethodName(), result, result.getThrowable());
         }
     }
 
@@ -82,6 +87,9 @@ public class TestListener implements ITestListener {
         Object instance = result.getInstance();
         if (instance instanceof TestSetup) {
             afterMethodFailure((TestSetup) instance, result);
+        } else {
+            sendTestResluts(result, result.isSuccess());
+            sendExtraData(result.getMethod().getMethodName(), result, result.getThrowable());
         }
     }
 
