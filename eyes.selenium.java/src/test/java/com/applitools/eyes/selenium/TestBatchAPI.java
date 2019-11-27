@@ -8,8 +8,10 @@ import com.applitools.eyes.utils.CommUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+@Listeners(TestListener.class)
 public final class TestBatchAPI {
     @Test
     public void testCloseBatch() {
