@@ -39,4 +39,11 @@
         </classes>
     </test>
 
+    <test name="TestBatchAPI">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestBatchAPI">
+            </class>
+        </classes>
+    </test>
+
 </suite>
