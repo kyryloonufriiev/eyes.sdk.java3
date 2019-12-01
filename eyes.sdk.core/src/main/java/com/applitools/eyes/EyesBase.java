@@ -910,10 +910,9 @@ public abstract class EyesBase implements IEyesBase{
         AppOutputProvider appOutputProvider = new AppOutputProvider() {
             public AppOutputWithScreenshot getAppOutput(
                     Region region,
-                    EyesScreenshot lastScreenshot,
                     ICheckSettingsInternal checkSettingsInternal) {
                 // FIXME - If we use compression here it hurts us later (because of another screenshot order).
-                return getAppOutputWithScreenshot(region, null, null);
+                return getAppOutputWithScreenshot(region, null);
             }
         };
 
@@ -1069,9 +1068,9 @@ public abstract class EyesBase implements IEyesBase{
                 // A callback which will call getAppOutput
                 new AppOutputProvider() {
                     @Override
-                    public AppOutputWithScreenshot getAppOutput(Region region, EyesScreenshot lastScreenshot,
+                    public AppOutputWithScreenshot getAppOutput(Region region,
                                                                 ICheckSettingsInternal checkSettingsInternal) {
-                        return getAppOutputWithScreenshot(region, lastScreenshot, checkSettingsInternal);
+                        return getAppOutputWithScreenshot(region, checkSettingsInternal);
                     }
                 }
         );
@@ -1378,11 +1377,10 @@ public abstract class EyesBase implements IEyesBase{
 
     /**
      * @param region         The region of the screenshot which will be set in the application output.
-     * @param lastScreenshot Previous application screenshot (used for compression) or {@code null} if not available.
      * @return The updated app output and screenshot.
      */
     private AppOutputWithScreenshot getAppOutputWithScreenshot(
-            Region region, EyesScreenshot lastScreenshot, ICheckSettingsInternal checkSettingsInternal) {
+            Region region, ICheckSettingsInternal checkSettingsInternal) {
 
         logger.verbose("getting screenshot...");
         // Getting the screenshot (abstract function implemented by each SDK).
@@ -1398,7 +1396,10 @@ public abstract class EyesBase implements IEyesBase{
         }
 
         logger.verbose("Compressing screenshot...");
-        String compressResult = compressScreenshot64(screenshot);
+        BufferedImage screenshotImage = screenshot.getImage();
+        byte[] pngBytes = ImageUtils.encodeAsPng(screenshotImage);
+        String compressResult = Base64.encodeBase64String(pngBytes);
+
         logger.verbose("Done! Getting title...");
         String title = getTitle();
         logger.verbose("Done!");
@@ -1406,33 +1407,6 @@ public abstract class EyesBase implements IEyesBase{
         AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, compressResult, screenshot.domUrl, null), screenshot, location);
         logger.verbose("Done!");
         return result;
-    }
-
-    /**
-     * Compresses a given screenshot.
-     * @param screenshot     The screenshot to compress.
-     * @return A base64 encoded compressed screenshot.
-     */
-    private String compressScreenshot64(EyesScreenshot screenshot) {
-
-        ArgumentGuard.notNull(screenshot, "screenshot");
-
-        BufferedImage screenshotImage = screenshot.getImage();
-        byte[] uncompressed = ImageUtils.encodeAsPng(screenshotImage);
-
-//        BufferedImage source = (lastScreenshot != null) ?
-//                lastScreenshot.getImage() : null;
-
-//        // Compressing the screenshot
-//        byte[] compressedScreenshot;
-//        try {
-//            compressedScreenshot = ImageDeltaCompressor.compressByRawBlocks(
-//                    screenshotImage, uncompressed, source);
-//        } catch (IOException e) {
-//            throw new EyesException("Failed to compress screenshot!", e);
-//        }
-
-        return Base64.encodeBase64String(uncompressed);
     }
 
     public void log(String message) {
