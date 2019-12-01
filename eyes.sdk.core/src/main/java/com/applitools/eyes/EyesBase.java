@@ -27,7 +27,6 @@ import com.applitools.utils.*;
 import org.apache.commons.codec.binary.Base64;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayDeque;
@@ -1399,7 +1398,7 @@ public abstract class EyesBase implements IEyesBase{
         }
 
         logger.verbose("Compressing screenshot...");
-        String compressResult = compressScreenshot64(screenshot, lastScreenshot);
+        String compressResult = compressScreenshot64(screenshot);
         logger.verbose("Done! Getting title...");
         String title = getTitle();
         logger.verbose("Done!");
@@ -1412,30 +1411,28 @@ public abstract class EyesBase implements IEyesBase{
     /**
      * Compresses a given screenshot.
      * @param screenshot     The screenshot to compress.
-     * @param lastScreenshot The previous screenshot, or null.
      * @return A base64 encoded compressed screenshot.
      */
-    private String compressScreenshot64(EyesScreenshot screenshot,
-                                        EyesScreenshot lastScreenshot) {
+    private String compressScreenshot64(EyesScreenshot screenshot) {
 
         ArgumentGuard.notNull(screenshot, "screenshot");
 
         BufferedImage screenshotImage = screenshot.getImage();
         byte[] uncompressed = ImageUtils.encodeAsPng(screenshotImage);
 
-        BufferedImage source = (lastScreenshot != null) ?
-                lastScreenshot.getImage() : null;
+//        BufferedImage source = (lastScreenshot != null) ?
+//                lastScreenshot.getImage() : null;
 
-        // Compressing the screenshot
-        byte[] compressedScreenshot;
-        try {
-            compressedScreenshot = ImageDeltaCompressor.compressByRawBlocks(
-                    screenshotImage, uncompressed, source);
-        } catch (IOException e) {
-            throw new EyesException("Failed to compress screenshot!", e);
-        }
+//        // Compressing the screenshot
+//        byte[] compressedScreenshot;
+//        try {
+//            compressedScreenshot = ImageDeltaCompressor.compressByRawBlocks(
+//                    screenshotImage, uncompressed, source);
+//        } catch (IOException e) {
+//            throw new EyesException("Failed to compress screenshot!", e);
+//        }
 
-        return Base64.encodeBase64String(compressedScreenshot);
+        return Base64.encodeBase64String(uncompressed);
     }
 
     public void log(String message) {
