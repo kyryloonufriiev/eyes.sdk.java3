@@ -19,6 +19,9 @@ public class  RenderRequest {
     @JsonInclude
     private String agentId = "eyes.selenium.visualgrid.java/3.158.8";
 
+    @JsonInclude
+    private String stitchingServiceUrl;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String webhook;
 
@@ -49,7 +52,7 @@ public class  RenderRequest {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private boolean sendDom;
 
-    public RenderRequest(String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo, String platform, String browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor, boolean sendDom, VisualGridTask visualGridTask) {
+    public RenderRequest(String webHook, String url, RGridDom dom, Map<String, RGridResource> resources, RenderInfo renderInfo, String platform, String browserName, Object scriptHooks, List<VisualGridSelector> selectorsToFindRegionsFor, boolean sendDom, VisualGridTask visualGridTask, String stitchingServiceUrl) {
         this.webhook = webHook;
         this.url = url;
         this.dom = dom;
@@ -61,7 +64,7 @@ public class  RenderRequest {
         this.selectorsToFindRegionsFor = selectorsToFindRegionsFor;
         this.sendDom = sendDom;
         this.visualGridTask = visualGridTask;
-
+        this.stitchingServiceUrl = stitchingServiceUrl;
     }
 
     public String getUrl() {
@@ -163,6 +166,14 @@ public class  RenderRequest {
 
     public void setRenderId(String renderId) {
         this.renderId = renderId;
+    }
+
+    public String getStitchingServiceUrl() {
+        return stitchingServiceUrl;
+    }
+
+    public void setStitchingServiceUrl(String stitchingServiceUrl) {
+        this.stitchingServiceUrl = stitchingServiceUrl;
     }
 
     @Override
