@@ -552,7 +552,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),
-                    checkSettingsInternal.getScriptHooks(), regionSelectorsList, checkSettingsInternal.isSendDom(), visualGridTask);
+                    checkSettingsInternal.getScriptHooks(), regionSelectorsList, checkSettingsInternal.isSendDom(), visualGridTask, this.renderingInfo.getStitchingServiceUrl());
 
             allRequestsForRG.add(request);
         }
