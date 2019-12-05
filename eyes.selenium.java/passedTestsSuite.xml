@@ -160,9 +160,9 @@
 
     <test name="Proxy_Test">
         <classes>
-            <class name="com.applitools.eyes.selenium.ProxyTest">
+            <class name="com.applitools.eyes.selenium.TestProxy">
                 <methods>
-                    <include name="checkNetworkThroughProxy" />
+                    <include name="testNetworkThroughProxy" />
                 </methods>
             </class>
         </classes>

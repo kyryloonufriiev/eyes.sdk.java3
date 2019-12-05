@@ -11,10 +11,10 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 
 @Listeners(TestListener.class)
-public class ProxyTest {
+public class TestProxy {
 
     @Test
-    public void checkNetworkThroughProxy() throws IOException, InterruptedException {
+    public void testNetworkThroughProxy() throws IOException, InterruptedException {
         checkNetworkPassThroughProxy();
         checkNetworkFailIfNoProxy();
     }
