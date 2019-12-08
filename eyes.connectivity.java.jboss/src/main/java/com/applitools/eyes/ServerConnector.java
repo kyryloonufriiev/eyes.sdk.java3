@@ -390,7 +390,7 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public IResourceFuture downloadResource(final URL url, String userAgent) {
+    public IResourceFuture downloadResource(final URL url, String userAgent, ResourceFuture resourceFuture) {
         Client client = RestClient.buildRestClient(getTimeout(), getProxy());
 
         WebTarget target = client.target(url.toString());
@@ -399,7 +399,7 @@ public class ServerConnector extends RestClient
 
         request.header("User-Agent", userAgent);
 
-        final IResourceFuture newFuture = new ResourceFuture(url.toString(), logger, this, userAgent);
+        final IResourceFuture newFuture = resourceFuture == null ? new ResourceFuture(url.toString(), logger, this, userAgent) : resourceFuture;
 
         Future<Response> responseFuture = request.async().get(new InvocationCallback<Response>() {
             @Override

@@ -2,8 +2,8 @@ package com.applitools.eyes.visualgrid;
 
 import com.applitools.eyes.IServerConnector;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.eyes.visualgrid.model.RGridResource;
+import com.applitools.eyes.visualgrid.services.IResourceFuture;
 import com.applitools.utils.GeneralUtils;
 
 import java.net.MalformedURLException;
@@ -53,10 +53,11 @@ public class ResourceFuture implements IResourceFuture {
     @Override
     public RGridResource get() throws InterruptedException {
         logger.verbose("entering - " + url);
+        if (rgResource != null) return rgResource;
         synchronized (url) {
             if (this.responseFuture == null) {
                 try {
-                    IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent);
+                    IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent, this);
                     this.responseFuture = ((ResourceFuture) newFuture).responseFuture;
                 } catch (MalformedURLException malformedUrlException) {
                     GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);
@@ -72,7 +73,7 @@ public class ResourceFuture implements IResourceFuture {
                     logger.verbose("Entering retry for - " + url);
                     try {
                         Thread.sleep(300);
-                        IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent);
+                        IResourceFuture newFuture = serverConnector.downloadResource(new URL(this.url), userAgent, this);
                         this.responseFuture = ((ResourceFuture) newFuture).responseFuture;
                     } catch (MalformedURLException malformedUrlException) {
                         GeneralUtils.logExceptionStackTrace(logger, malformedUrlException);

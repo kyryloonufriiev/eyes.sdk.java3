@@ -1,8 +1,9 @@
 package com.applitools.eyes;
 
 import com.applitools.IResourceUploadListener;
-import com.applitools.eyes.visualgrid.services.IResourceFuture;
+import com.applitools.eyes.visualgrid.ResourceFuture;
 import com.applitools.eyes.visualgrid.model.*;
+import com.applitools.eyes.visualgrid.services.IResourceFuture;
 
 import java.net.URI;
 import java.net.URL;
@@ -107,11 +108,12 @@ public interface IServerConnector {
     /**
      * Downloads string from a given Url.
      *
-     * @param uri The URI from which the IServerConnector will download the string
-     * @param userAgent user agent to send to server
+     * @param uri            The URI from which the IServerConnector will download the string
+     * @param userAgent      user agent to send to server
+     * @param resourceFuture
      * @return A future which will be resolved when the resources is downloaded.
      */
-    IResourceFuture downloadResource(URL uri, String userAgent);
+    IResourceFuture downloadResource(URL uri, String userAgent, ResourceFuture resourceFuture);
 
 
     /**

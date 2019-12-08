@@ -3,13 +3,13 @@ package com.applitools.eyes.selenium.rendering;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.config.*;
+import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.selenium.IConfigurationGetter;
 import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
+import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.IResourceFuture;
-import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 
 import java.net.URI;
@@ -55,7 +55,7 @@ class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
 
     @Override
     public IResourceFuture getResource(URL url, String userAgent) {
-        return this.serverConnector.downloadResource(url, userAgent);
+        return this.serverConnector.downloadResource(url, userAgent, null);
     }
 
     @Override
@@ -92,7 +92,7 @@ class EyesConnector extends EyesBase implements IEyesConnector , IBatchCloser {
 
         MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, this.serverConnector, this.runningSession, getConfigGetter().getMatchTimeout(), this);
 
-        ImageMatchSettings imageMatchSettings = matchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
+        ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
 
         String tag = checkSettingsInternal.getName();
 
