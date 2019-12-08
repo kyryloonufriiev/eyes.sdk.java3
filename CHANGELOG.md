@@ -2,7 +2,9 @@
 - Fixed ensuring eyes open before check. [Trello 722](https://trello.com/c/JgXaAhPo)
 - Fixed creation of new Rest client when closing batches. [Trello 1327](https://trello.com/c/Jdoj8AQ9) 
 - ImageDeltaCompressor. Images are no longer compressed by delta to the previous image. [Trello 1361](https://trello.com/c/AZiEB8bP) 
-- Added new stitchingServiceUrl field to RenderingInfo and RenderRequest [Trello 1368](https://trello.com/c/RkBRBJCu) 
+- Added new stitchingServiceUrl field to RenderingInfo and RenderRequest [Trello 1368](https://trello.com/c/RkBRBJCu)
+- Hackathon bugfix 1238 env variable verification. [Trello 1238](https://trello.com/c/5Hy0nGkN) 
+- Bugfix 362 incorrect menu rendering visual grid . [Trello 362](https://trello.com/c/cWdSJeMy) 
 
 ## [3.158.8] - 2019-11-22
 ### Fixed
@@ -15,6 +17,7 @@
 ## [3.158.6] - 2019-11-13
 ### Fixed
 - Fixed connection pool hanging with DomCapture. [Trello 1144](https://trello.com/c/Aex0NkjK) 
+ 
 
 ## [3.158.5] - 2019-11-08
 ### Fixed
