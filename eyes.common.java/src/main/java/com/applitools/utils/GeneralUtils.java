@@ -5,6 +5,7 @@ import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.config.IConfigurationGetter;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -15,7 +16,10 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -286,6 +290,7 @@ public class GeneralUtils {
      */
     public static <T> T parseJsonToObject(String executeScripString, Class<T> tClass) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         T executeScriptMap;
         if (tClass != null) {
             executeScriptMap = mapper.readValue(executeScripString, tClass);
