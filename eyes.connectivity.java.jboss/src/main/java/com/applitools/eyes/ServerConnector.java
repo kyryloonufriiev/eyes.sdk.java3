@@ -57,18 +57,11 @@ public class ServerConnector extends RestClient
      * @param logger A logger instance.
      */
     public ServerConnector(Logger logger) {
-        this(logger, GeneralUtils.getDefaultServerUrl());
-    }
-
-    /***
-     * @param serverUrl The URI of the Eyes server.
-     */
-    public ServerConnector(URI serverUrl) {
-        this(null, serverUrl);
+        this(logger, GeneralUtils.geServerUrl());
     }
 
     public ServerConnector() {
-        this((Logger) null);
+        this(null);
     }
 
     /**
@@ -721,8 +714,8 @@ public class ServerConnector extends RestClient
 
     @Override
     public void closeBatch(String batchId) {
-        boolean dontCloseBatchesStr = GeneralUtils.getDontCloseBatches();
-        if (dontCloseBatchesStr){
+        if (getDontCloseBatches())
+        {
             logger.log("APPLITOOLS_DONT_CLOSE_BATCHES environment variable set to true. Skipping batch close.");
             return;
         }
@@ -742,6 +735,11 @@ public class ServerConnector extends RestClient
         if (restClient != null) {
             restClient.close();
         }
+    }
+
+    @Override
+    public boolean getDontCloseBatches() {
+        return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
     }
 
     private byte[] downloadFile(Response response) {
