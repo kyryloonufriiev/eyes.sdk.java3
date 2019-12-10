@@ -14,8 +14,8 @@ accessibility
 batch completion
 multiple viewport sizes
 visual locators
-css stiching
-scroll stiching
+css stitching
+scroll stitching
 iframes
 Ultrafast Grid
 Screenshots
