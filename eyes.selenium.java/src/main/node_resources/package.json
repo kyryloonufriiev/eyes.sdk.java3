@@ -3,6 +3,6 @@
   "description": "required javascript scripts",
   "dependencies": {
     "@applitools/dom-capture": "^7.1.2",
-    "@applitools/dom-snapshot": "^3.1.4"
+    "@applitools/dom-snapshot": "^3.2.1"
   }
 }
