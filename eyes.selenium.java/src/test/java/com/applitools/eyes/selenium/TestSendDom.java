@@ -92,35 +92,37 @@ public final class TestSendDom {
         }
     }
 
-//    @Test
-//    public void TestSendDOM_FullWindow() {
-//        WebDriver webDriver = SeleniumUtils.createChromeDriver();
-//        webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
-//        DomInterceptingEyes eyes = new DomInterceptingEyes();
-//        eyes.setBatch(TestDataProvider.batchInfo);
-//        config.setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
-//        EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
-//        try {
-//            eyes.check("Window", Target.window().fully());
-//            String actualDomJsonString = eyes.getDomJson();
-//
-//            TestResults results = eyes.close(false);
-//            boolean hasDom = getHasDom(eyes, results);
-//            Assert.assertTrue(hasDom);
-//            ObjectMapper mapper = new ObjectMapper();
-//            try {
-//                String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/expected_dom1.json"));
-//                JsonNode actual = mapper.readTree(actualDomJsonString);
-//                JsonNode expected = mapper.readTree(expectedDomJson);
-//                Assert.assertTrue(actual.equals(expected));
-//            } catch (IOException e) {
-//                GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
-//            }
-//        } finally {
-//            eyes.abort();
-//            webDriver.quit();
-//        }
-//    }
+    @Test
+    public void TestSendDOM_FullWindow() {
+        WebDriver webDriver = SeleniumUtils.createChromeDriver();
+        webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
+        DomInterceptingEyes eyes = new DomInterceptingEyes();
+        eyes.setBatch(TestDataProvider.batchInfo);
+        eyes.getConfigSetter().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
+        EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
+        try {
+            eyes.check("Window", Target.window().fully());
+            String actualDomJsonString = eyes.getDomJson();
+
+            TestResults results = eyes.close(false);
+            boolean hasDom = getHasDom(eyes, results);
+            Assert.assertTrue(hasDom);
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String expectedDomJson = GeneralUtils.readToEnd(TestSendDom.class.getResourceAsStream("/expected_dom1.json"));
+                JsonNode actual = mapper.readTree(actualDomJsonString);
+                JsonNode expected = mapper.readTree(expectedDomJson);
+                Assert.assertTrue(actual.equals(expected));
+            } catch (IOException e) {
+                GeneralUtils.logExceptionStackTrace(eyes.getLogger(), e);
+            }
+        }
+        finally {
+            eyes.abort();
+            webDriver.quit();
+        }
+    }
+
 
 //    //@Test
 //    public void TestSendDOM_Simple_HTML() {
