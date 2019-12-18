@@ -16,6 +16,7 @@ import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -23,6 +24,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -279,12 +281,7 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
     public Collection<Future<TestResultContainer>> abortIfNotClosed() {
-        List<Future<TestResultContainer>> futures = new ArrayList<>();
-        for (RunningTest runningTest : testList) {
-            Future<TestResultContainer> future = runningTest.abortIfNotClosed();
-            futures.add(future);
-        }
-        return futures;
+        return abortAndCollectTasks();
     }
 
     public boolean getIsOpen() {
@@ -508,8 +505,10 @@ public class VisualGridEyes implements IRenderingEyes {
             String resultAsString;
             ScriptResponse.Status status = null;
             ScriptResponse scriptResponse = null;
+            String strToBase64Script = " function stringToBase64(r){function n(r){return r<26?r+65:r<52?r+71:r<62?r-4:62===r?43:63===r?47:65}return function(r){for(var t,e=(3-r.length%3)%3,o=\"\",u=r.length,a=0,f=0;f<u;f++)t=f%3,a|=r[f]<<(16>>>t&24),2!==t&&r.length-f!=1||(o+=String.fromCharCode(n(a>>>18&63),n(a>>>12&63),n(a>>>6&63),n(63&a)),a=0);return 0===e?o:o.substring(0,o.length-e)+(1===e?\"=\":\"==\")}(function(r){for(var n,t,e=r.length,o=0,u=0;u<e;u++)o+=(t=r.charCodeAt(u))<128?1:t<2048?2:t<65536?3:t<2097152?4:t<67108864?5:6;n=new Uint8Array(o);for(var a=0,f=0;a<o;f++)(t=r.charCodeAt(f))<128?n[a++]=t:t<2048?(n[a++]=192+(t>>>6),n[a++]=128+(63&t)):t<65536?(n[a++]=224+(t>>>12),n[a++]=128+(t>>>6&63),n[a++]=128+(63&t)):t<2097152?(n[a++]=240+(t>>>18),n[a++]=128+(t>>>12&63),n[a++]=128+(t>>>6&63),n[a++]=128+(63&t)):t<67108864?(n[a++]=248+(t>>>24),n[a++]=128+(t>>>18&63),n[a++]=128+(t>>>12&63),n[a++]=128+(t>>>6&63),n[a++]=128+(63&t)):(n[a++]=252+(t>>>30),n[a++]=128+(t>>>24&63),n[a++]=128+(t>>>18&63),n[a++]=128+(t>>>12&63),n[a++]=128+(t>>>6&63),n[a++]=128+(63&t));return n}(r))}";
             do {
-                resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + "return __processPageAndSerializePoll();");
+                resultAsString = (String) this.webDriver.executeScript(PROCESS_RESOURCES + strToBase64Script + "; return stringToBase64(__processPageAndSerializePoll());");
+                resultAsString = decodeB64(resultAsString);
                 try {
                     scriptResponse = GeneralUtils.parseJsonToObject(resultAsString, ScriptResponse.class);
                     logger.verbose("Dom extraction polling...");
@@ -588,6 +587,15 @@ public class VisualGridEyes implements IRenderingEyes {
                 timer.cancel();
             }
         }
+    }
+
+    private String decodeB64(String resultAsString) {
+        org.apache.commons.codec.binary.Base64 codec = new Base64();
+//        byte[] decode = DatatypeConverter.parseBase64Binary(resultAsString);
+        byte[] decode = codec.decode(resultAsString);
+        String result = null;
+        result = new String(decode, StandardCharsets.UTF_8);
+        return result;
     }
 
     private void waitBeforeDomSnapshot() {
@@ -898,7 +906,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
     private void abort(Throwable e) {
         for (RunningTest runningTest : testList) {
-            runningTest.abort(e);
+            runningTest.abort(true, e);
         }
     }
 
@@ -933,5 +941,22 @@ public class VisualGridEyes implements IRenderingEyes {
     @Override
     public String getBatchId() {
         return this.getConfigGetter().getBatch().getId();
+    }
+
+    public void abortAsync()
+    {
+        abortAndCollectTasks();
+    }
+
+    private List<Future<TestResultContainer>> abortAndCollectTasks()
+    {
+        List<Future<TestResultContainer>> tasks = new ArrayList<>();
+        for(RunningTest runningTest : testList)
+        {
+            Future<TestResultContainer> task = runningTest.abort(false, null);
+            tasks.add(task);
+        }
+
+        return tasks;
     }
 }
