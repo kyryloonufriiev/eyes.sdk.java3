@@ -269,7 +269,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
 
     public void abortRunningTest(Throwable exception) {
-        runningTest.abort(exception);
+        runningTest.abort(true, exception);
     }
 
     @Override

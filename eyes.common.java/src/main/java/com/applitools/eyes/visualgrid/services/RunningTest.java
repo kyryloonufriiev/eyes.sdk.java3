@@ -43,12 +43,12 @@ public class RunningTest {
         this.testName = configurationProvider.get().getTestName();
     }
 
-    public Future<TestResultContainer> abort(Throwable e) {
+    public Future<TestResultContainer> abort( boolean forceAbort, Throwable e) {
         removeAllCheckTasks();
         if (isOpenTaskIssued()) {
             openTask.setException(e);
         }
-        if(closeTask != null && closeTask.getType() == VisualGridTask.TaskType.CLOSE){
+        if(forceAbort && closeTask != null && closeTask.getType() == VisualGridTask.TaskType.CLOSE){
             closeTask.setExceptionAndAbort(e);
         }
         if (closeTask == null) {
@@ -74,11 +74,6 @@ public class RunningTest {
             if (next.getType() == VisualGridTask.TaskType.CHECK) iterator.remove();
 
         }
-    }
-
-    public Future<TestResultContainer> abortIfNotClosed() {
-        if (isCloseTaskIssued.get() && closeTask.isSent()) return null;
-        return abort(null);
     }
 
     public boolean isCloseTaskIssued() {

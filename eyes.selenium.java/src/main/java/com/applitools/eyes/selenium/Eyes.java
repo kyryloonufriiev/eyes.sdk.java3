@@ -167,6 +167,15 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
         return testResults;
     }
 
+    public void abortAsync(){
+        if (isVisualGridEyes) {
+            visualGridEyes.abortAsync();
+        }
+        else{
+            seleniumEyes.abortAsync();
+        }
+    }
+
     /**
      * Gets is disabled.
      *

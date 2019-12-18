@@ -1,3 +1,6 @@
+###Fixed
+- Java SDK was missing abortAsync. [Trello 1420](https://trello.com/c/3NOKuLLj)
+
 ## [3.158.9] - 2019-12-12
 ### Fixed
 - Fixed ensuring eyes open before check. [Trello 722](https://trello.com/c/JgXaAhPo)

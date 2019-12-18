@@ -279,12 +279,7 @@ public class VisualGridEyes implements IRenderingEyes {
     }
 
     public Collection<Future<TestResultContainer>> abortIfNotClosed() {
-        List<Future<TestResultContainer>> futures = new ArrayList<>();
-        for (RunningTest runningTest : testList) {
-            Future<TestResultContainer> future = runningTest.abortIfNotClosed();
-            futures.add(future);
-        }
-        return futures;
+        return abortAndCollectTasks();
     }
 
     public boolean getIsOpen() {
@@ -898,7 +893,7 @@ public class VisualGridEyes implements IRenderingEyes {
 
     private void abort(Throwable e) {
         for (RunningTest runningTest : testList) {
-            runningTest.abort(e);
+            runningTest.abort(true, e);
         }
     }
 
@@ -933,5 +928,22 @@ public class VisualGridEyes implements IRenderingEyes {
     @Override
     public String getBatchId() {
         return this.getConfigGetter().getBatch().getId();
+    }
+
+    public void abortAsync()
+    {
+        abortAndCollectTasks();
+    }
+
+    private List<Future<TestResultContainer>> abortAndCollectTasks()
+    {
+        List<Future<TestResultContainer>> tasks = new ArrayList<>();
+        for(RunningTest runningTest : testList)
+        {
+            Future<TestResultContainer> task = runningTest.abort(false, null);
+            tasks.add(task);
+        }
+
+        return tasks;
     }
 }

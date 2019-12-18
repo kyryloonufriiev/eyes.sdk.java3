@@ -28,5 +28,7 @@ public interface IEyesBase {
 
     TestResults abortIfNotClosed();
 
+    void abortAsync();
+
     TestResults abort();
 }
