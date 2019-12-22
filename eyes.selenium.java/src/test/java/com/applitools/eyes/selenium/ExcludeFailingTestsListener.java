@@ -10,6 +10,7 @@ import java.util.*;
  * Implement this listener by adding it to your TestNG suite.
  * To exclude a test add a parameter in the suite with key: "dont_run", value: "methodName+dataProviderInstance"
  * Example: <parameter name="dont_run" value="test+CSS"></parameter>
+ * Example: <parameter name="dont_run" value="TestIOSSafariCrop_SauceLabs+iPhone XR Simulator+12.2+PORTRAIT+true+scrolled_mobile"></parameter>
  */
 public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
 
