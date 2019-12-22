@@ -87,7 +87,7 @@ public class TestMobileDevices {
                     {"iPhone 5s Simulator", "10.3", ScreenOrientation.LANDSCAPE, true}
             }));
         }
-        devices = AddPageOrientation(devices);
+        devices = addPageType(devices);
         return devices.toArray(new Object[0][]);
     }
 
@@ -97,7 +97,7 @@ public class TestMobileDevices {
                 {"Android Emulator", "8.0", ScreenOrientation.PORTRAIT, false},
                 {"Android Emulator", "8.0", ScreenOrientation.LANDSCAPE, true}
         });
-        devices = AddPageOrientation(devices);
+        devices = addPageType(devices);
         return devices.toArray(new Object[0][]);
     }
 
@@ -144,7 +144,7 @@ public class TestMobileDevices {
         }
     }
 
-    private static List<Object[]> AddPageOrientation(List<Object[]> devices)
+    private static List<Object[]> addPageType(List<Object[]> devices)
     {
         List<Object[]> devicesWithPage = new ArrayList<Object[]>();
         for(String page : Arrays.asList(new String[]{"mobile", "desktop", "scrolled_mobile"}))
