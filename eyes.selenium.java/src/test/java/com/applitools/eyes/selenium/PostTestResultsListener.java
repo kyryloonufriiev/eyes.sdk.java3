@@ -113,6 +113,7 @@ public class PostTestResultsListener implements ITestListener {
         JsonObject finalJsonObject = new JsonObject();
         finalJsonObject.addProperty("sdk", "java");
         finalJsonObject.addProperty("id", suiteId.get());
+        finalJsonObject.addProperty("group", "selenium");
         String travisGitTag = System.getenv("TRAVIS_TAG");
         if (travisGitTag == null || !travisGitTag.contains("RELEASE_CANDIDATE")){
             finalJsonObject.addProperty("sandbox", true);
