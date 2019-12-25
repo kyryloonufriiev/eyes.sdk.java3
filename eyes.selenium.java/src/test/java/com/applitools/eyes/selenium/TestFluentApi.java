@@ -11,6 +11,7 @@ import org.testng.annotations.Factory;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+@Listeners(TestListener.class)
 public class TestFluentApi extends TestSetup {
 
     @Factory(dataProvider = "dp", dataProviderClass = TestDataProvider.class)

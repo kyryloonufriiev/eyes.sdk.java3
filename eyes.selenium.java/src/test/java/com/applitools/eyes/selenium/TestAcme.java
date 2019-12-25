@@ -9,6 +9,7 @@ import org.testng.annotations.Factory;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+@Listeners(TestListener.class)
 @SuppressWarnings("SpellCheckingInspection")
 public class TestAcme extends TestSetup {
 

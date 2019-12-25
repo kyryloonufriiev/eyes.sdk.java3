@@ -2,6 +2,7 @@ package com.applitools.eyes.selenium;
 
 import org.testng.annotations.Listeners;
 
+@Listeners(TestListener.class)
 @SuppressWarnings("SpellCheckingInspection")
 public class TestCustomerWebsites {
 
