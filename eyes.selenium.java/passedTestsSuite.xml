@@ -158,12 +158,33 @@
             </class>
         </classes>
     </test>
-
+  
     <test name="Proxy_Test">
         <classes>
             <class name="com.applitools.eyes.selenium.TestProxy">
                 <methods>
                     <include name="testNetworkThroughProxy" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestDuplicates" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestDuplicates">
+                <methods>
+                    <include name="TestDuplicatedIFrames" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="TestScrollRootElement" parallel="methods">
+        <parameter name="dont_run"
+                   value="TestCheckWindow_Body+CSS"/>
+        <classes>
+            <class name="com.applitools.eyes.selenium.TestScrollRootElement">
+                <methods>
+                    <include name="TestCheckWindow_Body" />
+                    <include name="TestCheckWindow_Html" />
                 </methods>
             </class>
         </classes>
