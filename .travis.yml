@@ -10,6 +10,7 @@ dist: trusty
 addons:
   chrome: stable
 
+
 # env variables
 # $RELEASE_BRANCH
 # $GITHUB_TOKEN
