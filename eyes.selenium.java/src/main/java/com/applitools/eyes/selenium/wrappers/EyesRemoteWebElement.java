@@ -588,7 +588,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     @Override
     public String toString() {
-        return "EyesRemoteWebElement:" + webElement.toString();
+        return "EyesRemoteWebElement: " + webElement.getId();
     }
 
     public PositionProvider getPositionProvider() {

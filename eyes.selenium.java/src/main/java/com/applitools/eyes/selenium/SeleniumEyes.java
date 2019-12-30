@@ -863,8 +863,6 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
             // FIXME - Scaling should be handled in a single place instead
             ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
 
-            EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
-            switchTo.frames(fc);
 
             EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
             regionToCheck = screenshot.getFrameWindow();
@@ -902,12 +900,6 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
                 }
             }
 
-            if (childFrame != null) {
-                logger.verbose("childFrame.Reference:         " + childFrame.getLocation());
-                if (childFrame.getScrollRootElement() != null) {
-                    logger.verbose("childFrame.ScrollRootElement: " + childFrame.getScrollRootElement());
-                }
-            }
             logger.verbose("scrollRootElement: " + scrollRootElement);
 
             PositionProvider positionProvider = getElementPositionProvider(scrollRootElement);
@@ -1099,15 +1091,18 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
         FrameChain fc = driver.getFrameChain().clone();
         Frame currentFrame = fc.peek();
         WebElement scrollRootElement = null;
-        if (currentFrame != null) {
+        if (currentFrame != null)
+        {
             scrollRootElement = currentFrame.getScrollRootElement();
         }
-        if (scrollRootElement == null && !EyesSeleniumUtils.isMobileDevice(this.driver)) {
+        else
+        {
             scrollRootElement = this.scrollRootElement;
+        }
 
-            if (scrollRootElement == null) {
-                scrollRootElement = driver.findElement(By.tagName("html"));
-            }
+        if (scrollRootElement == null)
+        {
+            scrollRootElement = driver.findElement(By.tagName("html"));
         }
         return scrollRootElement;
     }

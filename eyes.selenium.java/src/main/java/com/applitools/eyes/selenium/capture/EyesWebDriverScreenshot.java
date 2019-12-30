@@ -7,26 +7,28 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.exceptions.CoordinatesTypeConversionException;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.*;
+import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
+import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.ImageUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Iterator;
 
 public class EyesWebDriverScreenshot extends EyesScreenshot {
 
     public enum ScreenshotType {VIEWPORT, ENTIRE_FRAME}
 
-    private final EyesWebDriver driver;
+    private  EyesWebDriver driver;
     private final FrameChain frameChain;
-    private final Location currentFrameScrollPosition;
+    private Location currentFrameScrollPosition;
     private final ScreenshotType screenshotType;
 
     // The top/left coordinates of the frame window(!) relative to the top/left
@@ -39,70 +41,6 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
     // FIXME: 18/03/2018 Workaround specifically for regions
     //private final Region regionWindow;
-
-    private static Location getDefaultContentScrollPosition(Logger logger, FrameChain currentFrames, EyesWebDriver driver) {
-        IEyesJsExecutor jsExecutor = new SeleniumJavaScriptExecutor(driver);
-        Location defaultContentScrollPosition;
-        if (currentFrames.size() == 0) {
-            defaultContentScrollPosition = getDefaultContentScrollPosition(logger, driver, jsExecutor);
-        } else {
-            FrameChain originalFC = new FrameChain(logger, currentFrames);
-
-            EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
-            FrameChain currentFC = driver.getEyes().getOriginalFC();
-            switchTo.frames(currentFC);
-            defaultContentScrollPosition = getDefaultContentScrollPosition(logger, driver, jsExecutor);
-            switchTo.frames(originalFC);
-        }
-        return defaultContentScrollPosition;
-    }
-
-    private static Location getDefaultContentScrollPosition(Logger logger, EyesWebDriver driver, IEyesJsExecutor jsExecutor) {
-        WebElement scrollRootElement = driver.getEyes().getCurrentFrameScrollRootElement();
-        PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, scrollRootElement);
-        return positionProvider.getCurrentPosition();
-    }
-
-    public static Location calcFrameLocationInScreenshot(Logger logger, EyesWebDriver driver,
-                                                         FrameChain frameChain, ScreenshotType screenshotType) {
-
-        Location windowScroll = getDefaultContentScrollPosition(logger, frameChain, driver);
-
-        logger.verbose("windowScroll: " + windowScroll);
-
-        logger.verbose("Getting first frame...");
-        Iterator<Frame> frameIterator = frameChain.iterator();
-        Frame firstFrame = frameIterator.next();
-        Location locationInScreenshot = new Location(firstFrame.getLocation());
-        logger.verbose("Done! locationInScreenshot: " + locationInScreenshot);
-
-        // We only consider scroll of the default content if this is a viewport screenshot.
-        if (screenshotType == ScreenshotType.VIEWPORT) {
-            locationInScreenshot = locationInScreenshot.offset(-windowScroll.getX(), -windowScroll.getY());
-            logger.verbose("updated locationInScreenshot: " + locationInScreenshot);
-        }
-
-        logger.verbose("Iterating over frames...");
-        Frame frame;
-        while (frameIterator.hasNext()) {
-            logger.verbose("Getting next frame...");
-            frame = frameIterator.next();
-            logger.verbose("Done!");
-            Location frameLocation = frame.getLocation();
-            // For inner frames we must consider the scroll
-            Location frameOriginalLocation = frame.getOriginalLocation();
-            logger.verbose("Done! frameLocation: " + frameLocation + " ; frameOriginalLocation: " + frameOriginalLocation);
-            // Offsetting the location in the screenshot
-            locationInScreenshot = locationInScreenshot.offset(
-                    frameLocation.getX() - frameOriginalLocation.getX(),
-                    frameLocation.getY() - frameOriginalLocation.getY());
-            logger.verbose("updated locationInScreenshot: " + locationInScreenshot);
-        }
-        logger.verbose("Done! final locationInScreenshot: " + locationInScreenshot);
-
-        return locationInScreenshot;
-    }
-
     /**
      * @param logger                    A Logger instance.
      * @param driver                    The web driver used to get the screenshot.
@@ -122,51 +60,131 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         this.screenshotType = updateScreenshotType(screenshotType, image);
 
         PositionProvider positionProvider;
-        SeleniumEyes eyes = driver.getEyes();
-        PositionProvider currentFramePositionProvider = eyes.getCurrentFramePositionProvider();
-        if (frameLocationInScreenshot != null && eyes.checkFrameOrElement) {
-
-            positionProvider = eyes.getCurrentFramePositionProvider(); // TODO - ITAI - this is not the way I do it in C# !!!
-
-            // TODO - ITAI - THAT'S the way I do it in C#, but I don't have SeleniumScrollPositionProviderFactory.
-            //IWebElement frameScrollRoot = driver.Eyes.GetCurrentFrameScrollRootElement();
-            //positionProvider = SeleniumScrollPositionProviderFactory.GetPositionProvider(logger, driver.Eyes.StitchMode, driver, frameScrollRoot);
-
-            logger.verbose("position provider: using the current frame scroll root element's position provider: " + positionProvider);
-        } else if (currentFramePositionProvider != null) {
-            positionProvider = currentFramePositionProvider;
-            logger.verbose("position provider: using CurrentFramePositionProvider: " + positionProvider);
-        } else {
-            positionProvider = eyes.getPositionProvider();
-            logger.verbose("position provider: using PositionProvider: " + positionProvider);
+        if (frameLocationInScreenshot == null && driver.getEyes().checkFrameOrElement)
+        {
+            WebElement frameScrollRoot = driver.getEyes().getCurrentFrameScrollRootElement();
+            positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(),logger , driver, frameScrollRoot);
+            logger.verbose((String.format("position provider: using the current frame scroll root element's position provider: %s", positionProvider)));
         }
-        if (!EyesSeleniumUtils.isMobileDevice(driver)) {
-
-            this.frameChain = driver.getFrameChain();
-            RectangleSize frameSize = getFrameSize(positionProvider);
-            this.currentFrameScrollPosition = getUpdatedScrollPosition(positionProvider);
-            updateFrameLocationInScreenshot(frameLocationInScreenshot);
-
-            logger.verbose("Calculating frame window...");
-            this.frameWindow = new Region(this.frameLocationInScreenshot, frameSize);
-        } else {
-            this.frameChain = new FrameChain(logger);
-            this.currentFrameScrollPosition = new Location(0,0);
-            this.frameLocationInScreenshot = new Location(0,0);
-            this.frameWindow = new Region(this.frameLocationInScreenshot, new RectangleSize(image.getWidth(), image.getHeight()));
+        else if (driver.getEyes().getCurrentFramePositionProvider() != null)
+        {
+            positionProvider = driver.getEyes().getCurrentFramePositionProvider();
+            logger.verbose(String.format("position provider: using CurrentFramePositionProvider: %s", positionProvider));
         }
+        else
+        {
+            positionProvider = driver.getEyes().getPositionProvider();
+            logger.verbose(String.format("position provider: using PositionProvider: %s", positionProvider));
+        }
+
+        //IPositionProvider positionProvider = driver.getEyes().CurrentFramePositionProvider ?? driver.getEyes().PositionProvider;
+
+        frameChain = driver.getFrameChain();
+        try {
+            updateCurrentScrollPosition(positionProvider);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        updateFrameLocationInScreenshot(frameLocationInScreenshot);
+        RectangleSize frameContentSize = getFrameContentSize();
+
+        logger.verbose("Calculating frame window...");
+        frameWindow = new Region(this.frameLocationInScreenshot, frameContentSize);
         Region imageSizeAsRegion = new Region(0, 0, image.getWidth(), image.getHeight());
-        logger.verbose("this.frameWindow: " + this.frameWindow + " ; imageSizeAsRegion: " + imageSizeAsRegion);
-        this.frameWindow.intersect(imageSizeAsRegion);
-        logger.verbose("updated frameWindow: " + this.frameWindow);
-        if (this.frameWindow.getWidth() <= 0 || this.frameWindow.getHeight() <= 0) {
+        logger.verbose(String.format("frameWindow: %s ; imageSizeAsRegion: %s", frameWindow, imageSizeAsRegion));
+        frameWindow.intersect(imageSizeAsRegion);
+        logger.verbose(String.format("updated frameWindow: %s", frameWindow));
+
+        if (frameWindow.getWidth() <= 0 || frameWindow.getHeight() <= 0)
+        {
             throw new EyesException("Got empty frame window for screenshot!");
         }
 
-        //regionWindow = new Region(0, 0, 0, 0); // FIXME: 18/03/2018 Region workaround
-
         logger.verbose("Done!");
     }
+
+    private void updateCurrentScrollPosition(PositionProvider positionProvider)
+    {
+        // Getting the scroll position. For native Appium apps we can't get the
+        // scroll position, so we use (0,0)
+        try
+        {
+            currentFrameScrollPosition = positionProvider.getCurrentPosition();
+        }
+        catch (EyesDriverOperationException e)
+        {
+            currentFrameScrollPosition = new Location(0, 0);
+        }
+    }
+    private RectangleSize getFrameContentSize()
+    {
+        EyesRemoteWebElement frameDocumentElement = (EyesRemoteWebElement)driver.findElement(By.tagName("html"));
+        return frameDocumentElement.getClientSize() ;
+    }
+    private static Location getDefaultContentScrollPosition(Logger logger, FrameChain currentFrames, EyesWebDriver driver) {
+        IEyesJsExecutor jsExecutor = new SeleniumJavaScriptExecutor(driver);
+        Location defaultContentScrollPosition;
+        if (currentFrames.size() == 0) {
+            defaultContentScrollPosition = getDefaultContentScrollPosition(logger, driver, jsExecutor);
+        } else {
+            FrameChain originalFC = new FrameChain(logger, currentFrames);
+
+            EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
+            FrameChain currentFC = driver.getEyes().getOriginalFC().clone();
+            switchTo.frames(currentFC);
+            defaultContentScrollPosition = getDefaultContentScrollPosition(logger, driver, jsExecutor);
+            switchTo.frames(originalFC);
+        }
+        return defaultContentScrollPosition;
+    }
+
+    private static Location getDefaultContentScrollPosition(Logger logger, EyesWebDriver driver, IEyesJsExecutor jsExecutor) {
+        WebElement scrollRootElement = driver.getEyes().getCurrentFrameScrollRootElement();
+        PositionProvider positionProvider = ScrollPositionProviderFactory.getScrollPositionProvider(driver.getUserAgent(), logger, jsExecutor, scrollRootElement);
+        return positionProvider.getCurrentPosition();
+    }
+    private RectangleSize eGetFrameContentSize()
+    {
+        EyesRemoteWebElement frameDocumentElement = (EyesRemoteWebElement)driver.findElement(By.tagName("html"));
+        return frameDocumentElement.getClientSize();
+    }
+
+//    public EyesWebDriverScreenshot(Logger logger, EyesWebDriver driver, BufferedImage image, RectangleSize entireFrameSize)
+//    {
+//        super(logger, image);
+//        ArgumentGuard.notNull(driver, EyesWebDriver.class.getSimpleName());
+//        ArgumentGuard.notNull(entireFrameSize, RectangleSize.class.getSimpleName());
+//        logger = logger;
+//        this.driver = driver;
+//        frameChain = driver.getFrameChain();
+//        // The frame comprises the entire screenshot.
+//        screenshotType = ScreenshotType.ENTIRE_FRAME;
+//        currentFrameScrollPosition = new Location(0, 0);
+//        frameLocationInScreenshot = new Point(0, 0);
+//        frameWindow = new Region(new Location(0, 0), entireFrameSize);
+//    }
+
+    public static Location calcFrameLocationInScreenshot(Logger logger, EyesWebDriver driver,
+                                                      FrameChain frameChain, ScreenshotType screenshotType) {
+
+        EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
+        FrameChain currentFC = frameChain.clone();
+        switchTo.defaultContent();
+        Location locationInScreenshot = new Location(0,0);
+        for(Frame frame : currentFC)
+        {
+            org.openqa.selenium.Rectangle rect = ((EyesRemoteWebElement) frame.getReference()).getBoundingClientRect();
+            SizeAndBorders sizeAndBorders = ((EyesRemoteWebElement)frame.getReference()).getSizeAndBorders();
+            Borders borders = sizeAndBorders.getBorders();
+            rect.setX(rect.getX()+borders.getLeft());
+            rect.setY(rect.getY()+borders.getTop());
+            locationInScreenshot = locationInScreenshot.offset(rect.getX(), rect.getY());
+            switchTo.frame(frame.getReference());
+        }
+
+        return locationInScreenshot;
+    }
+
 
     private void updateFrameLocationInScreenshot(Location location) {
         if (location == null) {
@@ -195,13 +213,29 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
     private RectangleSize getFrameSize(PositionProvider positionProvider) {
         RectangleSize frameSize;
-        if (frameChain.size() != 0) {
+        // If we're inside a frame, then the frame size is given by the frame
+        // chain. Otherwise, it's the size of the entire page.
+        if (frameChain.size() != 0)
+        {
             frameSize = frameChain.getCurrentFrameInnerSize();
-        } else if (!EyesSeleniumUtils.isMobileDevice(driver)) {
-            frameSize = positionProvider.getEntireSize();
-        } else {
-            frameSize = this.driver.getDefaultContentViewportSize();
         }
+        else
+        {
+            // get entire page size might throw an exception for applications
+            // which don't support Javascript (e.g., Appium). In that case
+            // we'll use the viewport size as the frame's size.
+            try
+            {
+                logger.verbose(String.format("no framechain. positionProvider: %s", positionProvider));
+                frameSize = positionProvider.getEntireSize();
+                logger.verbose(String.format("frameSize: %s", frameSize));
+            }
+            catch (EyesDriverOperationException e)
+            {
+                frameSize = driver.getDefaultContentViewportSize();
+            }
+        }
+
         return frameSize;
     }
 
@@ -373,51 +407,44 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         ArgumentGuard.notNull(from, "from");
         ArgumentGuard.notNull(to, "to");
 
-        Location result = new Location(location);
-
-        if (from == to) {
-            return result;
+        if (from == to)
+        {
+            return location;
         }
+
+        Location result = location;
 
         // If we're not inside a frame, and the screenshot is the entire
         // page, then the context as-is/relative are the same (notice
         // screenshot as-is might be different, e.g.,
         // if it is actually a sub-screenshot of a region).
-        if (frameChain.size() == 0 &&
-                screenshotType == ScreenshotType.ENTIRE_FRAME) {
-            if ((from == CoordinatesType.CONTEXT_RELATIVE
-                    || from == CoordinatesType.CONTEXT_AS_IS)
-                    && to == CoordinatesType.SCREENSHOT_AS_IS) {
-
+        if (frameChain.size() == 0 && screenshotType == ScreenshotType.ENTIRE_FRAME)
+        {
+            if ((from == CoordinatesType.CONTEXT_RELATIVE || from == CoordinatesType.CONTEXT_AS_IS) && to == CoordinatesType.SCREENSHOT_AS_IS)
+            {
                 // If this is not a sub-screenshot, this will have no effect.
-                result = result.offset(frameLocationInScreenshot.getX(),
-                        frameLocationInScreenshot.getY());
+                result = result.offset((int)frameLocationInScreenshot.getX(), (int)frameLocationInScreenshot.getY());
 
-//                // FIXME: 18/03/2018 Region workaround
-//                // If this is not a region subscreenshot, this will have no effect.
-//                result = result.offset(-regionWindow.getLeft(), -regionWindow.getTop());
-
-            } else if (from == CoordinatesType.SCREENSHOT_AS_IS &&
-                    (to == CoordinatesType.CONTEXT_RELATIVE
-                            || to == CoordinatesType.CONTEXT_AS_IS)) {
-
-                result = result.offset(-frameLocationInScreenshot.getX(),
-                        -frameLocationInScreenshot.getY());
+            }
+            else if (from == CoordinatesType.SCREENSHOT_AS_IS &&
+                    (to == CoordinatesType.CONTEXT_RELATIVE || to == CoordinatesType.CONTEXT_AS_IS))
+            {
+                result = result.offset(-(int)frameLocationInScreenshot.getX(), -(int)frameLocationInScreenshot.getY());
             }
             return result;
         }
 
-        switch (from) {
+        switch (from)
+        {
             case CONTEXT_AS_IS:
-                switch (to) {
+                switch (to)
+                {
                     case CONTEXT_RELATIVE:
-                        result = result.offset(currentFrameScrollPosition.getX(),
-                                currentFrameScrollPosition.getY());
+                        result = result.offset(currentFrameScrollPosition);
                         break;
 
                     case SCREENSHOT_AS_IS:
-                        result = result.offset(frameLocationInScreenshot.getX(),
-                                frameLocationInScreenshot.getY());
+                        result = result.offset((int)frameLocationInScreenshot.getX(), (int)frameLocationInScreenshot.getY());
                         break;
 
                     default:
@@ -426,21 +453,17 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
                 break;
 
             case CONTEXT_RELATIVE:
-                switch (to) {
+                switch (to)
+                {
                     case SCREENSHOT_AS_IS:
-
                         // First, convert context-relative to context-as-is.
-                        result = result.offset(-currentFrameScrollPosition.getX(),
-                                -currentFrameScrollPosition.getY());
+                        result = result.offset(-currentFrameScrollPosition.getX(), -currentFrameScrollPosition.getY());
                         // Now convert context-as-is to screenshot-as-is.
-                        result = result.offset(frameLocationInScreenshot.getX(),
-                                frameLocationInScreenshot.getY());
-
+                        result = result.offset((int)frameLocationInScreenshot.getX(), (int)frameLocationInScreenshot.getY());
                         break;
 
                     case CONTEXT_AS_IS:
-                        result = result.offset(-currentFrameScrollPosition.getX(),
-                                -currentFrameScrollPosition.getY());
+                        result = result.offset(-currentFrameScrollPosition.getX(), -currentFrameScrollPosition.getY());
                         break;
 
                     default:
@@ -449,19 +472,17 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
                 break;
 
             case SCREENSHOT_AS_IS:
-                switch (to) {
+                switch (to)
+                {
                     case CONTEXT_RELATIVE:
                         // First convert to context-as-is.
-                        result = result.offset(-frameLocationInScreenshot.getX(),
-                                -frameLocationInScreenshot.getY());
+                        result = result.offset(-(int)frameLocationInScreenshot.getX(), -(int)frameLocationInScreenshot.getY());
                         // Now convert to context-relative.
-                        result = result.offset(currentFrameScrollPosition.getX(),
-                                currentFrameScrollPosition.getY());
+                        result = result = result.offset(currentFrameScrollPosition);
                         break;
 
                     case CONTEXT_AS_IS:
-                        result = result.offset(-frameLocationInScreenshot.getX(),
-                                -frameLocationInScreenshot.getY());
+                        result = result.offset(-(int)frameLocationInScreenshot.getX(), -(int)frameLocationInScreenshot.getY());
                         break;
 
                     default:
@@ -472,6 +493,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             default:
                 throw new CoordinatesTypeConversionException(from, to);
         }
+
         return result;
     }
 
@@ -537,31 +559,31 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
         return intersectedRegion;
     }
 
-    /**
-     * Gets the elements region in the screenshot.
-     * @param element The element which region we want to intersect.
-     * @return The intersected region, in {@code SCREENSHOT_AS_IS} coordinates
-     * type.
-     */
-    public Region getIntersectedRegion(WebElement element) {
-        ArgumentGuard.notNull(element, "element");
-
-        Point pl = element.getLocation();
-        Dimension ds = element.getSize();
-
-        Region elementRegion = new Region(pl.getX(), pl.getY(), ds.getWidth(),
-                ds.getHeight());
-
-        // Since the element coordinates are in context relative
-        elementRegion = getIntersectedRegion(elementRegion,
-                CoordinatesType.CONTEXT_RELATIVE);
-
-        if (!elementRegion.isSizeEmpty()) {
-            elementRegion = convertRegionLocation(elementRegion,
-                    CoordinatesType.CONTEXT_RELATIVE,
-                    CoordinatesType.SCREENSHOT_AS_IS);
-        }
-
-        return elementRegion;
-    }
+//    /**
+//     * Gets the elements region in the screenshot.
+//     * @param element The element which region we want to intersect.
+//     * @return The intersected region, in {@code SCREENSHOT_AS_IS} coordinates
+//     * type.
+//     */
+//    public Region getIntersectedRegion(WebElement element) {
+//        ArgumentGuard.notNull(element, "element");
+//
+//        Point pl = element.getLocation();
+//        Dimension ds = element.getSize();
+//
+//        Region elementRegion = new Region(pl.getX(), pl.getY(), ds.getWidth(),
+//                ds.getHeight());
+//
+//        // Since the element coordinates are in context relative
+//        elementRegion = getIntersectedRegion(elementRegion,
+//                CoordinatesType.CONTEXT_RELATIVE);
+//
+//        if (!elementRegion.isSizeEmpty()) {
+//            elementRegion = convertRegionLocation(elementRegion,
+//                    CoordinatesType.CONTEXT_RELATIVE,
+//                    CoordinatesType.SCREENSHOT_AS_IS);
+//        }
+//
+//        return elementRegion;
+//    }
 }
