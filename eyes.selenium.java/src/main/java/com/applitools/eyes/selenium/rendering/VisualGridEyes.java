@@ -176,7 +176,7 @@ public class VisualGridEyes implements IRenderingEyes {
         logger.verbose(String.format("opening %d tests...", testList.size()));
         this.renderingGridRunner.open(this, renderingInfo);
         logger.verbose("done");
-        return webDriver;
+        return this.webDriver != null ? this.webDriver : webDriver;
     }
 
     private void ensureBrowsers() {
