@@ -24,6 +24,18 @@ public class TestListener implements ITestListener {
     @Override
     public void onTestStart(ITestResult result) {
         //System.out.println("onTestStart");
+        if (!isBuildOnTravis()) {
+            Object instance = result.getInstance();
+            if (instance instanceof TestSetup) {
+                TestSetup testSetup = (TestSetup) instance;
+                Method method = result.getMethod().getConstructorOrMethod().getMethod();
+                testSetup.beforeMethod(method.getName());
+            }
+        }
+    }
+
+    private boolean isBuildOnTravis() {
+        return System.getenv("TRAVIS") != null && System.getenv("TRAVIS").equals("true");
     }
 
     @Override
