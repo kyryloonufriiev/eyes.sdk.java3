@@ -82,17 +82,20 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
             e.printStackTrace();
         }
         updateFrameLocationInScreenshot(frameLocationInScreenshot);
-        RectangleSize frameContentSize = getFrameContentSize();
+        if (!EyesSeleniumUtils.isMobileDevice(driver)) {
+            RectangleSize frameContentSize = getFrameContentSize();
 
-        logger.verbose("Calculating frame window...");
-        frameWindow = new Region(this.frameLocationInScreenshot, frameContentSize);
-        Region imageSizeAsRegion = new Region(0, 0, image.getWidth(), image.getHeight());
-        logger.verbose(String.format("frameWindow: %s ; imageSizeAsRegion: %s", frameWindow, imageSizeAsRegion));
-        frameWindow.intersect(imageSizeAsRegion);
-        logger.verbose(String.format("updated frameWindow: %s", frameWindow));
+            logger.verbose("Calculating frame window...");
+            frameWindow = new Region(this.frameLocationInScreenshot, frameContentSize);
 
-        if (frameWindow.getWidth() <= 0 || frameWindow.getHeight() <= 0)
-        {
+            Region imageSizeAsRegion = new Region(0, 0, image.getWidth(), image.getHeight());
+            logger.verbose(String.format("frameWindow: %s ; imageSizeAsRegion: %s", frameWindow, imageSizeAsRegion));
+            frameWindow.intersect(imageSizeAsRegion);
+            logger.verbose(String.format("updated frameWindow: %s", frameWindow));
+        } else {
+            frameWindow = new Region(0, 0, image.getWidth(), image.getHeight());
+        }
+        if (frameWindow.getWidth() <= 0 || frameWindow.getHeight() <= 0) {
             throw new EyesException("Got empty frame window for screenshot!");
         }
 
