@@ -3,6 +3,7 @@
 
 ###Fixed
 - Java SDK was missing abortAsync. [Trello 1420](https://trello.com/c/3NOKuLLj)
+- Fixed viewport computation on edge cases.
 
 ## [3.158.9] - 2019-12-12
 ### Fixed
