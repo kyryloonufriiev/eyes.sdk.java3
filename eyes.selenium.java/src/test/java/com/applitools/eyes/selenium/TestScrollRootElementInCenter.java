@@ -3,10 +3,9 @@ package com.applitools.eyes.selenium;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
-import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.Test;
 
 public final class TestScrollRootElementInCenter {
@@ -14,7 +13,7 @@ public final class TestScrollRootElementInCenter {
        @Test
         public void testCheckScrollRootElement(){
             String TestedPageUrl = "https://applitools.github.io/demo/TestPages/PageWithScrollableArea/index.html";
-            WebDriver driver = new ChromeDriver();
+            WebDriver driver = SeleniumUtils.createChromeDriver();
             driver.get(TestedPageUrl);
             Eyes eyes = new Eyes();
             eyes.setSendDom(false);
