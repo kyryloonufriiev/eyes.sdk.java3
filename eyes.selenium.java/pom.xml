@@ -52,7 +52,10 @@
                 <version>2.22.0</version>
                 <configuration>
                     <properties>
-                        <suiteThreadPoolSize>2</suiteThreadPoolSize>
+                        <property>
+                            <name>suitethreadpoolsize</name>
+                            <value>2</value>
+                        </property>
                     </properties>
                     <suiteXmlFiles>
                         <suiteXmlFile>regressionTestsSuite.xml</suiteXmlFile>
