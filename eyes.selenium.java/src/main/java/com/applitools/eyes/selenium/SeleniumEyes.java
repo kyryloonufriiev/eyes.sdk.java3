@@ -43,7 +43,7 @@ import java.util.*;
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchCloser {
+public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchCloser {
 
     private FrameChain originalFC;
     private WebElement scrollRootElement;
@@ -960,7 +960,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
 
             PositionProvider positionProvider = getElementPositionProvider(scrollRootElement);
             PositionMemento positionMemento = positionProvider.getState();
-            Point sreLocation = ((EyesRemoteWebElement)scrollRootElement).getBoundingClientRect().getPoint();
+            Point sreLocation = ((EyesRemoteWebElement) scrollRootElement).getBoundingClientRect().getPoint();
             Location scrollToLocation = elementLocation.offset(-sreLocation.getX(), -sreLocation.getY());
             positionProvider.setPosition(scrollToLocation);
             ppams.add(new PositionProviderAndMemento(positionProvider, positionMemento, fc));
@@ -1091,17 +1091,13 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
         FrameChain fc = driver.getFrameChain().clone();
         Frame currentFrame = fc.peek();
         WebElement scrollRootElement = null;
-        if (currentFrame != null)
-        {
+        if (currentFrame != null) {
             scrollRootElement = currentFrame.getScrollRootElement();
-        }
-        else
-        {
+        } else {
             scrollRootElement = this.scrollRootElement;
         }
 
-        if (scrollRootElement == null)
-        {
+        if (scrollRootElement == null) {
             scrollRootElement = driver.findElement(By.tagName("html"));
         }
         return scrollRootElement;
@@ -1338,12 +1334,11 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
                 elementRegion = new Region(
                         pl.getX() + borderWidths.getLeft(), pl.getY() + borderWidths.getTop(),
                         elementSize.getWidth(), elementSize.getHeight(), CoordinatesType.SCREENSHOT_AS_IS);
-            }
-            else{
+            } else {
                 elementRegion = new Region(
                         pl.getX(), pl.getY(),
                         elementSize.getWidth() + borderWidths.getLeft() + borderWidths.getRight(),
-                        elementSize.getHeight() + borderWidths.getTop()+borderWidths.getBottom(),
+                        elementSize.getHeight() + borderWidths.getTop() + borderWidths.getBottom(),
                         CoordinatesType.SCREENSHOT_AS_IS);
             }
 
