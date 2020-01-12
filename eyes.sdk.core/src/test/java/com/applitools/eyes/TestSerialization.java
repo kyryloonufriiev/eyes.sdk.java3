@@ -77,12 +77,6 @@ public class TestSerialization {
         }
 
         try {
-            new Region(null, new RectangleSize(3, 4));
-            Assert.fail("Location must not be null!");
-        } catch (IllegalArgumentException e) {
-        }
-
-        try {
             new Region(new Location(1, 2), null);
             Assert.fail("Size must not be null!");
         } catch (IllegalArgumentException e) {

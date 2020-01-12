@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium.wrappers;
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
@@ -289,11 +290,13 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     @Override
     public void click() {
-
-        // Letting the driver know about the current action.
-        Region currentControl = getBounds();
-        eyesDriver.getEyes().addMouseTrigger(MouseAction.Click, this);
-        logger.verbose(String.format("click(%s)", currentControl));
+        SeleniumEyes eyes = eyesDriver.getEyes();
+        if (eyes != null) {
+            // Letting the driver know about the current action.
+            Region currentControl = getBounds();
+            eyes.addMouseTrigger(MouseAction.Click, this);
+            logger.verbose(String.format("click(%s)", currentControl));
+        }
 
         webElement.click();
     }
@@ -342,11 +345,13 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     @Override
     public void sendKeys(CharSequence... keysToSend) {
-        for (CharSequence keys : keysToSend) {
-            String text = String.valueOf(keys);
-            eyesDriver.getEyes().addTextTrigger(this, text);
+        SeleniumEyes eyes = eyesDriver.getEyes();
+        if (eyes != null) {
+            for (CharSequence keys : keysToSend) {
+                String text = String.valueOf(keys);
+                eyes.addTextTrigger(this, text);
+            }
         }
-
         webElement.sendKeys(keysToSend);
     }
 
@@ -572,7 +577,9 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     public RectangleSize getClientSize() {
         Object retVal = eyesDriver.executeScript(JS_GET_CLIENT_SIZE, this);
-        if (retVal == null) { return null; }
+        if (retVal == null) {
+            return null;
+        }
         @SuppressWarnings("unchecked") String sizeStr = (String) retVal;
         sizeStr = sizeStr.replace("px", "");
         String[] parts = sizeStr.split(";");
@@ -588,7 +595,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     @Override
     public String toString() {
-        return "EyesRemoteWebElement:" + webElement.toString();
+        return "EyesRemoteWebElement: " + webElement.getId();
     }
 
     public PositionProvider getPositionProvider() {
