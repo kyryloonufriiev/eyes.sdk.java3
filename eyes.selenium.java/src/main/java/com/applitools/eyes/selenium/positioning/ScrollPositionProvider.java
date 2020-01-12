@@ -119,4 +119,11 @@ public class ScrollPositionProvider implements PositionProvider, ISeleniumPositi
             return this.scrollRootElement.hashCode();
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "ScrollPositionProvider{" +
+                "scrollRootElement=" + scrollRootElement +
+                '}';
+    }
 }

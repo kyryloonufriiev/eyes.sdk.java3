@@ -27,8 +27,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     private By scrollRootSelector;
 
     private VisualGridSelector selector;
-    private Region region;
-
 
     public SeleniumCheckSettings() {
     }
@@ -74,7 +72,6 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         clone.frameChain.addAll(this.frameChain);
         clone.scrollRootElement = this.scrollRootElement;
         clone.scrollRootSelector = this.scrollRootSelector;
-        clone.region = this.region;
         clone.selector = this.selector;
         clone.sendDom = this.sendDom;
         return clone;
@@ -428,7 +425,7 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     }
 
     public SeleniumCheckSettings(Region region, boolean isSendDom) {
-        this.region = region;
+        super(region);
         this.sendDom = isSendDom;
     }
 
@@ -436,25 +433,18 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
     public String getSizeMode() {
         ICheckSettingsInternal checkSettingsInternal = this;
         Boolean stitchContent = checkSettingsInternal.getStitchContent();
-        if (region == null) {
-            region  = checkSettingsInternal.getTargetRegion();
+        if (stitchContent == null) {
+            stitchContent = false;
         }
-        if (region == null && getVGTargetSelector() == null)
-        {
-            return stitchContent == null || stitchContent ? FULL_PAGE : VIEWPORT;
-        }
-        else if (region != null)
-        {
+        Region region = checkSettingsInternal.getTargetRegion();
+
+        if (region == null && getVGTargetSelector() == null) {
+            return stitchContent ? FULL_PAGE : VIEWPORT;
+        } else if (region != null) {
             return REGION;
-        }
-        else /* if (selector != null) */
-        {
+        } else /* if (selector != null) */ {
             return SELECTOR;
         }
-    }
-
-    public Region getRegion() {
-        return region;
     }
 
     @Override
@@ -495,25 +485,21 @@ public class SeleniumCheckSettings extends CheckSettings implements ISeleniumChe
         return this.ignoreDisplacements(true);
     }
 
-    public SeleniumCheckSettings accessibility(By regionSelector, AccessibilityRegionType regionType)
-    {
+    public SeleniumCheckSettings accessibility(By regionSelector, AccessibilityRegionType regionType) {
         SeleniumCheckSettings clone = clone();
         clone.accessibility_(new AccessibilityRegionBySelector(regionSelector, regionType));
         return clone;
     }
 
-    public SeleniumCheckSettings accessibility(WebElement element, AccessibilityRegionType regionType)
-    {
+    public SeleniumCheckSettings accessibility(WebElement element, AccessibilityRegionType regionType) {
         SeleniumCheckSettings clone = clone();
         clone.accessibility(new AccessibilityRegionByElement(element, regionType));
         return clone;
     }
 
-    public SeleniumCheckSettings accessibility(AccessibilityRegionType regionType, WebElement[] elementsToIgnore)
-    {
+    public SeleniumCheckSettings accessibility(AccessibilityRegionType regionType, WebElement[] elementsToIgnore) {
         SeleniumCheckSettings clone = clone();
-        for (WebElement element : elementsToIgnore)
-        {
+        for (WebElement element : elementsToIgnore) {
             clone.accessibility(new AccessibilityRegionByElement(element, regionType));
         }
         return clone;

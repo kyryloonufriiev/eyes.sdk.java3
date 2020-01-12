@@ -176,7 +176,7 @@ public class VisualGridEyes implements IRenderingEyes {
         logger.verbose(String.format("opening %d tests...", testList.size()));
         this.renderingGridRunner.open(this, renderingInfo);
         logger.verbose("done");
-        return webDriver;
+        return this.webDriver != null ? this.webDriver : webDriver;
     }
 
     private void ensureBrowsers() {
@@ -449,7 +449,6 @@ public class VisualGridEyes implements IRenderingEyes {
     public void check(String name, ICheckSettings checkSettings) {
         if (!validateEyes()) return;
         ArgumentGuard.notNull(checkSettings, "checkSettings");
-        trySetTargetSelector((SeleniumCheckSettings) checkSettings);
         if (name != null) {
             checkSettings = checkSettings.withName(name);
         }
@@ -531,6 +530,8 @@ public class VisualGridEyes implements IRenderingEyes {
             List<VisualGridSelector[]> regionsXPaths = getRegionsXPaths(checkSettingsInternal);
 
             logger.verbose("regionXPaths : " + regionsXPaths);
+
+            trySetTargetSelector((SeleniumCheckSettings)checkSettings);
 
             List<RunningTest> filteredTests = new ArrayList<>();
 
@@ -797,9 +798,6 @@ public class VisualGridEyes implements IRenderingEyes {
 
     private List<VisualGridSelector[]> getRegionsXPaths(ICheckSettingsInternal csInternal) {
         List<VisualGridSelector[]> result = new ArrayList<>();
-        FrameChain frameChain = webDriver.getFrameChain().clone();
-        EyesTargetLocator switchTo = (EyesTargetLocator) webDriver.switchTo();
-        switchToFrame((ISeleniumCheckTarget) csInternal);
         List<WebElementRegion>[] elementLists = collectSeleniumRegions(csInternal);
         for (List<WebElementRegion> elementList : elementLists) {
             //noinspection SpellCheckingInspection
@@ -811,7 +809,6 @@ public class VisualGridEyes implements IRenderingEyes {
             }
             result.add(xpaths.toArray(new VisualGridSelector[0]));
         }
-        switchTo.frames(frameChain);
         return result;
     }
 

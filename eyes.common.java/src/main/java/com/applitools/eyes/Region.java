@@ -132,7 +132,6 @@ public class Region implements IRegion {
      * @param coordinatesType the coordinates type
      */
     public Region(Location location, RectangleSize size, CoordinatesType coordinatesType) {
-        ArgumentGuard.notNull(location, "location");
         ArgumentGuard.notNull(size, "size");
 
         this.left = location.getX();

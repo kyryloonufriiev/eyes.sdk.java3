@@ -136,7 +136,7 @@ public class TestFluentApi extends TestSetup {
 
     @Test
     public void TestCheckScrollableModal() {
-        getDriver().findElement(By.id("centered")).click();
+        getWebDriver().findElement(By.id("centered")).click();
         By scrollRootSelector = (stitchMode == StitchMode.CSS) ? By.id("modal-content") : By.id("modal1");
         getEyes().check("Scrollable Modal", Target.region(By.id("modal-content")).fully().scrollRootElement(scrollRootSelector));
     }

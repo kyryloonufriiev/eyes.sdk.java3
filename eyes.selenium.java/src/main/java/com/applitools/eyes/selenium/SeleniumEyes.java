@@ -43,7 +43,7 @@ import java.util.*;
  * The main API gateway for the SDK.
  */
 @SuppressWarnings("WeakerAccess")
-public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchCloser {
+public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchCloser {
 
     private FrameChain originalFC;
     private WebElement scrollRootElement;
@@ -863,8 +863,6 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
             // FIXME - Scaling should be handled in a single place instead
             ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
 
-            EyesTargetLocator switchTo = (EyesTargetLocator) driver.switchTo();
-            switchTo.frames(fc);
 
             EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
             regionToCheck = screenshot.getFrameWindow();
@@ -902,12 +900,6 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
                 }
             }
 
-            if (childFrame != null) {
-                logger.verbose("childFrame.Reference:         " + childFrame.getLocation());
-                if (childFrame.getScrollRootElement() != null) {
-                    logger.verbose("childFrame.ScrollRootElement: " + childFrame.getScrollRootElement());
-                }
-            }
             logger.verbose("scrollRootElement: " + scrollRootElement);
 
             PositionProvider positionProvider = getElementPositionProvider(scrollRootElement);
@@ -968,7 +960,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
 
             PositionProvider positionProvider = getElementPositionProvider(scrollRootElement);
             PositionMemento positionMemento = positionProvider.getState();
-            positionProvider.setPosition(elementLocation);
+            Point sreLocation = ((EyesRemoteWebElement) scrollRootElement).getBoundingClientRect().getPoint();
+            Location scrollToLocation = elementLocation.offset(-sreLocation.getX(), -sreLocation.getY());
+            positionProvider.setPosition(scrollToLocation);
             ppams.add(new PositionProviderAndMemento(positionProvider, positionMemento, fc));
         }
         return ppams;
@@ -1099,13 +1093,12 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
         WebElement scrollRootElement = null;
         if (currentFrame != null) {
             scrollRootElement = currentFrame.getScrollRootElement();
-        }
-        if (scrollRootElement == null && !EyesSeleniumUtils.isMobileDevice(this.driver)) {
+        } else {
             scrollRootElement = this.scrollRootElement;
+        }
 
-            if (scrollRootElement == null) {
-                scrollRootElement = driver.findElement(By.tagName("html"));
-            }
+        if (scrollRootElement == null) {
+            scrollRootElement = driver.findElement(By.tagName("html"));
         }
         return scrollRootElement;
     }
@@ -1301,6 +1294,9 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
         if (scrollRootElement instanceof EyesRemoteWebElement) {
             EyesRemoteWebElement eyesRemoteWebElement = (EyesRemoteWebElement) scrollRootElement;
             eyesRemoteWebElement.setPositionProvider(positionProvider);
+            Rectangle sreBounds = eyesRemoteWebElement.getBoundingClientRect();
+            Region sreBoundsRegion = new Region(sreBounds.getX(), sreBounds.getY(), sreBounds.getWidth(), sreBounds.getHeight());
+            effectiveViewport.intersect(sreBoundsRegion);
         }
 
         ensureElementVisible(targetElement);
@@ -1333,9 +1329,18 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider ,IBatchClo
                 elementPositionProvider = null;
             }
 
-            final Region elementRegion = new Region(
-                    pl.getX() + borderWidths.getLeft(), pl.getY() + borderWidths.getTop(),
-                    elementSize.getWidth(), elementSize.getHeight(), CoordinatesType.SCREENSHOT_AS_IS);
+            final Region elementRegion;
+            if (useEntireSize) {
+                elementRegion = new Region(
+                        pl.getX() + borderWidths.getLeft(), pl.getY() + borderWidths.getTop(),
+                        elementSize.getWidth(), elementSize.getHeight(), CoordinatesType.SCREENSHOT_AS_IS);
+            } else {
+                elementRegion = new Region(
+                        pl.getX(), pl.getY(),
+                        elementSize.getWidth() + borderWidths.getLeft() + borderWidths.getRight(),
+                        elementSize.getHeight() + borderWidths.getTop() + borderWidths.getBottom(),
+                        CoordinatesType.SCREENSHOT_AS_IS);
+            }
 
             logger.verbose("Element region: " + elementRegion);
 
