@@ -1008,11 +1008,9 @@ public abstract class EyesBase implements IEyesBase{
                 beforeOpen();
 
                 viewportSize = getViewportSizeForOpen();
-
+                if (viewportSize == null) viewportSize = RectangleSize.EMPTY;
                 try {
-                    if (viewportSize != null) {
-                        ensureRunningSession();
-                    }
+                    ensureRunningSession();
                 } catch (Exception e) {
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     retry++;
