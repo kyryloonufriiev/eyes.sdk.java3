@@ -79,6 +79,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
 
     private UserAgent userAgent;
     private ImageProvider imageProvider;
+    private ISizeAdjuster sizeAdjuster;
     private RegionPositionCompensation regionPositionCompensation;
     private WebElement targetElement;
     private PositionMemento positionMemento;
@@ -251,13 +252,14 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
             userAgent = UserAgent.ParseUserAgentString(uaString, true);
         }
 
+        this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
+        updateScalingParams();
+
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
+        sizeAdjuster = ImageProviderFactory.getImageSizeAdjuster(userAgent, jsExecutor);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
         ArgumentGuard.notNull(driver, "driver");
-
-        devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
-        this.jsExecutor = new SeleniumJavaScriptExecutor(this.driver);
 
         this.driver.setRotation(rotation);
         this.runner.addBatch(this.getConfigGetter().getBatch().getId(), this);
@@ -1037,8 +1039,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
      */
     protected ScaleProviderFactory updateScalingParams() {
         // Update the scaling params only if we haven't done so yet, and the user hasn't set anything else manually.
-        if (devicePixelRatio == UNKNOWN_DEVICE_PIXEL_RATIO &&
-                scaleProviderHandler.get() instanceof NullScaleProvider) {
+        if (scaleProviderHandler.get() instanceof NullScaleProvider) {
             ScaleProviderFactory factory;
             logger.verbose("Trying to extract device pixel ratio...");
             if (!EyesSeleniumUtils.isMobileDevice(driver)) {
@@ -1614,10 +1615,14 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
      */
     @Override
     public RectangleSize getViewportSize() {
-        if (viewportSize == null) {
-            viewportSize = driver.getDefaultContentViewportSize();
+        RectangleSize vpSize;
+        if (imageProvider instanceof MobileScreenshotImageProvider) {
+            BufferedImage image = imageProvider.getImage();
+            vpSize = new RectangleSize((int) Math.round(image.getWidth() / devicePixelRatio), (int) Math.round(image.getHeight() / devicePixelRatio));
+        } else {
+            vpSize = EyesSeleniumUtils.getViewportSize(driver);
         }
-        return viewportSize;
+        return vpSize;
     }
 
     /**
@@ -1958,7 +1963,7 @@ public class SeleniumEyes extends EyesBase implements IDriverProvider, IBatchClo
                 scaleProviderFactory,
                 cutProviderHandler.get(),
                 getConfigGetter().getStitchOverlap(),
-                imageProvider);
+                imageProvider, sizeAdjuster);
     }
 
     @Override
