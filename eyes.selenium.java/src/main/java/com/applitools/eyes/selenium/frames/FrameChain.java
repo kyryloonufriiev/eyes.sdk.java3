@@ -24,7 +24,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Compares two frame chains.
-     *
      * @param c1 Frame chain to be compared against c2.
      * @param c2 Frame chain to be compared against c1.
      * @return True if both frame chains represent the same frame, false otherwise.
@@ -54,7 +53,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Creates a new frame chain.
-     *
      * @param logger A Logger instance.
      */
     public FrameChain(Logger logger) {
@@ -65,7 +63,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Creates a frame chain which is a copy of the current frame.
-     *
      * @param logger A Logger instance.
      * @param other  A frame chain from which the current frame chain will be created.
      */
@@ -78,7 +75,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Size int.
-     *
      * @return The number of frames in the chain.
      */
     public int size() {
@@ -95,16 +91,15 @@ public class FrameChain implements Iterable<Frame> {
     /**
      * Removes the last inserted frame element. Practically means we switched
      * back to the parent of the current frame
-     *
      * @return the frame
      */
     public Frame pop() {
+        if (frames.size() == 0) return null;
         return frames.remove(frames.size() - 1);
     }
 
     /**
      * Peek frame.
-     *
      * @return Returns the top frame in the chain.
      */
     public Frame peek() {
@@ -114,7 +109,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Appends a frame to the frame chain.
-     *
      * @param frame The frame to be added.
      */
     public void push(Frame frame) {
@@ -123,7 +117,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Gets current frame offset.
-     *
      * @return The location of the current frame in the page.
      */
     public Location getCurrentFrameOffset() {
@@ -138,7 +131,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Gets default content scroll position.
-     *
      * @return The outermost frame's location, or NoFramesException.
      */
     public Location getDefaultContentScrollPosition() {
@@ -150,7 +142,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Gets current frame size.
-     *
      * @return The size of the current frame.
      */
     public RectangleSize getCurrentFrameSize() {
@@ -162,7 +153,6 @@ public class FrameChain implements Iterable<Frame> {
 
     /**
      * Gets current frame inner size.
-     *
      * @return The inner size of the current frame.
      */
     public RectangleSize getCurrentFrameInnerSize() {
@@ -170,6 +160,10 @@ public class FrameChain implements Iterable<Frame> {
         RectangleSize result = frames.get(frames.size() - 1).getInnerSize();
         logger.verbose("Done!");
         return result;
+    }
+
+    public Frame getAt(int index) {
+        return frames.get(index);
     }
 
     /**
