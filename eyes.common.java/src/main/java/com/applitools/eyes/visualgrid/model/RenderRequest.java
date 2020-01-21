@@ -17,7 +17,7 @@ public class  RenderRequest {
     private final VisualGridTask visualGridTask;
 
     @JsonInclude
-    private String agentId = "eyes.selenium.visualgrid.java/3.158.9";
+    private String agentId = "eyes.selenium.visualgrid.java/3.159.0";
 
     @JsonInclude
     private String stitchingServiceUrl;
