@@ -49,7 +49,7 @@ jobs:
           echo "DEPLOY";
           chmod +x ./extractChangeLog.sh;
           TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
-          CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION" || echo "$TMP_CHANGELOG");
+          CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "There is no change log for version $SDK_VERSION"; exit 1 || echo "$TMP_CHANGELOG");
           echo $CHANGELOG;
           chmod +x ./sendMail.sh;
           TEST_COVERAGE_GAP=$(cat testCoverageGap.txt);
