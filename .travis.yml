@@ -29,7 +29,7 @@ jobs:
         - chmod +x ./extractChangeLog.sh
         - TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md")
         - echo "$TMP_CHANGELOG"
-        - CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "ERROR: There is no change log for version $SDK_VERSION" || echo "$TMP_CHANGELOG")
+        - CHANGELOG=$([ -z "$TMP_CHANGELOG" ] && echo "ERROR === There is no change log for version $SDK_VERSION" || echo "$TMP_CHANGELOG")
         - echo $CHANGELOG
         - if [[ (-z "$TMP_CHANGELOG") && ($TRAVIS_TAG =~ ^RELEASE_CANDIDATE) ]]; then
           sleep 5;
