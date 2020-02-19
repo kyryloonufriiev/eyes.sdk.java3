@@ -3,6 +3,7 @@ package com.applitools.eyes.selenium;
 import org.testng.*;
 import java.util.*;
 import java.lang.reflect.Method;
+import com.applitools.eyes.api.TestApiMethods;
 
 
 
@@ -27,11 +28,18 @@ public class ExcludeFailingTestsListener implements IInvokedMethodListener2 {
                 Method method = iTestResult.getMethod().getConstructorOrMethod().getMethod();
                 ((TestSetup) testInstance).beforeMethod(method.getName());
             }
-            else if (testInstance instanceof TestMobileDevices){
+            if (testInstance instanceof TestMobileDevices) {
                 testData = ((TestMobileDevices) testInstance).deviceName
                         + "+" + ((TestMobileDevices) testInstance).platformVersion
                         + "+" + ((TestMobileDevices) testInstance).deviceOrientation.toString()
                         + "+" + ((TestMobileDevices) testInstance).page;
+                handleTests(iTestResult, testParameters, testData);
+            }
+            if (    (testInstance instanceof TestScrolling) ||
+                    (testInstance instanceof TestApiMethods) ||
+                    (testInstance instanceof TestConfigurationSentCorrectlyToServer)){
+                Object[] parameters = iTestResult.getParameters();
+                testData = parameters[0].toString();
                 handleTests(iTestResult, testParameters, testData);
             }
         }
