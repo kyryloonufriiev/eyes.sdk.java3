@@ -52,6 +52,6 @@ public class TestAbort {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        eyes.abort();
+        eyes.abortIfNotClosed();
     }
 }
