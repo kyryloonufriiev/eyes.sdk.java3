@@ -1,6 +1,7 @@
-## [vNext]
+## [3.160.2]
 ### Fixed
 - Fixed UFG coded regions placements. [Trello 1542](https://trello.com/c/2Awzru1V)
+- Check at least one render request exists before extracting id. [Trello 1489](https://trello.com/c/KSfk2LhY)
 
 ## [3.160.1] - 2020-02-23
 ### Fixed
