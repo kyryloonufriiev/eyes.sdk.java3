@@ -39,7 +39,7 @@ jobs:
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
           mvn versions:set -DnewVersion=$SDK_VERSION;
           mvn versions:commit;
-          git add --all;
+          git add */pom.xml pom.xml;
           git commit -m 'update pom version';
           git push origin HEAD:$RELEASE_BRANCH;
           fi
