@@ -129,7 +129,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     @Override
     public String getBaseAgentId() {
-        return "eyes.selenium.java/3.160.2";
+        return "eyes.selenium.java/3.160.3";
     }
 
     public void apiKey(String apiKey){
