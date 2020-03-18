@@ -1,4 +1,4 @@
-## [vNext]
+## [3.160.3] - 2020-03-18
 ### Fixed
 - Fixed UserAgent parsing + tests. (Problem found in [Trello 1589](https://trello.com/c/3C2UTw5P))
 - Fixed Viewport metatag parsing. [Trello 1629](https://trello.com/c/a0AgWIWj)
