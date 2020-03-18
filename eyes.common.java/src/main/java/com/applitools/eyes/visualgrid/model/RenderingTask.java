@@ -111,7 +111,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             RenderRequest[] requests = prepareDataForRG(result);
 
             logger.verbose("step 2");
-            boolean stillRunning = true;
+            boolean stillRunning;
             int fetchFails = 0;
             boolean isForcePutAlreadyDone = false;
             List<RunningRender> runningRenders = null;
@@ -136,9 +136,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     fetchFails++;
                 }
                 logger.verbose("step 3.1");
-                if (runningRenders == null) {
-                    logger.verbose("ERROR - runningRenders is null.");
-                    continue;
+                if (runningRenders == null || runningRenders.size() == 0) {
+                    logger.verbose("ERROR - runningRenders is null or empty.");
+                    break;
                 }
 
                 for (int i = 0; i < requests.length; i++) {
