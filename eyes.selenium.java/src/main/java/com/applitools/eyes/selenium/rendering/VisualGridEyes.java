@@ -548,7 +548,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
             checkSettingsInternal = updateCheckSettings(checkSettings);
 
-            List<RunningTest> filteredTests = collectTestsForCheck();
+            List<RunningTest> filteredTests = collectTestsForCheck(logger, testList);
 
             String source = webDriver.getCurrentUrl();
             for (RunningTest runningTest : filteredTests) {
@@ -587,9 +587,10 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    private List<RunningTest> collectTestsForCheck() {
+    /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
+    public static List<RunningTest> collectTestsForCheck(Logger logger, List<RunningTest> tests) {
         List<RunningTest> filteredTests = new ArrayList<>();
-        for (final RunningTest test : testList) {
+        for (final RunningTest test : tests) {
             List<VisualGridTask> taskList = test.getVisualGridTaskList();
             VisualGridTask visualGridTask = null;
             if (!taskList.isEmpty()) {
@@ -612,6 +613,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
         return filteredTests;
     }
+    /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
     private ICheckSettings switchFramesAsNeeded(ICheckSettings checkSettings, EyesTargetLocator switchTo) {
         int switchedToCount = switchToFrame((ISeleniumCheckTarget) checkSettings);

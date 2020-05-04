@@ -33,6 +33,23 @@ public class RunningTest {
     private String appName;
     private String testName;
     private Throwable error;
+
+    /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
+    public void setCloseTask(VisualGridTask task) {
+        this.closeTask = task;
+    }
+
+    public void setOpenTask(VisualGridTask task) {
+        this.openTask = task;
+    }
+
+    public RunningTest(RenderBrowserInfo browserInfo, Logger logger)
+    {
+        this.browserInfo = browserInfo;
+        this.logger = logger;
+    }
+    /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
+
     public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
         this.eyes = eyes;
         this.browserInfo = browserInfo;
@@ -43,12 +60,12 @@ public class RunningTest {
         this.testName = configurationProvider.get().getTestName();
     }
 
-    public Future<TestResultContainer> abort( boolean forceAbort, Throwable e) {
+    public Future<TestResultContainer> abort(boolean forceAbort, Throwable e) {
         removeAllCheckTasks();
         if (isOpenTaskIssued()) {
             openTask.setException(e);
         }
-        if(forceAbort && closeTask != null && closeTask.getType() == VisualGridTask.TaskType.CLOSE){
+        if (forceAbort && closeTask != null && closeTask.getType() == VisualGridTask.TaskType.CLOSE) {
             closeTask.setExceptionAndAbort(e);
         }
         if (closeTask == null) {
