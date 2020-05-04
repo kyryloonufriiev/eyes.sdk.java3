@@ -276,4 +276,13 @@
             </class>
         </classes>
     </test>
+    <test name="TestVGNoMissingSteps" parallel="methods">
+        <classes>
+            <class name="com.applitools.eyes.renderingGrid.TestVGNoMissingSteps">
+                <methods>
+                    <include name="TestNoMissingSteps_UT"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
