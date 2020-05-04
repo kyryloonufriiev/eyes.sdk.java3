@@ -548,7 +548,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
             checkSettingsInternal = updateCheckSettings(checkSettings);
 
-            List<RunningTest> filteredTests = collectFilteredTests();
+            List<RunningTest> filteredTests = collectTestsForCheck();
 
             String source = webDriver.getCurrentUrl();
             for (RunningTest runningTest : filteredTests) {
@@ -587,7 +587,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    private List<RunningTest> collectFilteredTests() {
+    private List<RunningTest> collectTestsForCheck() {
         List<RunningTest> filteredTests = new ArrayList<>();
         for (final RunningTest test : testList) {
             List<VisualGridTask> taskList = test.getVisualGridTaskList();
@@ -596,13 +596,17 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
                 visualGridTask = taskList.get(taskList.size() - 1);
             }
 
-            VisualGridTask.TaskType taskType = null;
+            VisualGridTask.TaskType lastTaskType = null;
             if (visualGridTask != null) {
-                taskType = visualGridTask.getType();
+                lastTaskType = visualGridTask.getType();
             }
 
-            if ((taskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued()) ||
-                    (taskType != null && taskType != VisualGridTask.TaskType.CLOSE && taskType != VisualGridTask.TaskType.ABORT)) {
+            boolean testIsOpenAndNotClosed = lastTaskType == null && test.isOpenTaskIssued() && !test.isCloseTaskIssued();
+            boolean lastTaskIsNotAClosingTask = lastTaskType != null && lastTaskType != VisualGridTask.TaskType.CLOSE && lastTaskType != VisualGridTask.TaskType.ABORT;
+
+            // We are interested in tests which should be opened or are open.
+            if (testIsOpenAndNotClosed || lastTaskIsNotAClosingTask)
+            {
                 filteredTests.add(test);
             }
         }
