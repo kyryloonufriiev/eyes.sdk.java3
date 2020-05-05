@@ -143,6 +143,14 @@ public abstract class EyesBase implements IEyesBase{
         this.serverConnector = serverConnector;
     }
 
+    public IServerConnector getServerConnector() {
+        if (serverConnector != null && serverConnector.getAgentId() == null) {
+            serverConnector.setAgentId(getFullAgentId());
+        }
+
+        return serverConnector;
+    }
+
     /**
      * Sets the API key of your applitools Eyes account.
      * @param apiKey The api key to set.
@@ -471,13 +479,13 @@ public abstract class EyesBase implements IEyesBase{
                 return new TestResults();
             }
 
-            boolean isNewSession = runningSession.getIsNewSession();
+            boolean isNewSession = runningSession.getIsNew();
 
             logger.verbose("Ending server session...");
             boolean save = (isNewSession && getConfigGetter().getSaveNewTests())
                     || (!isNewSession && getConfigGetter().getSaveFailedTests());
             logger.verbose("Automatically save test? " + String.valueOf(save));
-            TestResults results = serverConnector.stopSession(runningSession, false, save);
+            TestResults results = getServerConnector().stopSession(runningSession, false, save);
 
             results.setNew(isNewSession);
             results.setUrl(runningSession.getUrl());
@@ -551,7 +559,7 @@ public abstract class EyesBase implements IEyesBase{
                 return;
             }
 
-            boolean isNewSession = runningSession.getIsNewSession();
+            boolean isNewSession = runningSession.getIsNew();
             String sessionResultsUrl = runningSession.getUrl();
 
             logger.verbose("Ending server session...");
@@ -559,7 +567,7 @@ public abstract class EyesBase implements IEyesBase{
 
             logger.verbose("Automatically save test? " + String.valueOf(save));
             TestResults results =
-                    serverConnector.stopSession(runningSession, false,
+                    getServerConnector().stopSession(runningSession, false,
                             save);
 
             results.setNew(isNewSession);
@@ -628,8 +636,8 @@ public abstract class EyesBase implements IEyesBase{
             logger.verbose("Aborting server session...");
             try {
                 // When aborting we do not save the test.
-                boolean isNewSession = runningSession.getIsNewSession();
-                TestResults results = serverConnector.stopSession(runningSession, true, false);
+                boolean isNewSession = runningSession.getIsNew();
+                TestResults results = getServerConnector().stopSession(runningSession, true, false);
                 results.setNew(isNewSession);
                 results.setUrl(runningSession.getUrl());
                 logger.log("--- Test aborted.");
@@ -839,7 +847,7 @@ public abstract class EyesBase implements IEyesBase{
 
         shouldMatchWindowRunOnceOnTimeout = true;
 
-        if (!runningSession.getIsNewSession()) {
+        if (!runningSession.getIsNew()) {
             logger.log(String.format("Mismatch! (%s)", tag));
         }
 
@@ -910,15 +918,15 @@ public abstract class EyesBase implements IEyesBase{
         };
 
         MatchWindowDataWithScreenshot result;
-        if (runningSession.getIsNewSession()) {
+        if (runningSession.getIsNew()) {
             ResponseTimeAlgorithm.runNewProgressionSession(logger,
-                    serverConnector, runningSession, appOutputProvider,
+                    getServerConnector(), runningSession, appOutputProvider,
                     regionProvider, startTime, deadline);
             // Since there's never a match for a new session..
             result = null;
         } else {
             result = ResponseTimeAlgorithm.runProgressionSessionForExistingBaseline(
-                    logger, serverConnector, runningSession, appOutputProvider, regionProvider, startTime,
+                    logger, getServerConnector(), runningSession, appOutputProvider, regionProvider, startTime,
                     deadline, timeout, matchInterval);
         }
 
@@ -960,7 +968,7 @@ public abstract class EyesBase implements IEyesBase{
             return;
         }
 
-        if (serverConnector == null) {
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
 
@@ -1278,7 +1286,8 @@ public abstract class EyesBase implements IEyesBase{
      */
     protected void startSession() {
         logger.verbose("startSession()");
-        if (serverConnector == null) {
+
+        if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }
         ensureViewportSize();
@@ -1306,12 +1315,12 @@ public abstract class EyesBase implements IEyesBase{
                 configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(), properties);
 
         logger.verbose("Starting server session...");
-        runningSession = serverConnector.startSession(sessionStartInfo);
+        runningSession = getServerConnector().startSession(sessionStartInfo);
 
         logger.verbose("Server session ID is " + runningSession.getId());
 
         String testInfo = "'" + getTestName() + "' of '" + appName + "' " + appEnv;
-        if (runningSession.getIsNewSession()) {
+        if (runningSession.getIsNew()) {
             logger.log("--- New test started - " + testInfo);
             shouldMatchWindowRunOnceOnTimeout = true;
         } else {
@@ -1436,7 +1445,7 @@ public abstract class EyesBase implements IEyesBase{
         if (this.renderInfo != null) {
             return this.renderInfo;
         }
-        this.renderInfo = this.serverConnector.getRenderInfo();
+        this.renderInfo = getServerConnector().getRenderInfo();
         return this.renderInfo;
     }
 
