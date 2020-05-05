@@ -4,7 +4,6 @@ import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
@@ -18,9 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Provides common rest client functionality.
@@ -35,6 +32,8 @@ public class RestClient {
         Response call();
     }
 
+    protected static final String AGENT_ID_CUSTOM_HEADER = "x-applitools-eyes-client";
+
     private AbstractProxySettings abstractProxySettings;
     private int timeout; // seconds
 
@@ -42,6 +41,7 @@ public class RestClient {
     protected Client restClient;
     protected URI serverUrl;
     protected WebTarget endPoint;
+    protected String agentId;
 
     // Used for JSON serialization/de-serialization.
     protected ObjectMapper jsonMapper;
@@ -121,7 +121,6 @@ public class RestClient {
         this(logger, serverUrl, 1000 * 60 * 5);
     }
 
-
     /**
      * Sets the proxy settings to be used by the rest client.
      * @param abstractProxySettings The proxy settings to be used by the rest client.
@@ -183,12 +182,42 @@ public class RestClient {
         return serverUrl;
     }
 
+    /**
+     * Creates a request for the eyes server
+     * @param target The target to start building from
+     * @param queryParams Query parameters for the URI
+     * @param responseTypes The accepted response type
+     * @return The created request
+     */
+    protected Invocation.Builder makeEyesRequest(WebTarget target, Map<String, Object> queryParams,  String... responseTypes) {
+        if (queryParams == null) {
+            queryParams = Collections.emptyMap();
+        }
+
+        for (Map.Entry<String, Object> param : queryParams.entrySet()) {
+            target = target.queryParam(param.getKey(), param.getValue());
+        }
+
+        Invocation.Builder request = target.request(responseTypes);
+        return request.header(AGENT_ID_CUSTOM_HEADER, agentId);
+    }
+
+    protected Invocation.Builder makeEyesRequest(WebTarget target, Map<String, Object> queryParams) {
+        return makeEyesRequest(target, queryParams, MediaType.APPLICATION_JSON);
+    }
+
+    protected Invocation.Builder makeEyesRequest(WebTarget target) {
+        return makeEyesRequest(target, null);
+    }
+
     protected Response sendLongRequest(Invocation.Builder invocationBuilder, String method, Entity<?> entity)
             throws EyesException {
 
         logger.verbose("enter");
         String currentTime = GeneralUtils.toRfc1123(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-        invocationBuilder = invocationBuilder.header("Eyes-Expect", "202+location").header("Eyes-Date", currentTime);
+        invocationBuilder = invocationBuilder
+                .header("Eyes-Expect", "202+location")
+                .header("Eyes-Date", currentTime);
         Response response = invocationBuilder.method(method, entity);
 
         String statusUrl = response.getHeaderString(HttpHeaders.LOCATION);
@@ -249,10 +278,7 @@ public class RestClient {
     }
 
     protected Response sendHttpWebRequest(String path, final String method, String accept) {
-        // Building the request
-        Invocation.Builder invocationBuilder = restClient.target(path).request(accept);
-
-        // Actually perform the method call and return the result
+        Invocation.Builder invocationBuilder = makeEyesRequest(restClient.target(path), null, accept);
         return invocationBuilder.method(method);
     }
 

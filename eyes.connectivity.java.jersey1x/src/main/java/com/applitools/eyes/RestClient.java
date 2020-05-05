@@ -14,13 +14,12 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Provides common rest client functionality.
@@ -35,6 +34,8 @@ public class RestClient {
         ClientResponse call();
     }
 
+    protected static final String AGENT_ID_CUSTOM_HEADER = "x-applitools-eyes-client";
+
     private AbstractProxySettings abstractProxySettings;
     private int timeout; // seconds
 
@@ -42,6 +43,7 @@ public class RestClient {
     protected Client restClient;
     protected URI serverUrl;
     protected WebResource endPoint;
+    protected String agentId;
 
     // Used for JSON serialization/de-serialization.
     protected ObjectMapper jsonMapper;
@@ -193,6 +195,34 @@ public class RestClient {
         return serverUrl;
     }
 
+    /**
+     * Creates a request for the eyes server
+     * @param target The target to start building from
+     * @param queryParams Query parameters for the URI
+     * @param responseTypes The accepted response type
+     * @return The created request
+     */
+    protected WebResource.Builder makeEyesRequest(WebResource target, Map<String, Object> queryParams, String... responseTypes) {
+        if (queryParams == null) {
+            queryParams = Collections.emptyMap();
+        }
+
+        for (Map.Entry<String, Object> param : queryParams.entrySet()) {
+            target = target.queryParam(param.getKey(), (String) param.getValue());
+        }
+
+        WebResource.Builder request = target.accept(responseTypes);
+        return request.header(AGENT_ID_CUSTOM_HEADER, agentId);
+    }
+
+    protected WebResource.Builder makeEyesRequest(WebResource target, Map<String, Object> queryParams) {
+        return makeEyesRequest(target, queryParams, MediaType.APPLICATION_JSON);
+    }
+
+    protected WebResource.Builder makeEyesRequest(WebResource target) {
+        return makeEyesRequest(target, null);
+    }
+
     protected ClientResponse sendLongRequest(WebResource.Builder invocationBuilder, String method, Object entity, String mediaType)
             throws EyesException {
 
@@ -267,11 +297,8 @@ public class RestClient {
     }
 
     protected ClientResponse sendHttpWebRequest(String path, final String method, String accept) {
-        // Building the request
-        WebResource.Builder invocationBuilder = restClient.resource(path).accept(accept);
-
-        // Actually perform the method call and return the result
-        return invocationBuilder.method(method, ClientResponse.class);
+        WebResource.Builder request = makeEyesRequest(restClient.resource(path), null, accept);
+        return request.method(method, ClientResponse.class);
     }
 
     /**
@@ -314,9 +341,8 @@ public class RestClient {
      * @throws EyesException For invalid status codes or if the response
      *                       parsing failed.
      */
-    protected <T> T parseResponseWithJsonData(ClientResponse response,
-                                              List<Integer> validHttpStatusCodes, Class<T> resultType)
-            throws EyesException {
+    protected <T> T parseResponseWithJsonData(ClientResponse response, List<Integer> validHttpStatusCodes,
+                                              Class<T> resultType) throws EyesException {
         ArgumentGuard.notNull(response, "response");
         ArgumentGuard.notNull(validHttpStatusCodes, "validHttpStatusCodes");
         ArgumentGuard.notNull(resultType, "resultType");

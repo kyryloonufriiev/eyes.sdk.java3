@@ -64,7 +64,7 @@ public class ServerConnector extends RestClient
      */
     @SuppressWarnings("WeakerAccess")
     public ServerConnector(Logger logger) {
-        this(logger, GeneralUtils.geServerUrl());
+        this(logger, GeneralUtils.getServerUrl());
     }
 
     /***
@@ -92,6 +92,16 @@ public class ServerConnector extends RestClient
      */
     public String getApiKey() {
         return this.apiKey != null ? this.apiKey : GeneralUtils.getEnvString("APPLITOOLS_API_KEY");
+    }
+
+    @Override
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    @Override
+    public String getAgentId() {
+        return this.agentId;
     }
 
     /**
@@ -155,10 +165,6 @@ public class ServerConnector extends RestClient
 
         String postData;
         ClientResponse response;
-        int statusCode;
-        List<Integer> validStatusCodes;
-        boolean isNewSession;
-        RunningSession runningSession;
 
         try {
 
@@ -174,25 +180,26 @@ public class ServerConnector extends RestClient
         }
 
         try {
-            WebResource.Builder builder = endPoint.queryParam("apiKey", getApiKey()).accept(MediaType.APPLICATION_JSON);
-            response = sendLongRequest(builder, HttpMethod.POST, postData, MediaType.APPLICATION_JSON);
+            Map<String, Object> queryParams = new HashMap<String, Object>(){{
+                put("apiKey", getApiKey());
+            }};
+            WebResource.Builder request = makeEyesRequest(endPoint, queryParams);
+            response = sendLongRequest(request, HttpMethod.POST, postData, MediaType.APPLICATION_JSON);
         } catch (RuntimeException e) {
             logger.log("startSession(): Server request failed: " + e.getMessage());
             throw e;
         }
 
         // Ok, let's create the running session from the response
-        validStatusCodes = new ArrayList<>();
+        List<Integer> validStatusCodes = new ArrayList<>();
         validStatusCodes.add(ClientResponse.Status.OK.getStatusCode());
         validStatusCodes.add(ClientResponse.Status.CREATED.getStatusCode());
 
-        runningSession = parseResponseWithJsonData(response, validStatusCodes,
-                RunningSession.class);
-
         // If this is a new session, we set this flag.
-        statusCode = response.getStatus();
-        isNewSession = (statusCode == ClientResponse.Status.CREATED.getStatusCode());
-        runningSession.setIsNewSession(isNewSession);
+        RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
+        if (runningSession.getIsNew() == null) {
+            runningSession.setIsNew(response.getStatus() == Response.Status.CREATED.getStatusCode());
+        }
 
         return runningSession;
     }
@@ -215,13 +222,13 @@ public class ServerConnector extends RestClient
         List<Integer> validStatusCodes;
         TestResults result;
 
-        WebResource.Builder builder = endPoint.path(sessionId)
-                .queryParam("apiKey", getApiKey())
-                .queryParam("aborted", String.valueOf(isAborted))
-                .queryParam("updateBaseline", String.valueOf(save))
-                .accept(MediaType.APPLICATION_JSON);
-
-        response = sendLongRequest(builder, "DELETE", null, null);
+        Map<String, Object> queryParams = new HashMap<String, Object>(){{
+            put("apiKey", getApiKey());
+            put("aborted", String.valueOf(isAborted));
+            put("updateBaseline", String.valueOf(save));
+        }};
+        WebResource.Builder request = makeEyesRequest(endPoint.path(sessionId), queryParams);
+        response = sendLongRequest(request, "DELETE", null, null);
 
         // Ok, let's create the running session from the response
         validStatusCodes = new ArrayList<>();
@@ -233,20 +240,23 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public void deleteSession(TestResults testResults) {
+    public void deleteSession(final TestResults testResults) {
         ArgumentGuard.notNull(testResults, "testResults");
 
-        WebResource sessionsResources = restClient.resource(serverUrl);
-        WebResource.Builder builder = sessionsResources
+        WebResource target = restClient.resource(serverUrl)
                 .path("/api/sessions/batches/")
                 .path(testResults.getBatchId())
                 .path("/")
-                .path(testResults.getId())
-                .queryParam("apiKey", getApiKey())
-                .queryParam("AccessToken", testResults.getSecretToken())
-                .accept(MediaType.APPLICATION_JSON);
+                .path(testResults.getId());
 
-        builder.delete();
+        Map<String, Object> queryParams = new HashMap<String, Object>(){{
+            put("apiKey", getApiKey());
+            put("AccessToken", testResults.getSecretToken());
+        }};
+
+        WebResource.Builder request = makeEyesRequest(target, queryParams);
+
+        request.delete();
     }
 
     /**
@@ -270,10 +280,6 @@ public class ServerConnector extends RestClient
         MatchResult result;
         String jsonData;
 
-        // since we rather not add an empty "tag" param
-        WebResource runningSessionsEndpoint =
-                endPoint.path(runningSession.getId());
-
         // Serializing model into JSON (we'll treat it as binary later).
         try {
             jsonData = jsonMapper.writeValueAsString(matchData);
@@ -282,9 +288,11 @@ public class ServerConnector extends RestClient
         }
 
         // Sending the request
-        WebResource.Builder request = runningSessionsEndpoint.queryParam("apiKey", getApiKey())
-                .accept(MediaType.APPLICATION_JSON);
+        Map<String, Object> queryParams = new HashMap<String, Object>(){{
+            put("apiKey", getApiKey());
+        }};
 
+        WebResource.Builder request = makeEyesRequest(endPoint.path(runningSession.getId()), queryParams);
         response = sendLongRequest(request, HttpMethod.POST, jsonData, MediaType.APPLICATION_JSON);
 
         // Ok, let's create the running session from the response
@@ -299,9 +307,7 @@ public class ServerConnector extends RestClient
 
     @Override
     public int uploadData(byte[] bytes, RenderingInfo renderingInfo, String targetUrl, String contentType, String mediaType) {
-        WebResource target = restClient.resource(targetUrl);
-        WebResource.Builder request = target
-                .accept(mediaType)
+        WebResource.Builder request = makeEyesRequest(restClient.resource(targetUrl), null, mediaType)
                 .entity(bytes, contentType)
                 .header("X-Auth-Token", renderingInfo.getAccessToken())
                 .header("x-ms-blob-type", "BlockBlob");
@@ -424,8 +430,11 @@ public class ServerConnector extends RestClient
     public RenderingInfo getRenderInfo() {
         this.logger.verbose("enter");
         if (renderingInfo == null) {
-            WebResource target = restClient.resource(serverUrl).path(RENDER_INFO_PATH).queryParam("apiKey", getApiKey());
-            WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
+            WebResource target = restClient.resource(serverUrl).path(RENDER_INFO_PATH);
+            Map<String, Object> queryParams = new HashMap<String, Object>(){{
+                put("apiKey", getApiKey());
+            }};
+            WebResource.Builder request = makeEyesRequest(target, queryParams);
             ClientResponse response = sendLongRequest(request, HttpMethod.GET, null, null);
 
             // Ok, let's create the running session from the response
@@ -443,53 +452,42 @@ public class ServerConnector extends RestClient
         this.logger.verbose("called with " + Arrays.toString(renderRequests));
 
         WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path(RENDER);
-        WebResource webResource = null;
-
         if (renderRequests.length > 1) {
             MultivaluedMap<String, String> params = new MultivaluedMapImpl();
             List<String> idsAsList = extractIdsFromRRequests(renderRequests);
             if (idsAsList != null && !idsAsList.isEmpty()) {
                 params.put(RENDER_ID, idsAsList);
-                webResource = target.queryParams(params);
+                target = target.queryParams(params);
             }
         } else if (renderRequests.length == 1) {
             String renderId = renderRequests[0].getRenderId();
             if (renderId != null) {
-                webResource = target.queryParam("render-id", renderId);
+                target = target.queryParam("render-id", renderId);
             }
         }
 
-        WebResource.Builder builder = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
             byte[] bytes = objectMapper.writeValueAsString(renderRequests).getBytes(StandardCharsets.UTF_8);
-            if (webResource == null) {
-                builder = target.getRequestBuilder();
-                builder = builder.entity(bytes, MediaType.APPLICATION_JSON);
-            } else {
+            WebResource.Builder request = makeEyesRequest(target)
+                    .entity(bytes, MediaType.APPLICATION_JSON)
+                    .header("X-Auth-Token", renderingInfo.getAccessToken());
 
-                builder = webResource.entity(bytes, MediaType.APPLICATION_JSON);
+            // Ok, let's create the running session from the response
+            List<Integer> validStatusCodes = new ArrayList<>();
+            validStatusCodes.add(Response.Status.OK.getStatusCode());
+            validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
+            ClientResponse response = request.post(ClientResponse.class);
+
+            if (validStatusCodes.contains(response.getStatus())) {
+                RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
+                return Arrays.asList(runningRenders);
             }
-
         } catch (JsonProcessingException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
-        assert builder != null;
-        WebResource.Builder request = builder.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", renderingInfo.getAccessToken());
-
-        // Ok, let's create the running session from the response
-        List<Integer> validStatusCodes = new ArrayList<>();
-        validStatusCodes.add(Response.Status.OK.getStatusCode());
-        validStatusCodes.add(Response.Status.NOT_FOUND.getStatusCode());
-        ClientResponse response = request.post(ClientResponse.class);
-
-        if (validStatusCodes.contains(response.getStatus())) {
-            RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
-            return Arrays.asList(runningRenders);
-        }
-//            throw new EyesException("Jersey2 ServerConnector.render - unexpected status (" + response.getStatus() + "), msg (" + new String(response + ")");
 
         return null;
     }
@@ -506,16 +504,18 @@ public class ServerConnector extends RestClient
     }
 
     @Override
-    public boolean renderCheckResource(RunningRender runningRender, RGridResource resource) {
+    public boolean renderCheckResource(final RunningRender runningRender, RGridResource resource) {
 
         ArgumentGuard.notNull(runningRender, "runningRender");
         ArgumentGuard.notNull(resource, "resource");
         // eslint-disable-next-line max-len
         this.logger.verbose("called with resource#" + resource.getSha256() + " for render: " + runningRender.getRenderId());
 
-        WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256()).queryParam("render-id", runningRender.getRenderId());
-
-        WebResource.Builder request = target.accept(MediaType.APPLICATION_JSON);
+        WebResource target = restClient.resource(renderingInfo.getServiceUrl()).path((RESOURCES_SHA_256) + resource.getSha256());
+        Map<String, Object> queryParams = new HashMap<String, Object>(){{
+            put("render-id", runningRender.getRenderId());
+        }};
+        WebResource.Builder request = makeEyesRequest(target, queryParams);
 
         // Ok, let's create the running session from the response
 //        List<Integer> validStatusCodes = new ArrayList<>();
@@ -550,7 +550,9 @@ public class ServerConnector extends RestClient
         } else {
             builder = target.entity(content, MediaType.APPLICATION_OCTET_STREAM_TYPE);
         }
-        builder = builder.header("X-Auth-Token", renderingInfo.getAccessToken());
+        builder = builder
+                .header("X-Auth-Token", renderingInfo.getAccessToken())
+                .header(AGENT_ID_CUSTOM_HEADER, agentId);
         final Future<ClientResponse> future = builder.put(ClientResponse.class);
         logger.verbose("future created.");
         //noinspection UnnecessaryLocalVariable
@@ -573,7 +575,9 @@ public class ServerConnector extends RestClient
             ArgumentGuard.notNull(renderIds, "renderIds");
             this.logger.verbose("called for render: " + Arrays.toString(renderIds));
 
-            WebResource.Builder target = restClient.resource(renderingInfo.getServiceUrl()).path((RENDER_STATUS)).header("X-Auth-Token", renderingInfo.getAccessToken());
+            WebResource.Builder target = restClient.resource(renderingInfo.getServiceUrl()).path((RENDER_STATUS))
+                    .header("X-Auth-Token", renderingInfo.getAccessToken())
+                    .header(AGENT_ID_CUSTOM_HEADER, agentId);
 
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
@@ -631,8 +635,11 @@ public class ServerConnector extends RestClient
         this.logger.verbose("called with " + batchId);
 
         String url = String.format(CLOSE_BATCH, batchId);
-        WebResource target = restClient.resource(serverUrl).path(url).queryParam("apiKey", getApiKey());
-        target.delete();
+        WebResource target = restClient.resource(serverUrl).path(url);
+        Map<String, Object> queryParams = new HashMap<String, Object>(){{
+            put("apiKey", getApiKey());
+        }};
+        makeEyesRequest(target, queryParams, (String) null).delete();
     }
 
     @Override
@@ -662,13 +669,10 @@ public class ServerConnector extends RestClient
 
     @Override
     protected ClientResponse sendHttpWebRequest(String path, final String method, String accept) {
-        // Building the request
-        WebResource.Builder invocationBuilder = restClient
-                .resource(path)
-                .queryParam("apikey", getApiKey())
-                .accept(accept);
-
-        // Actually perform the method call and return the result
+        Map<String, Object> queryParams = new HashMap<String, Object>(){{
+            put("apiKey", getApiKey());
+        }};
+        WebResource.Builder invocationBuilder = makeEyesRequest(restClient.resource(path), queryParams, accept);
         return invocationBuilder.method(method, ClientResponse.class);
     }
 }
