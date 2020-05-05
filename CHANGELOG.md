@@ -1,4 +1,4 @@
-## [vNext]
+## [3.161.0] - 2020-05-05
 ### Fixed
 - Default versions reported in `AgentId` now automatically generated and match `pom.xml`.
 - Method `setEnablePatterns` now works properly. [Trello 1714](https://trello.com/c/jQgW5dpz)
