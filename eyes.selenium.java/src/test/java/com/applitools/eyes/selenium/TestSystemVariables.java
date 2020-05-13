@@ -1,8 +1,8 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.ServerConnector;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -47,19 +47,19 @@ public class TestSystemVariables extends EnvironmentModifier {
     public void testDontCloseBatchesSystemVariables() {
         setEnvironmentVariable("APPLITOOLS_DONT_CLOSE_BATCHES", "true");
         ServerConnector serverConnector = new ServerConnector(logger);
-        Assert.assertEquals(true, serverConnector.getDontCloseBatches());
+        Assert.assertTrue(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES", "false");
         serverConnector = new ServerConnector(logger);
-        Assert.assertEquals(true, serverConnector.getDontCloseBatches());
+        Assert.assertTrue(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("APPLITOOLS_DONT_CLOSE_BATCHES", null);
         serverConnector = new ServerConnector(logger);
-        Assert.assertEquals(false, serverConnector.getDontCloseBatches());
+        Assert.assertFalse(serverConnector.getDontCloseBatches());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_DONT_CLOSE_BATCHES", "true");
         serverConnector = new ServerConnector(logger);
-        Assert.assertEquals(true, serverConnector.getDontCloseBatches());
+        Assert.assertTrue(serverConnector.getDontCloseBatches());
     }
 
     @Test
@@ -111,19 +111,19 @@ public class TestSystemVariables extends EnvironmentModifier {
     public void testBatchNotifySystemVariables() {
         setEnvironmentVariable("APPLITOOLS_BATCH_NOTIFY", "true");
         BatchInfo batchInfo = new BatchInfo();
-        Assert.assertEquals(true, batchInfo.isNotifyOnCompletion());
+        Assert.assertTrue(batchInfo.isNotifyOnCompletion());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_BATCH_NOTIFY", "false");
         batchInfo = new BatchInfo();
-        Assert.assertEquals(true, batchInfo.isNotifyOnCompletion());
+        Assert.assertTrue(batchInfo.isNotifyOnCompletion());
 
         setEnvironmentVariable("APPLITOOLS_BATCH_NOTIFY", null);
         batchInfo = new BatchInfo();
-        Assert.assertEquals(false, batchInfo.isNotifyOnCompletion());
+        Assert.assertFalse(batchInfo.isNotifyOnCompletion());
 
         setEnvironmentVariable("bamboo_APPLITOOLS_BATCH_NOTIFY", "true");
         batchInfo = new BatchInfo();
-        Assert.assertEquals(true, batchInfo.isNotifyOnCompletion());
+        Assert.assertTrue(batchInfo.isNotifyOnCompletion());
     }
 
     @Test

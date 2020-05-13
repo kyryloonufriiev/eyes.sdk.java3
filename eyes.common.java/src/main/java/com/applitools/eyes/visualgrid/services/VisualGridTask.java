@@ -175,7 +175,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                     testResults = eyesConnector.abortIfNotClosed();
                     logger.verbose("Closing a not opened test");
             }
-            @SuppressWarnings("UnnecessaryLocalVariable")
+
             TestResultContainer testResultContainer = new TestResultContainer(testResults, runningTest.getBrowserInfo(), this.exception);
             notifySuccessAllListeners();
             this.isTaskComplete.set(true);
@@ -261,10 +261,6 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         if(type == TaskType.CLOSE){
             type = TaskType.ABORT;
         }
-        abortRunningTest(exception);
-    }
-
-    private void abortRunningTest(Throwable exception) {
         runningTest.abort(true, exception);
     }
 

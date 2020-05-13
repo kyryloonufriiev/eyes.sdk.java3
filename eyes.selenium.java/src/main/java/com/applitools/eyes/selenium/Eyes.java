@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.events.ISessionEventHandler;
@@ -14,7 +15,6 @@ import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
-import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.ArgumentGuard;
@@ -23,9 +23,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * The type Eyes.
@@ -1518,7 +1515,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * Sets the server connector to use. MUST BE SET IN ORDER FOR THE EYES OBJECT TO WORK!
      * @param serverConnector The server connector object to use.
      */
-    public void setServerConnector(IServerConnector serverConnector) {
+    public void setServerConnector(ServerConnector serverConnector) {
         if (this.isVisualGridEyes) {
             this.visualGridEyes.setServerConnector(serverConnector);
         }
@@ -1869,7 +1866,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * Gets server connector.
      * @return the server connector
      */
-    public IServerConnector getServerConnector() {
+    public ServerConnector getServerConnector() {
         if (!isVisualGridEyes) {
             return this.seleniumEyes.getServerConnector();
         }

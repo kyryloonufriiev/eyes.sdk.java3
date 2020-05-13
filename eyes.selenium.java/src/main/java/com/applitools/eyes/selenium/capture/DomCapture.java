@@ -1,11 +1,11 @@
 package com.applitools.eyes.selenium.capture;
 
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionMemento;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.rendering.VisualGridEyes;
 import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.EfficientStringReplace;
@@ -19,7 +19,6 @@ import com.helger.css.decl.ICSSTopLevelRule;
 import com.helger.css.reader.CSSReader;
 import com.helger.css.writer.CSSWriterSettings;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class DomCapture {
 
     private static long DOM_EXTRACTION_TIMEOUT = 5 * 60 * 1000;
 
-    private static IServerConnector mServerConnector = null;
+    private static ServerConnector mServerConnector = null;
     private EyesWebDriver driver;
     private final Logger logger;
     private String cssStartToken;

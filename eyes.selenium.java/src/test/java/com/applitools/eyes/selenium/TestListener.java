@@ -19,8 +19,6 @@ import java.util.Map;
 
 public class TestListener implements ITestListener {
 
-
-
     @Override
     public void onTestStart(ITestResult result) {
         //System.out.println("onTestStart");
@@ -78,7 +76,7 @@ public class TestListener implements ITestListener {
         Eyes eyes = testSetup.getEyes();
         try {
             if (eyes.getIsOpen()) {
-                TestResults close = eyes.close(false);
+                eyes.closeAsync();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,6 +85,7 @@ public class TestListener implements ITestListener {
             if (testSetup.getDriver() != null) {
                 testSetup.getDriver().quit();
             }
+            testSetup.getRunner().getAllTestResults();
         }
     }
 
@@ -130,8 +129,6 @@ public class TestListener implements ITestListener {
             }
         }
     }
-
-
 
     private void compareRegions(TestSetup testSetup, ImageMatchSettings imageMatchSettings) {
         FloatingMatchSettings[] floating = imageMatchSettings.getFloating();
@@ -197,7 +194,7 @@ public class TestListener implements ITestListener {
                 GeneralUtils.logExceptionStackTrace(testSetup.getEyes().getLogger(), e);
             }
 
-            Assert.assertEquals(currentObject, kvp.getValue());
+                Assert.assertEquals(currentObject, kvp.getValue(), String.format("Property comparison for test '%s' failed! Property %s expected %s but got %s",testSetup.getTestName(), kvp.getKey(), kvp.getValue(), currentObject));
         }
     }
 
@@ -209,5 +206,10 @@ public class TestListener implements ITestListener {
     @Override
     public void onFinish(ITestContext context) {
         //System.out.println("onFinish");
+        Object instance = context.getAllTestMethods()[0].getInstance();
+        if (instance instanceof TestSetup) {
+            TestSetup testSetup = (TestSetup) instance;
+            testSetup.getRunner().getAllTestResults(false);
+        }
     }
 }
