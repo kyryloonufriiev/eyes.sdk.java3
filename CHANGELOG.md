@@ -1,11 +1,23 @@
+## [vNext] - 
+### Fixed
+- Fixed a bug where the Jeresy1 and Jboss connectivity modules didn't work with visual grid runner when running multiple tests simultaneously.
+- Fixed a bug where calling abortAsync when running tests with Visual Grid would cancel all previous `check` calls. [Trello 1762](https://trello.com/c/UrYlQavt)
+### Updated
+- Moved the logic from the connectivity modules and merged it into the common module to save a lot of code duplication. [Trello 1732](https://trello.com/c/mug8ARUc)
+### Added
+- Disabled SSL verification. Accept all certificates. [Trello 1777](https://trello.com/c/ZNSJZ1cf)
+- Added a script for running basic eyes tests for connectivity packages Jersey1 and Jsboss. [Trello 1782](https://trello.com/c/TA7v4Y4t)
+
+
 ## [3.161.0] - 2020-05-05
 ### Fixed
 - Default versions reported in `AgentId` now automatically generated and match `pom.xml`.
 - Method `setEnablePatterns` now works properly. [Trello 1714](https://trello.com/c/jQgW5dpz)
-- Fixed missing steps in certain cases in UltraFast Grid. [Trello 1717](https://trello.com/c/U1TTels2)
+- Fixed steps missing in certain cases in UltraFast Grid. [Trello 1717](https://trello.com/c/U1TTels2)
+- Now all requests include the Eyes-Date header when sending a long request
 ### Updated
-- Adding agent id to all requests headers. [Trello 1697](https://trello.com/c/CzhUxOqE)
 - The `startSession` method now uses long request. [Trello 1715](https://trello.com/c/DcVzWbeR)
+- Adding agent id to all requests headers. [Trello 1697](https://trello.com/c/CzhUxOqE)
 
 ## [3.160.3] - 2020-03-18
 ### Fixed

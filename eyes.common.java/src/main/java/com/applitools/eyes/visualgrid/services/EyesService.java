@@ -20,7 +20,11 @@ public class EyesService extends Thread {
     protected Logger logger;
 
     public void setLogger(Logger logger) {
-        this.logger = logger;
+        if (this.logger == null) {
+            this.logger = logger;
+        } else {
+            this.logger.setLogHandler(logger.getLogHandler());
+        }
     }
 
     interface Tasker {
@@ -45,6 +49,7 @@ public class EyesService extends Thread {
     @Override
     public void run() {
         try {
+            logger.log("Service '" + this.getName() + "' had started");
             while (isServiceOn) {
                 pauseIfNeeded();
                 runNextTask();

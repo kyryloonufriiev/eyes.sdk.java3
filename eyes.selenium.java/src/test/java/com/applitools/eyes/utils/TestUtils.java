@@ -1,14 +1,16 @@
 package com.applitools.eyes.utils;
 
+import com.applitools.connectivity.RestClient;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.Eyes;
-import com.applitools.eyes.selenium.TestSendDom;
 import com.applitools.utils.ArgumentGuard;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
@@ -44,6 +46,7 @@ public class TestUtils {
     public static LogHandler initLogger() {
         return initLogger(Thread.currentThread().getStackTrace()[2].getMethodName());
     }
+
     public static LogHandler initLogger(String testName, String logPath) {
 //FIXME - 
         //        if (!TestUtils.runOnCI)
@@ -84,8 +87,12 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri);
-        String srStr = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
+        RestClient client = new RestClient(new Logger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
+            client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
+        }
+        String srStr = client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
+                .readEntity(String.class);
         ObjectMapper jsonMapper = new ObjectMapper();
         jsonMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
@@ -97,7 +104,7 @@ public class TestUtils {
     }
 
     public static Object getFinalStatic(Field field) throws Exception {
-        return getFieldValue(field, (Object)null);
+        return getFieldValue(field, (Object) null);
     }
 
     public static Object getFieldValue(Object instance, String fieldName) throws Exception {
@@ -180,8 +187,8 @@ public class TestUtils {
                 .queryParam("apiKey", eyes.getApiKey())
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri);
-        String result = client.getString(apiSessionUri.toString(), MediaType.APPLICATION_JSON);
-        return result;
+        RestClient client = new RestClient(new Logger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        return client.sendHttpWebRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON)
+                .readEntity(String.class);
     }
 }

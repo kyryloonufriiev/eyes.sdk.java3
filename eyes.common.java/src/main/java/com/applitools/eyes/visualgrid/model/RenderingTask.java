@@ -12,7 +12,6 @@ import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.css.ECSSVersion;
@@ -37,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings("WeakerAccess")
 public class RenderingTask implements Callable<RenderStatusResults>, CompletableTask {
 
-    private static final int MAX_FETCH_FAILS = 62;
+    private static final int FETCH_TIMEOUT_SECONDS = 60;
     public static final String FULLPAGE = "full-page";
     public static final String VIEWPORT = "viewport";
     public static final int HOUR = 60 * 60 * 1000;
@@ -114,7 +113,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             logger.verbose("step 2");
             boolean stillRunning;
-            int fetchFails = 0;
+            long elapsedTimeStart = System.currentTimeMillis();
             boolean isForcePutAlreadyDone = false;
             List<RunningRender> runningRenders = null;
             do {
@@ -135,7 +134,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 //                        this.isForcePutNeeded.set(true);
                     }
                     logger.verbose("ERROR " + e.getMessage());
-                    fetchFails++;
                 }
                 logger.verbose("step 3.1");
                 if (runningRenders == null || runningRenders.size() == 0) {
@@ -162,7 +160,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 }
 
                 logger.verbose("step 3.3");
-                stillRunning = worstStatus == RenderStatus.NEED_MORE_RESOURCE || isNeedMoreDom || fetchFails > MAX_FETCH_FAILS;
+                double elapsedTime = (System.currentTimeMillis() - elapsedTimeStart) / 1000;
+                stillRunning = (worstStatus == RenderStatus.NEED_MORE_RESOURCE || isNeedMoreDom) && elapsedTime < FETCH_TIMEOUT_SECONDS;
                 if (stillRunning) {
                     sendMissingResources(runningRenders, requests[0].getDom(), requests[0].getResources(), isNeedMoreDom);
                 }
@@ -295,9 +294,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             } catch (Throwable e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
-            logger.verbose("locking putResourceCache");
-            allPuts.add(future);
-            logger.verbose("releasing putResourceCache");
+            if (future != null) {
+                allPuts.add(future);
+            }
         }
 
         logger.verbose("creating PutFutures for " + runningRenders.size() + " runningRenders");
@@ -389,7 +388,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 IResourceFuture iResourceFuture = this.fetchedCacheMap.get(url);
                 if (iResourceFuture != null) {
                     RGridResource value = iResourceFuture.get();
-                    if (value.getContent() != null) resourceMapping.put(url, value);
+                    if (value.getContent() != null) {
+                        logger.verbose("adding url to map: " + url);
+                        resourceMapping.put(url, value);
+                    }
                 }
             } catch (Exception e) {
                 logger.verbose("Couldn't download url = " + url);
@@ -421,13 +423,16 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     private void buildAllRGDoms(Map<String, RGridResource> resourceMapping, FrameData domData) {
         URL baseUrl = null;
+        String domDataUrl = domData.getUrl();
+        logger.verbose("url in DOM: " + domDataUrl);
         try {
-            baseUrl = new URL(domData.getUrl());
+            baseUrl = new URL(domDataUrl);
         } catch (MalformedURLException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         logger.verbose("baseUrl: " + baseUrl);
         List<FrameData> allFrame = domData.getFrames();
+        logger.verbose("FrameData count: " + allFrame.size());
         Map<String, RGridResource> mapping = new HashMap<>();
         for (FrameData frameObj : allFrame) {
             List<BlobData> allFramesBlobs = frameObj.getBlobs();
@@ -458,7 +463,6 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             } catch (JsonProcessingException e) {
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
-
         }
     }
 
@@ -554,6 +558,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             regionSelectorsList.addAll(Arrays.asList(regionSelector));
         }
 
+        logger.verbose("region selectors count: " + regionSelectorsList.size());
+        logger.verbose("this.visualGridTaskList count: " + this.visualGridTaskList.size());
+
         for (VisualGridTask visualGridTask : this.visualGridTaskList) {
 
             RenderBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
@@ -573,6 +580,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
             allRequestsForRG.add(request);
         }
+
+        logger.verbose("count of all requests for RG: " + allRequestsForRG.size());
         return allRequestsForRG;
     }
 
@@ -627,7 +636,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     href = element.attr("xlink:href");
                     if (href.startsWith("#")) continue;
                 }
-                CreateUriAndAddToList(allResourceUris, tdr.uri, href);
+                createUriAndAddToList(allResourceUris, tdr.uri, href);
             }
         } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
@@ -730,13 +739,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         ICommonsList<CSSImportRule> allImportRules = cascadingStyleSheet.getAllImportRules();
         for (CSSImportRule importRule : allImportRules) {
             String uri = importRule.getLocation().getURI();
-            CreateUriAndAddToList(allResourceUris, baseUrl, uri);
+            createUriAndAddToList(allResourceUris, baseUrl, uri);
         }
         logger.verbose("exit");
     }
 
-    private void CreateUriAndAddToList(Set<URL> allResourceUris, URL baseUrl, String uri) {
-        if (uri.toLowerCase().startsWith("data:")) return;
+    private void createUriAndAddToList(Set<URL> allResourceUris, URL baseUrl, String uri) {
+        if (uri.toLowerCase().startsWith("data:") || uri.toLowerCase().startsWith("javascript:")) return;
         try {
             URL url = new URL(baseUrl, uri);
             allResourceUris.add(url);
@@ -753,7 +762,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             ICommonsList<CSSExpressionMemberTermURI> allUriExpressions = allExpressionMembers.getAllInstanceOf(CSSExpressionMemberTermURI.class);
             for (CSSExpressionMemberTermURI uriExpression : allUriExpressions) {
                 String uri = uriExpression.getURIString();
-                CreateUriAndAddToList(allResourceUris, baseUrl, uri);
+                createUriAndAddToList(allResourceUris, baseUrl, uri);
             }
         }
     }

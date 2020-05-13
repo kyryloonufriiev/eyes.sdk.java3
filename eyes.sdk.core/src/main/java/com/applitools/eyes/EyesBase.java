@@ -1,11 +1,11 @@
 package com.applitools.eyes;
 
 import com.applitools.ICheckSettings;
-import com.applitools.eyes.config.IConfigurationGetter;
-import com.applitools.eyes.config.IConfigurationSetter;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
+import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
+import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.config.IConfigurationSetter;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
@@ -16,13 +16,17 @@ import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.exceptions.NewTestException;
 import com.applitools.eyes.exceptions.TestFailedException;
-import com.applitools.eyes.fluent.*;
-import com.applitools.eyes.positioning.*;
+import com.applitools.eyes.fluent.CheckSettings;
+import com.applitools.eyes.fluent.ICheckSettingsInternal;
+import com.applitools.eyes.positioning.InvalidPositionProvider;
+import com.applitools.eyes.positioning.PositionProvider;
+import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.scaling.FixedScaleProvider;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.triggers.MouseTrigger;
 import com.applitools.eyes.triggers.TextTrigger;
+import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.*;
 
 import java.awt.image.BufferedImage;
@@ -45,7 +49,7 @@ public abstract class EyesBase implements IEyesBase{
 
     private MatchWindowTask matchWindowTask;
 
-    protected IServerConnector serverConnector;
+    protected ServerConnector serverConnector;
     protected RunningSession runningSession;
     protected SessionStartInfo sessionStartInfo;
     protected RectangleSize viewportSize;
@@ -135,15 +139,16 @@ public abstract class EyesBase implements IEyesBase{
      * Sets the server connector to use. MUST BE SET IN ORDER FOR THE EYES OBJECT TO WORK!
      * @param serverConnector The server connector object to use.
      */
-    public void setServerConnector(IServerConnector serverConnector) {
+    public void setServerConnector(ServerConnector serverConnector) {
         ArgumentGuard.notNull(serverConnector, "serverConnector");
         if (serverConnector.getLogger() == null) {
             serverConnector.setLogger(this.logger);
         }
         this.serverConnector = serverConnector;
+        serverConnector.setLogger(logger);
     }
 
-    public IServerConnector getServerConnector() {
+    public ServerConnector getServerConnector() {
         if (serverConnector != null && serverConnector.getAgentId() == null) {
             serverConnector.setAgentId(getFullAgentId());
         }
@@ -1286,7 +1291,6 @@ public abstract class EyesBase implements IEyesBase{
      */
     protected void startSession() {
         logger.verbose("startSession()");
-
         if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
         }

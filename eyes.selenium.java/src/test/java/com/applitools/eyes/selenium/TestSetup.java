@@ -105,6 +105,8 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
     protected String platform;
     protected boolean forceFPS;
 
+    EyesRunner getRunner() { return this.runner; }
+
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
         if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
@@ -116,7 +118,7 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
             TestDataProvider.batchInfo.setId(batchId);
         }
 
-        this.runner = this.useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
+        this.runner = this.useVisualGrid ? new VisualGridRunner(10, testSuitName) : new ClassicRunner();
     }
 
     public SpecificTestContextRequirements getTestData() {

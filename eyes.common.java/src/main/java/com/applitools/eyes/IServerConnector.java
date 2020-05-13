@@ -78,7 +78,7 @@ public interface IServerConnector {
      * @throws EyesException the exception is being thrown when stopSession failed
      */
     TestResults stopSession(final RunningSession runningSession,
-                                   final boolean isAborted, final boolean save);
+                            final boolean isAborted, final boolean save);
 
     /**
      * Deletes the given test result
@@ -107,7 +107,7 @@ public interface IServerConnector {
      * @param isSecondRetry Indicates if a retry is mandatory onFailed - 2 retries per request
      * @param listener the listener will be called when the request will be resolved.
      */
-     void downloadString(URL uri, boolean isSecondRetry, IDownloadListener<String> listener);
+    void downloadString(URL uri, boolean isSecondRetry, IDownloadListener<String> listener);
 
     /**
      * Downloads string from a given Url.
