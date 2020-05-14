@@ -58,7 +58,7 @@ public interface IConfigurationSetter {
 
     IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements);
 
-    IConfigurationSetter setAccessibilityValidation(AccessibilityLevel accessibilityValidation);
+    IConfigurationSetter setAccessibilityValidation(AccessibilitySettings accessibilitySettings);
 
     IConfigurationSetter setUseDom(boolean useDom);
 

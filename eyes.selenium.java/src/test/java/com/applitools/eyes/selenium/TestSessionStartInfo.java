@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Calendar;
 
 @Listeners(TestListener.class)
-@SuppressWarnings("SpellCheckingInspection")
 public class TestSessionStartInfo {
 
     @Test()
@@ -29,7 +28,8 @@ public class TestSessionStartInfo {
         ims.setMatchLevel(MatchLevel.STRICT);
         AccessibilityRegionByRectangle[] accessibilityValidation = {new AccessibilityRegionByRectangle(10, 20, 30, 40, AccessibilityRegionType.GraphicalObject)};
         ims.setAccessibility(accessibilityValidation);
-        ims.setAccessibilityLevel(AccessibilityLevel.AA);
+        AccessibilitySettings accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_0);
+        ims.setAccessibilitySettings(accessibilitySettings);
         ims.setFloatingRegions(new FloatingMatchSettings[]{new FloatingMatchSettings(22, 32, 42, 52, 5, 10, 15, 20)});
 
         SessionStartInfo sessionStartInfo = new SessionStartInfo(

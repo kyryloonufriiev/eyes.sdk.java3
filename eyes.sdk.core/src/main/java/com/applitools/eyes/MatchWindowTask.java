@@ -509,7 +509,7 @@ public class MatchWindowTask {
             imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : configGetter.getUseDom());
             imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns() != null ? checkSettingsInternal.isEnablePatterns() : configGetter.getEnablePatterns());
             imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacements());
-            imageMatchSettings.setAccessibilityLevel(configGetter.getAccessibilityValidation());
+            imageMatchSettings.setAccessibilitySettings(configGetter.getAccessibilityValidation());
         }
         return imageMatchSettings;
     }

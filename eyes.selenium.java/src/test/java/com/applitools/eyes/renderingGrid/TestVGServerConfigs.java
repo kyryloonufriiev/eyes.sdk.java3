@@ -1,9 +1,6 @@
 package com.applitools.eyes.renderingGrid;
 
-import com.applitools.eyes.AccessibilityLevel;
-import com.applitools.eyes.FileLogger;
-import com.applitools.eyes.MatchLevel;
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.BrowserType;
@@ -36,7 +33,7 @@ public class TestVGServerConfigs {
             eyes.open(driver);
             Error ex = Assert.expectThrows(Error.class, new Assert.ThrowingRunnable() {
                 @Override
-                public void run() throws Throwable {
+                public void run() {
                     eyes.close();
                 }
             });
@@ -45,7 +42,7 @@ public class TestVGServerConfigs {
             driver.quit();
             Assert.expectThrows(Error.class, new Assert.ThrowingRunnable() {
                 @Override
-                public void run() throws Throwable {
+                public void run() {
                     runner.getAllTestResults();
                 }
             });
@@ -66,18 +63,20 @@ public class TestVGServerConfigs {
             conf.setApiKey("CAE7aS103TDz7XyegELya3tHpEIXTFi0gBBwvgq104PSHIU110");
             conf.setAppName("app").setTestName("test");
             conf.setBatch(TestDataProvider.batchInfo);
-            conf.setAccessibilityValidation(AccessibilityLevel.None).setIgnoreDisplacements(false);
+            conf.setAccessibilityValidation(null).setIgnoreDisplacements(false);
 //            conf.setProxy(new ProxySettings("http://127.0.0.1", 8888, null, null));
             eyes.setConfiguration(conf);
 
             eyes.open(driver);
 
-            conf.setAccessibilityValidation(AccessibilityLevel.AAA).setIgnoreDisplacements(true);
+            AccessibilitySettings accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AAA, AccessibilityGuidelinesVersion.WCAG_2_0);
+            conf.setAccessibilityValidation(accessibilitySettings).setIgnoreDisplacements(true);
             eyes.setConfiguration(conf);
 
             eyes.checkWindow();
 
-            conf.setAccessibilityValidation(AccessibilityLevel.AA).setMatchLevel(MatchLevel.LAYOUT);
+            accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_1);
+            conf.setAccessibilityValidation(accessibilitySettings).setMatchLevel(MatchLevel.LAYOUT);
             eyes.setConfiguration(conf);
 
             eyes.checkWindow();
@@ -91,18 +90,21 @@ public class TestVGServerConfigs {
                 e.printStackTrace();
             }
 
-            Assert.assertEquals(AccessibilityLevel.None, sessionResults.getStartInfo().getDefaultMatchSettings().getAccessibilityLevel());
+            Assert.assertNull(sessionResults.getStartInfo().getDefaultMatchSettings().getAccessibilitySettings());
             final ImageMatchSettings defaultMatchSettings = sessionResults.getStartInfo().getDefaultMatchSettings();
             Assert.assertFalse(defaultMatchSettings.getIgnoreDisplacements());
             Assert.assertEquals(MatchLevel.STRICT, sessionResults.getStartInfo().getDefaultMatchSettings().getMatchLevel());
 
             Assert.assertEquals(2, sessionResults.getActualAppOutput().length);
 
-            Assert.assertEquals(AccessibilityLevel.AAA, sessionResults.getActualAppOutput()[0].getImageMatchSettings().getAccessibilityLevel());
+            accessibilitySettings = sessionResults.getActualAppOutput()[0].getImageMatchSettings().getAccessibilitySettings();
+            Assert.assertEquals(AccessibilityLevel.AAA, accessibilitySettings.getLevel());
+            Assert.assertEquals(AccessibilityGuidelinesVersion.WCAG_2_0, accessibilitySettings.getGuidelinesVersion());
             Assert.assertTrue(sessionResults.getActualAppOutput()[0].getImageMatchSettings().getIgnoreDisplacements());
             Assert.assertEquals(MatchLevel.STRICT, sessionResults.getActualAppOutput()[0].getImageMatchSettings().getMatchLevel());
 
-            Assert.assertEquals(AccessibilityLevel.AA, sessionResults.getActualAppOutput()[1].getImageMatchSettings().getAccessibilityLevel());
+            accessibilitySettings =sessionResults.getActualAppOutput()[1].getImageMatchSettings().getAccessibilitySettings();
+            Assert.assertEquals(AccessibilityGuidelinesVersion.WCAG_2_1, accessibilitySettings.getGuidelinesVersion());
             Assert.assertTrue(sessionResults.getActualAppOutput()[1].getImageMatchSettings().getIgnoreDisplacements());
             Assert.assertEquals(MatchLevel.LAYOUT2, sessionResults.getActualAppOutput()[1].getImageMatchSettings().getMatchLevel());
         } finally {
