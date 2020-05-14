@@ -176,7 +176,8 @@ public class TestFluentApi extends TestSetup {
     @Test
     public void TestAccessibilityRegions() {
         Configuration config = getEyes().getConfiguration();
-        config.setAccessibilityValidation(AccessibilityLevel.AAA);
+        AccessibilitySettings accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AAA, AccessibilityGuidelinesVersion.WCAG_2_0);
+        config.setAccessibilityValidation(accessibilitySettings);
         getEyes().setConfiguration(config);
         getEyes().check(Target.window().accessibility(By.className("ignore"), AccessibilityRegionType.LargeText));
         setExpectedAccessibilityRegions(new AccessibilityRegionByRectangle[]{
@@ -184,12 +185,12 @@ public class TestFluentApi extends TestSetup {
                 new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.LargeText),
                 new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.LargeText)}
         );
-        addExpectedProperty("AccessibilityLevel", AccessibilityLevel.AAA);
+        addExpectedProperty("AccessibilitySettings", accessibilitySettings);
     }
 
     @Override
     protected void beforeOpen(Eyes eyes) {
-        eyes.getDefaultMatchSettings().setAccessibilityLevel(AccessibilityLevel.AAA);
+        AccessibilitySettings accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AAA, AccessibilityGuidelinesVersion.WCAG_2_0);
+        eyes.getDefaultMatchSettings().setAccessibilitySettings(accessibilitySettings);
     }
-
 }
