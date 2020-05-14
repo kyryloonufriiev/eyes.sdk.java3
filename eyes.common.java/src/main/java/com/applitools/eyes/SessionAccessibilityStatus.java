@@ -1,17 +1,26 @@
 package com.applitools.eyes;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SessionAccessibilityStatus {
     public enum AccessibilityStatus {
-        PASSED,
-        FAILED
+        Passed,
+        Failed
     }
 
-    private final AccessibilityStatus status;
-    private final AccessibilitySettings settings;
+    @JsonProperty("status")
+    private AccessibilityStatus status;
+    @JsonProperty("level")
+    private AccessibilityLevel level;
+    @JsonProperty("version")
+    private AccessibilityGuidelinesVersion version;
+
+    public SessionAccessibilityStatus() {}
 
     public SessionAccessibilityStatus(AccessibilityStatus status, AccessibilitySettings settings) {
         this.status = status;
-        this.settings = settings;
+        this.level = settings.getLevel();
+        this.version = settings.getGuidelinesVersion();
     }
 
     public AccessibilityStatus getStatus() {
@@ -19,6 +28,6 @@ public class SessionAccessibilityStatus {
     }
 
     public AccessibilitySettings getSettings() {
-        return settings;
+        return new AccessibilitySettings(level, version);
     }
 }
