@@ -21,7 +21,7 @@ import java.util.List;
 public class TestAccessibility {
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE, Boolean.FALSE};
+        return new Object[]{Boolean.TRUE};
     }
 
     @Test(dataProvider = "booleanDP")
@@ -62,8 +62,8 @@ public class TestAccessibility {
             }
 
             SessionAccessibilityStatus accessibilityStatus = resultSanity.getAccessibilityStatus();
-            Assert.assertEquals(accessibilityStatus.getSettings().getLevel(), AccessibilityLevel.AA);
-            Assert.assertEquals(accessibilityStatus.getSettings().getGuidelinesVersion(), AccessibilityGuidelinesVersion.WCAG_2_0);
+            Assert.assertEquals(accessibilityStatus.getLevel(), AccessibilityLevel.AA);
+            Assert.assertEquals(accessibilityStatus.getVersion(), AccessibilityGuidelinesVersion.WCAG_2_0);
             Assert.assertNull(resultNoAccessibility.getAccessibilityStatus());
 
             SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), resultSanity);
