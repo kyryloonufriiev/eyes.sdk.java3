@@ -21,7 +21,7 @@ import java.util.List;
 public class TestAccessibility {
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
-        return new Object[]{Boolean.TRUE};
+        return new Object[]{Boolean.TRUE, Boolean.FALSE};
     }
 
     @Test(dataProvider = "booleanDP")
@@ -29,11 +29,8 @@ public class TestAccessibility {
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
-        eyes.setProxy(new ProxySettings("http://localhost:8888"));
-        eyes.setServerUrl("https://testeyesapi.applitools.com");
-        eyes.setApiKey("D98LyaCRbaPoEDpIyF99AKiUHAzx1JUoqITFiyF104mHniE110");
         AccessibilitySettings settings = new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_0);
-        Configuration configuration = new Configuration();
+        Configuration configuration = eyes.getConfiguration();
         configuration.setAccessibilityValidation(settings);
         eyes.setConfiguration(configuration);
         WebDriver driver = SeleniumUtils.createChromeDriver();
