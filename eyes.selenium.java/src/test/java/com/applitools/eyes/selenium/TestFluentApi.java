@@ -173,21 +173,6 @@ public class TestFluentApi extends TestSetup {
         addExpectedProperty("IgnoreDisplacements", ignoreDisplacements);
     }
 
-    @Test
-    public void TestAccessibilityRegions() {
-        Configuration config = getEyes().getConfiguration();
-        AccessibilitySettings accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AAA, AccessibilityGuidelinesVersion.WCAG_2_0);
-        config.setAccessibilityValidation(accessibilitySettings);
-        getEyes().setConfiguration(config);
-        getEyes().check(Target.window().accessibility(By.className("ignore"), AccessibilityRegionType.LargeText));
-        setExpectedAccessibilityRegions(new AccessibilityRegionByRectangle[]{
-                new AccessibilityRegionByRectangle(122, 928, 456, 306, AccessibilityRegionType.LargeText),
-                new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.LargeText),
-                new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.LargeText)}
-        );
-        addExpectedProperty("AccessibilitySettings", accessibilitySettings);
-    }
-
     @Override
     protected void beforeOpen(Eyes eyes) {
         AccessibilitySettings accessibilitySettings = new AccessibilitySettings(AccessibilityLevel.AAA, AccessibilityGuidelinesVersion.WCAG_2_0);
