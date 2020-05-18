@@ -1,4 +1,4 @@
-## [vNext]
+## [3.163.0] - 2020-05-18
 ### Fixed
 - Updating configuration now updates the default match settings. [Trello 1810](https://trello.com/c/dAdD9AkN)
 ### Updated
