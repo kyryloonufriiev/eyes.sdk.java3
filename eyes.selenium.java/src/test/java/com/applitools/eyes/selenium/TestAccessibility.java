@@ -33,6 +33,8 @@ public class TestAccessibility {
         Configuration configuration = eyes.getConfiguration();
         configuration.setAccessibilityValidation(settings);
         eyes.setConfiguration(configuration);
+        eyes.setServerUrl("https://testeyesapi.applitools.com");
+        eyes.setApiKey("D98LyaCRbaPoEDpIyF99AKiUHAzx1JUoqITFiyF104mHniE110");
         WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
