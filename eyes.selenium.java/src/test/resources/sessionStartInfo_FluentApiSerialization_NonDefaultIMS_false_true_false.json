@@ -11,7 +11,7 @@
   "enablePatterns" : true,
   "ignoreDisplacements" : false,
   "accessibility" : [ ],
-  "accessibilityLevel" : "None",
+  "accessibilitySettings" : null,
   "Ignore" : null,
   "Layout" : null,
   "Strict" : null,

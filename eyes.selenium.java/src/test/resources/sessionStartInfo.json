@@ -45,7 +45,10 @@
       "height" : 40,
       "type" : "GraphicalObject"
     } ],
-    "accessibilityLevel" : "AA",
+    "accessibilitySettings" : {
+      "level": "AA",
+      "version": "WCAG_2_0"
+    },
     "Ignore" : null,
     "Layout" : null,
     "Strict" : null,
