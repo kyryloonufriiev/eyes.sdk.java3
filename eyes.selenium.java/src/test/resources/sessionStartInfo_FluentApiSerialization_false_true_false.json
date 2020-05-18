@@ -6,7 +6,7 @@
   "enablePatterns" : true,
   "ignoreDisplacements" : false,
   "accessibility" : [ ],
-  "accessibilityLevel" : "None",
+  "accessibilitySettings" : null,
   "Ignore" : [ ],
   "Layout" : [ ],
   "Strict" : [ ],
