@@ -676,7 +676,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     }
 
     @Override
-    public IConfigurationSetter setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
+    public IConfigurationSetter setAccessibilityValidation(AccessibilitySettings accessibilityValidation) {
         return this.config.setAccessibilityValidation(accessibilityValidation);
     }
 
@@ -704,7 +704,7 @@ public class Eyes extends EyesBase implements IConfigurationGetter, IConfigurati
     }
 
     @Override
-    public AccessibilityLevel getAccessibilityValidation() {
+    public AccessibilitySettings getAccessibilityValidation() {
         return config.getAccessibilityValidation();
     }
 

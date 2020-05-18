@@ -59,7 +59,7 @@ public interface IConfigurationGetter {
 
     boolean getIgnoreDisplacements();
 
-    AccessibilityLevel getAccessibilityValidation();
+    AccessibilitySettings getAccessibilityValidation();
 
     boolean getUseDom();
 

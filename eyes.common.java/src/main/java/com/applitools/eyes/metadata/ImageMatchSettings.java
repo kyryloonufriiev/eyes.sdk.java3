@@ -1,10 +1,6 @@
 package com.applitools.eyes.metadata;
 
-import com.applitools.eyes.AccessibilityLevel;
-import com.applitools.eyes.AccessibilityRegionByRectangle;
-import com.applitools.eyes.FloatingMatchSettings;
-import com.applitools.eyes.MatchLevel;
-import com.applitools.eyes.Region;
+import com.applitools.eyes.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -51,8 +47,8 @@ public class ImageMatchSettings {
     private Boolean ignoreDisplacements;
     @JsonProperty("accessibility")
     private AccessibilityRegionByRectangle[] accessibility = new AccessibilityRegionByRectangle[0];
-    @JsonProperty("accessibilityLevel")
-    private AccessibilityLevel accessibilityLevel = AccessibilityLevel.None;
+    @JsonProperty("accessibilitySettings")
+    private AccessibilitySettings accessibilitySettings;
 
     @JsonProperty("matchLevel")
     public MatchLevel getMatchLevel() {
@@ -174,13 +170,13 @@ public class ImageMatchSettings {
         this.ignoreDisplacements = ignoreDisplacements;
     }
 
-    @JsonProperty("accessibilityLevel")
-    public AccessibilityLevel getAccessibilityLevel() {
-        return accessibilityLevel;
+    @JsonProperty("accessibilitySettings")
+    public AccessibilitySettings getAccessibilitySettings() {
+        return accessibilitySettings;
     }
-    @JsonProperty("accessibilityLevel")
-    public void setAccessibilityLevel(AccessibilityLevel accessibilityLevel) {
-        this.accessibilityLevel = accessibilityLevel;
+    @JsonProperty("accessibilitySettings")
+    public void setAccessibilitySettings(AccessibilitySettings accessibilitySettings) {
+        this.accessibilitySettings = accessibilitySettings;
     }
     @JsonProperty("accessibility")
     public AccessibilityRegionByRectangle[] getAccessibility() {

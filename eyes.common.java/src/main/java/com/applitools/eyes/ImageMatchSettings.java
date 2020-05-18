@@ -19,7 +19,7 @@ public class ImageMatchSettings {
     public boolean enablePatterns;
     public boolean ignoreDisplacements;
     private AccessibilityRegionByRectangle[] accessibility = new AccessibilityRegionByRectangle[0];
-    private AccessibilityLevel accessibilityLevel = AccessibilityLevel.None;
+    private AccessibilitySettings accessibilitySettings;
 
     public ImageMatchSettings(MatchLevel matchLevel, ExactMatchSettings exact, boolean useDom) {
         this.matchLevel = matchLevel;
@@ -51,7 +51,7 @@ public class ImageMatchSettings {
             this.enablePatterns = other.enablePatterns;
             this.ignoreDisplacements = other.ignoreDisplacements;
             this.accessibility = other.accessibility;
-            this.accessibilityLevel = other.accessibilityLevel;
+            this.accessibilitySettings = other.accessibilitySettings;
         } else {
             this.matchLevel = MatchLevel.STRICT;
         }
@@ -231,12 +231,12 @@ public class ImageMatchSettings {
         this.accessibility = accessibilityValidation;
     }
 
-    public AccessibilityLevel getAccessibilityLevel() {
-        return accessibilityLevel;
+    public AccessibilitySettings getAccessibilitySettings() {
+        return accessibilitySettings;
     }
 
-    public void setAccessibilityLevel(AccessibilityLevel accessibilityLevel) {
-        this.accessibilityLevel = accessibilityLevel;
+    public void setAccessibilitySettings(AccessibilitySettings accessibilitySettings) {
+        this.accessibilitySettings = accessibilitySettings;
     }
 
     public AccessibilityRegionByRectangle[] getAccessibility() {
