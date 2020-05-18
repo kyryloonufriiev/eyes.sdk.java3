@@ -2125,6 +2125,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         try {
             results = super.close(throwEx);
         } catch (Throwable e) {
+            logger.log(e.getMessage());
             if (throwEx) {
                 throw e;
             }

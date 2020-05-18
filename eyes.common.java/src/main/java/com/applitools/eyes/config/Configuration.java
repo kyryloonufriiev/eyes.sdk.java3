@@ -34,7 +34,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     private String serverUrl = null;
     private AbstractProxySettings proxy = null;
     private FailureReports failureReports = FailureReports.ON_CLOSE;
-    private AccessibilityLevel accessibilityValidation = null;
+    private AccessibilitySettings accessibilitySettings = null;
     private boolean enablePatterns;
     private boolean useDom;
 
@@ -72,7 +72,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
             this.defaultMatchSettings.setMatchLevel(other.getMatchLevel());
         }
         this.ignoreDisplacements = other.getIgnoreDisplacements();
-        this.accessibilityValidation = other.getAccessibilityValidation();
+        this.accessibilitySettings = other.getAccessibilityValidation();
     }
 
     public Configuration() {
@@ -417,23 +417,36 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
 
     @Override
     public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+        this.defaultMatchSettings.setIgnoreDisplacements(isIgnoreDisplacements);
         this.ignoreDisplacements = isIgnoreDisplacements;
         return this;
     }
 
     @Override
-    public AccessibilityLevel getAccessibilityValidation() {
-        return this.accessibilityValidation != null ? this.accessibilityValidation : getDefaultMatchSettings().getAccessibilityLevel();
+    public AccessibilitySettings getAccessibilityValidation() {
+        return this.accessibilitySettings != null ? this.accessibilitySettings : getDefaultMatchSettings().getAccessibilitySettings();
     }
 
     @Override
-    public IConfigurationSetter setAccessibilityValidation(AccessibilityLevel accessibilityValidation) {
-        this.accessibilityValidation = accessibilityValidation;
+    public IConfigurationSetter setAccessibilityValidation(AccessibilitySettings accessibilitySettings) {
+        if (accessibilitySettings == null) {
+            this.defaultMatchSettings.setAccessibilitySettings(null);
+            this.accessibilitySettings = null;
+            return this;
+        }
+
+        if (accessibilitySettings.getLevel() == null || accessibilitySettings.getGuidelinesVersion() == null) {
+            throw new IllegalArgumentException("AccessibilitySettings should have the following properties: ‘level,version’");
+        }
+
+        this.defaultMatchSettings.setAccessibilitySettings(accessibilitySettings);
+        this.accessibilitySettings = accessibilitySettings;
         return this;
     }
 
     @Override
     public IConfigurationSetter setUseDom(boolean useDom) {
+        this.defaultMatchSettings.setUseDom(useDom);
         this.useDom = useDom;
         return this;
     }
@@ -445,6 +458,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
 
     @Override
     public IConfigurationSetter setEnablePatterns(boolean enablePatterns) {
+        this.defaultMatchSettings.setEnablePatterns(enablePatterns);
         this.enablePatterns = enablePatterns;
         return this;
     }

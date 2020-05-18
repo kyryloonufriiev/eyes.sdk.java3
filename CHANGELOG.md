@@ -1,3 +1,9 @@
+## [vNext]
+### Fixed
+- Updating configuration now updates the default match settings. [Trello 1810](https://trello.com/c/dAdD9AkN)
+### Updated
+- Accessibility guidelines version support [Trello 1767](https://trello.com/c/gq69woeK)
+
 ## [3.162.0] - 2020-05-13 
 ### Fixed
 - Fixed a bug where the Jeresy1 and Jboss connectivity modules didn't work with visual grid runner when running multiple tests simultaneously.

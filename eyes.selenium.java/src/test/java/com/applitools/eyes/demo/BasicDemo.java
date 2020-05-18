@@ -69,7 +69,7 @@ public class BasicDemo extends ReportingTestSuite {
             eyes = sanityTest("Classic Runner", runner);
         } finally {
             if (eyes != null) {
-                eyes.abortIfNotClosed();
+                eyes.abortAsync();
             }
 
             afterEach(runner);
