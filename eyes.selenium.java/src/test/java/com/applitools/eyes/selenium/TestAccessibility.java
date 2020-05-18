@@ -52,22 +52,26 @@ public class TestAccessibility {
             Assert.assertEquals(2, allTestResults.getAllResults().length);
             TestResults resultSanity = allTestResults.getAllResults()[0].getTestResults();
             TestResults resultNoAccessibility = allTestResults.getAllResults()[1].getTestResults();
+            // Visual grid runner doesn't guarantee the order of the results
             if (allTestResults.getAllResults()[1].getTestResults().getName().startsWith("TestAccessibility_Sanity")) {
                 TestResults temp = resultSanity;
                 resultSanity = resultNoAccessibility;
                 resultNoAccessibility = temp;
             }
 
+            // Testing the accessibility status returned in the results
             SessionAccessibilityStatus accessibilityStatus = resultSanity.getAccessibilityStatus();
             Assert.assertEquals(accessibilityStatus.getLevel(), AccessibilityLevel.AA);
             Assert.assertEquals(accessibilityStatus.getVersion(), AccessibilityGuidelinesVersion.WCAG_2_0);
             Assert.assertNull(resultNoAccessibility.getAccessibilityStatus());
 
+            // Testing the accessibility settings sent in the start info
             SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), resultSanity);
             ImageMatchSettings defaultMatchSettings = sessionResults.getStartInfo().getDefaultMatchSettings();
             Assert.assertEquals(defaultMatchSettings.getAccessibilitySettings().getGuidelinesVersion(), AccessibilityGuidelinesVersion.WCAG_2_0);
             Assert.assertEquals(defaultMatchSettings.getAccessibilitySettings().getLevel(), AccessibilityLevel.AA);
 
+            // Testing the accessibility regions sent in the session
             ImageMatchSettings matchSettings = sessionResults.getActualAppOutput()[0].getImageMatchSettings();
             List<AccessibilityRegionByRectangle> actual = Arrays.asList(matchSettings.getAccessibility());
             Assert.assertEquals(new HashSet<>(actual), new HashSet<>(Arrays.asList(
