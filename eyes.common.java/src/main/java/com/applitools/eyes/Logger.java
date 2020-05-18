@@ -9,8 +9,7 @@ public class Logger {
     protected int getMethodsBack() { return 3; }
 
     public Logger() {
-        //logHandler = new NullLogHandler();
-        logHandler = new StdoutLogHandler();
+        logHandler = new NullLogHandler();
         sessionId = "";
     }
 
