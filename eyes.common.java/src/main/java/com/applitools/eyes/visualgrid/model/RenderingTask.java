@@ -63,8 +63,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private Timer timer = new Timer("VG_StopWatch", true);
     private AtomicBoolean isTimeElapsed = new AtomicBoolean(false);
 
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private boolean isTaskStarted = false;
+
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private boolean isTaskCompleted = false;
+
+    @SuppressWarnings("unused")
     private boolean isTaskInException = false;
 
     public interface RenderTaskListener {
@@ -361,7 +366,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private RenderRequest[] prepareDataForRG(FrameData domData) {
 
         final Map<String, RGridResource> allBlobs = Collections.synchronizedMap(new HashMap<String, RGridResource>());
-        Set<URL> resourceUrls = new HashSet<>();
+        Set<URI> resourceUrls = new HashSet<>();
 
         writeFrameDataAsResource(domData);
 
@@ -480,7 +485,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
     @SuppressWarnings("unchecked")
-    private void parseScriptResult(FrameData domData, Map<String, RGridResource> allBlobs, Set<URL> resourceUrls) {
+    private void parseScriptResult(FrameData domData, Map<String, RGridResource> allBlobs, Set<URI> resourceUrls) {
 
         Base64 codec = new Base64();
 
@@ -488,12 +493,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         logger.verbose("baseUrl: " + baseUrlStr);
 
-        URL baseUrl = null;
+        URI baseUrl = null;
         try {
-            baseUrl = new URL(baseUrlStr);
-        } catch (MalformedURLException e) {
+            baseUrl = new URI(baseUrlStr);
+        } catch (Exception e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
+
         parseBlobs(allBlobs, codec, baseUrl, domData.getBlobs());
 
         parseResourceUrls(domData, resourceUrls, baseUrl);
@@ -510,7 +516,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
 
-    private void parseFrames(FrameData frameData, Map<String, RGridResource> allBlobs, Set<URL> resourceUrls) {
+    private void parseFrames(FrameData frameData, Map<String, RGridResource> allBlobs, Set<URI> resourceUrls) {
         logger.verbose("handling 'frames' key (level: " + framesLevel.incrementAndGet() + ")");
         for (FrameData frameObj : frameData.getFrames()) {
             parseScriptResult(frameObj, allBlobs, resourceUrls);
@@ -518,12 +524,13 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("done handling 'frames' key (level: " + framesLevel.getAndDecrement() + ")");
     }
 
-    private void parseResourceUrls(FrameData result, Set<URL> resourceUrls, URL baseUrl) {
+    private void parseResourceUrls(FrameData result, Set<URI> resourceUrls, URI baseUrl) {
         List<String> list = result.getResourceUrls();
         for (String url : list) {
             try {
-                resourceUrls.add(new URL(baseUrl, url));
-            } catch (MalformedURLException e) {
+                resourceUrls.add(baseUrl.resolve(url));
+            } catch (Exception e) {
+                logger.log("Error resolving url:" + url);
                 GeneralUtils.logExceptionStackTrace(logger, e);
             }
         }
@@ -531,7 +538,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("exit");
     }
 
-    private void parseBlobs(Map<String, RGridResource> allBlobs, Base64 codec, URL baseUrl, List<BlobData> value) {
+    private void parseBlobs(Map<String, RGridResource> allBlobs, Base64 codec, URI baseUrl, List<BlobData> value) {
         //TODO check if empty
         for (BlobData blob : value) {
             RGridResource resource = parseBlobToGridResource(codec, baseUrl, blob);
@@ -585,18 +592,17 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         return allRequestsForRG;
     }
 
-    private RGridResource parseBlobToGridResource(Base64 codec, URL baseUrl, BlobData blobAsMap) {
+    private RGridResource parseBlobToGridResource(Base64 codec, URI baseUrl, BlobData blobAsMap) {
         // TODO - handle non-String values (probably empty json objects)
         String contentAsString = blobAsMap.getValue();
         byte[] content = codec.decode(contentAsString);
         String urlAsString = blobAsMap.getUrl();
         try {
-
-            URL url = new URL(baseUrl, urlAsString);
+            URI url = baseUrl.resolve(urlAsString);
             urlAsString = url.toString();
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
+            logger.log("Error resolving uri:" + urlAsString);
             GeneralUtils.logExceptionStackTrace(logger, e);
-
         }
 
         @SuppressWarnings("UnnecessaryLocalVariable")
@@ -604,14 +610,15 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         return resource;
     }
 
-    private void parseAndCollectExternalResources(List<RGridResource> allBlobs, String baseUrl, Set<URL> resourceUrls) {
+    private void parseAndCollectExternalResources(List<RGridResource> allBlobs, String baseUrl, Set<URI> resourceUrls) {
         for (RGridResource blob : allBlobs) {
             getAndParseResource(blob, baseUrl, resourceUrls);
         }
     }
 
-    private void getAndParseResource(RGridResource blob, String baseUrl, Set<URL> resourceUrls) {
-        TextualDataResource tdr = tryGetTextualData(blob, baseUrl);
+    private void getAndParseResource(RGridResource blob, String baseUrl, Set<URI> resourceUrls) {
+        URI baseUri = URI.create(baseUrl);
+        TextualDataResource tdr = tryGetTextualData(blob, baseUri);
         if (tdr == null) return;
         switch (tdr.mimeType) {
             case TEXT_CSS:
@@ -623,7 +630,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
     }
 
-    private void parseSVG(TextualDataResource tdr, Set<URL> allResourceUris) {
+    private void parseSVG(TextualDataResource tdr, Set<URI> allResourceUris) {
 
         try {
             Document doc = Jsoup.parse(new String(tdr.originalData), tdr.uri.toString(), Parser.xmlParser());
@@ -646,12 +653,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     class TextualDataResource {
         String mimeType;
-        URL uri;
+        URI uri;
         String data;
         byte[] originalData;
     }
 
-    private TextualDataResource tryGetTextualData(RGridResource blob, String baseUrl) {
+    private TextualDataResource tryGetTextualData(RGridResource blob, URI baseUrl) {
         byte[] contentBytes = blob.getContent();
 //        logger.verbose(String.format("enter - content length: %d ; content type: %s", contentBytes.length , contentTypeStr));
         String contentTypeStr = blob.getContentType();
@@ -683,10 +690,12 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
+        URI uri = null;
         try {
-            URL uri = new URL(GeneralUtils.sanitizeURL(blob.getUrl(), logger));
-            tdr.uri = new URL(new URL(baseUrl), uri.toString());
-        } catch (MalformedURLException e) {
+            uri = new URI(GeneralUtils.sanitizeURL(blob.getUrl(), logger));
+            tdr.uri = baseUrl.resolve(uri);
+        } catch (Exception e) {
+            logger.log("Error resolving uri:" + uri);
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
@@ -696,7 +705,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
 
-    private void parseCSS(TextualDataResource css, Set<URL> resourceUrls) {
+    private void parseCSS(TextualDataResource css, Set<URI> resourceUrls) {
 //        logger.verbose("enter");
         try {
             String data = css.data;
@@ -715,7 +724,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 //        logger.verbose("exit");
     }
 
-    private void collectAllFontFaceUris(CascadingStyleSheet cascadingStyleSheet, Set<URL> allResourceUris, URL baseUrl) {
+    private void collectAllFontFaceUris(CascadingStyleSheet cascadingStyleSheet, Set<URI> allResourceUris, URI baseUrl) {
         logger.verbose("enter");
         ICommonsList<CSSFontFaceRule> allFontFaceRules = cascadingStyleSheet.getAllFontFaceRules();
         for (CSSFontFaceRule fontFaceRule : allFontFaceRules) {
@@ -724,7 +733,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("exit");
     }
 
-    private void collectAllBackgroundImageUris(CascadingStyleSheet cascadingStyleSheet, Set<URL> allResourceUris, URL baseUrl) {
+    private void collectAllBackgroundImageUris(CascadingStyleSheet cascadingStyleSheet, Set<URI> allResourceUris, URI baseUrl) {
         logger.verbose("enter");
         ICommonsList<CSSStyleRule> allStyleRules = cascadingStyleSheet.getAllStyleRules();
         for (CSSStyleRule styleRule : allStyleRules) {
@@ -734,7 +743,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("exit");
     }
 
-    private void collectAllImportUris(CascadingStyleSheet cascadingStyleSheet, Set<URL> allResourceUris, URL baseUrl) {
+    private void collectAllImportUris(CascadingStyleSheet cascadingStyleSheet, Set<URI> allResourceUris, URI baseUrl) {
         logger.verbose("enter");
         ICommonsList<CSSImportRule> allImportRules = cascadingStyleSheet.getAllImportRules();
         for (CSSImportRule importRule : allImportRules) {
@@ -744,17 +753,18 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("exit");
     }
 
-    private void createUriAndAddToList(Set<URL> allResourceUris, URL baseUrl, String uri) {
+    private void createUriAndAddToList(Set<URI> allResourceUris, URI baseUrl, String uri) {
         if (uri.toLowerCase().startsWith("data:") || uri.toLowerCase().startsWith("javascript:")) return;
         try {
-            URL url = new URL(baseUrl, uri);
+            URI url = baseUrl.resolve(uri);
             allResourceUris.add(url);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
+            logger.log("Error resolving uri:" + uri);
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
     }
 
-    private <T extends IHasCSSDeclarations<T>> void getAllResourcesUrisFromDeclarations(Set<URL> allResourceUris, IHasCSSDeclarations<T> rule, String propertyName, URL baseUrl) {
+    private <T extends IHasCSSDeclarations<T>> void getAllResourcesUrisFromDeclarations(Set<URI> allResourceUris, IHasCSSDeclarations<T> rule, String propertyName, URI baseUrl) {
         ICommonsList<CSSDeclaration> sourcesList = rule.getAllDeclarationsOfPropertyName(propertyName);
         for (CSSDeclaration cssDeclaration : sourcesList) {
             CSSExpression cssDeclarationExpression = cssDeclaration.getExpression();
@@ -809,15 +819,15 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         return unparsedResources;
     }
 
-    private void fetchAllResources(final Map<String, RGridResource> allBlobs, Set<URL> resourceUrls, FrameData result) {
+    private void fetchAllResources(final Map<String, RGridResource> allBlobs, Set<URI> resourceUrls, FrameData result) {
         logger.verbose("enter");
         if (resourceUrls.isEmpty()) {
             return;
         }
         List<IResourceFuture> allFetches = new ArrayList<>();
-        final Iterator<URL> iterator = resourceUrls.iterator();
+        final Iterator<URI> iterator = resourceUrls.iterator();
         while (iterator.hasNext()) {
-            URL link = iterator.next();
+            URI link = iterator.next();
             String url = link.toString();
             url = GeneralUtils.sanitizeURL(url, logger);
             synchronized (this.fetchedCacheMap) {
@@ -833,8 +843,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 IEyesConnector eyesConnector = this.visualGridTaskList.get(0).getEyesConnector();
                 IResourceFuture future;
                 try {
-                    future = eyesConnector.getResource(link, userAgent.getOriginalUserAgentString());
+                    future = eyesConnector.getResource(link.toURL(), userAgent.getOriginalUserAgentString());
                 } catch (Exception e) {
+                    logger.log("error converting " + link + " to url");
                     GeneralUtils.logExceptionStackTrace(logger, e);
                     iterator.remove();
                     continue;
@@ -878,7 +889,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
                 String contentType = resource.getContentType();
                 logger.verbose("handling " + contentType + " resource from URL: " + url);
-                Set<URL> newResourceUrls = new HashSet<>();
+                Set<URI> newResourceUrls = new HashSet<>();
                 getAndParseResource(resource, result.getUrl(), newResourceUrls);
                 resource.setIsResourceParsed(true);
                 fetchAllResources(allBlobs, newResourceUrls, result);
@@ -891,10 +902,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger.verbose("exit");
     }
 
-    private void removeUrlFromList(String url, Set<URL> resourceUrls) {
-        Iterator<URL> iterator = resourceUrls.iterator();
+    private void removeUrlFromList(String url, Set<URI> resourceUrls) {
+        Iterator<URI> iterator = resourceUrls.iterator();
         while (iterator.hasNext()) {
-            URL resourceUrl = iterator.next();
+            URI resourceUrl = iterator.next();
             if (resourceUrl.toString().equalsIgnoreCase(url)) {
                 iterator.remove();
             }
