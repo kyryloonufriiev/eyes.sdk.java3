@@ -11,19 +11,29 @@ import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.utils.CommunicationUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
+import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Comparator;
 
 @Listeners(TestListener.class)
 public final class TestSendDom {
+
+    @BeforeClass(alwaysRun = true)
+    public void OneTimeSetUp() {
+        if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
+            System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
+        }
+    }
 
     private interface WebDriverInitializer {
         void initWebDriver(WebDriver webDriver);
@@ -94,6 +104,34 @@ public final class TestSendDom {
         }
     }
 
+    // This is used for rhe
+    public static class DiffPrintingNotARealComparator implements Comparator<JsonNode> {
+
+        private JsonNode lastObject;
+        private Logger logger;
+        public DiffPrintingNotARealComparator(Logger logger) {
+            this.logger = logger;
+        }
+
+        @Override
+        public int compare(JsonNode o1, JsonNode o2) {
+            if (o1 == null) {
+                logger.log(String.format("O1 IS NULL! o2: %s, parent: %s", o2, lastObject));
+            }
+
+            if (o2 == null) {
+                logger.log(String.format("O2 IS NULL! o1: %s, parent: %s", o1, lastObject));
+            }
+
+            if (!o1.equals(o2)) {
+                logger.log(String.format("JSON diff found! Parent: %s, o1: %s , o2: %s", lastObject, o1, o2));
+                return 1;
+            }
+            lastObject = o1;
+            return 0;
+        }
+    }
+
     @Test
     public void TestSendDOM_FullWindow() {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
@@ -115,13 +153,22 @@ public final class TestSendDom {
                 JsonNode actual = mapper.readTree(actualDomJsonString);
                 JsonNode expected = mapper.readTree(expectedDomJson);
                 //noinspection SimplifiedTestNGAssertion
-                Assert.assertTrue(actual.equals(expected));
+                if (actual == null) {
+                    eyes.getLogger().log("ACTUAL DOM IS NULL!");
+                }
+                if (expected == null) {
+                    eyes.getLogger().log("EXPECTED DOM IS NULL!");
+                }
+                Assert.assertTrue(actual.equals(new DiffPrintingNotARealComparator(eyes.getLogger()), expected));
 
                 SessionResults sessionResults = TestUtils.getSessionResults(eyes.getApiKey(), results);
                 ActualAppOutput[] actualAppOutput = sessionResults.getActualAppOutput();
                 String downloadedDomJsonString = TestUtils.getStepDom(eyes, actualAppOutput[0]);
                 JsonNode downloaded = mapper.readTree(downloadedDomJsonString);
                 //noinspection SimplifiedTestNGAssertion
+                if (downloaded == null) {
+                    eyes.getLogger().log("Downloaded DOM IS NULL!");
+                }
                 Assert.assertTrue(downloaded.equals(expected));
 
             } catch (IOException e) {
