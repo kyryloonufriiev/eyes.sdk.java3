@@ -4,6 +4,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ImageMatchSettings;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
@@ -18,7 +19,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-public class TestAccessibility {
+public class TestAccessibility extends ReportingTestSuite {
+    public TestAccessibility(){
+        super.setGroupName("selenium");
+    }
+
     @DataProvider(name = "booleanDP")
     public Object[] dp() {
         return new Object[]{Boolean.TRUE, Boolean.FALSE};
@@ -27,6 +32,7 @@ public class TestAccessibility {
     @Test(dataProvider = "booleanDP")
     public void testAccessibility(boolean useVisualGrid) throws IOException {
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
+        runner.setLogHandler(new StdoutLogHandler());
         String suffix = useVisualGrid ? "_VG" : "";
         Eyes eyes = new Eyes(runner);
         AccessibilitySettings settings = new AccessibilitySettings(AccessibilityLevel.AA, AccessibilityGuidelinesVersion.WCAG_2_0);
