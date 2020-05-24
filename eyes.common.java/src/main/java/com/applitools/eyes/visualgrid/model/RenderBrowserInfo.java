@@ -27,6 +27,7 @@ public class RenderBrowserInfo {
     public RenderBrowserInfo(EmulationBaseInfo emulationInfo, String baselineEnvName) {
         this.emulationInfo = emulationInfo;
         this.baselineEnvName = baselineEnvName;
+        this.browserType = BrowserType.CHROME;
     }
 
     public RenderBrowserInfo(int width, int height) {
@@ -35,6 +36,7 @@ public class RenderBrowserInfo {
 
     public RenderBrowserInfo(EmulationBaseInfo emulationInfo) {
         this.emulationInfo = emulationInfo;
+        this.browserType = BrowserType.CHROME;
     }
 
     public RenderBrowserInfo(int width, int height, BrowserType browserType, String baselineEnvName) {
@@ -63,36 +65,8 @@ public class RenderBrowserInfo {
         return viewportSize;
     }
 
-    public String getBrowserType() {
-        if (browserType != null) {
-            switch (this.browserType) {
-                case CHROME:
-                    return "chrome-0";
-                case CHROME_ONE_VERSION_BACK:
-                    return "chrome-1";
-                case CHROME_TWO_VERSIONS_BACK:
-                    return "chrome-2";
-                case FIREFOX:
-                    return "firefox-0";
-                case FIREFOX_ONE_VERSION_BACK:
-                    return "firefox-1";
-                case FIREFOX_TWO_VERSIONS_BACK:
-                    return "firefox-2";
-                case SAFARI:
-                    return "safari-0";
-                case SAFARI_ONE_VERSION_BACK:
-                    return "safari-1";
-                case SAFARI_TWO_VERSIONS_BACK:
-                    return "safari-2";
-                case IE_10:
-                    return "ie10";
-                case IE_11:
-                    return "ie";
-                case EDGE:
-                    return "edge";
-            }
-        }
-        return "chrome";
+    public BrowserType getBrowserType() {
+        return this.browserType;
     }
 
     public String getPlatform() {
@@ -112,6 +86,9 @@ public class RenderBrowserInfo {
                 case IE_10:
                 case IE_11:
                 case EDGE:
+                case EDGE_LEGACY:
+                case EDGE_CHROMIUM:
+                case EDGE_CHROMIUM_ONE_VERSION_BACK:
                     return "windows";
             }
         }
