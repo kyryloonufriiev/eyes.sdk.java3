@@ -1,4 +1,4 @@
-## [vNext]
+## [3.164.0] - 2020-05-24
 ### Added
 - Edge Chromium support. [Trello 1757](https://trello.com/c/LUe43aee)
 ### Fixed
