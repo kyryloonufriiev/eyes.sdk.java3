@@ -136,17 +136,14 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 try {
                     runningRenders = this.eyesConnector.render(requests);
                 } catch (Exception e) {
-
                     Thread.sleep(1500);
                     logger.verbose("/render throws exception... sleeping for 1.5s");
-                    GeneralUtils.logExceptionStackTrace(logger, e);
-                    if (e.getMessage().contains("Second request, yet still some resources were not PUT in renderId")) {
-                        if (isSecondRequestAlreadyHappened) {
-                            logger.verbose("Second request already happened");
-                        }
-                        isSecondRequestAlreadyHappened = true;
-//                        this.isForcePutNeeded.set(true);
+                    if (isSecondRequestAlreadyHappened) {
+                        logger.verbose("Second request already happened");
+                        throw e;
                     }
+                    isSecondRequestAlreadyHappened = true;;
+                    GeneralUtils.logExceptionStackTrace(logger, e);
                     logger.verbose("ERROR " + e.getMessage());
                 }
                 logger.verbose("step 3.1");
@@ -794,6 +791,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         String url;
         for (RGridResource blob : allBlobs.values()) {
             url = blob.getUrl();
+            if (fetchedCacheMap.containsKey(url)) {
+                allBlobs.put(url, fetchedCacheMap.get(url));
+                continue;
+            }
             String contentType = blob.getContentType();
             try {
                 if (contentType == null || !contentType.equalsIgnoreCase(RGridDom.CONTENT_TYPE)) {
