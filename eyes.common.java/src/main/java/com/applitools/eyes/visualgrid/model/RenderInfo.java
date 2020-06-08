@@ -25,15 +25,19 @@ public class RenderInfo {
     private EmulationBaseInfo emulationInfo;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private IosDeviceInfo iosDeviceInfo;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private VisualGridSelector selector;
 
 
-    public RenderInfo(int width, int height, String sizeMode, Region region, VisualGridSelector selector, EmulationBaseInfo emulationInfo) {
+    public RenderInfo(int width, int height, String sizeMode, Region region, VisualGridSelector selector, EmulationBaseInfo emulationInfo, IosDeviceInfo iosDeviceInfo) {
         this.width = width;
         this.height = height;
         this.sizeMode = sizeMode;
         this.region = region;
         this.emulationInfo = emulationInfo;
+        this.iosDeviceInfo = iosDeviceInfo;
         this.selector = selector;
     }
 
@@ -82,8 +86,16 @@ public class RenderInfo {
         return emulationInfo;
     }
 
+    public IosDeviceInfo getIosDeviceInfo() {
+        return iosDeviceInfo;
+    }
+
     public void setEmulationInfo(ChromeEmulationInfo emulationInfo) {
         this.emulationInfo = emulationInfo;
+    }
+
+    public void setIosDeviceInfo(IosDeviceInfo iosDeviceInfo) {
+        this.iosDeviceInfo = iosDeviceInfo;
     }
 
     public VisualGridSelector getSelector() {

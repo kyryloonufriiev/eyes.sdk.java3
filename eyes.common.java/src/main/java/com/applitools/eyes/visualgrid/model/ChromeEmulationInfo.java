@@ -1,6 +1,6 @@
 package com.applitools.eyes.visualgrid.model;
 
-public class ChromeEmulationInfo extends EmulationBaseInfo {
+public class ChromeEmulationInfo extends EmulationBaseInfo implements IRenderingBrowserInfo {
 
     private DeviceName deviceName;
 
@@ -24,7 +24,6 @@ public class ChromeEmulationInfo extends EmulationBaseInfo {
     public void setScreenOrientation(ScreenOrientation screenOrientation) {
         this.screenOrientation = screenOrientation;
     }
-
 
     @Override
     public String toString() {

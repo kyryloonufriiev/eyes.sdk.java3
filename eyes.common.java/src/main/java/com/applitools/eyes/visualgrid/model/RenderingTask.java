@@ -592,7 +592,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         for (VisualGridTask visualGridTask : this.visualGridTaskList) {
 
-            RenderBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
+            DesktopBrowserInfo browserInfo = visualGridTask.getBrowserInfo();
 
             String sizeMode = checkSettingsInternal.getSizeMode();
 
@@ -601,7 +601,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             }
 
             RenderInfo renderInfo = new RenderInfo(browserInfo.getWidth(), browserInfo.getHeight(),
-                    sizeMode, checkSettingsInternal.getTargetRegion(), checkSettingsInternal.getVGTargetSelector(), browserInfo.getEmulationInfo());
+                    sizeMode, checkSettingsInternal.getTargetRegion(), checkSettingsInternal.getVGTargetSelector(),
+                    browserInfo.getEmulationInfo(), browserInfo.getIosDeviceInfo());
 
             RenderRequest request = new RenderRequest(this.renderingInfo.getResultsUrl(), result.getUrl(), dom,
                     resourceMapping, renderInfo, browserInfo.getPlatform(), browserInfo.getBrowserType(),
