@@ -1,8 +1,6 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.visualgrid.model.DeviceName;
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
-import com.applitools.eyes.visualgrid.model.ScreenOrientation;
+import com.applitools.eyes.visualgrid.model.*;
 
 import java.util.List;
 
@@ -15,9 +13,13 @@ public interface IConfigurationSetter extends com.applitools.eyes.config.IConfig
 
     IConfigurationSetter setHideCaret(boolean hideCaret);
 
-    IConfigurationSetter addBrowsers(RenderBrowserInfo... browsersInfo);
+    IConfigurationSetter addBrowsers(IRenderingBrowserInfo... browserInfos);
 
-    IConfigurationSetter addBrowser(RenderBrowserInfo browserInfo);
+    IConfigurationSetter addBrowser(DesktopBrowserInfo desktopBrowserInfo);
+
+    IConfigurationSetter addBrowser(ChromeEmulationInfo chromeEmulationInfo);
+
+    IConfigurationSetter addBrowser(IosDeviceInfo iosDeviceInfo);
 
     IConfigurationSetter addBrowser(int width, int height, BrowserType browserType, String baselineEnvName);
 
@@ -35,7 +37,7 @@ public interface IConfigurationSetter extends com.applitools.eyes.config.IConfig
 //
 //    IConfigurationSetter addDeviceEmulation(int width, int height, double scaleFactor);
 
-    IConfigurationSetter setBrowsersInfo(List<RenderBrowserInfo> browsersInfo);
+    IConfigurationSetter setBrowsersInfo(List<DesktopBrowserInfo> browsersInfo);
 
     IConfigurationSetter setTestName(String testName);
 
