@@ -127,7 +127,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
         regionVisibilityStrategyHandler = new SimplePropertyHandler<>();
         regionVisibilityStrategyHandler.set(new MoveToRegionVisibilityStrategy(logger));
-        this.runner = runner != null ? runner : new ClassicRunner();
+        this.runner = runner;
     }
 
     @Override
@@ -279,7 +279,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
         imageProvider = ImageProviderFactory.getImageProvider(userAgent, this, logger, this.driver);
         regionPositionCompensation = RegionPositionCompensationFactory.getRegionPositionCompensation(userAgent, this, logger);
 
-        openBase();
+        if (!getConfigGetter().isVisualGrid()) {
+            openBase();
+        }
 
         //updateScalingParams();
 
@@ -2259,6 +2261,4 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     protected IConfigurationSetter getConfigSetter() {
         return this.configurationProvider.set();
     }
-
-
 }

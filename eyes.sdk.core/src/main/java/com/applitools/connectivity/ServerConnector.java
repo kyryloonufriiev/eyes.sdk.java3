@@ -2,11 +2,13 @@ package com.applitools.connectivity;
 
 import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
+import com.applitools.eyes.locators.VisualLocatorsData;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +29,7 @@ import java.util.concurrent.Future;
 public class ServerConnector extends RestClient implements IServerConnector {
 
     public static final int DEFAULT_CLIENT_TIMEOUT = 1000 * 60 * 5; // 5 minutes
-    private static final int MAX_CONNECTION_RETRIES = 3;
+    public static final int MAX_CONNECTION_RETRIES = 3;
 
     String API_SESSIONS = "api/sessions";
     String CLOSE_BATCH = "api/sessions/batches/%s/close/bypointerid";
@@ -169,11 +171,10 @@ public class ServerConnector extends RestClient implements IServerConnector {
             validStatusCodes.add(HttpStatus.SC_CREATED);
 
             // If this is a new session, we set this flag.
-            RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, RunningSession.class);
+            RunningSession runningSession = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RunningSession>() {});
             if (runningSession.getIsNew() == null) {
                 runningSession.setIsNew(response.getStatusCode() == HttpStatus.SC_CREATED);
             }
-
             return runningSession;
         } finally {
             response.close();
@@ -206,7 +207,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             // Ok, let's create the running session from the response
             List<Integer> validStatusCodes = new ArrayList<>();
             validStatusCodes.add(HttpStatus.SC_OK);
-            return parseResponseWithJsonData(response, validStatusCodes, TestResults.class);
+            return parseResponseWithJsonData(response, validStatusCodes, new TypeReference<TestResults>() {});
         } finally {
             response.close();
         }
@@ -269,13 +270,13 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(HttpStatus.SC_OK);
 
         try {
-            return parseResponseWithJsonData(response, validStatusCodes, MatchResult.class);
+            return parseResponseWithJsonData(response, validStatusCodes, new TypeReference<MatchResult>() {});
         } finally {
             response.close();
         }
     }
 
-    public int uploadData(byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
+    public Response uploadData(byte[] bytes, RenderingInfo renderingInfo, final String targetUrl, String contentType, final String mediaType) {
         Request request = makeEyesRequest(new HttpRequestBuilder() {
             @Override
             public Request build() {
@@ -284,11 +285,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         });
         request = request.header("X-Auth-Token", renderingInfo.getAccessToken())
                 .header("x-ms-blob-type", "BlockBlob");
-        Response response = request.method(HttpMethod.PUT, bytes, contentType);
-        int statusCode = response.getStatusCode();
-        response.close();
-        logger.verbose("Upload Status Code: " + statusCode);
-        return statusCode;
+        return request.method(HttpMethod.PUT, bytes, contentType);
     }
 
     public void downloadString(final URL uri, final TaskListener<String> listener) {
@@ -409,7 +406,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
         validStatusCodes.add(HttpStatus.SC_OK);
 
         try {
-            renderingInfo = parseResponseWithJsonData(response, validStatusCodes, RenderingInfo.class);
+            renderingInfo = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RenderingInfo>() {});
             return renderingInfo;
         } finally {
             response.close();
@@ -433,7 +430,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             String json = objectMapper.writeValueAsString(renderRequests);
             response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
             if (validStatusCodes.contains(response.getStatusCode())) {
-                RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, RunningRender[].class);
+                RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RunningRender[]>() {});
                 return Arrays.asList(runningRenders);
             }
             throw new EyesException(String.format("Unexpected status %d, message: %s", response.getStatusCode(), response.readEntity(String.class)));
@@ -594,7 +591,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 response = request.method(HttpMethod.POST, json, MediaType.APPLICATION_JSON);
                 if (validStatusCodes.contains(response.getStatusCode())) {
                     this.logger.verbose("request succeeded");
-                    RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, RenderStatusResults[].class);
+                    RenderStatusResults[] renderStatusResults = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RenderStatusResults[]>(){});
                     for (RenderStatusResults renderStatusResult : renderStatusResults) {
                         if (renderStatusResult != null && renderStatusResult.getStatus() == RenderStatus.ERROR) {
                             logger.verbose("error on render id - " + renderStatusResult);
@@ -614,6 +611,60 @@ public class ServerConnector extends RestClient implements IServerConnector {
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
         return null;
+    }
+
+    public String postViewportImage(byte[] bytes) {
+        String targetUrl;
+        RenderingInfo renderingInfo = getRenderInfo();
+        if (renderingInfo != null && (targetUrl = renderingInfo.getResultsUrl()) != null) {
+            try {
+                UUID uuid = UUID.randomUUID();
+                targetUrl = targetUrl.replace("__random__", uuid.toString());
+                logger.verbose("uploading viewport image to " + targetUrl);
+
+                for (int i = 0; i < ServerConnector.MAX_CONNECTION_RETRIES; i++) {
+                    Response response = uploadData(bytes, renderingInfo, targetUrl, "image/png", "image/png");
+                    int statusCode = response.getStatusCode();
+                    if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_CREATED) {
+                        return targetUrl;
+                    }
+
+                    String body = response.readEntity(String.class);
+                    String errorMessage = String.format("Status: %d %s. Response Body: %s",
+                            statusCode, response.getStatusPhrase(), body);
+
+                    if (statusCode < 500) {
+                        throw new IOException(String.format("Failed uploading image. %s", errorMessage));
+                    }
+
+                    logger.log(String.format("Failed uploading image, retrying. %s", errorMessage));
+                    Thread.sleep(200);
+                }
+            } catch (Exception e) {
+                logger.log("Error uploading viewport image");
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
+        }
+        return null;
+    }
+
+    public Map<String, List<Region>> postLocators(VisualLocatorsData visualLocatorsData) {
+        String postData;
+        try {
+            jsonMapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+            postData = jsonMapper.writeValueAsString(visualLocatorsData);
+        } catch (IOException e) {
+            throw new EyesException("Failed to convert " +
+                    "visualLocatorsData into Json string!", e);
+        }
+
+        ConnectivityTarget target = restClient.target(serverUrl).path(("api/locators/locate")).queryParam("apiKey", getApiKey());
+        Request request = target.request(MediaType.APPLICATION_JSON);
+        Response response = sendLongRequest(request, HttpMethod.POST, postData, MediaType.APPLICATION_JSON);
+        List<Integer> validStatusCodes = new ArrayList<>();
+        validStatusCodes.add(javax.ws.rs.core.Response.Status.OK.getStatusCode());
+
+        return parseResponseWithJsonData(response, validStatusCodes, new TypeReference<Map<String, List<Region>>>(){});
     }
 
     public void closeBatch(String batchId) {
