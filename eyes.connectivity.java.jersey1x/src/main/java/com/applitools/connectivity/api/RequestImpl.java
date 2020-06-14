@@ -1,14 +1,16 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-public class RequestImpl implements Request {
+public class RequestImpl extends Request {
 
     WebResource.Builder request;
 
-    RequestImpl(WebResource.Builder request) {
+    RequestImpl(WebResource.Builder request, Logger logger) {
+        super(logger);
         this.request = request;
     }
 
@@ -25,12 +27,12 @@ public class RequestImpl implements Request {
         ArgumentGuard.notNullOrEmpty(method, "method");
         if (data != null) {
             if (contentType == null) {
-                request = request.entity(data);
+                throw new IllegalArgumentException("Content type can't be null");
             } else {
                 request = request.entity(data, contentType);
             }
         }
 
-        return new ResponseImpl(request.method(method, ClientResponse.class));
+        return new ResponseImpl(request.method(method, ClientResponse.class), logger);
     }
 }

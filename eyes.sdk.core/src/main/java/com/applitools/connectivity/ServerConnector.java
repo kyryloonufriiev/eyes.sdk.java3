@@ -19,8 +19,8 @@ import org.brotli.dec.BrotliInputStream;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -324,7 +324,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     listener.onFail();
                 }
             }
-        }, null, null);
+        }, null, null, false);
     }
 
     public Future<?> downloadResource(final URI url, final String userAgent, final String refererUrl,
@@ -343,7 +343,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
             public void onComplete(Response response) {
                 RGridResource rgResource = null;
                 try {
-                    String contentLengthStr = response.getHeader("Content-length", false);
+                    String contentLengthStr = response.getHeader(Request.CONTENT_LENGTH_HEADER, false);
                     int contentLength = 0;
                     if (contentLengthStr != null) {
                         contentLength = Integer.parseInt(contentLengthStr);
@@ -357,7 +357,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     }
 
                     byte[] fileContent = downloadFile(response);
-                    String contentType = response.getHeader("Content-Type", true);
+                    String contentType = response.getHeader(Request.CONTENT_TYPE_HEADER, true);
                     String contentEncoding = response.getHeader("Content-Encoding", true);
                     if (contentEncoding != null && contentEncoding.contains("gzip")) {
                         try {
@@ -384,7 +384,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                     listener.onFail();
                 }
             }
-        }, null, null);
+        }, null, null, false);
     }
 
     public RenderingInfo getRenderInfo() {
@@ -433,7 +433,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                 RunningRender[] runningRenders = parseResponseWithJsonData(response, validStatusCodes, new TypeReference<RunningRender[]>() {});
                 return Arrays.asList(runningRenders);
             }
-            throw new EyesException(String.format("Unexpected status %d, message: %s", response.getStatusCode(), response.readEntity(String.class)));
+            throw new EyesException(String.format("Unexpected status %d, message: %s", response.getStatusCode(), response.getBodyString()));
         } catch (JsonProcessingException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
             return null;
@@ -523,7 +523,7 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         return;
                     }
 
-                    String responseData = response.readEntity(String.class);
+                    String responseData = response.getBodyString();
                     try {
                         JsonNode jsonObject = jsonMapper.readTree(responseData);
                         JsonNode value = jsonObject.get("hash");
@@ -629,9 +629,8 @@ public class ServerConnector extends RestClient implements IServerConnector {
                         return targetUrl;
                     }
 
-                    String body = response.readEntity(String.class);
-                    String errorMessage = String.format("Status: %d %s. Response Body: %s",
-                            statusCode, response.getStatusPhrase(), body);
+                    String errorMessage = String.format("Status: %d %s.",
+                            statusCode, response.getStatusPhrase());
 
                     if (statusCode < 500) {
                         throw new IOException(String.format("Failed uploading image. %s", errorMessage));
@@ -709,23 +708,17 @@ public class ServerConnector extends RestClient implements IServerConnector {
     }
 
     private byte[] downloadFile(Response response) {
-        InputStream inputStream = response.readEntity(InputStream.class);
+        byte[] responseBody = response.getBody();
         String contentEncoding = response.getHeader("Content-Encoding", false);
-        byte[] bytes = new byte[0];
+        if (!"br".equalsIgnoreCase(contentEncoding)) {
+            return responseBody;
+        }
+
         try {
-            if ("br".equalsIgnoreCase(contentEncoding)) {
-                inputStream = new BrotliInputStream(inputStream);
-            }
-            bytes = IOUtils.toByteArray(inputStream);
+            return IOUtils.toByteArray(new BrotliInputStream(new ByteArrayInputStream(responseBody)));
         } catch (IOException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                GeneralUtils.logExceptionStackTrace(logger, e);
-            }
         }
-        return bytes;
+        return new byte[0];
     }
 }
