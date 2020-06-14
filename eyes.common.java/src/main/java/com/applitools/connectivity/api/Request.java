@@ -1,12 +1,24 @@
 package com.applitools.connectivity.api;
 
-public interface Request {
+import com.applitools.eyes.Logger;
+
+public abstract class Request {
+
+    public static String CONTENT_LENGTH_HEADER = "Content-Length";
+    public static String CONTENT_TYPE_HEADER = "Content-Type";
+
+    protected Logger logger;
+
+    public Request(Logger logger) {
+        this.logger = logger;
+    }
+
     /**
      * Add a new http header to the request
      * @param name The header name
      * @param value The header value
      */
-    Request header(String name, String value);
+    public abstract Request header(String name, String value);
 
     /**
      *
@@ -15,5 +27,5 @@ public interface Request {
      * @param contentType The data content type.  If null, no data will be sent.
      * @return Response from the server
      */
-    Response method(String method, Object data, String contentType);
+    public abstract Response method(String method, Object data, String contentType);
 }

@@ -1,16 +1,20 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 import com.sun.jersey.api.client.ClientResponse;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-public class ResponseImpl implements Response {
+public class ResponseImpl extends Response {
 
     ClientResponse response;
 
-    ResponseImpl(ClientResponse response) {
+    ResponseImpl(ClientResponse response, Logger logger) {
+        super(logger);
         this.response = response;
+        readEntity();
+        logIfError();
     }
 
     @Override
@@ -41,8 +45,8 @@ public class ResponseImpl implements Response {
     }
 
     @Override
-    public <T> T readEntity(Class<T> type) {
-        return response.getEntity(type);
+    public void readEntity() {
+        body = response.getEntity(byte[].class);
     }
 
     @Override

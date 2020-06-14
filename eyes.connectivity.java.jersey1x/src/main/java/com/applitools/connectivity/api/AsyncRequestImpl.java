@@ -1,18 +1,19 @@
 package com.applitools.connectivity.api;
 
+import com.applitools.eyes.Logger;
 import com.applitools.utils.ArgumentGuard;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.async.TypeListener;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class AsyncRequestImpl implements AsyncRequest {
+public class AsyncRequestImpl extends AsyncRequest {
 
     AsyncWebResource.Builder request;
 
-    AsyncRequestImpl(AsyncWebResource.Builder request) {
+    AsyncRequestImpl(AsyncWebResource.Builder request, Logger logger) {
+        super(logger);
         this.request = request;
     }
 
@@ -25,7 +26,7 @@ public class AsyncRequestImpl implements AsyncRequest {
     }
 
     @Override
-    public Future<?> method(String method, final AsyncRequestCallback callback, Object data, String contentType) {
+    public Future<?> method(String method, final AsyncRequestCallback callback, Object data, String contentType, final boolean logIfError) {
         ArgumentGuard.notNullOrEmpty(method, "method");
         if (data != null) {
             if (contentType == null) {
@@ -37,10 +38,10 @@ public class AsyncRequestImpl implements AsyncRequest {
 
         return request.method(method, new TypeListener<ClientResponse>(ClientResponse.class) {
             @Override
-            public void onComplete(Future<ClientResponse> f) throws InterruptedException {
+            public void onComplete(Future<ClientResponse> f) {
                 try {
-                    callback.onComplete(new ResponseImpl(f.get()));
-                } catch (ExecutionException e) {
+                    callback.onComplete(new ResponseImpl(f.get(), logIfError ? logger : new Logger()));
+                } catch (Exception e) {
                     callback.onFail(e);
                 }
             }
