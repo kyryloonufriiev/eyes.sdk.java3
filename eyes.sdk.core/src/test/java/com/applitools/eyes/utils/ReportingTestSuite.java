@@ -5,6 +5,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Listeners;
 
+import javax.ws.rs.HttpMethod;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,11 +60,11 @@ public abstract class ReportingTestSuite {
 
     @AfterClass
     public void oneTimeTearDown(ITestContext testContext) {
-        System.out.println("Unified report: sending JSON to report " + reportSummary.toString());
+        System.out.println(String.format("Reporting test %s: %s", this.getClass().getName(), reportSummary));
         try {
-            CommunicationUtils.postJson("http://sdk-test-results.herokuapp.com/result", reportSummary, null);
+            CommunicationUtils.jsonRequest("http://sdk-test-results.herokuapp.com/result", reportSummary, null, HttpMethod.POST);
         } catch (Throwable t) {
-            CommunicationUtils.postJson("http://sdk-test-results.herokuapp.com/result", reportSummary, null);
+            CommunicationUtils.jsonRequest("http://sdk-test-results.herokuapp.com/result", reportSummary, null, HttpMethod.POST);
         }
     }
 }

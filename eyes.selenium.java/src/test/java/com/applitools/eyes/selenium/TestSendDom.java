@@ -8,10 +8,9 @@ import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
-import com.applitools.eyes.utils.CommunicationUtils;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
-import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,14 +18,16 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Comparator;
 
-@Listeners(TestListener.class)
-public final class TestSendDom {
+public final class TestSendDom extends ReportingTestSuite {
+
+    public TestSendDom() {
+        super.setGroupName("selenium");
+    }
 
     @BeforeClass(alwaysRun = true)
     public void OneTimeSetUp() {
@@ -180,29 +181,6 @@ public final class TestSendDom {
         }
     }
 
-
-//    //@Test
-//    public void TestSendDOM_Simple_HTML() {
-//        WebDriver webDriver = SeleniumUtils.createChromeDriver();
-//        webDriver.get("https://applitools-dom-capture-origin-1.surge.sh/test.html");
-//        Eyes eyes = new Eyes();
-//        try {
-//            EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver, "Test Send DOM", "Test DomCapture method", new RectangleSize(1200, 1000));
-//            Logger logger = new Logger();
-//            logger.setLogHandler(TestUtils.initLogger());
-//            DomCapture domCapture = new DomCapture(logger, eyesWebDriver);
-//            String actualDomJsonString = domCapture.getFullWindowDom();
-//            String expectedDomJson = getExpectedDomFromUrl("https://applitools-dom-capture-origin-1.surge.sh/test.dom.json");
-//
-//            eyes.close(false);
-//
-//            Assert.assertEquals(actualDomJsonString, expectedDomJson);
-//        } finally {
-//            eyes.abort();
-//            webDriver.quit();
-//        }
-//    }
-
     @Test
     public void TestSendDOM_Selector() {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
@@ -262,10 +240,5 @@ public final class TestSendDom {
         Assert.assertEquals(actualAppOutputs.length, 1);
         boolean hasDom = actualAppOutputs[0].getImage().getHasDom();
         return hasDom;
-    }
-
-    private String getExpectedDomFromUrl(String domUrl) {
-        String expectedDomJsonString = CommunicationUtils.getString(domUrl);
-        return expectedDomJsonString;
     }
 }

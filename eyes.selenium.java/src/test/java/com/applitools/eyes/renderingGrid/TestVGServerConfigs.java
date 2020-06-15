@@ -7,6 +7,7 @@ import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.TestDataProvider;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
@@ -18,7 +19,12 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-public class TestVGServerConfigs {
+public class TestVGServerConfigs extends ReportingTestSuite {
+
+    public TestVGServerConfigs() {
+        super.setGroupName("selenium");
+    }
+
     @Test
     public void TestVGDoubleCloseNoCheck() {
         WebDriver driver = SeleniumUtils.createChromeDriver();
