@@ -3,6 +3,7 @@ package com.applitools.eyes.renderingGrid;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.selenium.Configuration;
 import com.applitools.eyes.selenium.rendering.VisualGridEyes;
+import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.services.RunningTest;
@@ -15,9 +16,13 @@ import java.util.List;
 
 import static com.applitools.eyes.visualgrid.services.VisualGridTask.TaskType.*;
 
-public class TestVGNoMissingSteps {
+public class TestVGNoMissingSteps extends ReportingTestSuite {
     private static Logger logger = new Logger();
     private static RenderBrowserInfo browserInfo = new RenderBrowserInfo(10, 10);
+
+    public TestVGNoMissingSteps() {
+        super.setGroupName("selenium");
+    }
 
     @Test
     public void TestNoMissingSteps_UT() {

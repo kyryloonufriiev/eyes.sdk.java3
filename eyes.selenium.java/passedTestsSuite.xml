@@ -47,7 +47,7 @@
         <classes>
             <class name="com.applitools.eyes.selenium.TestScrollRootElementOnSimplePage">
                 <methods>
-                    <include name="TestCheckWindowSimpleHtml" />
+                    <include name="TestCheckWindow_Simple_Html" />
                 </methods>
             </class>
         </classes>
@@ -194,15 +194,6 @@
             <class name="com.applitools.eyes.renderingGrid.TestSpecialCharacters">
                 <methods>
                     <include name="TestRenderSpecialCharacters" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-    <test name="TestVGCloseAsync" parallel="methods">
-        <classes>
-            <class name="com.applitools.eyes.renderingGrid.TestVGCloseAsync">
-                <methods>
-                    <include name="TestCloseAsync"/>
                 </methods>
             </class>
         </classes>
