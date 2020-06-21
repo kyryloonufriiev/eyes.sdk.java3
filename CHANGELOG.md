@@ -1,19 +1,19 @@
-## [vNext]
+## [3.166.0] - 2020-06-22
 ### Fixed
 - Tests now report their status properly. [Trello 1902](https://trello.com/c/Y8SZwm6m)
-- Tests now won't run forever after a failed rendering in the VG server. [Trello 1907](https://trello.com/c/n80nncwf)
+- An endless loop on failed renders. [Trello 1907](https://trello.com/c/n80nncwf)
 ### Updated
 - DOM Capture and Snapshot scripts [Trello 1865](https://trello.com/c/haTeCXzq)
 - Updated browser info api as required. [Trello 1872](https://trello.com/c/bykk2rzB)
 ### Added
 - Supporting tests page factory object. [Trello 1503](https://trello.com/c/pjmn2N7H)
 
-## [3.165.0]
+## [3.165.0] - 2020-06-09
 ### Added
 - Supported rendering on ios simulators. [Trello 1872](https://trello.com/c/bykk2rzB)
 - Added support for Visual Locators. [Trello 1788](https://trello.com/c/dEeEDiIY)
 
-## [3.164.1]
+## [3.164.1] - 2020-06-03
 ### Fixed
 - Fixed the reporting of the TestResultsSummary. [Trello 1860](https://trello.com/c/X9xtbgXr)
 - When render fails twice the test fails instead of running endlessly. Fixed downloaded resource caching. [Trello 1850](https://trello.com/c/R6MYtCX6)
