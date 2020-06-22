@@ -2,8 +2,7 @@ package com.applitools.eyes.visualgrid.services;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
-import com.applitools.eyes.config.IConfigurationSetter;
-import com.applitools.eyes.selenium.IConfigurationGetter;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.visualgrid.model.*;
 
 import java.net.URI;
@@ -14,15 +13,15 @@ import java.util.concurrent.Future;
 public interface IEyesConnector {
     void log(String massage);
 
-    IConfigurationSetter setProxy(AbstractProxySettings proxy);
+    Configuration setProxy(AbstractProxySettings proxy);
 
     void setLogHandler(LogHandler logHandler);
 
-    IConfigurationSetter setServerUrl(String serverUrl) throws URISyntaxException;
+    Configuration setServerUrl(String serverUrl) throws URISyntaxException;
 
     URI getServerUrl();
 
-    void open(IConfigurationGetter configProvider, String appName, String testName);
+    void open(Configuration configuration, String appName, String testName);
 
     TestResults close(boolean throwExceptionOn);
 
@@ -44,13 +43,13 @@ public interface IEyesConnector {
 
     void setRenderInfo(RenderingInfo renderingInfo);
 
-    IConfigurationSetter setBatch(BatchInfo batchInfo);
+    Configuration setBatch(BatchInfo batchInfo);
 
     void setUserAgent(String userAgent);
 
     String getApiKey();
 
-    IConfigurationSetter setApiKey(String apiKey);
+    Configuration setApiKey(String apiKey);
 
     void setBranchName(String branchName);
 

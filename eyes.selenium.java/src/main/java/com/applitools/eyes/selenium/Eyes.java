@@ -3,11 +3,13 @@ package com.applitools.eyes.selenium;
 import com.applitools.ICheckSettings;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.events.ISessionEventHandler;
 import com.applitools.eyes.exceptions.TestFailedException;
-import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.locators.VisualLocatorSettings;
+import com.applitools.eyes.locators.VisualLocatorsProvider;
 import com.applitools.eyes.positioning.PositionProvider;
 import com.applitools.eyes.selenium.fluent.SeleniumCheckSettings;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -32,24 +34,30 @@ import java.util.Map;
 /**
  * The type Eyes.
  */
-public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
+public class Eyes implements IEyesBase {
 
     private static final int USE_DEFAULT_MATCH_TIMEOUT = -1;
 
     private boolean isVisualGridEyes = false;
     private VisualGridEyes visualGridEyes = null;
-    private SeleniumEyes seleniumEyes = null;
+    private SeleniumEyes seleniumEyes;
     private ISeleniumEyes activeEyes;
     private EyesRunner runner = null;
     private Configuration configuration = new Configuration();
     private ImageRotation rotation;
     VisualLocatorsProvider visualLocatorsProvider;
+    ConfigurationProvider configurationProvider = new ConfigurationProvider() {
+        @Override
+        public Configuration get() {
+            return configuration;
+        }
+    };
 
     /**
      * Instantiates a new Eyes.
      */
     public Eyes() {
-        seleniumEyes = new SeleniumEyes(this, new ClassicRunner());
+        seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
         activeEyes = seleniumEyes;
     }
 
@@ -61,11 +69,11 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
         this();
         this.runner = runner == null ? new ClassicRunner() : runner;
         if (this.runner instanceof VisualGridRunner) {
-            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, this);
+            visualGridEyes = new VisualGridEyes((VisualGridRunner) this.runner, configurationProvider);
             activeEyes = visualGridEyes;
             isVisualGridEyes = true;
         } else {
-            seleniumEyes = new SeleniumEyes(this, (ClassicRunner) runner);
+            seleniumEyes = new SeleniumEyes(configurationProvider, (ClassicRunner) runner);
             activeEyes = seleniumEyes;
         }
     }
@@ -135,6 +143,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * @param serverUrl the server url
      */
     public void setServerUrl(String serverUrl) {
+        configuration.setServerUrl(serverUrl);
         activeEyes.serverUrl(serverUrl);
     }
 
@@ -217,6 +226,7 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * @param apiKey the api key
      */
     public void setApiKey(String apiKey) {
+        // EyesBase sets the configuration
         if (seleniumEyes != activeEyes) {
             seleniumEyes.apiKey(apiKey);
         }
@@ -228,9 +238,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
      * @param branchName the branch name
      */
     public void setBranchName(String branchName) {
-        if (this.configuration != null) {
-            this.configuration.setBranchName(branchName);
-        }
         configuration.setBranchName(branchName);
     }
 
@@ -1815,17 +1822,6 @@ public class Eyes implements ISeleniumConfigurationProvider, IEyesBase {
     public ServerConnector getServerConnector() {
         return this.seleniumEyes.getServerConnector();
     }
-
-    @Override
-    public IConfigurationGetter get() {
-        return configuration;
-    }
-
-    @Override
-    public IConfigurationSetter set() {
-        return configuration;
-    }
-
 
     public Configuration getConfiguration() {
         return new Configuration(configuration);

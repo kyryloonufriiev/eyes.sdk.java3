@@ -1,12 +1,19 @@
 package com.applitools.eyes.config;
 
 import com.applitools.eyes.*;
+import com.applitools.eyes.selenium.BrowserType;
+import com.applitools.eyes.selenium.StitchMode;
+import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.GeneralUtils;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class Configuration implements IConfigurationSetter, IConfigurationGetter {
+public class Configuration implements IConfiguration {
     private static final int DEFAULT_MATCH_TIMEOUT = 2000; // Milliseconds;
+    private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
 
     private String branchName = GeneralUtils.getEnvString("APPLITOOLS_BRANCH");
 
@@ -38,7 +45,19 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     private boolean enablePatterns;
     private boolean useDom;
 
-    public Configuration(IConfigurationGetter other) {
+    private Boolean forceFullPageScreenshot;
+    private int waitBeforeScreenshots = DEFAULT_WAIT_BEFORE_SCREENSHOTS;
+    private StitchMode stitchMode = StitchMode.SCROLL;
+    private boolean hideScrollbars = true;
+    private boolean hideCaret = true;
+    private boolean isVisualGrid = false;
+
+    //Rendering Configuration
+    private Boolean isRenderingConfig = false;
+
+    private List<RenderBrowserInfo> browsersInfo = new ArrayList<>();
+
+    public Configuration(Configuration other) {
         this.branchName = other.getBranchName();
         this.parentBranchName = other.getParentBranchName();
         this.baselineBranchName = other.getBaselineBranchName();
@@ -73,6 +92,15 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         }
         this.ignoreDisplacements = other.getIgnoreDisplacements();
         this.accessibilitySettings = other.getAccessibilityValidation();
+        this.forceFullPageScreenshot = other.getForceFullPageScreenshot();
+        this.waitBeforeScreenshots = other.getWaitBeforeScreenshots();
+        this.stitchMode = other.getStitchMode();
+        this.hideScrollbars = other.getHideScrollbars();
+        this.hideCaret = other.getHideCaret();
+        this.isRenderingConfig = other.isRenderingConfig();
+        this.browsersInfo.addAll(other.getBrowsersInfo());
+        this.defaultMatchSettings = new ImageMatchSettings(other.getDefaultMatchSettings());
+        this.isVisualGrid = isVisualGrid();
     }
 
     public Configuration() {
@@ -83,13 +111,36 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
 
     }
 
+    public Configuration(RectangleSize viewportSize) {
+        this();
+        ArrayList<RenderBrowserInfo> browsersInfo = new ArrayList<>();
+        browsersInfo.add(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, null));
+        this.browsersInfo = browsersInfo;
+    }
+
+    public Configuration(String testName) {
+        this.testName = testName;
+    }
+
+    public Configuration(String appName, String testName, RectangleSize viewportSize) {
+        this();
+        ArrayList<RenderBrowserInfo> browsersInfo = new ArrayList<>();
+        if (viewportSize != null) {
+            browsersInfo.add(new RenderBrowserInfo(viewportSize.getWidth(), viewportSize.getHeight(), BrowserType.CHROME, null));
+        }
+        this.browsersInfo = browsersInfo;
+        this.testName = testName;
+        this.viewportSize = viewportSize;
+        this.setAppName(appName);
+    }
+
     @Override
     public boolean getSaveNewTests() {
         return saveNewTests;
     }
 
     @Override
-    public IConfigurationSetter setSaveNewTests(boolean saveNewTests) {
+    public Configuration setSaveNewTests(boolean saveNewTests) {
         this.saveNewTests = saveNewTests;
         return this;
     }
@@ -100,11 +151,10 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setSaveFailedTests(boolean saveFailedTests) {
+    public Configuration setSaveFailedTests(boolean saveFailedTests) {
         this.saveFailedTests = saveFailedTests;
         return this;
     }
-
 
     @Override
     public ImageMatchSettings getDefaultMatchSettings() {
@@ -112,7 +162,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setDefaultMatchSettings(ImageMatchSettings defaultMatchSettings) {
+    public Configuration setDefaultMatchSettings(ImageMatchSettings defaultMatchSettings) {
         this.defaultMatchSettings = defaultMatchSettings;
         return this;
     }
@@ -123,7 +173,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setMatchTimeout(int matchTimeout) {
+    public Configuration setMatchTimeout(int matchTimeout) {
         this.matchTimeout = matchTimeout;
         return this;
     }
@@ -134,7 +184,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setHostApp(String hostApp) {
+    public Configuration setHostApp(String hostApp) {
         this.hostApp = hostApp;
         return this;
     }
@@ -145,7 +195,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setHostOS(String hostOS) {
+    public Configuration setHostOS(String hostOS) {
         this.hostOS = hostOS;
         return this;
     }
@@ -155,15 +205,14 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         return stitchOverlap;
     }
 
-
     @Override
-    public IConfigurationSetter setStitchOverlap(int stitchOverlap) {
+    public Configuration setStitchOverlap(int stitchOverlap) {
         this.stitchOverlap = stitchOverlap;
         return this;
     }
 
     @Override
-    public IConfigurationSetter setBatch(BatchInfo batch) {
+    public Configuration setBatch(BatchInfo batch) {
         this.batch = batch;
         return this;
     }
@@ -174,7 +223,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setBranchName(String branchName) {
+    public Configuration setBranchName(String branchName) {
         this.branchName = branchName;
         return this;
     }
@@ -190,7 +239,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setAgentId(String agentId) {
+    public Configuration setAgentId(String agentId) {
         this.agentId = agentId;
         return this;
     }
@@ -201,7 +250,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setParentBranchName(String parentBranchName) {
+    public Configuration setParentBranchName(String parentBranchName) {
         this.parentBranchName = parentBranchName;
         return this;
     }
@@ -212,7 +261,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setBaselineBranchName(String baselineBranchName) {
+    public Configuration setBaselineBranchName(String baselineBranchName) {
         this.baselineBranchName = baselineBranchName;
         return this;
     }
@@ -223,7 +272,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setBaselineEnvName(String baselineEnvName) {
+    public Configuration setBaselineEnvName(String baselineEnvName) {
         this.baselineEnvName = baselineEnvName;
         return this;
     }
@@ -234,7 +283,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setEnvironmentName(String environmentName) {
+    public Configuration setEnvironmentName(String environmentName) {
         this.environmentName = environmentName;
         return this;
     }
@@ -245,7 +294,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setSaveDiffs(Boolean saveDiffs) {
+    public Configuration setSaveDiffs(Boolean saveDiffs) {
         this.saveDiffs = saveDiffs;
         return this;
     }
@@ -256,7 +305,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setAppName(String appName) {
+    public Configuration setAppName(String appName) {
         this.appName = appName;
         return this;
     }
@@ -267,18 +316,22 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setTestName(String testName) {
+    public Configuration setTestName(String testName) {
         this.testName = testName;
         return this;
     }
 
     @Override
     public RectangleSize getViewportSize() {
+        if (isRenderingConfig) {
+            RenderBrowserInfo renderBrowserInfo = this.browsersInfo.get(0);
+            return new RectangleSize(renderBrowserInfo.getWidth(), renderBrowserInfo.getHeight());
+        }
         return viewportSize;
     }
 
     @Override
-    public IConfigurationSetter setViewportSize(RectangleSize viewportSize) {
+    public Configuration setViewportSize(RectangleSize viewportSize) {
         this.viewportSize = viewportSize;
         return this;
     }
@@ -289,34 +342,28 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setSessionType(SessionType sessionType) {
+    public Configuration setSessionType(SessionType sessionType) {
         this.sessionType = sessionType;
         return this;
     }
 
-    public Configuration cloneConfig() {
-        return new Configuration(this);
-    }
-
     /**
-     * @param failureReports The failure reports setting.
-     * @see FailureReports
+     * @deprecated
      */
     @Override
-    public IConfigurationSetter setFailureReports(FailureReports failureReports) {
+    public Configuration setFailureReports(FailureReports failureReports) {
         this.failureReports = failureReports;
         return this;
     }
 
     /**
-     * @return the failure reports setting.
+     * @deprecated
      */
     @Override
     public FailureReports getFailureReports() {
         return failureReports;
     }
 
-    @Override
     public String toString() {
         return super.toString() +
                 "\n\tbatch = " + batch +
@@ -329,7 +376,12 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
                 "\n\tappName = " + appName +
                 "\n\ttestName = " + testName +
                 "\n\tviewportSize = " + viewportSize +
-                "\n\tsessionType = " + sessionType;
+                "\n\tsessionType = " + sessionType +
+                "\n\tforceFullPageScreenshot = " + forceFullPageScreenshot +
+                "\n\twaitBeforeScreenshots = " + waitBeforeScreenshots +
+                "\n\tstitchMode = " + stitchMode +
+                "\n\thideScrollbars = " + hideScrollbars +
+                "\n\thideCaret = " + hideCaret;
     }
 
     @Override
@@ -338,7 +390,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setSendDom(boolean sendDom) {
+    public Configuration setSendDom(boolean sendDom) {
         isSendDom = sendDom;
         return this;
     }
@@ -357,11 +409,10 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
      * @param value The ignore value.
      */
     @Override
-    public IConfigurationSetter setIgnoreCaret(boolean value) {
+    public Configuration setIgnoreCaret(boolean value) {
         defaultMatchSettings.setIgnoreCaret(value);
         return this;
     }
-
 
     @Override
     public String getApiKey() {
@@ -369,7 +420,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setApiKey(String apiKey) {
+    public Configuration setApiKey(String apiKey) {
         this.apiKey = apiKey;
         return this;
     }
@@ -383,7 +434,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setServerUrl(String serverUrl) {
+    public Configuration setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
         return this;
     }
@@ -394,7 +445,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setProxy(AbstractProxySettings proxy) {
+    public Configuration setProxy(AbstractProxySettings proxy) {
         this.proxy = proxy;
         return this;
     }
@@ -410,13 +461,13 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setMatchLevel(MatchLevel matchLevel) {
+    public Configuration setMatchLevel(MatchLevel matchLevel) {
         this.defaultMatchSettings.setMatchLevel(matchLevel);
         return this;
     }
 
     @Override
-    public IConfigurationSetter setIgnoreDisplacements(boolean isIgnoreDisplacements) {
+    public Configuration setIgnoreDisplacements(boolean isIgnoreDisplacements) {
         this.defaultMatchSettings.setIgnoreDisplacements(isIgnoreDisplacements);
         this.ignoreDisplacements = isIgnoreDisplacements;
         return this;
@@ -428,7 +479,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setAccessibilityValidation(AccessibilitySettings accessibilitySettings) {
+    public Configuration setAccessibilityValidation(AccessibilitySettings accessibilitySettings) {
         if (accessibilitySettings == null) {
             this.defaultMatchSettings.setAccessibilitySettings(null);
             this.accessibilitySettings = null;
@@ -445,7 +496,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setUseDom(boolean useDom) {
+    public Configuration setUseDom(boolean useDom) {
         this.defaultMatchSettings.setUseDom(useDom);
         this.useDom = useDom;
         return this;
@@ -457,7 +508,7 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
     }
 
     @Override
-    public IConfigurationSetter setEnablePatterns(boolean enablePatterns) {
+    public Configuration setEnablePatterns(boolean enablePatterns) {
         this.defaultMatchSettings.setEnablePatterns(enablePatterns);
         this.enablePatterns = enablePatterns;
         return this;
@@ -468,4 +519,168 @@ public class Configuration implements IConfigurationSetter, IConfigurationGetter
         return enablePatterns;
     }
 
+    public Boolean getForceFullPageScreenshot() {
+        return forceFullPageScreenshot;
+    }
+
+    public int getWaitBeforeScreenshots() {
+        return waitBeforeScreenshots;
+    }
+
+    public Configuration setWaitBeforeScreenshots(int waitBeforeScreenshots) {
+        if (waitBeforeScreenshots <= 0) {
+            this.waitBeforeScreenshots = DEFAULT_WAIT_BEFORE_SCREENSHOTS;
+        } else {
+            this.waitBeforeScreenshots = waitBeforeScreenshots;
+        }
+        return this;
+    }
+
+    public StitchMode getStitchMode() {
+        return stitchMode;
+    }
+
+    public Configuration setStitchMode(StitchMode stitchMode) {
+        this.stitchMode = stitchMode;
+        return this;
+    }
+
+    public boolean getHideScrollbars() {
+        return hideScrollbars;
+    }
+
+    public Configuration setHideScrollbars(boolean hideScrollbars) {
+        this.hideScrollbars = hideScrollbars;
+        return this;
+    }
+
+    public boolean getHideCaret() {
+        return hideCaret;
+    }
+
+    public Configuration setHideCaret(boolean hideCaret) {
+        this.hideCaret = hideCaret;
+        return this;
+    }
+
+    public Configuration addBrowsers(IRenderingBrowserInfo... browserInfos) {
+        for (IRenderingBrowserInfo browserInfo : browserInfos) {
+            addBrowser(browserInfo);
+        }
+        return this;
+    }
+
+    private void addBrowser(IRenderingBrowserInfo browserInfo) {
+        if (browserInfo instanceof DesktopBrowserInfo) {
+            addBrowser((DesktopBrowserInfo) browserInfo);
+        } else if(browserInfo instanceof ChromeEmulationInfo) {
+            addBrowser((ChromeEmulationInfo) browserInfo);
+        } else if(browserInfo instanceof IosDeviceInfo) {
+            addBrowser((IosDeviceInfo) browserInfo);
+        }
+    }
+
+    public Configuration addBrowser(RenderBrowserInfo renderBrowserInfo) {
+        this.browsersInfo.add(renderBrowserInfo);
+        return this;
+    }
+
+    public Configuration addBrowser(DesktopBrowserInfo desktopBrowserInfo) {
+        this.browsersInfo.add(desktopBrowserInfo.getRenderBrowserInfo());
+        return this;
+    }
+
+    public Configuration addBrowser(ChromeEmulationInfo chromeEmulationInfo) {
+        RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(chromeEmulationInfo);
+        this.browsersInfo.add(renderBrowserInfo);
+        return this;
+    }
+
+    public Configuration addBrowser(IosDeviceInfo iosDeviceInfo) {
+        RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(iosDeviceInfo);
+        this.browsersInfo.add(renderBrowserInfo);
+        return this;
+    }
+
+    public Configuration addBrowser(int width, int height, BrowserType browserType, String baselineEnvName) {
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(width, height, browserType, baselineEnvName);
+        addBrowser(browserInfo);
+        return this;
+    }
+
+    public Configuration addBrowser(int width, int height, BrowserType browserType) {
+        return addBrowser(width, height, browserType, baselineEnvName);
+    }
+
+    public Configuration addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation) {
+        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, orientation);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
+        this.browsersInfo.add(browserInfo);
+        return this;
+    }
+
+    public Configuration addDeviceEmulation(DeviceName deviceName) {
+        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, ScreenOrientation.PORTRAIT);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
+        this.browsersInfo.add(browserInfo);
+        return this;
+    }
+
+    public Configuration addDeviceEmulation(DeviceName deviceName, String baselineEnvName) {
+        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, ScreenOrientation.PORTRAIT);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
+        this.browsersInfo.add(browserInfo);
+        return this;
+    }
+
+    public Configuration addDeviceEmulation(DeviceName deviceName, ScreenOrientation orientation, String baselineEnvName) {
+        EmulationBaseInfo emulationInfo = new ChromeEmulationInfo(deviceName, orientation);
+        RenderBrowserInfo browserInfo = new RenderBrowserInfo(emulationInfo, baselineEnvName);
+        this.browsersInfo.add(browserInfo);
+        return this;
+    }
+
+    public List<RenderBrowserInfo> getBrowsersInfo() {
+        if (browsersInfo != null && !browsersInfo.isEmpty()) {
+            return browsersInfo;
+        }
+
+        if (this.viewportSize != null) {
+            RenderBrowserInfo renderBrowserInfo = new RenderBrowserInfo(this.viewportSize.getWidth(), this.viewportSize.getHeight(), BrowserType.CHROME, baselineEnvName);
+            return Collections.singletonList(renderBrowserInfo);
+        }
+        return browsersInfo;
+    }
+
+    public Configuration setBrowsersInfo(List<RenderBrowserInfo> browsersInfo) {
+        this.browsersInfo = browsersInfo;
+        return this;
+    }
+
+    public Boolean isForceFullPageScreenshot() {
+        return forceFullPageScreenshot;
+    }
+
+    public Configuration setForceFullPageScreenshot(boolean forceFullPageScreenshot) {
+        this.forceFullPageScreenshot = forceFullPageScreenshot;
+        return this;
+    }
+
+    public boolean isRenderingConfig() {
+        return isRenderingConfig;
+    }
+
+    public Configuration setRenderingConfig(boolean renderingConfig) {
+        isRenderingConfig = renderingConfig;
+        return this;
+    }
+
+    public Configuration setIsVisualGrid(boolean isVisualGrid) {
+        this.isVisualGrid = isVisualGrid;
+        return this;
+    }
+
+    public boolean isVisualGrid() {
+        return isVisualGrid;
+    }
 }

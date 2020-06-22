@@ -4,6 +4,8 @@ import com.applitools.eyes.IEyesBase;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TestResults;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -75,20 +77,15 @@ public final class TestSendDom extends ReportingTestSuite {
     }
 
 
-    class DomInterceptingEyes extends SeleniumEyes {
+    static class DomInterceptingEyes extends SeleniumEyes {
         private String domJson;
 
         public DomInterceptingEyes() {
-            super(new ISeleniumConfigurationProvider() {
-                private Configuration configuration = new Configuration();
+            super(new ConfigurationProvider() {
+                final Configuration configuration = new Configuration();
 
                 @Override
-                public IConfigurationGetter get() {
-                    return configuration;
-                }
-
-                @Override
-                public IConfigurationSetter set() {
+                public Configuration get() {
                     return configuration;
                 }
             }, new ClassicRunner());
@@ -139,7 +136,7 @@ public final class TestSendDom extends ReportingTestSuite {
         webDriver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");
         DomInterceptingEyes eyes = new DomInterceptingEyes();
         eyes.setBatch(TestDataProvider.batchInfo);
-        eyes.getConfigSetter().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
+        eyes.getConfiguration().setAppName("Test Send DOM").setTestName("Full Window").setViewportSize(new RectangleSize(1024, 768));
         EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver);
         try {
             eyes.check("Window", Target.window().fully());

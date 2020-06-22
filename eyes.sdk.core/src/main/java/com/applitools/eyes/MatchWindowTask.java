@@ -7,7 +7,7 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.config.IConfigurationGetter;
+import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
@@ -503,16 +503,16 @@ public class MatchWindowTask {
         ImageMatchSettings imageMatchSettings = null;
         if (checkSettingsInternal != null) {
 
-            IConfigurationGetter configGetter = eyes.getConfigGetter();
-            ImageMatchSettings defaultMatchSettings = configGetter.getDefaultMatchSettings();
+            Configuration config = eyes.getConfiguration();
+            ImageMatchSettings defaultMatchSettings = config.getDefaultMatchSettings();
 
             imageMatchSettings = new ImageMatchSettings(defaultMatchSettings); // clone default match settings
             imageMatchSettings.setMatchLevel(checkSettingsInternal.getMatchLevel() != null ? checkSettingsInternal.getMatchLevel() : defaultMatchSettings.getMatchLevel());
-            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : configGetter.getIgnoreCaret());
-            imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : configGetter.getUseDom());
-            imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns() != null ? checkSettingsInternal.isEnablePatterns() : configGetter.getEnablePatterns());
-            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : configGetter.getIgnoreDisplacements());
-            imageMatchSettings.setAccessibilitySettings(configGetter.getAccessibilityValidation());
+            imageMatchSettings.setIgnoreCaret(checkSettingsInternal.getIgnoreCaret() != null ? checkSettingsInternal.getIgnoreCaret() : config.getIgnoreCaret());
+            imageMatchSettings.setUseDom(checkSettingsInternal.isUseDom() != null ? checkSettingsInternal.isUseDom() : config.getUseDom());
+            imageMatchSettings.setEnablePatterns(checkSettingsInternal.isEnablePatterns() != null ? checkSettingsInternal.isEnablePatterns() : config.getEnablePatterns());
+            imageMatchSettings.setIgnoreDisplacements(checkSettingsInternal.isIgnoreDisplacements() != null ? checkSettingsInternal.isIgnoreDisplacements() : config.getIgnoreDisplacements());
+            imageMatchSettings.setAccessibilitySettings(config.getAccessibilityValidation());
         }
         return imageMatchSettings;
     }
