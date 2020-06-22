@@ -4,11 +4,11 @@ package com.applitools.eyes.visualgrid.services;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.IBatchCloser;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.selenium.Configuration;
-import com.applitools.eyes.selenium.ISeleniumConfigurationProvider;
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
-import com.applitools.eyes.visualgrid.model.RenderingTask;
 import com.applitools.eyes.TestResultContainer;
+import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
+import com.applitools.eyes.config.ConfigurationProvider;
+import com.applitools.eyes.visualgrid.model.RenderingTask;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
 import java.util.*;
@@ -24,7 +24,7 @@ public class RunningTest {
     private AtomicBoolean isTestClose = new AtomicBoolean(false);
     private AtomicBoolean isTestInExceptionMode = new AtomicBoolean(false);
     private RunningTestListener listener;
-    private ISeleniumConfigurationProvider configurationProvider;
+    private ConfigurationProvider configurationProvider;
     private HashMap<VisualGridTask, FutureTask<TestResultContainer>> taskToFutureMapping = new HashMap<>();
     private Logger logger;
     private AtomicBoolean isCloseTaskIssued = new AtomicBoolean(false);
@@ -53,18 +53,18 @@ public class RunningTest {
         this.logger = logger;
     }
 
-    public RunningTest(RenderBrowserInfo browserInfo, Logger logger, ISeleniumConfigurationProvider configuration) {
+    public RunningTest(RenderBrowserInfo browserInfo, Logger logger, ConfigurationProvider configurationProvider) {
         this.browserInfo = browserInfo;
-        this.configurationProvider = configuration;
+        this.configurationProvider = configurationProvider;
         this.logger = logger;
     }
 
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
-    public RunningTest(IEyesConnector eyes, ISeleniumConfigurationProvider configuration, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
+    public RunningTest(IEyesConnector eyes, ConfigurationProvider configurationProvider, RenderBrowserInfo browserInfo, Logger logger, RunningTestListener listener) {
         this.eyes = eyes;
         this.browserInfo = browserInfo;
-        this.configurationProvider = configuration;
+        this.configurationProvider = configurationProvider;
         this.listener = listener;
         this.logger = logger;
         this.appName = configurationProvider.get().getAppName();
@@ -125,7 +125,7 @@ public class RunningTest {
 
     }
 
-    private VisualGridTask.TaskListener taskListener = new VisualGridTask.TaskListener() {
+    private final VisualGridTask.TaskListener taskListener = new VisualGridTask.TaskListener() {
         @Override
         public void onTaskComplete(VisualGridTask visualGridTask) {
             RunningTest runningTest = RunningTest.this;
@@ -271,8 +271,7 @@ public class RunningTest {
             logVGTasksList(this.visualGridTaskList);
         }
         logger.verbose("releasing visualGridTaskList");
-        FutureTask<TestResultContainer> testResultContainerFutureTask = this.taskToFutureMapping.get(visualGridTask);
-        return testResultContainerFutureTask;
+        return this.taskToFutureMapping.get(visualGridTask);
     }
 
     private void logVGTasksList(List<VisualGridTask> visualGridTaskList) {
