@@ -10,6 +10,7 @@ import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
+import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.exceptions.TestFailedException;
 import com.applitools.eyes.fluent.GetRegion;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
@@ -1957,19 +1958,18 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
 
     private EyesWebDriverScreenshot getScaledAndCroppedScreenshot(ScaleProviderFactory scaleProviderFactory) {
         BufferedImage screenshotImage = this.imageProvider.getImage();
+        debugScreenshotsProvider.save(screenshotImage, "original");
 
         ScaleProvider scaleProvider = scaleProviderFactory.getScaleProvider(screenshotImage.getWidth());
         CutProvider cutProvider = cutProviderHandler.get();
         if (scaleProvider.getScaleRatio() != 1.0) {
-            BufferedImage scaledImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
-            screenshotImage = scaledImage;
+            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider);
             debugScreenshotsProvider.save(screenshotImage, "scaled");
             cutProvider.scale(scaleProvider.getScaleRatio());
         }
 
         if (!(cutProvider instanceof NullCutProvider)) {
-            BufferedImage croppedImage = cutProvider.cut(screenshotImage);
-            screenshotImage = croppedImage;
+            screenshotImage = cutProvider.cut(screenshotImage);
             debugScreenshotsProvider.save(screenshotImage, "cut");
         }
 
@@ -2268,5 +2268,12 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IDriverProv
     @Override
     public Configuration getConfiguration() {
         return configurationProvider.get();
+    }
+
+    /**
+     * For test purposes only.
+     */
+    void setDebugScreenshotProvider(DebugScreenshotsProvider debugScreenshotProvider) {
+        this.debugScreenshotsProvider = debugScreenshotProvider;
     }
 }
