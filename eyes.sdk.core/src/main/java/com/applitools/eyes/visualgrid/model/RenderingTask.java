@@ -156,21 +156,23 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             boolean stillRunning;
             long elapsedTimeStart = System.currentTimeMillis();
             boolean isForcePutAlreadyDone = false;
-            List<RunningRender> runningRenders = null;
+            List<RunningRender> runningRenders;
             do {
                 try {
                     runningRenders = this.eyesConnector.render(requests);
                 } catch (Exception e) {
-                    Thread.sleep(1500);
-                    logger.verbose("/render throws exception... sleeping for 1.5s");
-                    if (isSecondRequestAlreadyHappened) {
-                        logger.verbose("Second request already happened");
-                        throw e;
-                    }
-                    isSecondRequestAlreadyHappened = true;;
                     GeneralUtils.logExceptionStackTrace(logger, e);
+                    logger.verbose("/render throws exception... sleeping for 1.5s");
                     logger.verbose("ERROR " + e.getMessage());
+                    Thread.sleep(1500);
+                    try {
+                        runningRenders = this.eyesConnector.render(requests);
+                    } catch (Exception e1) {
+                        setRenderErrorToTasks(requests);
+                        throw new EyesException("Invalid response for render request", e1);
+                    }
                 }
+
                 logger.verbose("step 3.1");
                 if (runningRenders == null || runningRenders.size() == 0) {
                     setRenderErrorToTasks(requests);
