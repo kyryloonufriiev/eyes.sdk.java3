@@ -1,3 +1,7 @@
+## [vNext]
+### Fixed
+- `eyes.getConfiguration` now returns `com.applitools.eyes.selenium.Configuration`. [Trello 1950](https://trello.com/c/7vPwXLqG)
+
 ## [3.168.0] - 2020-06-25
 ### Fixed
 - Calling `eyes.check` with `fully(false)` now doesn't take full page screenshot even if `forceFullPageScreenshot` is set to true in the configuration. [Trello 1926](https://trello.com/c/4vcerUTm)

@@ -25,5 +25,8 @@ public class TestConfiguration extends ReportingTestSuite {
         cloneBase = new com.applitools.eyes.config.Configuration(new RectangleSize(800, 800));
         cloneBase = new com.applitools.eyes.config.Configuration("", "", new RectangleSize(800, 800));
 
+        Eyes eyes = new Eyes();
+        clone = eyes.getConfiguration();
+        cloneBase = eyes.getConfiguration();
     }
 }

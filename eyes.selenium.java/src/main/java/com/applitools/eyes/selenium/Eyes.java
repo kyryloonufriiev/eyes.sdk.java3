@@ -1823,8 +1823,8 @@ public class Eyes implements IEyesBase {
         return this.seleniumEyes.getServerConnector();
     }
 
-    public Configuration getConfiguration() {
-        return new Configuration(configuration);
+    public com.applitools.eyes.selenium.Configuration getConfiguration() {
+        return new com.applitools.eyes.selenium.Configuration(configuration);
     }
 
     public void setConfiguration(Configuration configuration) {
