@@ -6,8 +6,8 @@ import com.applitools.eyes.selenium.TestDomCapture;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -45,8 +45,9 @@ public class TestRenderRequestSerialization {
                 browserName, null, selectorsToFindRegionsFor, true, task, stitchingServiceUrl.toString());
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode actual = mapper.readTree(mapper.writeValueAsString(request));
-        JsonNode expected = mapper.readTree(GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream("/renderRequest.json")));
+        ObjectNode actual = (ObjectNode) mapper.readTree(mapper.writeValueAsString(request));
+        actual.remove("agentId");
+        ObjectNode expected = (ObjectNode) mapper.readTree(GeneralUtils.readToEnd(TestDomCapture.class.getResourceAsStream("/renderRequest.json")));
         Assert.assertEquals(actual, expected);
     }
 }
