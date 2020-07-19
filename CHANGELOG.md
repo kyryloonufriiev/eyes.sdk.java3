@@ -1,6 +1,8 @@
 ## [vNext]
 ### Fixed
 - Calling `switchTo` with `EyesWebDriver` now works properly. [Trello 1818](https://trello.com/c/488BZ24S)
+### Updated
+- Screenshot retry mechanism is now more efficient. [Trello 1866](https://trello.com/c/KyxkI6Bu)
 
 ## [3.170.0] - 2020-07-13
 ### Fixed
