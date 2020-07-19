@@ -39,7 +39,7 @@ public interface IEyesConnector {
 
     MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
                             List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
-                            String renderId, String source);
+                            String renderId, String source, RectangleSize virtualViewport);
 
     void setRenderInfo(RenderingInfo renderingInfo);
 

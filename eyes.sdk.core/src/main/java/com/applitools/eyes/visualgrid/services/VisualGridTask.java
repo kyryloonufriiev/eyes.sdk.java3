@@ -151,7 +151,8 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
                         }
                     }
 
-                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions, this.regionSelectors, location, renderResult.getRenderId(), source);
+                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions,
+                            this.regionSelectors, location, renderResult.getRenderId(), source, renderResult.getVisualViewport());
                     logger.verbose("match done");
                     break;
 
