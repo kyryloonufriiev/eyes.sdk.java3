@@ -1021,7 +1021,10 @@ public abstract class EyesBase implements IEyesBase{
                 beforeOpen();
 
                 viewportSize = getViewportSizeForOpen();
-                if (viewportSize == null) viewportSize = RectangleSize.EMPTY;
+                if (viewportSize == null) {
+                    viewportSize = RectangleSize.EMPTY;
+                }
+
                 try {
                     ensureRunningSession();
                 } catch (Exception e) {
@@ -1410,7 +1413,7 @@ public abstract class EyesBase implements IEyesBase{
         String title = getTitle();
         logger.verbose("Done!");
 
-        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, screenshot.domUrl, null), screenshot);
+        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, screenshot.domUrl, null), screenshot, location);
         logger.verbose("Done!");
         return result;
     }
