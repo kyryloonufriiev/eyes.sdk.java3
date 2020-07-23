@@ -1397,9 +1397,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 elementBounds = elementBounds.offset(-offset.getX(), -offset.getY());
                 fullElementBounds = fullElementBounds.offset(-offset.getX(), -offset.getY());
 
-                Region prevBounds = new Region(bounds);
                 logger.verbose("offset: " + offset);
-
                 if (currentFC != fc) {
                     PositionProviderAndMemento ppam = new PositionProviderAndMemento(positionProvider, memento, currentFC, offset);
                     ppams.add(ppam);
