@@ -53,8 +53,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     private List<VisualGridTask> openVisualGridTaskList;
     private RenderingInfo renderingInfo;
     private UserAgent userAgent;
-    private final Map<String, RGridResource> fetchedCacheMap;
-    private final Map<String, RGridResource> putResourceCache;
+    final Map<String, RGridResource> fetchedCacheMap;
+    final Map<String, RGridResource> putResourceCache;
     private Logger logger;
     private AtomicBoolean isTaskComplete = new AtomicBoolean(false);
     private AtomicBoolean isForcePutNeeded;
@@ -104,7 +104,17 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         void onRenderFailed(Exception e);
     }
 
+    /**
+     * For tests only
+     */
     RenderingTask(IEyesConnector eyesConnector, List<VisualGridTask> visualGridTaskList, UserAgent userAgent) {
+        this(eyesConnector, visualGridTaskList, userAgent, null);
+    }
+
+    /**
+     * For tests only
+     */
+    RenderingTask(IEyesConnector eyesConnector, List<VisualGridTask> visualGridTaskList, UserAgent userAgent, ICheckSettings checkSettings) {
         this.eyesConnector = eyesConnector;
         this.visualGridTaskList = visualGridTaskList;
         this.userAgent = userAgent;
@@ -112,6 +122,8 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         logger = new Logger();
         regionSelectors = new ArrayList<>();
         putResourceCache = new HashMap<>();
+        this.checkSettings = checkSettings;
+        this.renderingInfo = new RenderingInfo();
     }
 
     public RenderingTask(IEyesConnector eyesConnector, FrameData domData, ICheckSettings checkSettings,
@@ -182,6 +194,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 for (int i = 0; i < requests.length; i++) {
                     RenderRequest request = requests[i];
                     request.setRenderId(runningRenders.get(i).getRenderId());
+                    logger.verbose(String.format("RunningRender: %s", runningRenders.get(i)));
                 }
                 logger.verbose("step 3.2");
 
@@ -394,7 +407,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
         }
     }
 
-    private RenderRequest[] prepareDataForRG(FrameData domData) {
+    RenderRequest[] prepareDataForRG(FrameData domData) {
         final Map<String, RGridResource> allBlobs = Collections.synchronizedMap(new HashMap<String, RGridResource>());
         Set<URI> resourceUrls = new HashSet<>();
 
@@ -402,7 +415,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
         parseScriptResult(domData, allBlobs, resourceUrls);
 
-        logger.verbose("fetching " + resourceUrls.size() + " resources...");
+        logger.verbose(String.format("fetching %d resources: %s", resourceUrls.size(), resourceUrls));
 
         //Fetch all resources
         resourcesPhaser = new Phaser();
@@ -854,6 +867,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                 // If resource is already being fetched, remove it from the list, and use the future.
                 if (fetchedCacheMap.containsKey(uriStr)) {
                     logger.verbose("this.fetchedCacheMap.containsKey(" + uriStr + ")");
+                    allBlobs.put(uriStr, fetchedCacheMap.get(uriStr));
                     continue;
                 }
 

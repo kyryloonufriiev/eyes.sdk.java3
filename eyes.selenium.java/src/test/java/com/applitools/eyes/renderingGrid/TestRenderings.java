@@ -1,7 +1,10 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.ICheckSettings;
+import com.applitools.connectivity.MockedResponse;
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.connectivity.TestServerConnector;
+import com.applitools.connectivity.api.*;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.BrowserType;
@@ -16,6 +19,7 @@ import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
+import org.apache.http.conn.util.InetAddressUtils;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -24,9 +28,9 @@ import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javax.ws.rs.HttpMethod;
+import java.net.UnknownHostException;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -184,10 +188,44 @@ public class TestRenderings extends ReportingTestSuite {
     @Test
     public void testRenderResourceNotFound() {
         final AtomicBoolean alreadyRendered = new AtomicBoolean(false);
-        final List<RGridResource> missingResources = new ArrayList<>();
+        final Map<String,RGridResource> missingResources = new HashMap<>();
         final String missingUrl = "http://httpstat.us/503";
+        final String unknownHostUrl = "http://hostwhichdoesntexist/503";
 
+        HttpClient client = spy(new HttpClientImpl(new Logger(), ServerConnector.DEFAULT_CLIENT_TIMEOUT, null));
+
+        // Mocking async request to get status code 503 when downloading resource
+        ConnectivityTarget target1 = mock(ConnectivityTarget.class);
+        when(client.target(missingUrl)).thenReturn(target1);
+        AsyncRequest request1 = spy(new TestServerConnector.MockedAsyncRequest(new Logger()));
+        when(target1.asyncRequest(anyString())).thenReturn(request1);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(1);
+                callback.onComplete(new MockedResponse(new Logger(), 400, "", "".getBytes()));
+                return null;
+            }
+        }).when(request1).method(eq(HttpMethod.GET), any(AsyncRequestCallback.class), nullable(String.class), nullable(String.class), eq(false));
+
+        // Mocking async request to get an exception when downloading resource
+        ConnectivityTarget target2 = mock(ConnectivityTarget.class);
+        when(client.target(unknownHostUrl)).thenReturn(target2);
+        AsyncRequest request2 = spy(new TestServerConnector.MockedAsyncRequest(new Logger()));
+        when(target2.asyncRequest(anyString())).thenReturn(request2);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                AsyncRequestCallback callback = invocation.getArgument(1);
+                callback.onFail(new UnknownHostException());
+                return null;
+            }
+        }).when(request2).method(eq(HttpMethod.GET), any(AsyncRequestCallback.class), nullable(String.class), nullable(String.class), eq(false));
+
+
+        // Mocking server connector to add fake missing resources to the render request
         ServerConnector serverConnector = spy(new ServerConnector());
+        serverConnector.updateClient(client);
         doAnswer(new Answer<List<RunningRender>>() {
             @Override
             public List<RunningRender> answer(InvocationOnMock invocation) throws Throwable {
@@ -197,7 +235,7 @@ public class TestRenderings extends ReportingTestSuite {
                 }
 
                 alreadyRendered.set(true);
-                runningRenders.get(0).setNeedMoreResources(Collections.singletonList(missingUrl));
+                runningRenders.get(0).setNeedMoreResources(Arrays.asList(missingUrl, unknownHostUrl));
                 runningRenders.get(0).setRenderStatus(RenderStatus.NEED_MORE_RESOURCE);
                 return runningRenders;
             }
@@ -205,7 +243,8 @@ public class TestRenderings extends ReportingTestSuite {
         doAnswer(new Answer<Future<?>>() {
             @Override
             public Future<?> answer(InvocationOnMock invocation) throws Throwable {
-                missingResources.add((RGridResource) invocation.getArgument(1));
+                RGridResource rGridResource = invocation.getArgument(1);
+                missingResources.put(rGridResource.getUrl(), rGridResource);
                 return (Future<?>) invocation.callRealMethod();
             }
         }).when(serverConnector).renderPutResource(any(RunningRender.class), any(RGridResource.class), anyString(), ArgumentMatchers.<TaskListener<Boolean>>any());
@@ -216,6 +255,7 @@ public class TestRenderings extends ReportingTestSuite {
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 FrameData frameData = invocation.getArgument(2);
                 frameData.getResourceUrls().add(missingUrl);
+                frameData.getResourceUrls().add(unknownHostUrl);
                 invocation.callRealMethod();
                 return null;
             }
@@ -246,10 +286,14 @@ public class TestRenderings extends ReportingTestSuite {
             }
         }
 
-        Assert.assertEquals(missingResources.size(), 1);
-        RGridResource missingResource = missingResources.get(0);
+        RGridResource missingResource = missingResources.get(missingUrl);
         Assert.assertEquals(missingResource.getUrl(), missingUrl);
         Assert.assertEquals(missingResource.getContent().length, 0);
         Assert.assertEquals(missingResource.getContentType(), "application/empty-response");
+
+        RGridResource unknownHostResource = missingResources.get(unknownHostUrl);
+        Assert.assertEquals(unknownHostResource.getUrl(), unknownHostUrl);
+        Assert.assertEquals(unknownHostResource.getContent().length, 0);
+        Assert.assertEquals(unknownHostResource.getContentType(), "application/empty-response");
     }
 }
