@@ -1,4 +1,4 @@
-## [vNext]
+## [3.171.1] - 2020-07-27
 ### Fixed
 - Check region inside a frame with scroll stitching is now working. [Trello 2033](https://trello.com/c/ndMDaRQB)
 - Resource caching now work properly. [Trello 1989](https://trello.com/c/uyVUx6kL)
