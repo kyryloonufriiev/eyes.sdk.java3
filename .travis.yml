@@ -18,6 +18,9 @@ addons:
 # $GITHUB_TOKEN
 # $ALLOWED_RELEASE_COMMITERS
 # $SDK
+before_script:
+  - nvm install 14.5.0
+  - nvm use 14.5.0
 jobs:
   include:
     - stage: test
@@ -54,6 +57,14 @@ jobs:
           fi
         - chmod +x ./runTests.sh
         - ./runTests.sh
+    - stage: generic
+      script:
+        - cd eyes.selenium.java;
+        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
+          yarn release;
+          else
+          yarn java;
+          fi
     - stage: deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:
