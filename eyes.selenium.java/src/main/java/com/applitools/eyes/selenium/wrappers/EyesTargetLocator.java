@@ -11,7 +11,7 @@ import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.positioning.ScrollPositionProvider;
+import com.applitools.eyes.selenium.positioning.SeleniumScrollPositionProvider;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.*;
@@ -26,8 +26,8 @@ import java.util.List;
 public class EyesTargetLocator implements WebDriver.TargetLocator {
 
     private final Logger logger;
-    private final EyesWebDriver driver;
-    private ScrollPositionProvider scrollPosition;
+    private final EyesSeleniumDriver driver;
+    private SeleniumScrollPositionProvider scrollPosition;
     private final WebDriver.TargetLocator targetLocator;
     private final SeleniumJavaScriptExecutor jsExecutor;
 
@@ -38,7 +38,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
      * @param driver        The WebDriver from which the targetLocator was received.
      * @param targetLocator The actual TargetLocator object.
      */
-    public EyesTargetLocator(EyesWebDriver driver, Logger logger,
+    public EyesTargetLocator(EyesSeleniumDriver driver, Logger logger,
                              WebDriver.TargetLocator targetLocator) {
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(targetLocator, "targetLocator");

@@ -2,7 +2,7 @@ package com.applitools.eyes.selenium.wrappers;
 
 import com.applitools.eyes.*;
 import com.applitools.eyes.positioning.PositionProvider;
-import com.applitools.eyes.selenium.EyesSeleniumUtils;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.triggers.MouseAction;
@@ -10,12 +10,12 @@ import com.applitools.utils.ArgumentGuard;
 import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
-import org.openqa.selenium.remote.*;
+import org.openqa.selenium.remote.DriverCommand;
+import org.openqa.selenium.remote.FileDetector;
+import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.Response;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +23,7 @@ import java.util.Map;
 @SuppressWarnings("FieldCanBeLocal")
 public class EyesRemoteWebElement extends RemoteWebElement {
     private final Logger logger;
-    private final EyesWebDriver eyesDriver;
+    private final EyesSeleniumDriver eyesDriver;
     private final RemoteWebElement webElement;
     private Method executeMethod;
 
@@ -101,7 +101,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     private PositionProvider positionProvider;
 
-    public EyesRemoteWebElement(Logger logger, EyesWebDriver eyesDriver, WebElement webElement) {
+    public EyesRemoteWebElement(Logger logger, EyesSeleniumDriver eyesDriver, WebElement webElement) {
         super();
 
         ArgumentGuard.notNull(logger, "logger");
@@ -112,7 +112,8 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         this.eyesDriver = eyesDriver;
 
 
-        webElement = getWrappedWebElement(webElement);
+        logger.verbose(String.format("Element type: %s", webElement.getClass().getName()));
+        webElement = EyesDriverUtils.getWrappedWebElement(webElement);
         if (webElement instanceof RemoteWebElement) {
             this.webElement = (RemoteWebElement) webElement;
         } else {
@@ -132,32 +133,6 @@ public class EyesRemoteWebElement extends RemoteWebElement {
         } catch (NoSuchMethodException e) {
             throw new EyesException("Failed to find 'execute' method!");
         }
-    }
-
-    /**
-     * If the web element was created by {@link org.openqa.selenium.support.FindBy}, then it's a {@link Proxy} object.
-     * This method gets the real web element from the proxy object.
-     */
-    static WebElement getWrappedWebElement(WebElement webElement) {
-        if (!(webElement instanceof Proxy)) {
-            return webElement;
-        }
-
-        Proxy proxy = (Proxy) webElement;
-        Field[] fields =  Proxy.class.getDeclaredFields();
-        for (Field field : fields) {
-            if(field.getType().equals(InvocationHandler.class)) {
-                field.setAccessible(true);
-                try {
-                    InvocationHandler handler = (InvocationHandler) field.get(proxy);
-                    return  (WebElement) handler.invoke(null, WrapsElement.class.getMethod("getWrappedElement"), null);
-                } catch (Throwable throwable) {
-                    throw new EyesException("Failed getting web element from page object", throwable);
-                }
-            }
-        }
-
-        throw new IllegalStateException("InvocationHandler field wasn't found in proxy class");
     }
 
     public Region getBounds() {
@@ -228,7 +203,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     public Location getScrollLocation() {
         Object position = eyesDriver.executeScript(JS_GET_SCROLL_POSITION, this);
-        return parseLocationString(position);
+        return EyesDriverUtils.parseLocationString(position);
     }
 
     /**
@@ -291,17 +266,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     public Location scrollTo(Location location) {
         Object position = eyesDriver.executeScript(String.format(JS_SCROLL_TO_FORMATTED_STR,
                 location.getX(), location.getY()) + JS_GET_SCROLL_POSITION, this);
-        return parseLocationString(position);
-    }
-
-    private Location parseLocationString(Object position) {
-        String[] xy = position.toString().split(";");
-        if (xy.length != 2) {
-            throw new EyesException("Could not get scroll position!");
-        }
-        float x = Float.parseFloat(xy[0]);
-        float y = Float.parseFloat(xy[1]);
-        return new Location((int) Math.ceil(x), (int) Math.ceil(y));
+        return EyesDriverUtils.parseLocationString(position);
     }
 
     /**
@@ -316,7 +281,7 @@ public class EyesRemoteWebElement extends RemoteWebElement {
      * @param overflow The overflow to set.
      */
     public String setOverflow(String overflow) {
-        return EyesSeleniumUtils.setOverflow(eyesDriver, overflow, this);
+        return EyesDriverUtils.setOverflow(eyesDriver, overflow, this);
     }
 
     @Override
@@ -652,13 +617,13 @@ public class EyesRemoteWebElement extends RemoteWebElement {
     public Rectangle getBoundingClientRect() {
         String retVal = (String) eyesDriver.executeScript("var r = arguments[0].getBoundingClientRect();" +
                 "return r.left+';'+r.top+';'+r.width+';'+r.height;", this);
+        logger.verbose(String.format("Bounding client rect: %s", retVal));
         String[] parts = retVal.split(";");
-        Rectangle rect = new Rectangle(
+        return new Rectangle(
                 Math.round(Float.parseFloat(parts[0])),
                 Math.round(Float.parseFloat(parts[1])),
                 Math.round(Float.parseFloat(parts[3])),
                 Math.round(Float.parseFloat(parts[2])));
-        return rect;
     }
 
     /**

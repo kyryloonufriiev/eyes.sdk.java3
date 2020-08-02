@@ -1,3 +1,8 @@
+## [vNext]
+### Added
+- Appium module from java4 sdk. [Trello 1980](https://trello.com/c/RYAOPRpc)
+- Additional logging in `getViewportRect`. [Trello 644](https://trello.com/c/FnOtYN6J)
+
 ## [3.171.1] - 2020-07-27
 ### Fixed
 - Check region inside a frame with scroll stitching is now working. [Trello 2033](https://trello.com/c/ndMDaRQB)

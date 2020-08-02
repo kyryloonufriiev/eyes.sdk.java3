@@ -51,7 +51,6 @@ public abstract class EyesBase implements IEyesBase{
     protected ServerConnector serverConnector;
     protected RunningSession runningSession;
     protected SessionStartInfo sessionStartInfo;
-    protected RectangleSize viewportSize;
     protected EyesScreenshot lastScreenshot;
     protected PropertyHandler<ScaleProvider> scaleProviderHandler;
     protected PropertyHandler<CutProvider> cutProviderHandler;
@@ -161,12 +160,12 @@ public abstract class EyesBase implements IEyesBase{
      */
     public Configuration setApiKey(String apiKey) {
         ArgumentGuard.notNull(apiKey, "apiKey");
-        getConfiguration().setApiKey(apiKey);
+        getConfigurationInstance().setApiKey(apiKey);
         if (serverConnector == null) {
             throw new EyesException("server connector not set.");
         }
         serverConnector.setApiKey(apiKey);
-        return this.getConfiguration();
+        return this.getConfigurationInstance();
     }
 
     /**
@@ -187,7 +186,7 @@ public abstract class EyesBase implements IEyesBase{
      */
     public Configuration setServerUrl(String serverUrl) {
         setServerUrl(URI.create(serverUrl));
-        return this.getConfiguration();
+        return this.getConfigurationInstance();
     }
 
     /**
@@ -204,7 +203,7 @@ public abstract class EyesBase implements IEyesBase{
         } else {
             serverConnector.setServerUrl(serverUrl);
         }
-        return this.getConfiguration();
+        return this.getConfigurationInstance();
     }
 
     /**
@@ -228,7 +227,7 @@ public abstract class EyesBase implements IEyesBase{
         }
 
         serverConnector.setProxy(abstractProxySettings);
-        return getConfiguration();
+        return getConfigurationInstance();
     }
 
     /**
@@ -289,7 +288,7 @@ public abstract class EyesBase implements IEyesBase{
      * user given agent id.
      */
     public String getFullAgentId() {
-        String agentId = getConfiguration().getAgentId();
+        String agentId = getConfigurationInstance().getAgentId();
         if (agentId == null) {
             return getBaseAgentId();
         }
@@ -487,8 +486,8 @@ public abstract class EyesBase implements IEyesBase{
             boolean isNewSession = runningSession.getIsNew();
 
             logger.verbose("Ending server session...");
-            boolean save = (isNewSession && getConfiguration().getSaveNewTests())
-                    || (!isNewSession && getConfiguration().getSaveFailedTests());
+            boolean save = (isNewSession && getConfigurationInstance().getSaveNewTests())
+                    || (!isNewSession && getConfigurationInstance().getSaveFailedTests());
             logger.verbose("Automatically save test? " + String.valueOf(save));
             TestResults results = getServerConnector().stopSession(runningSession, false, save);
 
@@ -568,7 +567,7 @@ public abstract class EyesBase implements IEyesBase{
             String sessionResultsUrl = runningSession.getUrl();
 
             logger.verbose("Ending server session...");
-            boolean save = (isNewSession && getConfiguration().getSaveNewTests());
+            boolean save = (isNewSession && getConfigurationInstance().getSaveNewTests());
 
             logger.verbose("Automatically save test? " + String.valueOf(save));
             TestResults results =
@@ -725,6 +724,11 @@ public abstract class EyesBase implements IEyesBase{
     protected void afterMatchWindow() {
     }
 
+    protected MatchResult checkWindowBase(RegionProvider regionProvider, String tag,
+                                          boolean ignoreMismatch, ICheckSettings checkSettings) {
+        return checkWindowBase(regionProvider, tag, ignoreMismatch, checkSettings, getAppName());
+    }
+
     /**
      * Takes a snapshot of the application under test and matches it with the
      * expected output.
@@ -778,7 +782,7 @@ public abstract class EyesBase implements IEyesBase{
 
     protected String tryCaptureAndPostDom(ICheckSettingsInternal checkSettingsInternal) {
         String domUrl = null;
-        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfiguration())) {
+        if (GeneralUtils.configureSendDom(checkSettingsInternal, getConfigurationInstance())) {
             try {
                 String domJson = tryCaptureDom();
                 domUrl = tryPostDomCapture(domJson);
@@ -808,7 +812,7 @@ public abstract class EyesBase implements IEyesBase{
         MatchResult result;
         ICheckSettingsInternal checkSettingsInternal = (checkSettings instanceof ICheckSettingsInternal) ? (ICheckSettingsInternal) checkSettings : null;
 
-        ImageMatchSettings defaultMatchSettings = getConfiguration().getDefaultMatchSettings();
+        ImageMatchSettings defaultMatchSettings = getConfigurationInstance().getDefaultMatchSettings();
 
         // Update retry timeout if it wasn't specified.
         int retryTimeout = -1;
@@ -856,7 +860,7 @@ public abstract class EyesBase implements IEyesBase{
             logger.log(String.format("Mismatch! (%s)", tag));
         }
 
-        if (getConfiguration().getFailureReports() == FailureReports.IMMEDIATE) {
+        if (getConfigurationInstance().getFailureReports() == FailureReports.IMMEDIATE) {
             throw new TestFailedException(String.format(
                     "Mismatch found in '%s' of '%s'",
                     sessionStartInfo.getScenarioIdOrName(),
@@ -980,18 +984,18 @@ public abstract class EyesBase implements IEyesBase{
         // If there's no default application name, one must be provided for the current test.
         if (getAppName() == null) {
             ArgumentGuard.notNull(appName, "appName");
-            this.getConfiguration().setAppName(appName);
+            this.getConfigurationInstance().setAppName(appName);
         }
 
         ArgumentGuard.notNull(testName, "testName");
-        this.getConfiguration().setTestName(testName);
+        this.getConfigurationInstance().setTestName(testName);
 
         logger.log("Agent = " + getFullAgentId());
         logger.verbose(String.format("openBase('%s', '%s', '%s')", appName,
                 testName, viewportSize));
 
-        getConfiguration().setSessionType(sessionType != null ? sessionType : SessionType.SEQUENTIAL);
-        getConfiguration().setViewportSize(viewportSize);
+        getConfigurationInstance().setSessionType(sessionType != null ? sessionType : SessionType.SEQUENTIAL);
+        getConfigurationInstance().setViewportSize(viewportSize);
 
         openBase();
     }
@@ -1020,10 +1024,11 @@ public abstract class EyesBase implements IEyesBase{
 
                 beforeOpen();
 
-                viewportSize = getViewportSizeForOpen();
+                RectangleSize viewportSize = getViewportSizeForOpen();
                 if (viewportSize == null) {
                     viewportSize = RectangleSize.EMPTY;
                 }
+                getConfigurationInstance().setViewportSize(viewportSize);
 
                 try {
                     ensureRunningSession();
@@ -1052,7 +1057,7 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     protected RectangleSize getViewportSizeForOpen() {
-        return getConfiguration().getViewportSize();
+        return getConfigurationInstance().getViewportSize();
     }
 
     protected void ensureRunningSession() {
@@ -1070,7 +1075,7 @@ public abstract class EyesBase implements IEyesBase{
                 logger,
                 serverConnector,
                 runningSession,
-                getConfiguration().getMatchTimeout(),
+                getConfigurationInstance().getMatchTimeout(),
                 this,
                 // A callback which will call getAppOutput
                 new AppOutputProvider() {
@@ -1095,9 +1100,9 @@ public abstract class EyesBase implements IEyesBase{
     private void logOpenBase() {
         logger.log(String.format("Eyes server URL is '%s'", serverConnector.getServerUrl()));
         logger.verbose(String.format("Timeout = '%d'", serverConnector.getTimeout()));
-        logger.log(String.format("matchTimeout = '%d' ", getConfiguration().getMatchTimeout()));
-        logger.log(String.format("Default match settings = '%s' ", getConfiguration().getDefaultMatchSettings()));
-        logger.log(String.format("FailureReports = '%s' ", getConfiguration().getFailureReports()));
+        logger.log(String.format("matchTimeout = '%d' ", getConfigurationInstance().getMatchTimeout()));
+        logger.log(String.format("Default match settings = '%s' ", getConfigurationInstance().getDefaultMatchSettings()));
+        logger.log(String.format("FailureReports = '%s' ", getConfigurationInstance().getFailureReports()));
     }
 
     private void validateSessionOpen() {
@@ -1127,13 +1132,11 @@ public abstract class EyesBase implements IEyesBase{
      */
     public void setExplicitViewportSize(RectangleSize explicitViewportSize) {
         if (explicitViewportSize == null) {
-            this.viewportSize = null;
-            this.isViewportSizeSet = false;
             return;
         }
 
         logger.verbose("Viewport size explicitly set to " + explicitViewportSize);
-        this.viewportSize = explicitViewportSize;
+        getConfigurationInstance().setViewportSize(explicitViewportSize);
         this.isViewportSizeSet = true;
     }
 
@@ -1273,20 +1276,19 @@ public abstract class EyesBase implements IEyesBase{
      * @return The current application environment.
      */
     protected AppEnvironment getAppEnvironment() {
-
         AppEnvironment appEnv = new AppEnvironment();
 
         // If hostOS isn't set, we'll try and extract and OS ourselves.
-        if (getConfiguration().getHostOS() != null) {
-            appEnv.setOs(getConfiguration().getHostOS());
+        if (getConfigurationInstance().getHostOS() != null) {
+            appEnv.setOs(getConfigurationInstance().getHostOS());
         }
 
-        if (getConfiguration().getHostApp() != null) {
-            appEnv.setHostingApp(getConfiguration().getHostApp());
+        if (getConfigurationInstance().getHostApp() != null) {
+            appEnv.setHostingApp(getConfigurationInstance().getHostApp());
         }
 
         appEnv.setInferred(getInferredEnvironment());
-        appEnv.setDisplaySize(viewportSize);
+        appEnv.setDisplaySize(getConfigurationInstance().getViewportSize());
         return appEnv;
     }
 
@@ -1300,11 +1302,11 @@ public abstract class EyesBase implements IEyesBase{
         }
         ensureViewportSize();
 
-        Configuration configGetter = getConfiguration();
+        Configuration configGetter = getConfigurationInstance();
         BatchInfo testBatch = configGetter.getBatch();
         if (testBatch == null) {
             logger.verbose("No batch set");
-            getConfiguration().setBatch(new BatchInfo(null));
+            getConfigurationInstance().setBatch(new BatchInfo(null));
         } else {
             logger.verbose("Batch is " + testBatch);
         }
@@ -1338,15 +1340,15 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     protected String getTestName() {
-        return getConfiguration().getTestName();
+        return getConfigurationInstance().getTestName();
     }
 
     protected String getAppName() {
-        return getConfiguration().getAppName();
+        return getConfigurationInstance().getAppName();
     }
 
     protected String getBaselineEnvName() {
-        return getConfiguration().getBaselineEnvName();
+        return getConfigurationInstance().getBaselineEnvName();
     }
 
     public Object getAgentSetup() {
@@ -1354,29 +1356,33 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     private void ensureViewportSize() {
-        if (!isViewportSizeSet) {
-            if (viewportSize == null || viewportSize.isEmpty()) {
-                try {
-                    viewportSize = getViewportSize();
-                    logger.verbose("viewport size: " + viewportSize);
-                    setEffectiveViewportSize(viewportSize);
-                } catch (NullPointerException e) {
-                    isViewportSizeSet = false;
-                }
+        if (isViewportSizeSet) {
+            return;
+        }
+
+        RectangleSize viewportSize = getConfigurationInstance().getViewportSize();
+        if (viewportSize == null || viewportSize.isEmpty()) {
+            try {
+                viewportSize = getViewportSize();
+                logger.verbose("viewport size: " + viewportSize);
+                setEffectiveViewportSize(viewportSize);
+                getConfigurationInstance().setViewportSize(viewportSize);
+            } catch (NullPointerException e) {
+                isViewportSizeSet = false;
             }
-            else {
-                try
-                {
-                    logger.verbose("Setting viewport size to " + viewportSize);
-                    setViewportSize(viewportSize);
-                    isViewportSizeSet = true;
-                }
-                catch (Exception ex)
-                {
-                    //setEffectiveViewportSize(ex.ActualViewportSize);
-                    isViewportSizeSet = false;
-                    throw ex;
-                }
+        }
+        else {
+            try
+            {
+                logger.verbose("Setting viewport size to " + viewportSize);
+                setViewportSize(viewportSize);
+                isViewportSizeSet = true;
+            }
+            catch (Exception ex)
+            {
+                //setEffectiveViewportSize(ex.ActualViewportSize);
+                isViewportSizeSet = false;
+                throw ex;
             }
         }
     }
@@ -1389,9 +1395,7 @@ public abstract class EyesBase implements IEyesBase{
      * @param region         The region of the screenshot which will be set in the application output.
      * @return The updated app output and screenshot.
      */
-    private AppOutputWithScreenshot getAppOutputWithScreenshot(
-            Region region, ICheckSettingsInternal checkSettingsInternal) {
-
+    private AppOutputWithScreenshot getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal) {
         logger.verbose("getting screenshot...");
         // Getting the screenshot (abstract function implemented by each SDK).
         EyesScreenshot screenshot = getScreenshot(checkSettingsInternal);
@@ -1401,7 +1405,7 @@ public abstract class EyesBase implements IEyesBase{
         Location location = null;
         if (!region.isSizeEmpty()) {
             location = region.getLocation();
-            screenshot = screenshot.getSubScreenshot(region, false);
+            screenshot = getSubScreenshot(screenshot, region, checkSettingsInternal);
             debugScreenshotsProvider.save(screenshot.getImage(), "SUB_SCREENSHOT");
         }
 
@@ -1441,12 +1445,12 @@ public abstract class EyesBase implements IEyesBase{
     protected abstract String getAUTSessionId();
 
     public Boolean isSendDom() {
-        return getConfiguration().isSendDom();
+        return getConfigurationInstance().isSendDom();
     }
 
     public Configuration setSendDom(boolean isSendDom) {
-        this.getConfiguration().setSendDom(isSendDom);
-        return getConfiguration();
+        this.getConfigurationInstance().setSendDom(isSendDom);
+        return getConfigurationInstance();
     }
 
     public RenderingInfo getRenderingInfo() {
@@ -1465,16 +1469,16 @@ public abstract class EyesBase implements IEyesBase{
     public Configuration setBatch(BatchInfo batch) {
         if (isDisabled) {
             logger.verbose("Ignored");
-            return getConfiguration();
+            return getConfigurationInstance();
         }
 
         logger.verbose("setBatch(" + batch + ")");
 
-        this.getConfiguration().setBatch(batch);
-        return getConfiguration();
+        this.getConfigurationInstance().setBatch(batch);
+        return getConfigurationInstance();
     }
 
-    protected abstract Configuration getConfiguration();
+    protected abstract Configuration getConfigurationInstance();
 
     public void abortAsync() {
         abort();
