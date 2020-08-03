@@ -344,6 +344,7 @@
             <class name="com.applitools.eyes.selenium.TestConfiguration">
                 <methods>
                     <include name="testConfigurationConstructors"/>
+                    <include name="testConfigurationEdit"/>
                 </methods>
             </class>
         </classes>

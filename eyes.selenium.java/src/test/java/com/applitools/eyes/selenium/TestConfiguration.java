@@ -1,13 +1,15 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.utils.ReportingTestSuite;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TestConfiguration extends ReportingTestSuite {
 
     public TestConfiguration() {
-        super.setGroupName("selenium");
+        super.setGroupName("core");
     }
 
     @Test
@@ -28,5 +30,28 @@ public class TestConfiguration extends ReportingTestSuite {
         Eyes eyes = new Eyes();
         clone = eyes.getConfiguration();
         cloneBase = eyes.getConfiguration();
+    }
+
+    @Test
+    public void testConfigurationEdit() {
+        Eyes eyes = new Eyes();
+        int originalMatchTimeout = eyes.getConfiguration().getMatchTimeout();
+        int newMatchTimeout = originalMatchTimeout + 1000;
+        eyes.getConfiguration().setMatchTimeout(newMatchTimeout);
+        Assert.assertEquals(eyes.getConfiguration().getMatchTimeout(), originalMatchTimeout);
+
+        final Configuration configuration = new Configuration();
+        SeleniumEyes seleniumEyes = new SeleniumEyes(new ConfigurationProvider() {
+            @Override
+            public com.applitools.eyes.config.Configuration get() {
+                return configuration;
+            }
+        }, new ClassicRunner());
+        originalMatchTimeout = seleniumEyes.getConfiguration().getMatchTimeout();
+        newMatchTimeout = originalMatchTimeout + 1000;
+        seleniumEyes.getConfiguration().setMatchTimeout(newMatchTimeout);
+        Assert.assertEquals(seleniumEyes.getConfiguration().getMatchTimeout(), originalMatchTimeout);
+        seleniumEyes.getConfigurationInstance().setMatchTimeout(newMatchTimeout);
+        Assert.assertEquals(seleniumEyes.getConfiguration().getMatchTimeout(), newMatchTimeout);
     }
 }
