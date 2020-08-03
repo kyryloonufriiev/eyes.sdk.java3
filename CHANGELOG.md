@@ -1,4 +1,4 @@
-## [vNext]
+## [3.172.0] - 2020-08-03
 ### Added
 - Appium module from java4 sdk. [Trello 1980](https://trello.com/c/RYAOPRpc)
 - Additional logging in `getViewportRect`. [Trello 644](https://trello.com/c/FnOtYN6J)
