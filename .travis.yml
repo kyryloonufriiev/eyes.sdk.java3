@@ -27,15 +27,6 @@ jobs:
       name: Core
       script:
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
-        - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
-          git remote set-url origin https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG};
-          mvn versions:set -DnewVersion=$SDK_VERSION;
-          mvn versions:commit;
-          git add */pom.xml pom.xml;
-          git commit -m 'update pom version';
-          git push origin HEAD:$RELEASE_BRANCH;
-          fi
         - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.sdk.core"
@@ -85,7 +76,7 @@ jobs:
     - stage: Deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:
-          #         save the email of the person who did this commit in COMMITTER_EMAIL
+          # save the email of the person who did this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
         - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
