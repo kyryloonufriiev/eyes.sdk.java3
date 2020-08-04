@@ -1,4 +1,7 @@
 ## [3.172.1] - 2020-08-04
+### Added
+- Appium module from java4 sdk. [Trello 1980](https://trello.com/c/RYAOPRpc)
+- Additional logging in `getViewportRect`. [Trello 644](https://trello.com/c/FnOtYN6J)
 ### Fixed
 - Artifact names (internal)
 
