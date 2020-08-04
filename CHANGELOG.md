@@ -1,3 +1,7 @@
+## [3.172.1] - 2020-08-04
+### Fixed
+- Artifact names (internal)
+
 ## [3.172.0] - 2020-08-03
 ### Added
 - Appium module from java4 sdk. [Trello 1980](https://trello.com/c/RYAOPRpc)
