@@ -12,6 +12,7 @@ import com.applitools.utils.GeneralUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,13 +54,13 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     }
 
     /******** BEGIN - PUBLIC FOR TESTING PURPOSES ONLY ********/
-    public VisualGridTask(TaskType taskType, Logger logger, RunningTest runningTest)
-    {
+    public VisualGridTask(TaskType taskType, Logger logger, RunningTest runningTest) {
         this.logger = logger;
         this.type = taskType;
         this.runningTest = runningTest;
         this.regionSelectors = null;
     }
+
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
     public VisualGridTask(Configuration configuration, TestResults testResults, IEyesConnector eyesConnector, TaskType type, TaskListener runningTestListener,
@@ -125,16 +126,11 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
                     List<VGRegion> vgRegions = renderResult.getSelectorRegions();
                     List<IRegion> regions = new ArrayList<>();
-                    if (vgRegions != null)
-                    {
-                        for(VGRegion reg : vgRegions)
-                        {
-                            if (reg.getError() != null)
-                            {
+                    if (vgRegions != null) {
+                        for (VGRegion reg : vgRegions) {
+                            if (reg.getError() != null) {
                                 logger.log(String.format("Warning: region error: %s", reg.getError()));
-                            }
-                            else
-                            {
+                            } else {
                                 regions.add(reg);
                             }
                         }
@@ -240,15 +236,42 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
         this.listeners.add(listener);
     }
 
-    public void setRenderError(String renderId, String error) {
+    public void setRenderError(String renderId, String error, RenderRequest renderRequest) {
         logger.verbose("enter - renderId: " + renderId);
+
+        RectangleSize deviceSize = getCorrectDeviceSize(renderRequest);
+        RenderStatusResults renderResult = new RenderStatusResults();
+        renderResult.setDeviceSize(deviceSize);
+        this.renderResult = renderResult;
+        logger.verbose("device size: " + deviceSize);
         for (TaskListener listener : listeners) {
             exception = new InstantiationError("Render Failed for " + this.getBrowserInfo() + " (renderId: " + renderId + ") with reason: " + error);
             listener.onTaskFailed(exception, this);
         }
+
         logger.verbose("exit - renderId: " + renderId);
-        renderResult = new RenderStatusResults();
-        renderResult.setDeviceSize(configuration.getViewportSize());
+    }
+
+    private RectangleSize getCorrectDeviceSize(RenderRequest renderRequest) {
+        RectangleSize deviceSize = configuration.getViewportSize();
+        if (deviceSize.isEmpty()) {
+            IosDeviceInfo iosDeviceInfo = renderRequest.getRenderInfo().getIosDeviceInfo();
+            if (iosDeviceInfo != null) {
+                String deviceName = iosDeviceInfo.getDeviceName();
+                Map<String, DeviceSize> devicesSizes = eyesConnector.getDevicesSizes();
+                if (devicesSizes.containsKey(deviceName)) {
+                    logger.verbose("found device in list.");
+                    if (iosDeviceInfo.getScreenOrientation().equals(ScreenOrientation.PORTRAIT)){
+                        deviceSize = devicesSizes.get(deviceName).getPortrait();
+                    } else {
+                        deviceSize = devicesSizes.get(deviceName).getLandscapeLeft();
+                    }
+                } else {
+                    logger.verbose("could not find device in list.");
+                }
+            }
+        }
+        return deviceSize;
     }
 
     public Throwable getException() {
@@ -262,7 +285,7 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     public void setExceptionAndAbort(Throwable exception) {
         logger.verbose("aborting task with exception");
         this.exception = exception;
-        if(type == TaskType.CLOSE){
+        if (type == TaskType.CLOSE) {
             type = TaskType.ABORT;
         }
         runningTest.abort(true, exception);
