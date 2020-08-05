@@ -1,6 +1,7 @@
-## [vNext]
+## [3.173.0] - 2020-08-05
 ### Fixed
 - Try to send correct iOS device size when rendering fails. [Trello 2006](https://trello.com/c/a6l6gTf9)
+- EyesWebDriver namespace fix [Trello 1980](https://trello.com/c/RYAOPRpc)
 ### Updated
 - Updated DOM Snapshot script to 4.0.1. [Trello 2049](https://trello.com/c/8GP2pfLr)
 ### Added
