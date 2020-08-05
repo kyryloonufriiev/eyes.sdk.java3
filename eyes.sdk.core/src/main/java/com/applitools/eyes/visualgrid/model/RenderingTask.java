@@ -445,10 +445,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
                     logger.log(String.format("Illegal state: resource is null for url %s", url));
                     continue;
                 }
-                if (resource.getContent() != null) {
-                    logger.verbose("adding url to map: " + url);
-                    resourceMapping.put(url, resource);
-                }
+
+                logger.verbose("adding url to map: " + url);
+                resourceMapping.put(url, resource);
             } catch (Exception e) {
                 logger.verbose("Couldn't download url = " + url);
             }
@@ -643,10 +642,10 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
     }
 
     private RGridResource parseBlobToGridResource(Base64 codec, URI baseUrl, BlobData blobAsMap) {
-        // TODO - handle non-String values (probably empty json objects)
         String contentAsString = blobAsMap.getValue();
         byte[] content = codec.decode(contentAsString);
         String urlAsString = blobAsMap.getUrl();
+        Integer errorStatusCode = blobAsMap.getErrorStatusCode();
         try {
             URI url = baseUrl.resolve(urlAsString);
             urlAsString = url.toString();
@@ -655,9 +654,7 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
             GeneralUtils.logExceptionStackTrace(logger, e);
         }
 
-        @SuppressWarnings("UnnecessaryLocalVariable")
-        RGridResource resource = new RGridResource(urlAsString, blobAsMap.getType(), content);
-        return resource;
+        return new RGridResource(urlAsString, blobAsMap.getType(), content, errorStatusCode);
     }
 
     private void parseAndCollectExternalResources(List<RGridResource> allBlobs, String baseUrl, Set<URI> resourceUrls) {
