@@ -1,14 +1,11 @@
-mobile native (full screen)
 mobile web
 tutorials
 sauce labs (web)
 sauce labs (mobile web)
-browser stack (mobile native)
 browser stack (mobile web)
 perfecto mobile (mobile web)
 perfecto mobile (mobile native)
 all supported browser versions
 batch completion
-visual locators
 Default configuration validation
 Revert driver back to initial IFrame after checkWindow
