@@ -40,6 +40,10 @@ public abstract class HttpClient {
         return timeout;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     public abstract void close();
 
     public boolean isClosed() {

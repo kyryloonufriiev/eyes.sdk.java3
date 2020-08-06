@@ -165,7 +165,6 @@ public class TestServerConnector extends ReportingTestSuite {
 
         ServerConnector connector = new ServerConnector();
         connector.updateClient(restClient);
-        connector.setLogger(new Logger());
         connector.setAgentId("agent_id");
 
         when(response.getStatusCode()).thenReturn(HttpStatus.SC_OK);
@@ -228,5 +227,30 @@ public class TestServerConnector extends ReportingTestSuite {
         expectedHeaders = new HashMap<>();
         expectedHeaders.put("Referer", referer);
         Assert.assertEquals(mockedAsyncRequest.headers, expectedHeaders);
+    }
+
+    @Test
+    public void testNullHeader() {
+        HttpClient client = new HttpClientImpl(new Logger(), 0, null);
+        ConnectivityTarget target = client.target(GeneralUtils.getServerUrl());
+        final Request request = target.request();
+        final AsyncRequest asyncRequest = target.asyncRequest();
+
+        Assert.assertThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
+            @Override
+            public void run() {
+                request.header(null, "");
+            }
+        });
+
+        Assert.assertThrows(IllegalArgumentException.class, new Assert.ThrowingRunnable() {
+            @Override
+            public void run() {
+                asyncRequest.header(null, "");
+            }
+        });
+
+        request.header("1", null);
+        asyncRequest.header("2", null);
     }
 }
