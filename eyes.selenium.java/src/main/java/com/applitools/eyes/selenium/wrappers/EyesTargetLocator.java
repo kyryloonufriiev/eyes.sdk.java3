@@ -11,8 +11,8 @@ import com.applitools.eyes.selenium.SeleniumJavaScriptExecutor;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.selenium.frames.Frame;
 import com.applitools.eyes.selenium.frames.FrameChain;
-import com.applitools.eyes.selenium.positioning.SeleniumScrollPositionProvider;
 import com.applitools.eyes.selenium.positioning.ScrollPositionProviderFactory;
+import com.applitools.eyes.selenium.positioning.SeleniumScrollPositionProvider;
 import com.applitools.utils.ArgumentGuard;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -38,8 +38,7 @@ public class EyesTargetLocator implements WebDriver.TargetLocator {
      * @param driver        The WebDriver from which the targetLocator was received.
      * @param targetLocator The actual TargetLocator object.
      */
-    public EyesTargetLocator(EyesSeleniumDriver driver, Logger logger,
-                             WebDriver.TargetLocator targetLocator) {
+    public EyesTargetLocator(EyesSeleniumDriver driver, Logger logger, WebDriver.TargetLocator targetLocator) {
         ArgumentGuard.notNull(driver, "driver");
         ArgumentGuard.notNull(targetLocator, "targetLocator");
         this.driver = driver;

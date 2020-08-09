@@ -1,5 +1,7 @@
 package com.applitools.utils;
 
+import java.util.Arrays;
+
 /**
  * Argument validation utilities.
  */
@@ -18,6 +20,30 @@ public class ArgumentGuard {
         if (null == param) {
             throw new IllegalArgumentException(paramName + " is null");
         }
+    }
+
+    /**
+     * Fails if the input iterable contains null elements.
+     * @param param     The input parameter.
+     * @param paramName The input parameter name.
+     */
+    public static <T> void notContainsNull(Iterable<T> param, String paramName) throws IllegalArgumentException {
+        notNull(param, paramName);
+        for (T element : param) {
+            if (element == null) {
+                throw new IllegalArgumentException(paramName + " has null elements");
+            }
+        }
+    }
+
+    /**
+     * Fails if the input array has contains elements.
+     * @param param     The input parameter.
+     * @param paramName The input parameter name.
+     */
+    public static <T> void notContainsNull(T[] param, String paramName) throws IllegalArgumentException {
+        notNull(param, paramName);
+        notContainsNull(Arrays.asList(param), paramName);
     }
 
     /**
