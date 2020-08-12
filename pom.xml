@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.applitools</groupId>
     <artifactId>eyes-sdk-java3-parent</artifactId>
-    <version>3.173.0</version>
+    <version>3.174.0</version>
     <packaging>pom</packaging>
     <name>eyes-sdk-java3-parent</name>
     <url>http://www.applitools.com</url>
@@ -93,8 +93,8 @@
         <module>eyes.selenium.java</module>
         <module>eyes.appium.java</module>
         <module>eyes.selenium.common</module>
-        <!--        <module>eyes.sdk.distribution</module>-->
-<!--        <module>eyes.sdk.distribution.images</module>-->
+        <module>eyes.sdk.distribution</module>
+        <module>eyes.sdk.distribution.images</module>
     </modules>
 
     <distributionManagement>
