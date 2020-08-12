@@ -25,7 +25,6 @@ public class TestFluentApi extends TestSetup {
         super.getWebDriver().findElement(By.tagName("input")).sendKeys("My Input");
         getEyes().check("Fluent - Window with Ignore region", Target.window()
                 .fully()
-                .timeout(0) // FIXME: removed retry to avoid a bug.
                 .ignoreCaret()
                 .ignore(new Region(50, 50, 100, 100)));
 
@@ -153,6 +152,13 @@ public class TestFluentApi extends TestSetup {
     public void TestCheckElementFully_Fluent() {
         WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
         getEyes().check("Fluent - Region by element - fully", Target.region(element).fully());
+    }
+
+    @Test
+    public void TestCheckElementFullyAfterScroll() {
+        ((JavascriptExecutor)getDriver()).executeScript("window.scrollTo(0, 500)");
+        WebElement element = getWebDriver().findElement(By.id("overflowing-div-image"));
+        getEyes().check("Fluent - Region by element - fully after scroll", Target.region(element).fully());
     }
 
     @Test

@@ -183,6 +183,15 @@ public class Region implements IRegion {
     }
 
     /**
+     * Get an offset region.
+     * @param location the amount by which to offset.
+     * @return A region with an offset location.
+     */
+    public Region offset(Location location) {
+        return new Region(getLocation().offset(location), getSize(), getCoordinatesType());
+    }
+
+    /**
      * Get a region which is a scaled version of the current region.
      * IMPORTANT: This also scales the LOCATION(!!) of the region (not just its size).
      * @param scaleRatio The ratio by which to scale the region.
@@ -433,11 +442,16 @@ public class Region implements IRegion {
      * @param other The region with which to intersect.
      */
     public void intersect(Region other) {
+        Region intersected = getIntersected(other);
+        this.setLocation(intersected.getLocation());
+        this.setSize(intersected.getSize());
+    }
+
+    public Region getIntersected(Region other) {
 
         // If there's no intersection set this as the Empty region.
         if (!isIntersected(other)) {
-            makeEmpty();
-            return;
+            return Region.EMPTY;
         }
 
         // The regions intersect. So let's first find the left & top values
@@ -458,10 +472,7 @@ public class Region implements IRegion {
         int intersectionBottom = (bottom <= otherBottom) ? bottom : otherBottom;
         int intersectionHeight = intersectionBottom - intersectionTop;
 
-        left = intersectionLeft;
-        top = intersectionTop;
-        width = intersectionWidth;
-        height = intersectionHeight;
+        return new Region(intersectionLeft, intersectionTop, intersectionWidth, intersectionHeight, coordinatesType);
     }
 
     /**
