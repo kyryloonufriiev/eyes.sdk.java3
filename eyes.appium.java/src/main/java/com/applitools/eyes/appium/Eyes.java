@@ -17,7 +17,6 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.fluent.SimpleRegionByRectangle;
 import com.applitools.eyes.locators.VisualLocatorSettings;
 import com.applitools.eyes.locators.VisualLocatorsProvider;
-import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.EyesDriverUtils;
@@ -222,7 +221,7 @@ public class Eyes extends EyesBase {
 
     @Override
     public String getBaseAgentId() {
-        return "eyes.appium.java/"  + ClassVersionGetter.CURRENT_VERSION;
+        return "eyes.appium.java/" + ClassVersionGetter.CURRENT_VERSION;
     }
 
     @Override
@@ -427,7 +426,7 @@ public class Eyes extends EyesBase {
             AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
             AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
             MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
-                    checkSettingsInternal, ims, this, getAppName());
+                    ims, this, getAppName());
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
         }
     }
@@ -463,12 +462,8 @@ public class Eyes extends EyesBase {
 
         if (targetRegion != null) {
             logger.verbose("have target region");
-            result = this.checkWindowBase(new RegionProvider() {
-                @Override
-                public Region getRegion() {
-                    return new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
-                }
-            }, name, false, checkSettings);
+            Region region = new Region(targetRegion.getLocation(), targetRegion.getSize(), CoordinatesType.CONTEXT_RELATIVE);
+            result = this.checkWindowBase(region, name, checkSettings);
         } else if (appiumCheckTarget != null) {
             WebElement targetElement = getTargetElement(appiumCheckTarget);
             if (targetElement != null) {
@@ -482,7 +477,7 @@ public class Eyes extends EyesBase {
                 this.targetElement = null;
             } else {
                 logger.verbose("default case");
-                result = this.checkWindowBase(RegionProvider.NULL_INSTANCE, name, false, checkSettings);
+                result = this.checkWindowBase(null, name, checkSettings);
             }
         }
 
@@ -543,8 +538,7 @@ public class Eyes extends EyesBase {
     }
 
     @Override
-    protected EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal) {
-
+    protected EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal) {
         logger.verbose("getScreenshot()");
 
         EyesScreenshot result;
@@ -553,6 +547,11 @@ public class Eyes extends EyesBase {
             result = getFullPageScreenshot();
         } else {
             result = getSimpleScreenshot();
+        }
+
+        if (targetRegion != null && !targetRegion.isEmpty()) {
+            result = getSubScreenshot(result, targetRegion, checkSettingsInternal);
+            debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
         }
 
         logger.verbose("Done!");
@@ -565,12 +564,8 @@ public class Eyes extends EyesBase {
     }
 
     protected MatchResult checkElement(final WebElement element, String name, final ICheckSettings checkSettings) {
-        return checkWindowBase(new RegionProvider() {
-            @Override
-            public Region getRegion() {
-                return getElementRegion(element, checkSettings);
-            }
-        }, name, false, checkSettings);
+        Region region = getElementRegion(element, checkSettings);
+        return checkWindowBase(region, name, checkSettings);
     }
 
     public void checkElement(WebElement element) {
@@ -717,14 +712,10 @@ public class Eyes extends EyesBase {
     }
 
     protected MatchResult checkRegion(String name, ICheckSettings checkSettings) {
-        MatchResult result = checkWindowBase(new RegionProvider() {
-            @Override
-            public Region getRegion() {
-                Point p = targetElement.getLocation();
-                Dimension d = targetElement.getSize();
-                return new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
-            }
-        }, name, false, checkSettings);
+        Point p = targetElement.getLocation();
+        Dimension d = targetElement.getSize();
+        Region region = new Region(p.getX(), p.getY(), d.getWidth(), d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
+        MatchResult result = checkWindowBase(region, name, checkSettings);
         logger.verbose("Done! trying to scroll back to original position.");
 
         return result;
@@ -796,7 +787,6 @@ public class Eyes extends EyesBase {
         check(tag, Target.region(selector).timeout(matchTimeout).fully(stitchContent));
     }
 
-    @Override
     protected EyesScreenshot getSubScreenshot(EyesScreenshot screenshot, Region region, ICheckSettingsInternal checkSettingsInternal) {
         ArgumentGuard.notNull(region, "region");
         if ((EyesDriverUtils.isAndroid(driver) || EyesDriverUtils.isIOS(driver))
@@ -808,7 +798,7 @@ public class Eyes extends EyesBase {
                 image = ImageUtils.scaleImage(image, driver.getDevicePixelRatio(), true);
             }
             BufferedImage subScreenshotImage = ImageUtils.scaleImage(ImageUtils.getImagePart(image, region),
-                    1/driver.getDevicePixelRatio(), true);
+                    1 / driver.getDevicePixelRatio(), true);
 
             EyesAppiumScreenshot result = new EyesAppiumScreenshot(logger, driver, subScreenshotImage);
 

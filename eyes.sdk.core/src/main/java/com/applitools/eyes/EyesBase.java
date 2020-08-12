@@ -37,7 +37,7 @@ import java.util.*;
 /**
  * Applitools Eyes Base for Java API .
  */
-public abstract class EyesBase implements IEyesBase{
+public abstract class EyesBase implements IEyesBase {
 
     protected static final int USE_DEFAULT_TIMEOUT = -1;
     private static final int MAX_ITERATION = 10;
@@ -689,32 +689,30 @@ public abstract class EyesBase implements IEyesBase{
     }
 
     /**
-     * See {@link #checkWindowBase(RegionProvider, String, boolean, int, String)}.
+     * See {@link #checkWindowBase(Region, String, int, String)}.
      * {@code retryTimeout} defaults to {@code USE_DEFAULT_TIMEOUT}.
-     * @param regionProvider Returns the region to check or the empty rectangle to check the entire window.
-     * @param tag            An optional tag to be associated with the snapshot.
-     * @param ignoreMismatch Whether to ignore this check if a mismatch is found.
+     * @param region The region to check or null for the entire window.
+     * @param tag    An optional tag to be associated with the snapshot.
+     * @param source A string representing the source of the checkpoint.
      * @return The result of matching the output with the expected output.
      */
-    protected MatchResult checkWindowBase(RegionProvider regionProvider,
-                                          String tag, boolean ignoreMismatch, String source) {
-        return checkWindowBase(regionProvider, tag, ignoreMismatch,
-                USE_DEFAULT_TIMEOUT, source);
+    protected MatchResult checkWindowBase(Region region, String tag, String source) {
+        return checkWindowBase(region, tag, USE_DEFAULT_TIMEOUT, source);
     }
 
     /**
      * Takes a snapshot of the application under test and matches it with the
      * expected output.
-     * @param regionProvider Returns the region to check or the empty rectangle to check the entire window.
-     * @param tag            An optional tag to be associated with the snapshot.
-     * @param ignoreMismatch Whether to ignore this check if a mismatch is found.
-     * @param retryTimeout   The amount of time to retry matching in milliseconds or a negative
-     *                       value to use the default retry timeout.
+     * @param region       The region to check or null for the entire window.
+     * @param tag          An optional tag to be associated with the snapshot.
+     * @param retryTimeout The amount of time to retry matching in milliseconds or a negative
+     *                     value to use the default retry timeout.
+     * @param source       A string representing the source of the checkpoint.
      * @return The result of matching the output with the expected output.
      * @throws TestFailedException Thrown if a mismatch is detected and immediate failure reports are enabled.
      */
-    protected MatchResult checkWindowBase(RegionProvider regionProvider, String tag, boolean ignoreMismatch, int retryTimeout, String source) {
-        return this.checkWindowBase(regionProvider, tag, ignoreMismatch, new CheckSettings(retryTimeout), source);
+    protected MatchResult checkWindowBase(Region region, String tag, int retryTimeout, String source) {
+        return this.checkWindowBase(region, new CheckSettings(retryTimeout).withName(tag), source);
     }
 
     protected void beforeMatchWindow() {
@@ -723,23 +721,26 @@ public abstract class EyesBase implements IEyesBase{
     protected void afterMatchWindow() {
     }
 
-    protected MatchResult checkWindowBase(RegionProvider regionProvider, String tag,
-                                          boolean ignoreMismatch, ICheckSettings checkSettings) {
-        return checkWindowBase(regionProvider, tag, ignoreMismatch, checkSettings, getAppName());
+    protected MatchResult checkWindowBase(Region region, String tag, ICheckSettings checkSettings) {
+        return checkWindowBase(region, checkSettings.withName(tag), getAppName());
     }
 
     /**
      * Takes a snapshot of the application under test and matches it with the
      * expected output.
-     * @param regionProvider Returns the region to check or the empty rectangle to check the entire window.
-     * @param tag            An optional tag to be associated with the snapshot.
-     * @param ignoreMismatch Whether to ignore this check if a mismatch is found.
-     * @param checkSettings  The settings to use.
+     * @param region        The region to check or null for the entire window.
+     * @param checkSettings The settings to use.
+     * @param source        A string representing the source of the checkpoint.
      * @return The result of matching the output with the expected output.
      * @throws TestFailedException Thrown if a mismatch is detected and immediate failure reports are enabled.
      */
-    protected MatchResult checkWindowBase(RegionProvider regionProvider, String tag,
-                                          boolean ignoreMismatch, ICheckSettings checkSettings, String source) {
+    protected MatchResult checkWindowBase(Region region, ICheckSettings checkSettings, String source) {
+        ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
+        return checkWindowBase(region, checkSettingsInternal, source);
+    }
+
+    protected MatchResult checkWindowBase(Region region, ICheckSettingsInternal checkSettingsInternal, String source) {
+
         MatchResult result;
 
         if (getIsDisabled()) {
@@ -749,27 +750,22 @@ public abstract class EyesBase implements IEyesBase{
             return result;
         }
 
+        String tag = checkSettingsInternal.getName();
         if (tag == null) {
             tag = "";
         }
 
         ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
-        ArgumentGuard.notNull(regionProvider, "regionProvider");
 
         ensureRunningSession();
 
         beforeMatchWindow();
 
-        result = matchWindow(regionProvider, tag, checkSettings, source);
+        result = matchWindow(region, tag, checkSettingsInternal, source);
 
         afterMatchWindow();
 
         logger.verbose("MatchWindow Done!");
-
-        if (!ignoreMismatch) {
-            clearUserInputs();
-            lastScreenshot = result.getScreenshot(checkSettings);
-        }
 
         validateResult(tag, result);
 
@@ -806,36 +802,13 @@ public abstract class EyesBase implements IEyesBase{
         return validationInfo;
     }
 
-    private MatchResult matchWindow(RegionProvider regionProvider, String tag,
-                                    ICheckSettings checkSettings, String source) {
+    private MatchResult matchWindow(Region region, String tag,
+                                    ICheckSettingsInternal checkSettingsInternal, String source) {
         MatchResult result;
-        ICheckSettingsInternal checkSettingsInternal = (checkSettings instanceof ICheckSettingsInternal) ? (ICheckSettingsInternal) checkSettings : null;
-
-        ImageMatchSettings defaultMatchSettings = getConfigurationInstance().getDefaultMatchSettings();
-
-        // Update retry timeout if it wasn't specified.
-        int retryTimeout = -1;
-
-        // Set defaults if necessary
-        if (checkSettingsInternal != null) {
-            retryTimeout = checkSettingsInternal.getTimeout();
-            if (checkSettingsInternal.getMatchLevel() == null) {
-                checkSettings = checkSettings.matchLevel(defaultMatchSettings.getMatchLevel());
-            }
-
-            if (checkSettingsInternal.getIgnoreCaret() == null) {
-                checkSettings = checkSettings.ignoreCaret(defaultMatchSettings.getIgnoreCaret());
-            }
-
-            checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
-        }
-
-        Region region = regionProvider.getRegion(checkSettingsInternal);
-        logger.verbose("params: ([" + region + "], " + tag + ", " + retryTimeout + ")");
 
         result = matchWindowTask.matchWindow(
                 getUserInputs(), region, tag, shouldMatchWindowRunOnceOnTimeout,
-                checkSettingsInternal, retryTimeout, source);
+                checkSettingsInternal, source);
 
         return result;
     }
@@ -919,9 +892,8 @@ public abstract class EyesBase implements IEyesBase{
         AppOutputProvider appOutputProvider = new AppOutputProvider() {
             public AppOutputWithScreenshot getAppOutput(
                     Region region,
-                    ICheckSettingsInternal checkSettingsInternal) {
-                // FIXME - If we use compression here it hurts us later (because of another screenshot order).
-                return getAppOutputWithScreenshot(region, null);
+                    ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
+                return getAppOutputWithScreenshot(region, null, imageMatchSettings);
             }
         };
 
@@ -1080,8 +1052,8 @@ public abstract class EyesBase implements IEyesBase{
                 new AppOutputProvider() {
                     @Override
                     public AppOutputWithScreenshot getAppOutput(Region region,
-                                                                ICheckSettingsInternal checkSettingsInternal) {
-                        return getAppOutputWithScreenshot(region, checkSettingsInternal);
+                                                                ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
+                        return getAppOutputWithScreenshot(region, checkSettingsInternal, imageMatchSettings);
                     }
                 }
         );
@@ -1123,7 +1095,8 @@ public abstract class EyesBase implements IEyesBase{
      */
     protected abstract Configuration setViewportSize(RectangleSize size);
 
-    protected void setEffectiveViewportSize(RectangleSize size) { }
+    protected void setEffectiveViewportSize(RectangleSize size) {
+    }
 
     /**
      * Define the viewport size as {@code size} without doing any actual action on the
@@ -1153,7 +1126,7 @@ public abstract class EyesBase implements IEyesBase{
     /**
      * @return An updated screenshot.
      */
-    protected abstract EyesScreenshot getScreenshot(ICheckSettingsInternal checkSettingsInternal);
+    protected abstract EyesScreenshot getScreenshot(Region targetRegion, ICheckSettingsInternal checkSettingsInternal);
 
     /**
      * @return The current title of of the AUT.
@@ -1241,7 +1214,7 @@ public abstract class EyesBase implements IEyesBase{
         Location cursorInScreenshot = new Location(cursor);
         // First we need to getting the cursor's coordinates relative to the
         // context (and not to the control).
-        cursorInScreenshot.offset(control.getLocation());
+        cursorInScreenshot = cursorInScreenshot.offset(control.getLocation());
         try {
             cursorInScreenshot = lastScreenshot.getLocationInScreenshot(
                     cursorInScreenshot, CoordinatesType.CONTEXT_RELATIVE);
@@ -1258,7 +1231,7 @@ public abstract class EyesBase implements IEyesBase{
         // the control.
         if (!controlScreenshotIntersect.isSizeEmpty()) {
             Location l = controlScreenshotIntersect.getLocation();
-            cursorInScreenshot.offset(-l.getX(), -l.getY());
+            cursorInScreenshot = cursorInScreenshot.offset(-l.getX(), -l.getY());
         }
 
         Trigger trigger = new MouseTrigger(action, controlScreenshotIntersect, cursorInScreenshot);
@@ -1369,16 +1342,12 @@ public abstract class EyesBase implements IEyesBase{
             } catch (NullPointerException e) {
                 isViewportSizeSet = false;
             }
-        }
-        else {
-            try
-            {
+        } else {
+            try {
                 logger.verbose("Setting viewport size to " + viewportSize);
                 setViewportSize(viewportSize);
                 isViewportSizeSet = true;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //setEffectiveViewportSize(ex.ActualViewportSize);
                 isViewportSizeSet = false;
                 throw ex;
@@ -1386,37 +1355,32 @@ public abstract class EyesBase implements IEyesBase{
         }
     }
 
-    protected EyesScreenshot getSubScreenshot(EyesScreenshot screenshot, Region region, ICheckSettingsInternal checkSettingsInternal) {
-        return screenshot.getSubScreenshot(region, false);
-    }
-
     /**
-     * @param region         The region of the screenshot which will be set in the application output.
+     * @param region The region of the screenshot which will be set in the application output.
      * @return The updated app output and screenshot.
      */
-    private AppOutputWithScreenshot getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal) {
+    private AppOutputWithScreenshot getAppOutputWithScreenshot(Region region, ICheckSettingsInternal checkSettingsInternal, ImageMatchSettings imageMatchSettings) {
         logger.verbose("getting screenshot...");
         // Getting the screenshot (abstract function implemented by each SDK).
-        EyesScreenshot screenshot = getScreenshot(checkSettingsInternal);
+        EyesScreenshot screenshot = getScreenshot(region, checkSettingsInternal);
+        byte[] screenshotBytes = null;
         logger.verbose("Done getting screenshot!");
-
-        // Cropping by region if necessary
-        Location location = null;
-        if (!region.isSizeEmpty()) {
-            location = region.getLocation();
-            screenshot = getSubScreenshot(screenshot, region, checkSettingsInternal);
-            debugScreenshotsProvider.save(screenshot.getImage(), "SUB_SCREENSHOT");
+        String domUrl = null;
+        if (screenshot != null) {
+            logger.verbose("Getting image bytes (encoded as PNG)...");
+            BufferedImage screenshotImage = screenshot.getImage();
+            screenshotBytes = ImageUtils.encodeAsPng(screenshotImage);
+            domUrl = screenshot.domUrl;
         }
 
-        logger.verbose("Getting image bytes (encoded as PNG)...");
-        BufferedImage screenshotImage = screenshot.getImage();
-        byte[] screenshotBytes = ImageUtils.encodeAsPng(screenshotImage);
+        MatchWindowTask.collectRegions(this, screenshot, checkSettingsInternal, imageMatchSettings);
 
         logger.verbose("Done! Getting title...");
         String title = getTitle();
         logger.verbose("Done!");
 
-        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, screenshot.domUrl, null), screenshot, location);
+        AppOutputWithScreenshot result = new AppOutputWithScreenshot(new AppOutput(title, screenshotBytes, domUrl, null),
+                screenshot, region == null || region.isEmpty() ? null : region.getLocation());
         logger.verbose("Done!");
         return result;
     }
@@ -1491,7 +1455,6 @@ public abstract class EyesBase implements IEyesBase{
     protected abstract Configuration getConfigurationInstance();
 
     /**
-     *
      * @return Cloned instance of the configuration
      */
     public Configuration getConfiguration() {
