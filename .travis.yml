@@ -48,7 +48,7 @@ jobs:
     - name: Appium IOS
       script:
         - echo APPLITOOLS_REPORT_ID
-        - sh upload_app.sh "https://applitools.bintray.com/Examples/ipa/IOSTestApp_1.ipa" "app_ios"
+        - sh upload_app.sh "https://applitools.bintray.com/Examples/IOSTestApp/1.2/ipa/IOSTestApp.ipa" "app_ios"
         - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
