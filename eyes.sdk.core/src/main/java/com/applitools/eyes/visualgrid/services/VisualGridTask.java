@@ -3,10 +3,9 @@ package com.applitools.eyes.visualgrid.services;
 import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
-import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
 
@@ -239,8 +238,12 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
     public void setRenderError(String renderId, String error, RenderRequest renderRequest) {
         logger.verbose("enter - renderId: " + renderId);
 
-        RectangleSize deviceSize = getCorrectDeviceSize(renderRequest);
         RenderStatusResults renderResult = new RenderStatusResults();
+        String userAgent = getUserAgent(renderRequest);
+        if (userAgent != null) {
+            renderResult.setUserAgent(userAgent);
+        }
+        RectangleSize deviceSize = getCorrectDeviceSize(renderRequest);
         renderResult.setDeviceSize(deviceSize);
         logger.verbose("device size: " + deviceSize);
         for (TaskListener listener : listeners) {
@@ -250,6 +253,21 @@ public class VisualGridTask implements Callable<TestResultContainer>, Completabl
 
         this.renderResult = renderResult;
         logger.verbose("exit - renderId: " + renderId);
+    }
+
+    private String getUserAgent(RenderRequest renderRequest) {
+        if (renderRequest.getRenderInfo().getEmulationInfo() != null || renderRequest.getRenderInfo().getIosDeviceInfo() != null) {
+            return null;
+        }
+
+        String browser = renderRequest.getBrowserName().getName();
+        Map<String, String> userAgents = eyesConnector.getUserAgents();
+        if (!userAgents.containsKey(browser)) {
+            logger.verbose(String.format("could not find browser %s in list", browser));
+            return null;
+        }
+
+        return userAgents.get(browser);
     }
 
     private RectangleSize getCorrectDeviceSize(RenderRequest renderRequest) {
