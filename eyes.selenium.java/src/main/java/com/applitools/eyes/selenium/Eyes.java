@@ -1550,7 +1550,7 @@ public class Eyes implements IEyesBase {
      * @return The application name running the AUT.
      */
     public String getHostApp() {
-        return this.configuration.getHostOS();
+        return this.configuration.getHostApp();
     }
 
     /**

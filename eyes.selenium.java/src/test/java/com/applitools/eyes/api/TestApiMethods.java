@@ -78,4 +78,15 @@ public class TestApiMethods extends ReportingTestSuite {
             runner.getAllTestResultsImpl();
         }
     }
+
+    @Test
+    public void TestGetHostApp() {
+        final String TEST_HOST_APP = "TestHostApp";
+
+        Eyes eyes = new Eyes();
+        Assert.assertNull(eyes.getHostApp());
+
+        eyes.setHostApp(TEST_HOST_APP);
+        Assert.assertEquals(eyes.getHostApp(), TEST_HOST_APP);
+    }
 }

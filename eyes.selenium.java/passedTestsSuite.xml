@@ -238,6 +238,7 @@
                 <methods>
                     <include name="TestCloseAsync" />
                     <include name="TestWaitBeforeClose"/>
+                    <include name="TestGetHostApp"/>
                 </methods>
             </class>
         </classes>
