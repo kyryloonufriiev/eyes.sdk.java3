@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.SeleniumUtils;
@@ -14,6 +15,7 @@ public class TestServerConnector {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         Eyes eyes = new Eyes();
         eyes.setBatch(TestDataProvider.batchInfo);
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
             WebDriver driver = eyes.open(webDriver,
                     "TestSessionConnector", "TestSessionConnector",

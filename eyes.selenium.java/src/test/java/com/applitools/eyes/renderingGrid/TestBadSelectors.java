@@ -2,6 +2,7 @@ package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -31,6 +32,7 @@ public class TestBadSelectors extends ReportingTestSuite {
         runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         final Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
         driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
         String suffix = useVisualGrid ? "_VG" : "";

@@ -35,6 +35,7 @@ public class TestApiMethods extends ReportingTestSuite {
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         runner.setLogHandler(TestUtils.initLogger());
         Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
         eyes.setBatch(TestDataProvider.batchInfo);
         try {
             driver.get("https://applitools.com/helloworld");

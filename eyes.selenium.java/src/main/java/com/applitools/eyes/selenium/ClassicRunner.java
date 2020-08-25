@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class ClassicRunner extends EyesRunner {
 
-    private List<TestResults> allTestResult = new ArrayList<>();
+    private final List<TestResults> allTestResult = new ArrayList<>();
 
     private Error exception;
 

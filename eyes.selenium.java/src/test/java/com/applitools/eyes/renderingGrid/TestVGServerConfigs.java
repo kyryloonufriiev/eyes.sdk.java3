@@ -29,6 +29,7 @@ public class TestVGServerConfigs extends ReportingTestSuite {
         WebDriver driver = SeleniumUtils.createChromeDriver();
         final VisualGridRunner runner = new VisualGridRunner(10,"TestVGDoubleCloseNoCheck");
         final Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
             Configuration conf = new Configuration();
             conf.setAppName("app").setTestName("test");

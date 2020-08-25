@@ -35,6 +35,7 @@ public class TestConfigurationSentCorrectlyToServer extends EnvironmentModifier 
     public void TestEyesConfiguration(boolean useVisualGrid, String sequenceName, String sequenceNameEnvVar) {
         EyesRunner runner = useVisualGrid ? new VisualGridRunner(10) : new ClassicRunner();
         Eyes eyes = new Eyes(runner);
+        eyes.setLogHandler(new StdoutLogHandler());
 
         WebDriver driver = SeleniumUtils.createChromeDriver();
         driver.get("https://applitools.github.io/demo/TestPages/FramesTestPage/");

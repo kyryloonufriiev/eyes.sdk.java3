@@ -2,6 +2,7 @@ package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.BatchInfo;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
 import com.applitools.eyes.selenium.fluent.Target;
@@ -34,6 +35,7 @@ public class TestVGWithBadWebhook extends ReportingTestSuite {
         config.setTestName("Bad Webhook");
         config.setViewportSize(new RectangleSize(800, 600));
 
+        eyes.setLogHandler(new StdoutLogHandler());
         eyes.setConfiguration(config);
         eyes.open(driver);
         eyes.check(Target.window().fully().beforeRenderScreenshotHook("gibberish uncompilable java script"));

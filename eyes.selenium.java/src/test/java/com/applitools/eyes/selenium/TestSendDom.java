@@ -1,9 +1,6 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.IEyesBase;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.TestResults;
+import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.metadata.ActualAppOutput;
@@ -49,13 +46,11 @@ public final class TestSendDom extends ReportingTestSuite {
     private static void captureDom(String url, WebDriverInitializer initCode, String testName) {
         WebDriver webDriver = SeleniumUtils.createChromeDriver();
         webDriver.get(url);
-        Logger logger = new Logger();
-
-        logger.setLogHandler(TestUtils.initLogger(testName));
         if (initCode != null) {
             initCode.initWebDriver(webDriver);
         }
         Eyes eyes = new Eyes();
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
             eyes.setBatch(TestDataProvider.batchInfo);
             EyesWebDriver eyesWebDriver = (EyesWebDriver) eyes.open(webDriver, "Test Send DOM", testName);

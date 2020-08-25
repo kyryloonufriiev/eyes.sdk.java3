@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -38,6 +39,7 @@ public class TestConfiguration extends ReportingTestSuite {
     @Test
     public void testConfigurationEdit() {
         Eyes eyes = new Eyes();
+        eyes.setLogHandler(new StdoutLogHandler());
         int originalMatchTimeout = eyes.getConfiguration().getMatchTimeout();
         int newMatchTimeout = originalMatchTimeout + 1000;
         eyes.getConfiguration().setMatchTimeout(newMatchTimeout);

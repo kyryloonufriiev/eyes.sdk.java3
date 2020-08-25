@@ -1,5 +1,6 @@
 package com.applitools.eyes.selenium;
 
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumTestUtils;
@@ -30,6 +31,7 @@ public class MobileNativeTests extends ReportingTestSuite {
 
     private Eyes initEyes(DesiredCapabilities capabilities) {
         Eyes eyes = new Eyes();
+        eyes.setLogHandler(new StdoutLogHandler());
         String testName = Thread.currentThread().getStackTrace()[2].getMethodName();
         SeleniumTestUtils.setupLogging(eyes, testName);
         setCapabilities(eyes, capabilities, testName);

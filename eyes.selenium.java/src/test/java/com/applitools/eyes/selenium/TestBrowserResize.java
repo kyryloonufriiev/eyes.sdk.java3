@@ -1,6 +1,7 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.TestResults;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
@@ -22,6 +23,7 @@ public class TestBrowserResize {
         webDriver.get("https://applitools.github.io/demo/TestPages/DynamicResolution/desktop.html");
         Eyes eyes = new Eyes();
         eyes.setBatch(TestDataProvider.batchInfo);
+        eyes.setLogHandler(new StdoutLogHandler());
         try {
             eyes.open(webDriver, "Browser Size Test", "Browser Size Test", new RectangleSize(640, 480));
             eyes.check("Test 1", Target.window());

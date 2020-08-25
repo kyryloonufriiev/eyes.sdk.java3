@@ -2,6 +2,7 @@ package com.applitools.eyes.renderingGrid;
 
 import com.applitools.eyes.EyesRunner;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.TestResultsSummary;
 import com.applitools.eyes.selenium.ClassicRunner;
 import com.applitools.eyes.selenium.Eyes;
@@ -32,6 +33,7 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             final Eyes eyes = new Eyes(runner);
+            eyes.setLogHandler(new StdoutLogHandler());
             driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
             String suffix = useVisualGrid ? "_VG" : "";
@@ -56,6 +58,7 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
         final WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             final Eyes eyes = new Eyes(runner);
+            eyes.setLogHandler(new StdoutLogHandler());
             driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
 
             String suffix = useVisualGrid ? "_VG" : "";
@@ -84,6 +87,7 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
             String suffix = useVisualGrid ? "_VG" : "";
 
             Eyes eyes1 = new Eyes(runner);
+            eyes1.setLogHandler(new StdoutLogHandler());
             eyes1.setBatch(TestDataProvider.batchInfo);
             eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
             eyes1.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
@@ -91,6 +95,7 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
 
             Eyes eyes2 = new Eyes(runner);
             eyes2.setBatch(TestDataProvider.batchInfo);
+            eyes2.setLogHandler(new StdoutLogHandler());
             eyes2.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
             eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
             eyes2.close(false);
@@ -112,12 +117,14 @@ public class TestDoubleOpenClose extends ReportingTestSuite {
 
             Eyes eyes1 = new Eyes(runner);
             eyes1.setBatch(TestDataProvider.batchInfo);
+            eyes1.setLogHandler(new StdoutLogHandler());
             eyes1.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
             eyes1.check(Target.window().fully().ignoreDisplacements(false).withName("Step 1"));
             eyes1.closeAsync();
 
             Eyes eyes2 = new Eyes(runner);
             eyes2.setBatch(TestDataProvider.batchInfo);
+            eyes2.setLogHandler(new StdoutLogHandler());
             eyes2.open(driver, "Applitools Eyes SDK", "TestDoubleOpenCheckCloseAsyncWithDifferentInstances" + suffix, new RectangleSize(1200, 800));
             eyes2.check(Target.window().fully().ignoreDisplacements(false).withName("Step 2"));
             eyes2.closeAsync();

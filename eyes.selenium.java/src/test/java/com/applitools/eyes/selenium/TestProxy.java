@@ -1,7 +1,7 @@
 package com.applitools.eyes.selenium;
 
-import com.applitools.eyes.EyesException;
 import com.applitools.eyes.ProxySettings;
+import com.applitools.eyes.StdoutLogHandler;
 import com.applitools.eyes.utils.ReportingTestSuite;
 import com.applitools.eyes.utils.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
@@ -28,6 +28,7 @@ public class TestProxy extends ReportingTestSuite {
         boolean isOpenFailed = false;
         try {
             Eyes eyes = new Eyes();
+            eyes.setLogHandler(new StdoutLogHandler(false));
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8080));
             eyes.open(driver2, "ProxyTest", "proxy test");
         } catch (Exception e){
@@ -44,6 +45,7 @@ public class TestProxy extends ReportingTestSuite {
         WebDriver driver1 = SeleniumUtils.createChromeDriver();
         try {
             Eyes eyes = new Eyes();
+            eyes.setLogHandler(new StdoutLogHandler(false));
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8080));
             eyes.open(driver1, "ProxyTest", "proxy test");
             Assert.assertTrue(eyes.getIsOpen());

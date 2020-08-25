@@ -68,6 +68,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
     @Test
     public void testDebugScreenshot() {
         SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+        eyes.setLogHandler(new StdoutLogHandler());
 
         final AtomicBoolean wasSavedDebugScreenshot = new AtomicBoolean();
         wasSavedDebugScreenshot.set(false);
@@ -97,6 +98,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
     @Test
     public void testChangeTabs() {
         SeleniumEyes eyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+        eyes.setLogHandler(new StdoutLogHandler());
         WebDriver driver = SeleniumUtils.createChromeDriver();
         try {
             driver = eyes.open(driver, "Applitools Eyes SDK", "Test Change Tabs", new RectangleSize(800, 800));
@@ -118,6 +120,7 @@ public class TestSeleniumEyes extends ReportingTestSuite {
     public void testScreenshotTooBig() {
         ClassicRunner runner = new ClassicRunner();
         SeleniumEyes eyes = new SeleniumEyes(configurationProvider, runner);
+        eyes.setLogHandler(new StdoutLogHandler());
 
         final BufferedImage[] screenshots = new BufferedImage[1];
         screenshots[0] = null;
