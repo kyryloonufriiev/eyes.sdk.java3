@@ -1,4 +1,4 @@
-## [vNext]
+## [3.175.0] - 2020-08-26
 ### Fixed
 - UFG tests now finish properly even when being closed after `eyes.check` has finished. [Trello 2000](https://trello.com/c/0EWqP5to)
 - Now using cut provider and scale provider added by the user in the visual locators. [Trello 1955](https://trello.com/c/rhfcRXLV)
@@ -9,7 +9,6 @@
 - Extracted connectivity and ufg dom analyzing to remote repositories. [Trello 2074](https://trello.com/c/pP9VbmKF)
 ### Added
 - When render fails, the correct useragent will be sent in the test results. [Trello 2086](https://trello.com/c/RLOmjJLT)
-- When render fails, the correct device size will be sent in the test results. [Trello 2087](https://trello.com/c/AQ0upINc)
 
 ## [3.174.0] - 2020-08-12
 ### Fixed

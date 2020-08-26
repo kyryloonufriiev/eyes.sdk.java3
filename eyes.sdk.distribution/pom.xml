@@ -5,7 +5,7 @@
     <parent>
         <artifactId>eyes-sdk-java3-parent</artifactId>
         <groupId>com.applitools</groupId>
-        <version>3.174.0</version>
+        <version>3.175.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -45,17 +45,17 @@
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-sdk-core-java3</artifactId>
-            <version>3.174.0</version>
+            <version>3.175.0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-images-java3</artifactId>
-            <version>3.174.0</version>
+            <version>3.175.0</version>
         </dependency>
         <dependency>
             <groupId>com.applitools</groupId>
             <artifactId>eyes-selenium-java3</artifactId>
-            <version>3.174.0</version>
+            <version>3.175.0</version>
         </dependency>
     </dependencies>
 
