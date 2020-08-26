@@ -21,10 +21,12 @@ addons:
 before_install:
   - git clone https://$GITHUB_TOKEN@github.com/applitools/eyes.common.java3.git
   - pushd eyes.common.java3
+  - git checkout rfe_trello_2094_make_async_requests
   - mvn install
   - popd
   - git clone https://$GITHUB_TOKEN@github.com/applitools/eyes.ufg.java3.git
   - pushd eyes.ufg.java3
+  - git checkout rfe_trello_2094_make_async_requests
   - mvn install
   - popd
 before_script:
