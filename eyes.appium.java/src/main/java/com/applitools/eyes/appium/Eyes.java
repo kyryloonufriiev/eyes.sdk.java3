@@ -316,9 +316,8 @@ public class Eyes extends EyesBase {
             logger.verbose("Setting OS: " + os);
             appEnv.setOs(os);
         }
-        Object deviceNameCapability = underlyingDriver.getCapabilities().getCapability("deviceName");
-        String deviceName = deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
-        appEnv.setDeviceInfo(deviceName);
+
+        appEnv.setDeviceInfo(EyesAppiumUtils.getDeviceName(underlyingDriver));
         logger.log("Done!");
         return appEnv;
     }
