@@ -1,3 +1,7 @@
+
+### Added
+- Implemented test on setting deviceName to appEnvironment data. [Trello 125](https://trello.com/c/ekZqajRU)
+
 ## [3.175.0] - 2020-08-26
 ### Fixed
 - UFG tests now finish properly even when being closed after `eyes.check` has finished. [Trello 2000](https://trello.com/c/0EWqP5to)
