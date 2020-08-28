@@ -1,3 +1,7 @@
+## [3.175.1] - 2020-08-28
+### Fixed
+- Corrupt build for eyes-selenium-java3 in version 3.175.0 .
+
 ## [3.175.0] - 2020-08-26
 ### Fixed
 - UFG tests now finish properly even when being closed after `eyes.check` has finished. [Trello 2000](https://trello.com/c/0EWqP5to)
