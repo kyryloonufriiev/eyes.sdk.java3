@@ -1,5 +1,6 @@
 
 ### Added
+- Implemented test on getting status bar height. [Trello 1478](https://trello.com/c/RuPL3v4v)
 - Implemented test on setting deviceName to appEnvironment data. [Trello 125](https://trello.com/c/ekZqajRU)
 ### Updated
 - Scroll mechanism for Android. Added possibility to scroll with helper library. [Trello 1673](https://trello.com/c/CYbkzXia)
