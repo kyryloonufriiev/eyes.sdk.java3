@@ -33,12 +33,33 @@ public class EyesAppiumUtils {
      */
     public static String getPlatformVersion(HasCapabilities driver) {
         Capabilities capabilities = driver.getCapabilities();
-        Object platformVersionObj =
-                capabilities.getCapability
-                        (MobileCapabilityType.PLATFORM_VERSION);
+        Object platformVersionObj;
+        if (capabilities.getCapabilityNames().contains("os_version")) {
+            platformVersionObj = capabilities.getCapability("os_version");
+        } else {
+            platformVersionObj = capabilities.getCapability(MobileCapabilityType.PLATFORM_VERSION);
+        }
 
-        return platformVersionObj == null ?
-                null : String.valueOf(platformVersionObj);
+        return platformVersionObj == null ? null : String.valueOf(platformVersionObj);
+    }
+
+    /**
+     * @param driver The driver to get the platform version from.
+     * @return The device name or 'Unknown' if it is undefined.
+     */
+    public static String getDeviceName(HasCapabilities driver) {
+        Capabilities capabilities = driver.getCapabilities();
+
+        Object deviceNameCapability = capabilities.getCapability("deviceName");
+        String deviceName = deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
+
+        Object deviceCapability = capabilities.getCapability("device");
+
+        if (deviceCapability != null && !deviceName.toLowerCase().contains(deviceCapability.toString())) {
+            deviceName = deviceCapability.toString();
+        }
+
+        return deviceName;
     }
 
     public static WebElement getFirstScrollableView(WebDriver driver) {
