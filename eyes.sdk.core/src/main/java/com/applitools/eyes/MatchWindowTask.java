@@ -1,25 +1,25 @@
-/*
- * Applitools SDK for Selenium integration.
- */
 package com.applitools.eyes;
 
 import com.applitools.connectivity.ServerConnector;
-import com.applitools.connectivity.api.Response;
 import com.applitools.eyes.capture.AppOutputProvider;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.*;
 import com.applitools.eyes.visualgrid.model.IGetFloatingRegionOffsets;
 import com.applitools.eyes.visualgrid.model.MutableRegion;
-import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.EyesSyncObject;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MatchWindowTask {
 
@@ -86,6 +86,26 @@ public class MatchWindowTask {
 
     /**
      * Creates the match model and calls the server connector matchWindow method.
+     * @param appOutput          The application output to be matched.
+     * @param tag                Optional tag to be associated with the match (can be {@code null}).
+     * @param imageMatchSettings The settings to use.
+     * @param renderId           Visual Grid's renderId.
+     * @param source             The tested page URL or tested app name.
+     */
+    public MatchResult performMatch(AppOutputWithScreenshot appOutput,
+                                    String tag, ICheckSettingsInternal checkSettingsInternal,
+                                    ImageMatchSettings imageMatchSettings,
+                                    List<? extends IRegion> regions,
+                                    List<VisualGridSelector[]> regionSelectors,
+                                    EyesBase eyes, String renderId, String source) {
+        collectRegions(imageMatchSettings, regions, regionSelectors);
+        collectRegions(imageMatchSettings, checkSettingsInternal);
+        return performMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings,
+                eyes, renderId, source);
+    }
+
+    /**
+     * Creates the match model and calls the server connector matchWindow method.
      * @param userInputs         The user inputs related to the current appOutput.
      * @param appOutput          The application output to be matched.
      * @param tag                Optional tag to be associated with the match (can be {@code null}).
@@ -97,117 +117,107 @@ public class MatchWindowTask {
                                     AppOutputWithScreenshot appOutput,
                                     String tag, boolean replaceLast,
                                     ImageMatchSettings imageMatchSettings,
-                                    EyesBase eyes, String source) {
+                                    EyesBase eyes, String renderId, String source) {
         // called from regular flow and from check many flow.
         eyes.getLogger().verbose("enter");
 
         String agentSetupStr = "";
         Object agentSetup = eyes.getAgentSetup();
-        ObjectMapper jsonMapper = new ObjectMapper();
-        try {
-            agentSetupStr = jsonMapper.writeValueAsString(agentSetup);
-        } catch (JsonProcessingException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+        if (agentSetup != null) {
+            ObjectMapper jsonMapper = new ObjectMapper();
+            try {
+                agentSetupStr = jsonMapper.writeValueAsString(agentSetup);
+            } catch (JsonProcessingException e) {
+                GeneralUtils.logExceptionStackTrace(logger, e);
+            }
         }
 
-        MatchResult result =  performMatch(userInputs, appOutput, tag, replaceLast, imageMatchSettings, agentSetupStr, null, source);
+        final AtomicReference<MatchResult> matchResult = new AtomicReference<>();
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "preformMatch"));
+        TaskListener<MatchResult> listener = new SyncTaskListener<>(lock, matchResult);
+        performMatch(listener, userInputs, appOutput, tag, replaceLast, imageMatchSettings, agentSetupStr, renderId, source);
+        synchronized (lock.get()) {
+            try {
+                lock.get().waitForNotify();
+            } catch (InterruptedException e) {
+                throw new EyesException("Failed waiting for perform match", e);
+            }
+        }
+        if (matchResult.get() == null) {
+            throw new EyesException("Failed performing match with the server");
+        }
         eyes.getLogger().verbose("exit");
-        return result;
+        return matchResult.get();
     }
 
-    /**
-     * Creates the match model and calls the server connector matchWindow method.
-     * @param appOutput          The application output to be matched.
-     * @param tag                Optional tag to be associated with the match (can be {@code null}).
-     * @param imageMatchSettings The settings to use.
-     * @param renderId           Visual Grid's renderId.
-     * @param source             The tested page URL or tested app name.
-     * @return The match result.
-     */
-    public MatchResult performMatch(AppOutputWithScreenshot appOutput,
-                                    String tag, ICheckSettingsInternal checkSettingsInternal,
-                                    ImageMatchSettings imageMatchSettings,
-                                    List<? extends IRegion> regions,
-                                    List<VisualGridSelector[]> regionSelectors,
-                                    EyesBase eyes, String renderId, String source) {
-        String agentSetupStr = (String) eyes.getAgentSetup();
-        collectRegions(imageMatchSettings, regions, regionSelectors);
-        collectRegions(imageMatchSettings, checkSettingsInternal);
-        return performMatch(new ArrayList<Trigger>(), appOutput, tag, false, imageMatchSettings, agentSetupStr,
-                renderId, source);
-    }
-
-    private MatchResult performMatch(List<Trigger> userInputs,
-                                     AppOutputWithScreenshot appOutput,
-                                     String tag, boolean replaceLast,
-                                     ImageMatchSettings imageMatchSettings,
-                                     String agentSetupStr, String renderId,
-                                     String source) {
+    private void performMatch(final TaskListener<MatchResult> listener, List<Trigger> userInputs,
+                              AppOutputWithScreenshot appOutput,
+                              String tag, boolean replaceLast,
+                              ImageMatchSettings imageMatchSettings,
+                              String agentSetupStr, String renderId,
+                              String source) {
         // Prepare match data.
         MatchWindowData.Options options = new MatchWindowData.Options(tag, userInputs.toArray(new Trigger[0]), replaceLast,
                 false, false, false, false, imageMatchSettings, source, renderId);
 
-        MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput.getAppOutput(), tag,
+        final MatchWindowData data = new MatchWindowData(userInputs.toArray(new Trigger[0]), appOutput.getAppOutput(), tag,
                 false, options, agentSetupStr, renderId);
 
 
-        if (!tryUploadImage(data)) {
-            throw new EyesException("matchWindow failed: could not upload image to storage service.");
-        }
-        // Perform match.
-        return serverConnector.matchWindow(runningSession, data);
+        tryUploadImage(new TaskListener<Boolean>() {
+            @Override
+            public void onComplete(Boolean result) {
+                if (!result) {
+                    onFail();
+                    return;
+                }
+                serverConnector.matchWindow(listener, runningSession, data);
+            }
+
+            @Override
+            public void onFail() {
+                listener.onFail();
+            }
+        }, data);
     }
 
-    private boolean tryUploadImage(MatchWindowData data) {
-        AppOutput appOutput = data.getAppOutput();
+    private void tryUploadImage(final TaskListener<Boolean> taskListener, MatchWindowData data) {
+        final AppOutput appOutput = data.getAppOutput();
         if (appOutput.getScreenshotUrl() != null) {
-            return true;
+            taskListener.onComplete(true);
+            return;
         }
 
         // Getting the screenshot's bytes
-        byte[] bytes = appOutput.getScreenshotBytes();
-        String targetUrl = tryUploadData(bytes, "image/png", "image/png");
-        appOutput.setScreenshotUrl(targetUrl);
-        return targetUrl != null;
+        TaskListener<String> uploadListener = new TaskListener<String>() {
+            @Override
+            public void onComplete(String s) {
+                appOutput.setScreenshotUrl(s);
+                taskListener.onComplete(s != null);
+            }
+
+            @Override
+            public void onFail() {
+                appOutput.setScreenshotUrl(null);
+                taskListener.onComplete(false);
+            }
+        };
+        serverConnector.uploadImage(uploadListener, appOutput.getScreenshotBytes());
     }
 
-    public String tryUploadData(byte[] bytes, String contentType, String mediaType) {
-        String targetUrl;
-
-        RenderingInfo renderingInfo = serverConnector.getRenderInfo();
-        if (renderingInfo != null && (targetUrl = renderingInfo.getResultsUrl()) != null) {
+    public String tryUploadData(final byte[] bytes, final String contentType, final String mediaType) {
+        final AtomicReference<String> reference = new AtomicReference<>();
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "tryUploadData"));
+        serverConnector.uploadData(new SyncTaskListener<>(lock, reference), bytes, contentType, mediaType);
+        synchronized (lock.get()) {
             try {
-                UUID uuid = UUID.randomUUID();
-                targetUrl = targetUrl.replace("__random__", uuid.toString());
-                logger.verbose("uploading " + mediaType + " to " + targetUrl);
-
-                int retriesLeft = 3;
-                int wait = 500;
-                while (retriesLeft-- > 0) {
-                    try {
-                        Response response = serverConnector.uploadData(bytes, renderingInfo, targetUrl, contentType, mediaType);
-                        int statusCode = response.getStatusCode();
-                        response.close();
-                        if (statusCode == 200 || statusCode == 201) {
-                            logger.verbose("upload " + mediaType + " guid " + uuid + "complete.");
-                            return targetUrl;
-                        }
-                        if (statusCode < 500) {
-                            break;
-                        }
-                    } catch (Exception e) {
-                        if (retriesLeft == 0) throw e;
-                    }
-                    Thread.sleep(wait);
-                    wait *= 2;
-                    wait = Math.min(10000, wait);
-                }
-            } catch (Exception e) {
-                logger.log("Error uploading " + mediaType);
-                GeneralUtils.logExceptionStackTrace(logger, e);
+                lock.get().waitForNotify();
+            } catch (InterruptedException e) {
+                throw new EyesException("Failed waiting for upload", e);
             }
         }
-        return null;
+
+        return reference.get();
     }
 
     public static void collectRegions(EyesBase eyes, EyesScreenshot screenshot,
@@ -581,7 +591,7 @@ public class MatchWindowTask {
 
         ImageMatchSettings matchSettings = createImageMatchSettings(checkSettingsInternal, screenshot, eyes);
         matchResult = performMatch(Arrays.asList(userInputs), appOutput, tag, lastScreenshotHash != null,
-                matchSettings, eyes, source);
+                matchSettings, eyes, null, source);
         lastScreenshotHash = currentScreenshotHash;
         return screenshot;
     }

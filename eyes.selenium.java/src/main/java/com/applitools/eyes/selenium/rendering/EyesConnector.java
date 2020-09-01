@@ -3,16 +3,18 @@ package com.applitools.eyes.selenium.rendering;
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
-import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.config.Configuration;
+import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ClassVersionGetter;
+import com.applitools.utils.EyesSyncObject;
 
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     private final RenderBrowserInfo browserInfo;
@@ -34,7 +36,7 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     /**
-     * ﻿Starts a new test without setting the viewport size of the AUT.
+     * Starts a new test without setting the viewport size of the AUT.
      */
     public void open(Configuration config, String appName, String testName) {
         this.configuration = config;
@@ -53,11 +55,29 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     public List<RunningRender> render(RenderRequest... renderRequests) {
-        return getServerConnector().render(renderRequests);
+        final AtomicReference<List<RunningRender>> reference = new AtomicReference<>();
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "render"));
+        getServerConnector().render(new SyncTaskListener<>(lock, reference), renderRequests);
+        synchronized (lock.get()) {
+            try {
+                lock.get().waitForNotify();
+            } catch (InterruptedException ignored) {}
+        }
+
+        return reference.get();
     }
 
     public List<RenderStatusResults> renderStatusById(String... renderIds) {
-        return getServerConnector().renderStatusById(renderIds);
+        final AtomicReference<List<RenderStatusResults>> reference = new AtomicReference<>();
+        final AtomicReference<EyesSyncObject> lock = new AtomicReference<>(new EyesSyncObject(logger, "renderStatusById"));
+        getServerConnector().renderStatusById(new SyncTaskListener<>(lock, reference), renderIds);
+        synchronized (lock.get()) {
+            try {
+                lock.get().waitForNotify();
+            } catch (InterruptedException ignored) {}
+        }
+
+        return reference.get();
     }
 
     public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
@@ -74,18 +94,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, virtualViewport);
         AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null, location);
         return matchWindowTask.performMatch(appOutputWithScreenshot, tag, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
-    }
-
-    /**
-     * Starts a test.
-     * @param appName    The name of the application under test.
-     * @param testName   The test name.
-     * @param dimensions Determines the resolution used for the baseline.
-     *                   {@code null} will automatically grab the resolution from the image.
-     */
-    public void open(String appName, String testName,
-                     RectangleSize dimensions) {
-        openBase(appName, testName, dimensions, null);
     }
 
     protected String getBaseAgentId() {
@@ -123,7 +131,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
     }
 
     public void setRenderInfo(RenderingInfo renderInfo) {
-        this.renderInfo = renderInfo;
         getServerConnector().setRenderingInfo(renderInfo);
     }
 
