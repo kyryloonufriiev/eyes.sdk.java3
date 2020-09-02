@@ -1,4 +1,4 @@
-## [vNext]
+## [3.176.0] - 2020-09-02
 ### Added
 - Implemented test on getting status bar height. [Trello 1478](https://trello.com/c/RuPL3v4v)
 - Implemented test on setting deviceName to appEnvironment data. [Trello 125](https://trello.com/c/ekZqajRU)
