@@ -1,4 +1,6 @@
-## [vNext]
+## [3.177.0] - 2020-09-07 
+### Added
+- Use predefined device info for pixel ratio. [Trello 301](https://trello.com/c/vGSi2NFz/)
 ### Fixed
 - Supporting `getBoundingClientRect()` for web elements in IE Browser. [Trello 2130](https://trello.com/c/U6fhdMOO)
 - Supporting pages without a `body` element. [Trello 2130](https://trello.com/c/U6fhdMOO)
