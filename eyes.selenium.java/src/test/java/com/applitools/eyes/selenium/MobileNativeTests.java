@@ -114,7 +114,7 @@ public class MobileNativeTests extends ReportingTestSuite {
 
         Eyes eyes = initEyes(capabilities);
         Configuration configuration = eyes.getConfiguration();
-        configuration.setFeatures(Feature.OPTIMIZE_MOBILE_DEVICES_INFO);
+        configuration.setFeatures(Feature.USE_PREDEFINED_DEVICE_INFO);
 
         AndroidDriver driver = new AndroidDriver(new URL(SAUCE_SELENIUM_URL), capabilities);
         try {
@@ -140,7 +140,7 @@ public class MobileNativeTests extends ReportingTestSuite {
 
         Eyes eyes = initEyes(caps);
         Configuration configuration = eyes.getConfiguration();
-        configuration.setFeatures(Feature.OPTIMIZE_MOBILE_DEVICES_INFO);
+        configuration.setFeatures(Feature.USE_PREDEFINED_DEVICE_INFO);
 
         WebDriver driver = new IOSDriver(new URL(SAUCE_SELENIUM_URL), caps);
         try {
