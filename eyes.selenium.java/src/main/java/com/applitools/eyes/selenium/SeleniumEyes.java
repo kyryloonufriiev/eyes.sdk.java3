@@ -917,9 +917,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         // However, in Scroll stitch mode, we scroll the SRE itself to the get full contents, and it
         // already has an offset caused by "BringRegionToView", so we should consider this offset.
         if (getConfigurationInstance().getStitchMode() == StitchMode.SCROLL && !isScrollableElement) {
-            state.setStitchOffset(new RectangleSize(
-                    originalElementLocation.getX() - elementBounds.getLeft(),
-                    originalElementLocation.getY() - elementBounds.getTop()));
+            EyesRemoteWebElement sre = (EyesRemoteWebElement) getCurrentFrameScrollRootElement();
+            state.setStitchOffset(new RectangleSize(sre.getScrollLeft(), sre.getScrollTop()));
         }
 
         // 2. Intersect the element and the effective viewport
@@ -1009,12 +1008,11 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         // User might still call "fully" on a non-scrollable element, adjust the position provider accordingly.
         if (isScrollableElement) {
             state.setStitchPositionProvider(new ElementPositionProvider(logger, driver, targetElement));
-        } else // Not a scrollable element but an element enclosed within a scroll-root-element
-        {
+        } else { // Not a scrollable element but an element enclosed within a scroll-root-element
             WebElement scrollRootElement = getCurrentFrameScrollRootElement();
             if (getConfigurationInstance().getStitchMode() == StitchMode.CSS) {
                 state.setStitchPositionProvider(new CssTranslatePositionProvider(logger, driver, targetElement));
-                state.setOriginPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
+                state.setOriginPositionProvider(new NullPositionProvider());
             } else {
                 state.setStitchPositionProvider(new SeleniumScrollPositionProvider(logger, driver, scrollRootElement));
             }
