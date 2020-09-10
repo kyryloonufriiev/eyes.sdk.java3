@@ -1,4 +1,4 @@
-## [vNext]
+## [3.177.1] - 2020-09-10
 ### Fixed
 - Setting viewport 0x0 now won't do anything. [Trello 2115](https://trello.com/c/KYKyXSr6)
 - Now parsing cached resources when collecting resources before rendering. [Trello 2135](https://trello.com/c/hwkbp14g)
