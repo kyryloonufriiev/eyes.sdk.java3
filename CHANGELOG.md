@@ -1,4 +1,4 @@
-## [vNext]
+## [3.178.0] - 2020-09-10
 ### Updated
 - The `USE_PREDEFINED_DEVICE_INFO` feature now compares device name with all aliases returned from the server. [Trello 301](https://trello.com/c/vGSi2NFz)
 ### Fixed
