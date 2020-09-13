@@ -26,7 +26,7 @@ public class EyesWebDriverScreenshot extends EyesScreenshot {
 
     public enum ScreenshotType {VIEWPORT, ENTIRE_FRAME}
 
-    private EyesSeleniumDriver driver;
+    private final EyesSeleniumDriver driver;
     private final FrameChain frameChain;
     private Location currentFrameScrollPosition;
     private final ScreenshotType screenshotType;

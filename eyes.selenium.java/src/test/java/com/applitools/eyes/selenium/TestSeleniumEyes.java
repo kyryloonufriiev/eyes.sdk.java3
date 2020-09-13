@@ -6,6 +6,8 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
+import com.applitools.eyes.selenium.capture.EyesWebDriverScreenshot;
+import com.applitools.eyes.selenium.capture.TakesScreenshotImageProvider;
 import com.applitools.eyes.selenium.fluent.Target;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
@@ -25,8 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TestSeleniumEyes extends ReportingTestSuite {
 
@@ -234,6 +235,26 @@ public class TestSeleniumEyes extends ReportingTestSuite {
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
         try {
             EyesDriverUtils.setViewportSize(new Logger(), driver, new RectangleSize(0, 0));
+        } finally {
+            driver.quit();
+        }
+    }
+
+    @Test
+    public void testGetEmptyFrameContentSize() {
+        Logger logger = new Logger();
+        ChromeDriver driver = SeleniumUtils.createChromeDriver();
+        driver.get(TESTED_PAGE_URL);
+        try {
+            SeleniumEyes seleniumEyes = new SeleniumEyes(configurationProvider, new ClassicRunner());
+            EyesSeleniumDriver seleniumDriver = (EyesSeleniumDriver) seleniumEyes.open(
+                    driver, "Applitools Eyes SDK", "testGetEmptyFrameContentSize", new RectangleSize(800, 800));
+            TakesScreenshotImageProvider imageProvider = new TakesScreenshotImageProvider(logger, seleniumDriver);
+            EyesSeleniumDriver mockedDriver = spy(seleniumDriver);
+            doReturn("0;0").when(mockedDriver).executeScript(eq(EyesRemoteWebElement.JS_GET_CLIENT_SIZE), any());
+            EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, mockedDriver, imageProvider.getImage());
+            seleniumEyes.close();
+            Assert.assertEquals(screenshot.getFrameWindow(), new Region(0, 0, 800, 800));
         } finally {
             driver.quit();
         }

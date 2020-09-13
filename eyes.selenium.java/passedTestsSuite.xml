@@ -343,6 +343,7 @@
                     <include name="testGetBoundingClientRect"/>
                     <include name="testGetRootElementNoBody"/>
                     <include name="testSetEmptyViewportSize"/>
+                    <include name="testGetEmptyFrameContentSize"/>
                 </methods>
             </class>
         </classes>
