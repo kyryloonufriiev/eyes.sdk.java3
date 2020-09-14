@@ -3,6 +3,7 @@ package com.applitools.eyes.appium;
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
 import com.applitools.eyes.RectangleSize;
+import com.applitools.eyes.selenium.EyesDriverUtils;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.eyes.selenium.positioning.ImageRotation;
 import com.applitools.utils.ImageUtils;
@@ -12,6 +13,8 @@ import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EyesAppiumDriver extends EyesWebDriver {
 
@@ -20,6 +23,8 @@ public class EyesAppiumDriver extends EyesWebDriver {
     private final Map<String, WebElement> elementsIds = new HashMap<>();
     private ImageRotation rotation;
     private RectangleSize defaultContentViewportSize = null;
+    private Map<String, Integer> systemBarsHeights = null;
+    private Integer deviceHeight = null;
 
     public EyesAppiumDriver(Logger logger, Eyes eyes, AppiumDriver driver) {
         super(logger, eyes);
@@ -53,16 +58,55 @@ public class EyesAppiumDriver extends EyesWebDriver {
         return sessionDetails;
     }
 
-    public HashMap<String, Integer> getViewportRect () {
+    public HashMap<String, Integer> getViewportRect() {
         Object viewportRectObject = getCachedSessionDetails().get("viewportRect");
         logger.verbose("Viewport Rect Type: " + viewportRectObject.getClass());
         logger.verbose("Viewport Rect Value: " + viewportRectObject.toString());
 
         Map<String, Long> rectMap = (Map<String, Long>) getCachedSessionDetails().get("viewportRect");
+        int width = rectMap.get("width").intValue();
+        int height = ensureViewportHeight(rectMap.get("height").intValue());
+
         HashMap<String, Integer> intRectMap = new HashMap<>();
-        intRectMap.put("width", rectMap.get("width").intValue());
-        intRectMap.put("height", rectMap.get("height").intValue());
+        intRectMap.put("width", width);
+        intRectMap.put("height", height);
+
         return intRectMap;
+    }
+
+    private int ensureViewportHeight(int viewportHeight) {
+        if (EyesDriverUtils.isAndroid(driver)) {
+            int height = getDeviceHeight();
+            Map<String, Integer> systemBarsHeights = getSystemBarsHeights();
+            for (Integer barHeight : systemBarsHeights.values()) {
+                if (barHeight != null) {
+                    height -= barHeight;
+                }
+            }
+            return height;
+        }
+
+        return viewportHeight;
+    }
+
+    public int getDeviceHeight() {
+        if (deviceHeight == null) {
+            String deviceScreenSize = (String) getCachedSessionDetails().get("deviceScreenSize");
+            Pattern p = Pattern.compile("x(\\d+)");
+            Matcher m = p.matcher(deviceScreenSize);
+            m.find();
+            deviceHeight = Integer.parseInt(m.group(1));
+        }
+
+        return deviceHeight;
+    }
+
+    public Map<String, Integer> getSystemBarsHeights() {
+        if (systemBarsHeights == null) {
+            systemBarsHeights = EyesAppiumUtils.getSystemBarsHeights(this);
+        }
+
+        return systemBarsHeights;
     }
 
     public int getStatusBarHeight() {
