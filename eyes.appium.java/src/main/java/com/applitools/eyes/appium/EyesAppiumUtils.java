@@ -20,12 +20,17 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EyesAppiumUtils {
 
     private static final String NATIVE_APP = "NATIVE_APP";
     private static String SCROLLVIEW_XPATH = "//*[@scrollable='true']";
     private static String FIRST_VIS_XPATH = "/*[@firstVisible='true']";
+
+    public static final String STATUS_BAR = "statusBar";
+    public static final String NAVIGATION_BAR = "navigationBar";
 
     /**
      * @param driver The driver to get the platform version from.
@@ -175,5 +180,45 @@ public class EyesAppiumUtils {
         }
 
         return ImageUtils.rotateImage(image, degrees);
+    }
+
+    public static Map<String, Integer> getSystemBarsHeights(EyesAppiumDriver driver) {
+        Map<String, Integer> systemBarHeights = new HashMap();
+        systemBarHeights.put(STATUS_BAR, null);
+        systemBarHeights.put(NAVIGATION_BAR, null);
+
+        if (EyesDriverUtils.isAndroid(driver)) {
+            fillSystemBarsHeightsMap((AndroidDriver) driver.getRemoteWebDriver(), systemBarHeights);
+        } else {
+            fillSystemBarsHeightsMap(driver, systemBarHeights);
+        }
+
+        return systemBarHeights;
+    }
+
+    private static void fillSystemBarsHeightsMap(AndroidDriver driver, Map<String, Integer> systemBarHeights) {
+        Map<String, String> systemBars = driver.getSystemBars();
+        for (String systemBarName : systemBars.keySet()) {
+            systemBarHeights.put(systemBarName, getSystemBar(systemBarName, systemBars));
+        }
+    }
+
+    private static Integer getSystemBar(String systemBarName, Map<String, String> systemBars) {
+        if (systemBars.containsKey(systemBarName)) {
+            String value = String.valueOf(systemBars.get(systemBarName));
+            Pattern p = Pattern.compile("height=(\\d+)");
+            Matcher m = p.matcher(value);
+            m.find();
+            return Integer.parseInt(m.group(1));
+        }
+
+        return null;
+    }
+
+    private static void fillSystemBarsHeightsMap(EyesAppiumDriver driver, Map<String, Integer> systemBarHeights) {
+        int statusBarHeight = driver.getStatusBarHeight();
+        int navigationBarHeight = driver.getDeviceHeight() - driver.getViewportRect().get("height") - statusBarHeight;
+        systemBarHeights.put(STATUS_BAR, statusBarHeight);
+        systemBarHeights.put(NAVIGATION_BAR, navigationBarHeight);
     }
 }
