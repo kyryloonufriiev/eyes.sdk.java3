@@ -119,4 +119,9 @@ public class AndroidFullPageCaptureAlgorithm extends AppiumFullPageCaptureAlgori
             super.moveToTopLeft();
         }
     }
+
+    @Override
+    protected void moveToTopLeft(int startX, int startY, int endX, int endY) {
+        // Should not be used for Android due to creating this logic only for iOS
+    }
 }
