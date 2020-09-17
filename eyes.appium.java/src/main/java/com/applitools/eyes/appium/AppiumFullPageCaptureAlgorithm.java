@@ -132,14 +132,14 @@ public class AppiumFullPageCaptureAlgorithm {
         int maxScrollSteps = contentSize.getScrollContentHeight() / oneScrollStep;
         logger.verbose("maxScrollSteps: " + maxScrollSteps);
 
+        int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1;
+        int endY = startY - oneScrollStep + 2;
         for (int step = 1; step <= maxScrollSteps; step++) {
             regionToCrop = new Region(0,
                     scrollViewRegion.getTop(),
                     initialPartSize.getWidth(),
                     scrollViewRegion.getHeight());
 
-            int startY = downscaleSafe(scrollViewRegion.getHeight() + scrollViewRegion.getTop()) - 1;
-            int endY = startY - oneScrollStep;
             ((AppiumScrollPositionProvider) scrollProvider).scrollTo(xPos, startY, xPos, endY, false);
 
             currentPosition = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getCurrentPositionWithoutStatusBar(true));
@@ -166,7 +166,8 @@ public class AppiumFullPageCaptureAlgorithm {
         }
 
         cleanupStitch(originalStitchedState, currentPosition, lastSuccessfulPartSize, entireSize);
-        moveToTopLeft();
+
+        moveToTopLeft(xPos, endY + statusBarHeight, xPos, startY + statusBarHeight);
     }
 
 
@@ -181,6 +182,46 @@ public class AppiumFullPageCaptureAlgorithm {
                         .getWidth() + "x"
                         + region.getHeight();
         debugScreenshotsProvider.save(image, suffix);
+    }
+
+    /**
+     * Scrolls root scrollable view to the content beginning.
+     * @param startX Start X coordinate of scroll action.
+     * @param startY Start Y coordinate of scroll action.
+     * @param endX End X coordinate of scroll action.
+     * @param endY End Y coordinate of scroll action.
+     */
+    protected void moveToTopLeft(int startX, int startY, int endX, int endY) {
+        logger.verbose("Moving to the top left with coordinates");
+        currentPosition = originProvider.getCurrentPosition();
+        if (currentPosition.getX() <= 0 && currentPosition.getY() <= 0) {
+            logger.verbose("We are already at the top left, doing nothing");
+            return;
+        }
+
+        // Recalculate coordinates if they all were passed with 0 value.
+        if ( startX == 0 && startY == 0 && endX == 0 && endY == 0 ) {
+            Region scrollViewRegion = scaleSafe(((AppiumScrollPositionProvider) scrollProvider).getScrollableViewRegion());
+            int oneScrollStep = downscaleSafe(scrollViewRegion.getHeight());
+            startX = endX = downscaleSafe(scrollViewRegion.getLeft() + 1);
+            startY = downscaleSafe(scrollViewRegion.getTop()) + 1;
+            endY = startY + oneScrollStep - 2;
+        }
+        logger.verbose("Start scroll point is (" + startX + ", " + startY + "), end scroll point is (" + endX + ", " + endY + ").");
+
+        do {
+            ((AppiumScrollPositionProvider) scrollProvider).scrollTo(startX, startY, endX, endY, false);
+            GeneralUtils.sleep(waitBeforeScreenshots);
+            currentPosition = originProvider.getCurrentPosition();
+            if (currentPosition.getX() == 0 && currentPosition.getY() == 0) {
+                break;
+            }
+        } while (true);
+
+        if (currentPosition.getY() > 0) {
+            originProvider.restoreState(originalPosition);
+            throw new EyesException("Couldn't set position to the top/left corner!");
+        }
     }
 
     protected void moveToTopLeft() {
@@ -210,7 +251,7 @@ public class AppiumFullPageCaptureAlgorithm {
     }
 
     private BufferedImage getTopLeftScreenshot() {
-        moveToTopLeft();
+        moveToTopLeft(0, 0, 0, 0);
         logger.verbose("Getting top/left image...");
         BufferedImage image = imageProvider.getImage();
         debugScreenshotsProvider.save(image, "original");
