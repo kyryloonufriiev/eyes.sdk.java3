@@ -36,12 +36,12 @@ jobs:
     - stage: Test
       name: Core
       script:
-        - echo APPLITOOLS_REPORT_ID
+        - echo $APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.sdk.core"
     - name: Images
       script:
-        - echo APPLITOOLS_REPORT_ID
+        - echo $APPLITOOLS_REPORT_ID
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.images.java"
     - name: Appium Android
@@ -85,7 +85,7 @@ jobs:
         - ./runTests.sh "eyes.selenium.java"
     - name: Generic
       script:
-        - echo APPLITOOLS_REPORT_ID
+        - echo $APPLITOOLS_REPORT_ID
         - nvm install 14.5.0
         - nvm use 14.5.0
         - cd eyes.selenium.java;
@@ -94,6 +94,10 @@ jobs:
           else
           yarn java;
           fi
+    - name: Tutorials
+      script:
+        - echo APPLITOOLS_REPORT_ID
+        - ./eyes.selenium.java/tutorials/run.sh
     - stage: Test Appium IOS
       script:
         - echo APPLITOOLS_REPORT_ID
