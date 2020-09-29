@@ -134,9 +134,6 @@ public abstract class EyesBase implements IEyesBase {
      */
     public void setServerConnector(ServerConnector serverConnector) {
         ArgumentGuard.notNull(serverConnector, "serverConnector");
-        if (serverConnector.getLogger() == null) {
-            serverConnector.setLogger(this.logger);
-        }
         this.serverConnector = serverConnector;
         serverConnector.setLogger(logger);
     }
@@ -1136,6 +1133,18 @@ public abstract class EyesBase implements IEyesBase {
 
         if (getConfigurationInstance().getHostApp() != null) {
             appEnv.setHostingApp(getConfigurationInstance().getHostApp());
+        }
+
+        if (getConfigurationInstance().getHostingAppInfo() != null) {
+            appEnv.setHostingAppInfo(getConfigurationInstance().getHostingAppInfo());
+        }
+
+        if (getConfigurationInstance().getOsInfo() != null) {
+            appEnv.setOsInfo(getConfigurationInstance().getOsInfo());
+        }
+
+        if (getConfigurationInstance().getDeviceInfo() != null) {
+            appEnv.setDeviceInfo(getConfigurationInstance().getDeviceInfo());
         }
 
         appEnv.setInferred(getInferredEnvironment());
