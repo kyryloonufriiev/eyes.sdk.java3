@@ -807,7 +807,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     private synchronized List<VisualGridTask> addOpenTaskToAllRunningTest() {
-        logger.verbose("enter");
+        logger.verbose(String.format("Add open tasks for %d tests", testList.size()));
         List<VisualGridTask> visualGridTasks = new ArrayList<>();
         for (RunningTest runningTest : testList) {
             if (!runningTest.isOpenTaskIssued()) {
