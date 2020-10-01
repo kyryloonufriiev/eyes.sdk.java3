@@ -159,6 +159,9 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
         logger.verbose("Element is instance of " + element.getAttribute("type"));
         if (shouldStitchContent) {
             ContentSize contentSize = getCachedContentSize();
+            if (contentSize == null) {
+                contentSize = EyesAppiumUtils.initContentSize(element);
+            }
             /*
             * The result of EyesAppiumUtils.getContentSize() is different in the same conditions for different types of views.
             * E.g. contentSize.top value for type 'XCUIElementTypeTable' INcludes the size of status bar(of cause if
@@ -235,8 +238,8 @@ public class IOSScrollPositionProvider extends AppiumScrollPositionProvider {
             * To get more information about view hierarchy we printed page source to the logs
             * and saving debug screenshot for current screen
              */
-            String base64 = driver.getScreenshotAs(OutputType.BASE64);
-            BufferedImage image = ImageUtils.imageFromBase64(base64);
+//            String base64 = driver.getScreenshotAs(OutputType.BASE64);
+//            BufferedImage image = ImageUtils.imageFromBase64(base64);
 
             logger.verbose(driver.getPageSource());
         }
