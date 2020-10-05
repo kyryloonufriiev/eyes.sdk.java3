@@ -18,15 +18,11 @@ addons:
 # $GITHUB_TOKEN
 # $ALLOWED_RELEASE_COMMITERS
 # $SDK
+git:
+  submodules: false
 before_install:
-  - git clone https://$GITHUB_TOKEN@github.com/applitools/eyes.common.java3.git
-  - pushd eyes.common.java3
-  - mvn install
-  - popd
-  - git clone https://$GITHUB_TOKEN@github.com/applitools/eyes.ufg.java3.git
-  - pushd eyes.ufg.java3
-  - mvn install
-  - popd
+  - echo -e "\n\nmachine github.com\n  $GITHUB_TOKEN\n" >~/.netrc
+  - git submodule update --init --recursive
 before_script:
   - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
   - pushd eyes.selenium.java/src/main/node_resources
