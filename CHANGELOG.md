@@ -4,6 +4,8 @@
 - A new log handler for sending logs to the eyes server. [Trello 2206](https://trello.com/c/EX8JfK7W)
 ### Fixed
 - Fixed ignoring statusBar height on cropping when invisible. [Trello 2202](https://trello.com/c/qEH2mQgP)
+### Updated
+- Removed appium dependency from eyes-selenium-common module. [Trello 2188](https://trello.com/c/uTbDNRdf)
 
 [3.180.0] - 2020-10-09
 ### Updated
@@ -15,7 +17,7 @@
 
 [3.179.0] - 2020-10-01 
 ### Added
-New API for setting `deviceInfo`, `hostingAppInfo` and `osInfo` in the configuration. [Trello 2140](https://trello.com/c/vGSi2NFz)
+- New API for setting `deviceInfo`, `hostingAppInfo` and `osInfo` in the configuration. [Trello 2140](https://trello.com/c/vGSi2NFz)
 ### Updated
 - Use touch action to reach top left corner in Appium iOS. [Trello 2083](https://trello.com/c/bz4C8PMw)
 ### Fixed

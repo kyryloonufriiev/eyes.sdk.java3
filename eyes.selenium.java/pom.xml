@@ -42,6 +42,12 @@
             <artifactId>ph-css</artifactId>
             <version>6.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>7.0.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

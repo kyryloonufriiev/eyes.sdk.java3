@@ -1,26 +1,25 @@
 package com.applitools.eyes.selenium;
 
 import com.applitools.eyes.*;
-import com.applitools.eyes.config.Feature;
 import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.wrappers.EyesWebDriver;
 import com.applitools.utils.ArgumentGuard;
 import com.applitools.utils.GeneralUtils;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class EyesDriverUtils {
     private static final String NATIVE_APP = "NATIVE_APP";
+    private static final String PLATFORM_VERSION = "platformVersion";
+    private static final String DEVICE_NAME = "deviceName";
     // See Applitools WiKi for explanation.
     private static final String JS_GET_VIEWPORT_SIZE =
             "var height = undefined;"
@@ -125,8 +124,13 @@ public class EyesDriverUtils {
      */
     public static boolean isMobileDevice(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
-        return driver instanceof AppiumDriver &&
-                !((AppiumDriver) driver).isBrowser();
+        try {
+            return reflectionInstanceof(driver, "AppiumDriver") &&
+                    driver.getClass().getMethod("isBrowser").invoke(driver).equals(false);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -138,31 +142,35 @@ public class EyesDriverUtils {
     public static boolean isLandscapeOrientation(Logger logger, WebDriver driver) {
         // We can only find orientation for mobile devices.
         if (isMobileDevice(driver)) {
-            AppiumDriver<?> appiumDriver = (AppiumDriver<?>) getUnderlyingDriver(driver);
+            Object appiumDriver = getUnderlyingDriver(driver);
 
             String originalContext;
             try {
                 // We must be in native context in order to ask for orientation,
                 // because of an Appium bug.
-                originalContext = appiumDriver.getContext();
-                if (appiumDriver.getContextHandles().size() > 1 &&
-                        !originalContext.equalsIgnoreCase(NATIVE_APP)) {
-                    appiumDriver.context(NATIVE_APP);
+                originalContext = appiumDriver.getClass().getMethod("getContext").invoke(appiumDriver).toString();
+                Set<String> contextHandles = (Set<String>) appiumDriver.getClass().getMethod("getContextHandles").invoke(appiumDriver);
+                if (contextHandles.size() > 1 && !originalContext.equalsIgnoreCase(NATIVE_APP)) {
+                    appiumDriver.getClass().getMethod("context", String.class).invoke(appiumDriver, NATIVE_APP);
                 } else {
                     originalContext = null;
                 }
-            } catch (WebDriverException e) {
+            } catch (WebDriverException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 originalContext = null;
             }
             try {
-                ScreenOrientation orientation = appiumDriver.getOrientation();
+                Object orientation = appiumDriver.getClass().getMethod("getOrientation").invoke(appiumDriver);
                 return orientation == ScreenOrientation.LANDSCAPE;
             } catch (Exception e) {
                 logger.log("WARNING: Couldn't get device orientation. Assuming Portrait.");
                 return false;
             } finally {
                 if (originalContext != null) {
-                    appiumDriver.context(originalContext);
+                    try {
+                        appiumDriver.getClass().getMethod("context", String.class).invoke(appiumDriver, originalContext);
+                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -560,7 +568,7 @@ public class EyesDriverUtils {
      */
     public static boolean isAndroid(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
-        return driver instanceof AndroidDriver;
+        return reflectionInstanceof(driver, "AndroidDriver");
     }
 
     /**
@@ -570,7 +578,7 @@ public class EyesDriverUtils {
      */
     public static boolean isIOS(WebDriver driver) {
         driver = getUnderlyingDriver(driver);
-        return driver instanceof IOSDriver;
+        return reflectionInstanceof(driver, "IOSDriver");
     }
 
     /**
@@ -583,7 +591,7 @@ public class EyesDriverUtils {
         if (capabilities.getCapabilityNames().contains("os_version")) {
             platformVersionObj = capabilities.getCapability("os_version");
         } else {
-            platformVersionObj = capabilities.getCapability(MobileCapabilityType.PLATFORM_VERSION);
+            platformVersionObj = capabilities.getCapability(PLATFORM_VERSION);
         }
 
         return platformVersionObj == null ? null : String.valueOf(platformVersionObj);
@@ -598,11 +606,11 @@ public class EyesDriverUtils {
         Object desiredCaps = capabilities.getCapability("desired");
         if (desiredCaps != null) {
             Map<String, String> caps = (Map<String, String>) desiredCaps;
-            Object deviceNameCapability = caps.get(MobileCapabilityType.DEVICE_NAME);
+            Object deviceNameCapability = caps.get(DEVICE_NAME);
             return deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
         }
 
-        Object deviceNameCapability = capabilities.getCapability(MobileCapabilityType.DEVICE_NAME);
+        Object deviceNameCapability = capabilities.getCapability(DEVICE_NAME);
         String deviceName = deviceNameCapability != null ? deviceNameCapability.toString() : "Unknown";
 
         Object deviceCapability = capabilities.getCapability("device");
@@ -743,5 +751,16 @@ public class EyesDriverUtils {
         }
 
         throw new IllegalStateException("InvocationHandler field wasn't found in proxy class");
+    }
+
+    private static boolean reflectionInstanceof(Object object, String className) {
+        Class<?> objectClass = object.getClass();
+        while (objectClass != null) {
+            if (objectClass.getSimpleName().equals(className)) {
+                return true;
+            }
+            objectClass = objectClass.getSuperclass();
+        }
+        return false;
     }
 }
