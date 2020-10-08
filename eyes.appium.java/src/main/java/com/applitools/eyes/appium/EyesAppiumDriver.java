@@ -79,7 +79,7 @@ public class EyesAppiumDriver extends EyesWebDriver {
             int height = getDeviceHeight();
             Map<String, Integer> systemBarsHeights = getSystemBarsHeights();
             for (Integer barHeight : systemBarsHeights.values()) {
-                if (barHeight != null) {
+                if (barHeight != null && barHeight < height) {
                     height -= barHeight;
                 }
             }
