@@ -237,8 +237,6 @@ public abstract class TestSetup extends ReportingTestSuite implements ITest {
         eyes.setStitchMode(this.stitchMode);
         eyes.setSaveNewTests(false);
         eyes.setBatch(TestDataProvider.batchInfo);
-        eyes.setApiKey("97ELuwdIiAilbeumIilysV8yY24tygCeRFFTYEBO7EfE110");
-        eyes.setBranchName("master");
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             eyes.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }
