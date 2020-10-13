@@ -11,7 +11,6 @@ import com.applitools.utils.ImageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -190,13 +189,26 @@ public class EyesAppiumUtils {
     private static Integer getSystemBar(String systemBarName, Map<String, String> systemBars) {
         if (systemBars.containsKey(systemBarName)) {
             String value = String.valueOf(systemBars.get(systemBarName));
-            Pattern p = Pattern.compile("height=(\\d+)");
-            Matcher m = p.matcher(value);
-            m.find();
-            return Integer.parseInt(m.group(1));
+            if (getSystemBarVisibility(value)) {
+                return getSystemBarHeight(value);
+            }
         }
 
         return null;
+    }
+
+    private static Boolean getSystemBarVisibility(String systemBarDetails) {
+        Pattern p = Pattern.compile("visible=(\\w+)");
+        Matcher m = p.matcher(systemBarDetails);
+        m.find();
+        return Boolean.parseBoolean(m.group(1));
+    }
+
+    private static Integer getSystemBarHeight(String systemBarDetails) {
+        Pattern p = Pattern.compile("height=(\\d+)");
+        Matcher m = p.matcher(systemBarDetails);
+        m.find();
+        return Integer.parseInt(m.group(1));
     }
 
     private static void fillSystemBarsHeightsMap(EyesAppiumDriver driver, Map<String, Integer> systemBarHeights) {

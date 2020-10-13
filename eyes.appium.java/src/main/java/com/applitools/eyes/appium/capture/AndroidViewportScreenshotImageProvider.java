@@ -36,11 +36,17 @@ public class AndroidViewportScreenshotImageProvider implements ImageProvider {
         return result;
     }
 
-    private BufferedImage cropTop(BufferedImage screenshot, int cropHeight) {
+    private BufferedImage cropTop(BufferedImage screenshot, Integer cropHeight) {
+        if (cropHeight == null || cropHeight <= 0 || cropHeight >= screenshot.getHeight()) {
+            return screenshot;
+        }
         return screenshot.getSubimage(0, cropHeight, screenshot.getWidth(), screenshot.getHeight() - cropHeight);
     }
 
-    private BufferedImage cropBottom(BufferedImage screenshot, int cropHeight) {
+    private BufferedImage cropBottom(BufferedImage screenshot, Integer cropHeight) {
+        if (cropHeight == null || cropHeight <= 0 || cropHeight >= screenshot.getHeight()) {
+            return screenshot;
+        }
         return screenshot.getSubimage(0, 0, screenshot.getWidth(), screenshot.getHeight() - cropHeight);
     }
 }
