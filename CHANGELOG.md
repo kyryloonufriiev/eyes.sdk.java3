@@ -3,6 +3,7 @@
 - Supporting iPhone 12 in `IosDeviceName` class. [Trello 2269](https://trello.com/c/yWFy2pRE)
 ### Added
 - Stitch overlap functionality for iOS. [Trello 2138](https://trello.com/c/EI2mxmTD)
+- Implemented full-coverage report event. [Trello 2019](https://trello.com/c/3y4UcfXd)
 ### Fixed
 - Calling check more than once is now possible on images SDK. [Trello 2288](https://trello.com/c/hnnPOkVf)
 - Unifying urls which are similar (`#` or `?` in the end of the url). [Trello 2299](https://trello.com/c/r13tsIrG)
@@ -29,7 +30,6 @@
 ### Added
 - A new API for closing batch explicitly: `BatchClose`. [Trello 2189](https://trello.com/c/SlHH9Ssb)
 - A new log handler for sending logs to the eyes server. [Trello 2206](https://trello.com/c/EX8JfK7W)
-- Supporting check full element with ufg. [Trello 2145](https://trello.com/c/8tPAnz66)
 ### Fixed
 - Fixed ignoring statusBar height on cropping when invisible. [Trello 2202](https://trello.com/c/qEH2mQgP)
 ### Updated

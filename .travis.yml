@@ -25,6 +25,9 @@ before_install:
   - git submodule update --init --recursive
 before_script:
   - export APPLITOOLS_REPORT_ID=${TRAVIS_COMMIT:0:7}-$TRAVIS_BUILD_NUMBER
+  - if [ $TRAVIS_EVENT_TYPE == "cron" ] && [ $TRAVIS_BRANCH = "rfe_trello_2019_full_coverage_report" ] || [$TRAVIS_TAG =~ ^RELEASE_CANDIDATE]; then
+    export APPLITOOLS_REPORT_TO_SANDBOX=false;
+    fi
   - pushd eyes.selenium.java/src/main/node_resources
   - npm install
   - popd
@@ -50,7 +53,7 @@ jobs:
         - ./runTests.sh "eyes.appium.java"
     - name: Selenium
       script:
-        - echo APPLITOOLS_REPORT_ID
+        - echo $APPLITOOLS_REPORT_ID
         - google-chrome --version
         - chromium-browser --version
         - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
@@ -59,7 +62,9 @@ jobs:
         - chmod +x /home/travis/build/chromedriver
         - /home/travis/build/chromedriver --version
         - env webdriver.chrome.driver=/home/travis/build/
-        - if [[ $TRAVIS_TAG =~ ^FULL_COVERAGE_TESTS ]]; then
+        - echo $TRAVIS_EVENT_TYPE
+        - echo $TRAVIS_BRANCH
+        - if [ $TRAVIS_EVENT_TYPE == "cron" ] && [ $TRAVIS_BRANCH = "master" ]; then
           sed -i 's/passedTestsSuite.xml/devTestsSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.selenium.java/pom.xml;
           fi
         - chmod +x ./runTests.sh
@@ -96,6 +101,17 @@ jobs:
         - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"
+    - stage: Test Appium Failed
+      if: env(TRAVIS_EVENT_TYPE) =~ ^cron$ AND branch = master
+      script:
+        - echo APPLITOOLS_REPORT_ID
+        - sed -i 's/androidTestSuite.xml/failedTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
+        - chmod +x ./runTests.sh
+        - ./runTests.sh "eyes.appium.java"
+    - stage: Full Regression Mail
+      if: env(TRAVIS_EVENT_TYPE) =~ ^cron$ AND branch = master
+      script:
+        - sh send_full_regression_mail.sh "$SDK"
     - stage: Deploy
       if: tag =~ ^RELEASE_CANDIDATE AND fork == false
       script:
