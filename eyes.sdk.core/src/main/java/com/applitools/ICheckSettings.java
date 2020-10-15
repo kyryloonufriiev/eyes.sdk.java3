@@ -181,4 +181,6 @@ public interface ICheckSettings {
     ICheckSettings accessibility(Region region, AccessibilityRegionType regionType);
 
     ICheckSettings visualGridOptions(VisualGridOption... options);
+
+    boolean isCheckWindow();
 }
