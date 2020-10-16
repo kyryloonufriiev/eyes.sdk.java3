@@ -1,4 +1,4 @@
-[vNext]
+[3.181.0] - 2020-10-16
 ### Added
 - A new API for closing batch explicitly: `BatchClose`. [Trello 2189](https://trello.com/c/SlHH9Ssb)
 - A new log handler for sending logs to the eyes server. [Trello 2206](https://trello.com/c/EX8JfK7W)
