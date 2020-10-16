@@ -698,7 +698,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    private ICheckSettingsInternal updateCheckSettings(ICheckSettings checkSettings) {
+    ICheckSettingsInternal updateCheckSettings(ICheckSettings checkSettings) {
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
 
         MatchLevel matchLevel = checkSettingsInternal.getMatchLevel();
@@ -707,18 +707,19 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         Boolean sendDom = checkSettingsInternal.isSendDom();
         Boolean ignoreDisplacements = checkSettingsInternal.isIgnoreDisplacements();
 
-        Boolean b;
-
         if (matchLevel == null) {
             checkSettings = checkSettings.matchLevel(getConfiguration().getMatchLevel());
         }
 
         if (fully == null) {
-            checkSettings = checkSettings.fully((b = getConfiguration().isForceFullPageScreenshot()) == null || b);
+            Boolean isForceFullPageScreenshot = getConfiguration().isForceFullPageScreenshot();
+            boolean stitchContent = isForceFullPageScreenshot == null ? checkSettings.isCheckWindow() : isForceFullPageScreenshot;
+            checkSettings = checkSettings.fully(stitchContent);
         }
 
         if (sendDom == null) {
-            checkSettings = checkSettings.sendDom((b = getConfiguration().isSendDom()) == null || b);
+            Boolean isSendDom = getConfiguration().isSendDom();
+            checkSettings = checkSettings.sendDom(isSendDom == null || isSendDom);
         }
 
         if (ignoreDisplacements == null) {

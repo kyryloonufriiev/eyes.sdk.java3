@@ -552,6 +552,11 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
         return clone;
     }
 
+    @Override
+    public boolean isCheckWindow() {
+        return getTargetRegion() == null && getVGTargetSelector() == null;
+    }
+
     public List<VisualGridOption> getVisualGridOptions() {
         return visualGridOptions;
     }
