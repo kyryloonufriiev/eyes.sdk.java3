@@ -1,6 +1,8 @@
 ## [vNext]
 ### Updated
 - Dom Snapshot script version 4.2.2. [Trello 2226](https://trello.com/c/yH8WYHgt)
+### Fixed
+- Now checking if the element is scrollable before choosing default root element. [Trello 2198](https://trello.com/c/DTvpdAj4), [Trello 2207](https://trello.com/c/v5s4lv8u), [Trello 2215](https://trello.com/c/nUzTl0KB)
 
 ## [3.181.0] - 2020-10-16
 ### Added
@@ -12,7 +14,7 @@
 ### Updated
 - Removed appium dependency from eyes-selenium-common module. [Trello 2188](https://trello.com/c/uTbDNRdf)
 
-##[ 3.180.0] - 2020-10-09
+## [3.180.0] - 2020-10-09
 ### Updated
 - DeviceName now includes new mobile devices. [Trello 1751](https://trello.com/c/JOyUqzEM)
 - IosDeviceInfo includes the version property. [Trello 2187](https://trello.com/c/25AjSV6V)
