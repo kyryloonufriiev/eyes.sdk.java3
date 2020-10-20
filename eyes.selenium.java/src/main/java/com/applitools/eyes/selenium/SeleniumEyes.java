@@ -876,16 +876,16 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
         String positionStyle = ((EyesRemoteWebElement) targetElement).getComputedStyle("position");
         if (!positionStyle.equalsIgnoreCase("fixed")) {
-            elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
-            Region currentElementRegion;
-            if (isScrollableElement) {
-                currentElementRegion = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
+            if (getConfiguration().getStitchMode().equals(StitchMode.CSS)) {
+                bringRegionToViewCss(elementBounds, state.getEffectiveViewport().getLocation());
+                if (isScrollableElement) {
+                    elementBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(targetElement, driver, logger);
+                } else {
+                    elementBounds = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
+                }
+                state.setEffectiveViewport(computeEffectiveViewport(driver.getFrameChain().clone(), effectiveViewport.getSize()));
             } else {
-                currentElementRegion = EyesRemoteWebElement.getClientBounds(targetElement, driver, logger);
-            }
-
-            if (getConfigurationInstance().getStitchMode().equals(StitchMode.CSS)) {
-                elementBounds = currentElementRegion;
+                elementBounds = bringRegionToView(elementBounds, state.getEffectiveViewport().getLocation());
             }
         }
 
@@ -985,6 +985,36 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             offset = offset.offset(frame.getLocation());
         }
         return offset;
+    }
+
+    private Region bringRegionToViewCss(Region bounds, Location viewportLocation) {
+        FrameChain frames = driver.getFrameChain().clone();
+        if (frames.size() <= 0) {
+            return bringRegionToView(bounds, viewportLocation);
+        }
+
+        Location currentFrameOffset = frames.getCurrentFrameOffset();
+        EyesTargetLocator locator = (EyesTargetLocator) driver.switchTo();
+        locator.defaultContent();
+        try {
+            EyesRemoteWebElement currentFrameSRE = (EyesRemoteWebElement) getCurrentFrameScrollRootElement();
+            PositionProvider currentFramePositionProvider = PositionProviderFactory.getPositionProvider(
+                    logger, StitchMode.CSS, jsExecutor, currentFrameSRE, userAgent);
+            Location currentFramePosition = currentFramePositionProvider.getCurrentPosition();
+            Location boundsPosition = bounds.getLocation();
+            Location newFramePosition = boundsPosition.offset(-viewportLocation.getX(), -viewportLocation.getY());
+            newFramePosition = newFramePosition.offset(currentFrameOffset);
+            Location currentCssLocation = currentFrameSRE.getCurrentCssStitchingLocation();
+            if (currentCssLocation != null) {
+                newFramePosition = newFramePosition.offset(currentCssLocation);
+            }
+            Location actualFramePosition = currentFramePositionProvider.setPosition(newFramePosition);
+            bounds = bounds.offset(-actualFramePosition.getX(), -actualFramePosition.getY());
+            bounds = bounds.offset(currentFramePosition);
+            return bounds;
+        } finally {
+            locator.frames(frames);
+        }
     }
 
     private Region bringRegionToView(Region bounds, Location viewportLocation) {

@@ -7,6 +7,7 @@ import com.applitools.eyes.selenium.SeleniumEyes;
 import com.applitools.eyes.selenium.SizeAndBorders;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.GeneralUtils;
 import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
@@ -16,9 +17,12 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.remote.Response;
 
 import java.lang.reflect.Method;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class EyesRemoteWebElement extends RemoteWebElement {
@@ -661,6 +665,23 @@ public class EyesRemoteWebElement extends RemoteWebElement {
 
     public RectangleSize getScrollSize() {
         return getScrollSize(this, this.eyesDriver, this.logger);
+    }
+
+    public Location getCurrentCssStitchingLocation() {
+        try {
+            String data = (String) eyesDriver.executeScript("var el=arguments[0]; return el.style.transform", webElement);
+            if (data == null || !data.startsWith("translate(")) {
+                return null;
+            }
+            String x = data.substring(data.indexOf("(") + 1, data.indexOf(","));
+            String y = data.substring(data.indexOf(",") + 1, data.lastIndexOf(")"));
+            x = x.split("px")[0];
+            y = y.split("px")[0];
+            return new Location(-NumberFormat.getInstance().parse(x.trim()).intValue(), -NumberFormat.getInstance().parse(y.trim()).intValue());
+        } catch (Throwable t) {
+            GeneralUtils.logExceptionStackTrace(logger, t);
+            return null;
+        }
     }
 
     public static RectangleSize getScrollSize(WebElement element, JavascriptExecutor driver, Logger logger) {
