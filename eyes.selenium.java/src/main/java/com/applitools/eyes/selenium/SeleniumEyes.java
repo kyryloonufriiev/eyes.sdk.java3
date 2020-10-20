@@ -1090,7 +1090,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     private Region computeEffectiveViewport(FrameChain frameChain, RectangleSize initialSize) {
         Region viewport = new Region(Location.ZERO, initialSize);
-        if (userDefinedSRE != null) {
+        if (userDefinedSRE != null && !userDefinedSRE.equals(EyesSeleniumUtils.getDefaultRootElement(logger, driver))) {
             Region sreInnerBounds = EyesRemoteWebElement.getClientBoundsWithoutBorders(userDefinedSRE, driver, logger);
             viewport.intersect(sreInnerBounds);
         }
