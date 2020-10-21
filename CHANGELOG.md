@@ -8,6 +8,7 @@
 - CSS stitching is now working when checking a frame overlapping with elements from its outer frame. [Trello 1846](https://trello.com/c/grlCdwMs)
 - Calling close without open now behaves properly. [Trello 2241](https://trello.com/c/h7tW49Nz)
 - Calling session delete session will work without setting a new server connector. [Trello 2246](https://trello.com/c/aANiFwRX)
+- Fixed crashing app with no helper library and recyclerView, listView etc inside. [Trello 2202](https://trello.com/c/qEH2mQgP)
 
 ## [3.181.0] - 2020-10-16
 ### Added

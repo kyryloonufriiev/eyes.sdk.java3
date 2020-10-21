@@ -380,7 +380,11 @@ public class AndroidScrollPositionProvider extends AppiumScrollPositionProvider 
                         }
                     }
                 } catch (NoSuchElementException | StaleElementReferenceException ignored) {
-                    scrollableHeight = contentSize.scrollableOffset;
+                    if (contentSize.scrollableOffset > 0) {
+                        scrollableHeight = contentSize.scrollableOffset;
+                    } else {
+                        scrollableHeight = contentSize.height;
+                    }
                     logger.verbose("Could not get EyesAppiumHelper element. Return scrollable offset from cached content size (" + scrollableHeight + ")");
                 }
             }
