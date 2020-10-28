@@ -1,4 +1,4 @@
-## [vNext]
+## [3.182.0] - 2020-10-28 
 ### Added
 - New logs for printing dom snapshot result. [Trello 2252](https://trello.com/c/7aalHb28)
 - New API `runner.setDontCloseBatched` in case the user doesn't want to close the batches in the end of the test. [Trello 1908](https://trello.com/c/8BGfvXKU)
