@@ -1,3 +1,7 @@
+
+### Updated 
+- Getting platform version with previous implementation to avoid NoSuchMethodError with old Appium client versions. [Trello 2204](https://trello.com/c/LfbGdoxz)
+
 ## [3.182.0] - 2020-10-28 
 ### Added
 - New logs for printing dom snapshot result. [Trello 2252](https://trello.com/c/7aalHb28)
