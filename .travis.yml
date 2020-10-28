@@ -77,7 +77,7 @@ jobs:
         - ./runConnectivityTests.sh
     - name: Selenium Mobile
       script:
-        - echo APPLITOOLS_REPORT_ID
+        - echo $APPLITOOLS_REPORT_ID
         - latestChromeDriverURL=$(wget http://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)
         - wget "http://chromedriver.storage.googleapis.com/${latestChromeDriverURL}/chromedriver_linux64.zip"
         - unzip chromedriver_linux64.zip -d /home/travis/build/
@@ -89,10 +89,11 @@ jobs:
         - ./runTests.sh "eyes.selenium.java"
     - name: Generic
       script:
-        - echo APPLITOOLS_REPORT_ID
+        - echo $APPLITOOLS_REPORT_ID
         - nvm install 14.5.0
         - nvm use 14.5.0
-        - cd eyes.selenium.java;
+        - mvn clean install -DskipTests
+        - cd coverage-tests;
         - if [[ $TRAVIS_TAG =~ ^RELEASE_CANDIDATE ]]; then
           yarn release;
           else
@@ -100,7 +101,7 @@ jobs:
           fi
     - stage: Test Appium IOS
       script:
-        - echo APPLITOOLS_REPORT_ID
+        - echo $APPLITOOLS_REPORT_ID
         - sh upload_app.sh "https://applitools.bintray.com/Examples/IOSTestApp/1.2/ipa/IOSTestApp.ipa" "app_ios"
         - sed -i 's/androidTestSuite.xml/iosTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
@@ -108,7 +109,7 @@ jobs:
     - stage: Test Appium Failed
       if: env(TRAVIS_EVENT_TYPE) =~ ^cron$ AND branch = master
       script:
-        - echo APPLITOOLS_REPORT_ID
+        - echo $APPLITOOLS_REPORT_ID
         - sed -i 's/androidTestSuite.xml/failedTestSuite.xml/g' $TRAVIS_BUILD_DIR/eyes.appium.java/pom.xml;
         - chmod +x ./runTests.sh
         - ./runTests.sh "eyes.appium.java"

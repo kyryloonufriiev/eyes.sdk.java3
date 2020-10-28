@@ -17,15 +17,15 @@
     "java": "yarn && yarn docker:start && yarn test && yarn report",
     "local": "yarn install --no-lockfile && yarn docker:start && yarn test && yarn report; yarn docker:stop",
     "release": "yarn && yarn docker:start && yarn test && yarn report:prod",
-    "generate": "coverage-tests create-tests --path ./configuration",
-    "test": "yarn generate && mvn test -DsuiteFile=genericTestsSuite.xml",
-    "report": "yarn move:report && coverage-tests process-report --path ./configuration$( [ -z $APPLITOOLS_REPORT_ID ] || echo \" --reportId $APPLITOOLS_REPORT_ID\" )",
-    "report:prod": "yarn move:report && coverage-tests process-report --path ./configuration --reportId $APPLITOOLS_REPORT_ID --send-report prod",
+    "generate": "coverage-tests generate ./configuration --emitSkipped false ",
+    "test": "yarn generate && mvn test",
+    "report": "yarn move:report && coverage-tests report ./configuration  --sandbox$( [ -z $APPLITOOLS_REPORT_ID ] || echo \" --reportId $APPLITOOLS_REPORT_ID\" )",
+    "report:prod": "yarn move:report && coverage-tests report ./configuration --reportId $APPLITOOLS_REPORT_ID",
     "move:report": "mv ./target/surefire-reports/java_coverage_tests/coverage-test-report.xml ./coverage-test-report.xml",
-    "docker:start": "docker run -d -p 4444:4444 --name selenium --shm-size 8g selenium/standalone-chrome:3.141.59 ",
-    "docker:stop": "docker stop selenium && docker rm selenium"
+    "docker:start": "docker run -d -p 4444:4444 --name selenium_chrome --shm-size 8g selenium/standalone-chrome:3.141.59 && docker run -d -p 4445:4444 --name selenium_firefox --shm-size 2g selenium/standalone-firefox:3.141.59",
+    "docker:stop": "docker stop selenium_chrome selenium_firefox && docker rm selenium_chrome selenium_firefox"
   },
   "dependencies": {
-    "@applitools/sdk-coverage-tests": "^1.0.16"
+    "@applitools/sdk-coverage-tests": "^2.0.2"
   }
 }
