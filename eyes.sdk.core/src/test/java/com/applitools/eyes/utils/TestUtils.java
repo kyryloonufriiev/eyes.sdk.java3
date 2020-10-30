@@ -28,6 +28,7 @@ public class TestUtils {
     public final static String logsPath = System.getenv("APPLITOOLS_LOGS_PATH");
     public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
     public final static boolean verboseLogs = !runOnCI || "true".equalsIgnoreCase(System.getenv("APPLITOOLS_VERBOSE_LOGS"));
+    public final static String REPORTING_DIR = System.getenv("TRAVIS_BUILD_DIR") + "/report/";
 
     public static String initLogPath() {
         return initLogPath(Thread.currentThread().getStackTrace()[2].getMethodName());
@@ -47,7 +48,7 @@ public class TestUtils {
     }
 
     public static LogHandler initLogger(String testName, String logPath) {
-//FIXME - 
+//FIXME -
         //        if (!TestUtils.runOnCI)
 //        {
 //            String path = logPath != null ? logPath : initLogPath(testName);
@@ -170,5 +171,19 @@ public class TestUtils {
 
         RestClient client = new RestClient(eyes.getLogger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         return client.sendHttpRequest(apiSessionUri.toString(), HttpMethod.GET, MediaType.APPLICATION_JSON).getBodyString();
+    }
+
+    public static boolean createTestResultsDirIfNotExists() {
+        boolean success = true;
+        File directory = new File(TestUtils.REPORTING_DIR);
+        if (!directory.exists()) {
+            success = directory.mkdirs();
+            if (success) {
+                System.out.println("Test Report directory is created!");
+            } else {
+                System.out.printf("Failed test Report directory %s%n", directory.getAbsolutePath());
+            }
+        }
+        return success;
     }
 }

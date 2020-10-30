@@ -5,12 +5,18 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Listeners;
 
-import javax.ws.rs.HttpMethod;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 @Listeners({PostTestResultsListener.class, RetryListener.class})
 public abstract class ReportingTestSuite {
+
+    private static final String TEST_RESULT_FILENAME_PARTS_SEPARATOR = "_";
+    private static final String TEST_RESULT_FILE_EXTENSION = ".json";
 
     private final TestResultReportSummary reportSummary = new TestResultReportSummary();
     private final Map<String, Object> suiteArgs = new HashMap<>();
@@ -61,10 +67,33 @@ public abstract class ReportingTestSuite {
     @AfterClass
     public void oneTimeTearDown(ITestContext testContext) {
         System.out.println(String.format("Reporting test %s: %s", this.getClass().getName(), reportSummary));
-        try {
-            CommunicationUtils.jsonRequest("http://sdk-test-results.herokuapp.com/result", reportSummary, null, HttpMethod.POST);
-        } catch (Throwable t) {
-            CommunicationUtils.jsonRequest("http://sdk-test-results.herokuapp.com/result", reportSummary, null, HttpMethod.POST);
+        createTestResultFile();
+    }
+
+    private void createTestResultFile() {
+        if (!TestUtils.createTestResultsDirIfNotExists()) {
+            System.out.println("Cannot add test report file.");
+            return;
         }
+
+        try {
+            String filename = getTestResultFilename();
+            File file = new File(filename);
+            if (file.createNewFile()) {
+                Path report = file.toPath();
+                Files.write(report, CommunicationUtils.createJsonString(reportSummary).getBytes());
+                System.out.println("Test result was created");
+            } else {
+                System.out.println("Test result was not created");
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    private String getTestResultFilename() {
+        return TestUtils.REPORTING_DIR + reportSummary.getGroup() +
+                TEST_RESULT_FILENAME_PARTS_SEPARATOR + this.getClass().getSimpleName() +
+                Calendar.getInstance().getTimeInMillis() + TEST_RESULT_FILE_EXTENSION;
     }
 }

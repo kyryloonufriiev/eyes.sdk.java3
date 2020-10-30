@@ -35,6 +35,7 @@ public class ReportingListener implements ITestListener {
         if (TestUtils.runOnCI && System.getenv("TRAVIS") != null) {
             System.setProperty("webdriver.chrome.driver", "/home/travis/build/chromedriver"); // for travis build.
         }
+        TestUtils.createTestResultsDirIfNotExists();
     }
 
     @Override

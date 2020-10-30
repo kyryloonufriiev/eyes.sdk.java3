@@ -1,6 +1,7 @@
 ## [vNext]
 ### Updated
 - Supporting iPhone 12 in `IosDeviceName` class. [Trello 2269](https://trello.com/c/yWFy2pRE)
+- Assembling test results. [Trello 2286](https://trello.com/c/pVwVbFr1)
 ### Added
 - Stitch overlap functionality for iOS. [Trello 2138](https://trello.com/c/EI2mxmTD)
 ### Fixed

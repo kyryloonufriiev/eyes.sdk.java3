@@ -30,6 +30,13 @@ PING_LOOP_PID=$!
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
 mvn test -pl "$1" -e -X
 
+if [ -d "$TRAVIS_BUILD_DIR/report" ]; then
+  # send test results
+  sh sendTestResults.sh
+else
+  echo "No report was created"
+fi
+
 # The build finished without returning an error so dump a tail of the output
 dump_output
 
