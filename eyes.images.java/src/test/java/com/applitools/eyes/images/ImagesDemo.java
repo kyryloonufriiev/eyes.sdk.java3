@@ -34,6 +34,7 @@ public class ImagesDemo extends ReportingTestSuite {
             img = ImageIO.read(new URL("https://applitools.github.io/upload/appium.png"));
             // Visual validation point #1
             eyes.check("Contact page", Target.image(img));
+            eyes.check("Contact page", Target.image(img));
 
             // End visual testing. Validate visual correctness.
             TestResults results = eyes.close();
