@@ -418,15 +418,23 @@ public class ServerConnector extends UfgConnector {
         sendAsyncRequest(request, HttpMethod.DELETE, new AsyncRequestCallback() {
             @Override
             public void onComplete(Response response) {
-                closeConnector();
-                listener.onComplete(null);
+                try {
+                    closeConnector();
+                } catch (Throwable t) {
+                    GeneralUtils.logExceptionStackTrace(logger, t);
+                } finally {
+                    listener.onComplete(null);
+                }
             }
 
             @Override
             public void onFail(Throwable throwable) {
-                GeneralUtils.logExceptionStackTrace(logger, throwable);
-                closeConnector();
-                listener.onFail();
+                try {
+                    GeneralUtils.logExceptionStackTrace(logger, throwable);
+                    closeConnector();
+                } finally {
+                    listener.onFail();
+                }
             }
         });
     }
