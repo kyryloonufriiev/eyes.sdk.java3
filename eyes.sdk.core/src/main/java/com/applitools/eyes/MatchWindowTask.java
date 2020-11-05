@@ -119,7 +119,7 @@ public class MatchWindowTask {
                                     ImageMatchSettings imageMatchSettings,
                                     EyesBase eyes, String renderId, String source) {
         // called from regular flow and from check many flow.
-        eyes.getLogger().verbose("enter");
+        logger.verbose(String.format("replaceLast: %b", replaceLast));
 
         String agentSetupStr = "";
         Object agentSetup = eyes.getAgentSetup();
@@ -529,12 +529,13 @@ public class MatchWindowTask {
         // If the wait to load time is 0, or "run once" is true,
         // we perform a single check window.
         if (0 == retryTimeout || shouldMatchWindowRunOnceOnTimeout) {
-
+            logger.verbose("Taking screenshot without retry mechanism");
             if (shouldMatchWindowRunOnceOnTimeout) {
                 GeneralUtils.sleep(retryTimeout);
             }
             screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
         } else {
+            logger.verbose("Taking screenshot with retry mechanism");
             screenshot = retryTakingScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings,
                     retryTimeout, source);
         }
@@ -564,14 +565,17 @@ public class MatchWindowTask {
             screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
 
             if (matchResult.getAsExpected()) {
+                logger.verbose("Good match result");
                 break;
             }
 
+            logger.verbose("Bad match result");
             retry = System.currentTimeMillis() - start;
         }
 
         // if we're here because we haven't found a match yet, try once more
         if (!matchResult.getAsExpected()) {
+            logger.verbose("Bad match result, trying again");
             screenshot = tryTakeScreenshot(userInputs, region, tag, checkSettingsInternal, imageMatchSettings, source);
         }
         return screenshot;
