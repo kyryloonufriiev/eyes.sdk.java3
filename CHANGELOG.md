@@ -1,4 +1,4 @@
-## [vNext]
+## [3.183.0] - 2020-11-09
 ### Updated
 - Supporting iPhone 12 in `IosDeviceName` class. [Trello 2269](https://trello.com/c/yWFy2pRE)
 - Assembling test results. [Trello 2286](https://trello.com/c/pVwVbFr1)
