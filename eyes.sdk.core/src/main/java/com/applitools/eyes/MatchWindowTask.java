@@ -118,8 +118,10 @@ public class MatchWindowTask {
                                     String tag, boolean replaceLast,
                                     ImageMatchSettings imageMatchSettings,
                                     EyesBase eyes, String renderId, String source) {
+        eyes.getLogger().log(String.format("Starting perform match. Render ID: %s", renderId));
+
         // called from regular flow and from check many flow.
-        logger.verbose(String.format("replaceLast: %b", replaceLast));
+        eyes.getLogger().verbose(String.format("replaceLast: %b", replaceLast));
 
         String agentSetupStr = "";
         Object agentSetup = eyes.getAgentSetup();
@@ -146,6 +148,8 @@ public class MatchWindowTask {
         if (matchResult.get() == null) {
             throw new EyesException("Failed performing match with the server");
         }
+
+        eyes.getLogger().log(String.format("Finished perform match. Render ID: %s", renderId));
         eyes.getLogger().verbose("exit");
         return matchResult.get();
     }

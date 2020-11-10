@@ -519,6 +519,7 @@ public abstract class EyesBase implements IEyesBase {
         getServerConnector().stopSession(new TaskListener<TestResults>() {
             @Override
             public void onComplete(TestResults testResults) {
+                logger.log("Test closed successfully");
                 testResults.setNew(isNewSession);
                 testResults.setUrl(runningSession.getUrl());
                 logger.verbose(testResults.toString());
