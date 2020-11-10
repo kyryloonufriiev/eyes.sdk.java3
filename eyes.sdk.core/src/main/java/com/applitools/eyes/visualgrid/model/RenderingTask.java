@@ -377,7 +377,9 @@ public class RenderingTask implements Callable<RenderStatusResults>, Completable
 
     RenderRequest[] prepareDataForRG(FrameData domData) {
         DomAnalyzer domAnalyzer = new DomAnalyzer(logger, eyesConnector.getServerConnector(), debugResourceWriter, domData, fetchedCacheMap, userAgent);
+
         Map<String, RGridResource> resourceMap = domAnalyzer.analyze();
+
         List<RenderRequest> allRequestsForRG = buildRenderRequests(domData, resourceMap);
 
         RenderRequest[] asArray = allRequestsForRG.toArray(new RenderRequest[0]);
