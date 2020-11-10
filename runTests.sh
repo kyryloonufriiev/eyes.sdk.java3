@@ -28,7 +28,13 @@ PING_LOOP_PID=$!
 # My build is using maven, but you could build anything with this, E.g.
 # your_build_command_1 >> $BUILD_OUTPUT 2>&1
 # your_build_command_2 >> $BUILD_OUTPUT 2>&1
-mvn test -pl "$1" -e -X
+if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
+  # If test fails, ignore fail
+  set +e
+  mvn test -pl "$1" --fail-never
+else
+  mvn test -pl "$1" -e -X
+fi
 
 if [ -d "$TRAVIS_BUILD_DIR/report" ]; then
   # send test results
