@@ -53,10 +53,7 @@
     <build>
         <resources>
             <resource>
-                <directory>src/main/node_resources/node_modules/@applitools/dom-capture/dist</directory>
-            </resource>
-            <resource>
-                <directory>src/main/node_resources/node_modules/@applitools/dom-snapshot/dist</directory>
+                <directory>src/main/node_resources/node_modules/@applitools</directory>
             </resource>
         </resources>
         <plugins>
