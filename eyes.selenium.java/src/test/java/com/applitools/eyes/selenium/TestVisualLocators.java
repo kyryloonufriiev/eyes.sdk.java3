@@ -39,7 +39,7 @@ public class TestVisualLocators extends ReportingTestSuite {
         try {
             eyes.open(driver, "Applitools Eyes SDK", "testVisualLocators" + suffix);
             Map<String, List<Region>> result = eyes.locate(VisualLocator.name("applitools_title"));
-            eyes.setImageCut(new FixedCutProvider(11, 0, 2, 0));
+            eyes.setImageCut(new FixedCutProvider(19, 0, 3, 0));
             Map<String, List<Region>> resultCut = eyes.locate(VisualLocator.name("applitools_title"));
             eyes.closeAsync();
 
@@ -47,13 +47,13 @@ public class TestVisualLocators extends ReportingTestSuite {
             List<Region> regionList = result.get("applitools_title");
             Assert.assertEquals(regionList.size(), 1);
             Region region = regionList.get(0);
-            Assert.assertEquals(region, new Region(2, 11, 173, 58));
+            Assert.assertEquals(region, new Region(3, 19, 158, 38));
 
             Assert.assertEquals(resultCut.size(), 1);
             regionList = resultCut.get("applitools_title");
             Assert.assertEquals(regionList.size(), 1);
             region = regionList.get(0);
-            Assert.assertEquals(region, new Region(0, 0, 173, 58));
+            Assert.assertEquals(region, new Region(0, 0, 158, 38));
         } finally {
             driver.quit();
             eyes.abortAsync();

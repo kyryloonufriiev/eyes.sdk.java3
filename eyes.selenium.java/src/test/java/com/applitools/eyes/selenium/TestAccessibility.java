@@ -82,9 +82,9 @@ public class TestAccessibility extends ReportingTestSuite {
             ImageMatchSettings matchSettings = sessionResults.getActualAppOutput()[0].getImageMatchSettings();
             List<AccessibilityRegionByRectangle> actual = Arrays.asList(matchSettings.getAccessibility());
             Assert.assertEquals(new HashSet<>(actual), new HashSet<>(Arrays.asList(
-                    new AccessibilityRegionByRectangle(122, 928, 456, 306, AccessibilityRegionType.LargeText),
-                    new AccessibilityRegionByRectangle(8, 1270, 690, 206, AccessibilityRegionType.LargeText),
-                    new AccessibilityRegionByRectangle(10, 284, 800, 500, AccessibilityRegionType.LargeText)
+                    new AccessibilityRegionByRectangle(122, 933, 456, 306, AccessibilityRegionType.LargeText),
+                    new AccessibilityRegionByRectangle(8, 1277, 690, 206, AccessibilityRegionType.LargeText),
+                    new AccessibilityRegionByRectangle(10, 286, 800, 500, AccessibilityRegionType.LargeText)
             )));
         }
     }
