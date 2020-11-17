@@ -12,7 +12,6 @@ import com.applitools.eyes.UserAgent;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.utils.ReportingTestSuite;
-import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -186,7 +185,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         final Future<?> future = mock(Future.class);
         when(future.get()).thenThrow(new IllegalStateException());
         when(future.get(anyLong(), (TimeUnit) any())).thenThrow(new IllegalStateException());
-        IEyesConnector eyesConnector = mock(IEyesConnector.class);
+        EyesConnector eyesConnector = mock(EyesConnector.class);
         final ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector, null,
                 null, null, null, null);
 
@@ -213,7 +212,7 @@ public class TestRenderingTask extends ReportingTestSuite {
     @Test
     public void testResourcesCaching() {
         VisualGridTask visualGridTask = mock(VisualGridTask.class);
-        IEyesConnector eyesConnector = mock(IEyesConnector.class);
+        EyesConnector eyesConnector = mock(EyesConnector.class);
         when(visualGridTask.getEyesConnector()).thenReturn(eyesConnector);
         RenderBrowserInfo browserInfo = new RenderBrowserInfo(new RectangleSize(800, 800), BrowserType.CHROME);
         when(visualGridTask.getBrowserInfo()).thenReturn(browserInfo);
@@ -268,7 +267,7 @@ public class TestRenderingTask extends ReportingTestSuite {
 
     @Test
     public void testCheckResources() throws JsonProcessingException {
-        IEyesConnector eyesConnector = mock(IEyesConnector.class);
+        EyesConnector eyesConnector = mock(EyesConnector.class);
         ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector, null, null, null, null, null);
         resourceCollectionTask.uploadedResourcesCache.put("2", null);
         resourceCollectionTask.uploadedResourcesCache.put("4", null);

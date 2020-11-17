@@ -19,7 +19,6 @@ import com.applitools.eyes.utils.SeleniumTestUtils;
 import com.applitools.eyes.utils.SeleniumUtils;
 import com.applitools.eyes.utils.TestUtils;
 import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
@@ -296,7 +295,7 @@ public class TestRenderings extends ReportingTestSuite {
                 return null;
             }
         }).when(runner).check(any(ICheckSettings.class), nullable(IDebugResourceWriter.class), any(FrameData.class),
-                any(IEyesConnector.class), ArgumentMatchers.<List<VisualGridTask>>any(),
+                any(EyesConnector.class), ArgumentMatchers.<List<VisualGridTask>>any(),
                 ArgumentMatchers.<List<VisualGridSelector[]>>any(), any(UserAgent.class));
 
         Eyes eyes = new Eyes(runner);

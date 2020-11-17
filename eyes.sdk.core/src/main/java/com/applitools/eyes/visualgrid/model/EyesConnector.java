@@ -1,19 +1,17 @@
-package com.applitools.eyes.selenium.rendering;
+package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
 import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.fluent.ICheckSettingsInternal;
-import com.applitools.eyes.visualgrid.model.*;
-import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.utils.ClassVersionGetter;
 
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Future;
 
-class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
+public class EyesConnector extends EyesBase implements IBatchCloser {
     private final RenderBrowserInfo browserInfo;
     private Configuration configuration;
     private String appName;
@@ -45,12 +43,10 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return getServerConnector().downloadResource(url, userAgent, refererUrl, listener);
     }
 
-    @Override
     public Future<?> renderPutResource(String renderId, RGridResource resource, TaskListener<Void> listener) {
         return getServerConnector().renderPutResource(renderId, resource, listener);
     }
 
-    @Override
     public List<RunningRender> render(RenderRequest... renderRequests) {
         SyncTaskListener<List<RunningRender>> listener = new SyncTaskListener<>(logger, "render");
         getServerConnector().render(listener, renderRequests);
@@ -153,12 +149,10 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return this.runningSession;
     }
 
-    @Override
     public void checkResourceStatus(TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
         getServerConnector().checkResourceStatus(listener, renderId, hashes);
     }
 
-    @Override
     public JobInfo getJobInfo() {
         if (jobInfo != null) {
             return jobInfo;
@@ -177,7 +171,6 @@ class EyesConnector extends EyesBase implements IEyesConnector, IBatchCloser {
         return jobInfo;
     }
 
-    @Override
     public String getRenderer() {
         return getJobInfo().getRenderer();
     }

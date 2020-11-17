@@ -2,7 +2,6 @@ package com.applitools.eyes.visualgrid.model;
 
 import com.applitools.eyes.EyesException;
 import com.applitools.eyes.Logger;
-import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 
@@ -15,7 +14,7 @@ public class RenderingTask implements Callable<RenderStatusResults> {
     public static final int HOUR = 60 * 60 * 1000;
 
     private final RenderTaskListener listener;
-    private final IEyesConnector eyesConnector;
+    private final EyesConnector eyesConnector;
     final List<RenderRequest> renderRequests = new ArrayList<>();
     private final List<VisualGridTask> checkTasks = new ArrayList<>();
     private final Logger logger;
@@ -28,7 +27,7 @@ public class RenderingTask implements Callable<RenderStatusResults> {
         void onRenderFailed(Exception e);
     }
 
-    public RenderingTask(Logger logger, IEyesConnector eyesConnector, RenderRequest renderRequest,
+    public RenderingTask(Logger logger, EyesConnector eyesConnector, RenderRequest renderRequest,
                          VisualGridTask checkTask, RenderTaskListener listener) {
         this.logger = logger;
         this.eyesConnector = eyesConnector;

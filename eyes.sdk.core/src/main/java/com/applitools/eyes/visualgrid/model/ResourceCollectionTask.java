@@ -3,7 +3,6 @@ package com.applitools.eyes.visualgrid.model;
 import com.applitools.ICheckSettings;
 import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
-import com.applitools.eyes.visualgrid.services.IEyesConnector;
 import com.applitools.eyes.visualgrid.services.VisualGridRunner;
 import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.ArgumentGuard;
@@ -19,7 +18,7 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
     public static final String VIEWPORT = "viewport";
 
     private final Logger logger;
-    private final IEyesConnector eyesConnector;
+    private final EyesConnector eyesConnector;
     private final FrameData domData;
     private final UserAgent userAgent;
     private final RenderingInfo renderingInfo;
@@ -35,7 +34,7 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
     /**
      * For tests only
      */
-    public ResourceCollectionTask(IEyesConnector eyesConnector, List<VisualGridTask> checkTasks, FrameData domData,
+    public ResourceCollectionTask(EyesConnector eyesConnector, List<VisualGridTask> checkTasks, FrameData domData,
                                   UserAgent userAgent, ICheckSettings checkSettings, TaskListener<List<RenderingTask>> listTaskListener) {
         this.eyesConnector = eyesConnector;
         this.checkTasks = checkTasks;
@@ -50,7 +49,7 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
         this.renderingInfo = new RenderingInfo();
     }
 
-    public ResourceCollectionTask(VisualGridRunner runner, IEyesConnector eyesConnector, FrameData domData,
+    public ResourceCollectionTask(VisualGridRunner runner, EyesConnector eyesConnector, FrameData domData,
                                   UserAgent userAgent, List<VisualGridSelector[]> regionSelectors,
                                   ICheckSettings checkSettings, List<VisualGridTask> checkTasks,
                                   IDebugResourceWriter debugResourceWriter, TaskListener<List<RenderingTask>> listener,

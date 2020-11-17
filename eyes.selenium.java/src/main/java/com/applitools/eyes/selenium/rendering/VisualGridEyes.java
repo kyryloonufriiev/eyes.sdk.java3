@@ -51,7 +51,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private final String POLL_RESULT_FOR_IE;
     private EyesSeleniumDriver webDriver;
     private RenderingInfo renderingInfo;
-    private IEyesConnector eyesConnector;
+    private EyesConnector eyesConnector;
     private String url;
     private Set<Future<TestResultContainer>> closeFuturesSet = new HashSet<>();
     private Boolean isDisabled = Boolean.FALSE;
@@ -215,7 +215,7 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
         }
     }
 
-    private IEyesConnector createEyesConnector(RenderBrowserInfo browserInfo) {
+    private EyesConnector createEyesConnector(RenderBrowserInfo browserInfo) {
         logger.verbose("creating VisualGridEyes server connector");
         EyesConnector eyesConnector = new EyesConnector(getConfiguration(), this.properties, browserInfo);
         eyesConnector.setLogHandler(this.logger.getLogHandler());

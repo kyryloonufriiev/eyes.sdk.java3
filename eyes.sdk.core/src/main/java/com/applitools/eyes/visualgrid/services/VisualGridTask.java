@@ -5,10 +5,7 @@ import com.applitools.ICheckSettingsInternal;
 import com.applitools.eyes.*;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.exceptions.DiffsFoundException;
-import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
-import com.applitools.eyes.visualgrid.model.RenderStatusResults;
-import com.applitools.eyes.visualgrid.model.VGRegion;
-import com.applitools.eyes.visualgrid.model.VisualGridSelector;
+import com.applitools.eyes.visualgrid.model.*;
 import com.applitools.utils.GeneralUtils;
 
 import java.util.ArrayList;
@@ -28,7 +25,7 @@ public class VisualGridTask implements Callable<TestResultContainer> {
     private Configuration configuration;
     private TestResults testResults;
 
-    private IEyesConnector eyesConnector;
+    private EyesConnector eyesConnector;
     private TaskType type;
 
     private RenderStatusResults renderResult;
@@ -62,7 +59,7 @@ public class VisualGridTask implements Callable<TestResultContainer> {
 
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
-    public VisualGridTask(Configuration configuration, TestResults testResults, IEyesConnector eyesConnector, TaskType type, VGTaskListener runningTestListener,
+    public VisualGridTask(Configuration configuration, TestResults testResults, EyesConnector eyesConnector, TaskType type, VGTaskListener runningTestListener,
                           ICheckSettings checkSettings, RunningTest runningTest, List<VisualGridSelector[]> regionSelectors, String source) {
         this.configuration = configuration;
         this.testResults = testResults;
@@ -193,7 +190,7 @@ public class VisualGridTask implements Callable<TestResultContainer> {
         }
     }
 
-    public IEyesConnector getEyesConnector() {
+    public EyesConnector getEyesConnector() {
         return eyesConnector;
     }
 

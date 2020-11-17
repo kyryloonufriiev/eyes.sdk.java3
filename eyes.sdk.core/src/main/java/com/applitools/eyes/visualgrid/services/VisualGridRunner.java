@@ -537,7 +537,7 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, FrameData domData,
-                                   IEyesConnector connector, final List<VisualGridTask> checkVisualGridTasks,
+                                   EyesConnector connector, final List<VisualGridTask> checkVisualGridTasks,
                                    List<VisualGridSelector[]> selectors, UserAgent userAgent) {
 
         if (debugResourceWriter == null) {

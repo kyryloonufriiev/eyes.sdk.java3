@@ -7,6 +7,7 @@ import com.applitools.eyes.Logger;
 import com.applitools.eyes.TestResultContainer;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.config.ConfigurationProvider;
+import com.applitools.eyes.visualgrid.model.EyesConnector;
 import com.applitools.eyes.visualgrid.model.RenderBrowserInfo;
 import com.applitools.eyes.visualgrid.model.VisualGridSelector;
 
@@ -21,7 +22,7 @@ public class RunningTest {
 
     private final List<VisualGridTask> visualGridTaskList = Collections.synchronizedList(new ArrayList<VisualGridTask>());
     private IRenderingEyes eyes;
-    private IEyesConnector eyesConnector;
+    private EyesConnector eyesConnector;
     private final RenderBrowserInfo browserInfo;
     private final AtomicBoolean isTestOpen = new AtomicBoolean(false);
     private final AtomicBoolean isTestClose = new AtomicBoolean(false);
@@ -103,7 +104,7 @@ public class RunningTest {
 
     /******** END - PUBLIC FOR TESTING PURPOSES ONLY ********/
 
-    public RunningTest(IRenderingEyes eyes, IEyesConnector eyesConnector, ConfigurationProvider configurationProvider, RenderBrowserInfo browserInfo, Logger logger) {
+    public RunningTest(IRenderingEyes eyes, EyesConnector eyesConnector, ConfigurationProvider configurationProvider, RenderBrowserInfo browserInfo, Logger logger) {
         this.eyes = eyes;
         this.eyesConnector = eyesConnector;
         this.browserInfo = browserInfo;
@@ -143,7 +144,7 @@ public class RunningTest {
     }
 
     public IBatchCloser getBatchCloser() {
-        return (IBatchCloser) this.eyesConnector;
+        return this.eyesConnector;
     }
 
     private void removeAllCheckTasks() {
