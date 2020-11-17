@@ -1,12 +1,9 @@
 ## [vNext]
 ### Added
 - New DOM scripts features. [Trello 2268](https://trello.com/c/x6ImzMue)
+- UFG skip list functionality. [Trello 1974](https://trello.com/c/44xq8dze)
 ### Updated
-- Moved `open` to be before `render`. [Trello 2152](https://trello.com/c/yNzhBkBh)
-- Using server concurrency limitations. [Trello 2152](https://trello.com/c/yNzhBkBh)
-- Separated resource collection from the rendering task. [Trello 2152](https://trello.com/c/yNzhBkBh)
-- Removing resource contents after uploading to the server. [Trello 2152](https://trello.com/c/yNzhBkBh)
-- Checking resources status and uploading missing resources before rendering. [Trello 2152](https://trello.com/c/yNzhBkBh)
+- Updated concurrency model. [Trello 2152](https://trello.com/c/yNzhBkBh)
 ### Fixed
 - Fixed `DeviceSize` class to use `landscape` field. [Trello 2150](https://trello.com/c/8xXBu5Wk)
 - Debug resource writer is now working. [Trello 2310](https://trello.com/c/EOSqNaoG)
