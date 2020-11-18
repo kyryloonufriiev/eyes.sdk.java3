@@ -1,4 +1,4 @@
-## [vNext]
+## [3.184.0] - 2020-11-18
 ### Added
 - New DOM scripts features. [Trello 2268](https://trello.com/c/x6ImzMue)
 - UFG skip list functionality. [Trello 1974](https://trello.com/c/44xq8dze)
@@ -6,7 +6,7 @@
 - Updated concurrency model. [Trello 2152](https://trello.com/c/yNzhBkBh)
 ### Fixed
 - Fixed `DeviceSize` class to use `landscape` field. [Trello 2150](https://trello.com/c/8xXBu5Wk)
-- Debug resource writer is now working. [Trello 2310](https://trello.com/c/EOSqNaoG)
+- Debug resource writer bugfix. [Trello 2310](https://trello.com/c/EOSqNaoG)
 
 ## [3.183.0] - 2020-11-09
 ### Added
