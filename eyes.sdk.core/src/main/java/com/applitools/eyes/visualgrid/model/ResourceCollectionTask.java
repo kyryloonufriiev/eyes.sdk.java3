@@ -94,7 +94,6 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
             logger.verbose("Uploading missing resources");
             List<RGridResource> missingResources = checkResourcesStatus(renderRequests.get(0).getDom(), resourceMap);
             uploadResources(missingResources);
-
             List<RenderingTask> renderingTasks = new ArrayList<>();
             for (int i = 0; i < renderRequests.size(); i++) {
                 VisualGridTask checkTask = checkTasks.get(i);
@@ -102,6 +101,7 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
                 renderingTasks.add(new RenderingTask(logger, eyesConnector, renderRequests.get(i), checkTask, renderTaskListener));
             }
 
+            logger.verbose("exit - returning renderRequest array of length: " + renderRequests.size());
             listener.onComplete(renderingTasks);
         } catch (Throwable t) {
             GeneralUtils.logExceptionStackTrace(logger, t);

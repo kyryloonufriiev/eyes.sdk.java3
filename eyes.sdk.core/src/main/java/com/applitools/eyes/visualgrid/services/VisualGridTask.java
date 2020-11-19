@@ -106,34 +106,7 @@ public class VisualGridTask implements Callable<TestResultContainer> {
                 case CHECK:
                     logger.verbose("VisualGridTask.run check task");
 
-                    String imageLocation = renderResult.getImageLocation();
-                    String domLocation = renderResult.getDomLocation();
-
-                    List<VGRegion> vgRegions = renderResult.getSelectorRegions();
-                    List<IRegion> regions = new ArrayList<>();
-                    if (vgRegions != null) {
-                        for (VGRegion reg : vgRegions) {
-                            if (reg.getError() != null) {
-                                logger.log(String.format("Warning: region error: %s", reg.getError()));
-                            } else {
-                                regions.add(reg);
-                            }
-                        }
-                    }
-                    if (imageLocation == null) {
-                        logger.verbose("CHECKING IMAGE WITH NULL LOCATION - ");
-                        logger.verbose(renderResult.toString());
-                    }
-                    Location location = null;
-                    if (regionSelectors.size() > 0) {
-                        VisualGridSelector[] targetSelector = regionSelectors.get(regionSelectors.size() - 1);
-                        if (targetSelector.length > 0 && "target".equals(targetSelector[0].getCategory())) {
-                            location = regions.get(regions.size() - 1).getLocation();
-                        }
-                    }
-
-                    eyesConnector.matchWindow(imageLocation, domLocation, (ICheckSettings) checkSettings, regions,
-                            this.regionSelectors, location, renderResult.getRenderId(), source, renderResult.getVisualViewport());
+                    eyesConnector.matchWindow(renderResult, (ICheckSettings) checkSettings, this.regionSelectors, source);
                     logger.verbose("match done");
                     break;
 

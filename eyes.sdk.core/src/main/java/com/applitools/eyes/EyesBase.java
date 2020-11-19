@@ -8,8 +8,6 @@ import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.debug.DebugScreenshotsProvider;
 import com.applitools.eyes.debug.FileDebugScreenshotsProvider;
 import com.applitools.eyes.debug.NullDebugScreenshotProvider;
-import com.applitools.eyes.events.ISessionEventHandler;
-import com.applitools.eyes.events.SessionEventHandlers;
 import com.applitools.eyes.events.ValidationInfo;
 import com.applitools.eyes.exceptions.DiffsFoundException;
 import com.applitools.eyes.exceptions.NewTestException;
@@ -68,15 +66,9 @@ public abstract class EyesBase implements IEyesBase {
     private boolean isViewportSizeSet;
 
     private int validationId;
-    private final SessionEventHandlers sessionEventHandlers = new SessionEventHandlers();
     protected DebugScreenshotsProvider debugScreenshotsProvider;
 
     public EyesBase() {
-        if (isDisabled) {
-            userInputs = null;
-            return;
-        }
-
         logger = new Logger();
         initProviders();
 
@@ -94,28 +86,17 @@ public abstract class EyesBase implements IEyesBase {
      * @param hardReset If false, init providers only if they're not initialized.
      */
     private void initProviders(boolean hardReset) {
-        if (hardReset) {
-            scaleProviderHandler = new SimplePropertyHandler<>();
-            scaleProviderHandler.set(new NullScaleProvider(logger));
-            cutProviderHandler = new SimplePropertyHandler<>();
-            cutProviderHandler.set(new NullCutProvider());
-            positionProviderHandler = new SimplePropertyHandler<>();
-            positionProviderHandler.set(new InvalidPositionProvider());
-
-            return;
-        }
-
-        if (scaleProviderHandler == null) {
+        if (scaleProviderHandler == null || hardReset) {
             scaleProviderHandler = new SimplePropertyHandler<>();
             scaleProviderHandler.set(new NullScaleProvider(logger));
         }
 
-        if (cutProviderHandler == null) {
+        if (cutProviderHandler == null || hardReset) {
             cutProviderHandler = new SimplePropertyHandler<>();
             cutProviderHandler.set(new NullCutProvider());
         }
 
-        if (positionProviderHandler == null) {
+        if (positionProviderHandler == null || hardReset) {
             positionProviderHandler = new SimplePropertyHandler<>();
             positionProviderHandler.set(new InvalidPositionProvider());
         }
@@ -444,6 +425,29 @@ public abstract class EyesBase implements IEyesBase {
         return debugScreenshotsProvider;
     }
 
+    public SessionStopInfo prepareStopSession(SyncTaskListener<TestResults> listener, boolean isAborted) {
+        if (runningSession == null || !isOpen) {
+            logger.log("Server session was not started --- Empty test ended.");
+            TestResults testResults = new TestResults();
+            testResults.setStatus(TestResultsStatus.NotOpened);
+            listener.onComplete(testResults);
+            return null;
+        }
+
+        isOpen = false;
+        lastScreenshot = null;
+        clearUserInputs();
+        initProviders(true);
+
+        listener.setId(String.format("stop session %s. isAborted: %b", runningSession, isAborted));
+        final boolean isNewSession = runningSession.getIsNew();
+        logger.verbose("Ending server session...");
+        boolean save = (isNewSession && getConfigurationInstance().getSaveNewTests())
+                || (!isNewSession && getConfigurationInstance().getSaveFailedTests());
+        logger.verbose("Automatically save test? " + save);
+        return new SessionStopInfo(runningSession, isAborted, save);
+    }
+
     /**
      * See {@link #close(boolean)}.
      * {@code throwEx} defaults to {@code true}.
@@ -451,6 +455,10 @@ public abstract class EyesBase implements IEyesBase {
      */
     public TestResults close() {
         return close(true);
+    }
+
+    public TestResults abort() {
+        return abortIfNotClosed();
     }
 
     /**
@@ -462,62 +470,43 @@ public abstract class EyesBase implements IEyesBase {
      *                             is true.
      */
     public TestResults close(boolean throwEx) {
+        TestResults results =  stopSession(false);
+        logSessionResultsAndThrowException(logger, throwEx, results);
+        return results;
+    }
+
+    public TestResults abortIfNotClosed() {
+        return stopSession(true);
+    }
+
+    private TestResults stopSession(boolean isAborted) {
         SyncTaskListener<TestResults> listener = new SyncTaskListener<>(logger);
-        close(listener, throwEx);
+        stopSession(listener, isAborted);
         TestResults testResults = listener.get();
         if (testResults == null) {
-            throw new EyesException("Failed closing test");
+            throw new EyesException("Failed stopping session");
         }
-        logSessionResultsAndThrowException(logger, throwEx, testResults);
         return testResults;
     }
 
-    private void close(final SyncTaskListener<TestResults> listener, boolean throwEx) {
+    private void stopSession(final SyncTaskListener<TestResults> listener, boolean isAborted) {
         if (isDisabled) {
             logger.verbose("Ignored");
             listener.onComplete(new TestResults());
             return;
         }
-        logger.verbose(String.format("close(%b)", throwEx));
-        if (!isOpen) {
-            logger.log("WARNING: Eyes not open");
-            TestResults testResults = new TestResults();
-            testResults.setStatus(TestResultsStatus.NotOpened);
-            listener.onComplete(testResults);
+
+        SessionStopInfo sessionStopInfo = prepareStopSession(listener, isAborted);
+        if (sessionStopInfo == null) {
             return;
         }
-
-        isOpen = false;
-
-        lastScreenshot = null;
-        clearUserInputs();
-
-        initProviders(true);
-
-        if (runningSession == null) {
-            logger.log("Server session was not started --- Empty test ended.");
-            TestResults testResults = new TestResults();
-            testResults.setStatus(TestResultsStatus.NotOpened);
-            listener.onComplete(testResults);
-            return;
-        }
-
-        listener.setId(String.format("close test %s", runningSession));
-        final boolean isNewSession = runningSession.getIsNew();
-
-        logger.verbose("Ending server session...");
-        boolean save = (isNewSession && getConfigurationInstance().getSaveNewTests())
-                || (!isNewSession && getConfigurationInstance().getSaveFailedTests());
-        logger.verbose("Automatically save test? " + save);
         getServerConnector().stopSession(new TaskListener<TestResults>() {
             @Override
             public void onComplete(TestResults testResults) {
-                logger.log("Test closed successfully");
-                testResults.setNew(isNewSession);
+                logger.log("Session stopped successfully");
+                testResults.setNew(runningSession.getIsNew());
                 testResults.setUrl(runningSession.getUrl());
                 logger.verbose(testResults.toString());
-
-                sessionEventHandlers.testEnded(getAUTSessionId(), testResults);
                 testResults.setServerConnector(getServerConnector());
                 runningSession = null;
                 listener.onComplete(testResults);
@@ -528,7 +517,7 @@ public abstract class EyesBase implements IEyesBase {
                 runningSession = null;
                 listener.onFail();
             }
-        }, runningSession, false, save);
+        }, sessionStopInfo);
     }
 
     public static void logSessionResultsAndThrowException(Logger logger, boolean throwEx, TestResults results) {
@@ -570,67 +559,6 @@ public abstract class EyesBase implements IEyesBase {
                 }
                 break;
         }
-    }
-
-    public TestResults abortIfNotClosed() {
-        SyncTaskListener<TestResults> listener = new SyncTaskListener<>(logger);
-        abortIfNotClosed(listener);
-        TestResults testResults = listener.get();
-        if (testResults == null) {
-            throw new EyesException("Failed stopping session");
-        }
-        return testResults;
-    }
-
-    /**
-     * If a test is running, aborts it. Otherwise, does nothing.
-     */
-    private void abortIfNotClosed(final SyncTaskListener<TestResults> listener) {
-        if (isDisabled) {
-            logger.verbose("Ignored");
-            listener.onComplete(new TestResults());
-            return;
-        }
-
-        isOpen = false;
-
-        lastScreenshot = null;
-        clearUserInputs();
-
-        if (null == runningSession) {
-            logger.verbose("Closed");
-            TestResults testResults = new TestResults();
-            testResults.setStatus(TestResultsStatus.NotOpened);
-            listener.onComplete(testResults);
-            return;
-        }
-
-        listener.setId(String.format("abort test %s", runningSession));
-        logger.verbose("Aborting server session...");
-        // When aborting we do not save the test.
-        getServerConnector().stopSession(new TaskListener<TestResults>() {
-            @Override
-            public void onComplete(TestResults testResults) {
-                testResults.setNew(runningSession.getIsNew());
-                testResults.setUrl(runningSession.getUrl());
-                logger.log("--- Test aborted.");
-                runningSession = null;
-                closeLogger();
-                listener.onComplete(testResults);
-            }
-
-            @Override
-            public void onFail() {
-                logger.log("Failed to abort server session");
-                runningSession = null;
-                closeLogger();
-                listener.onFail();
-            }
-        }, runningSession, true, false);
-    }
-
-    public TestResults abort() {
-        return abortIfNotClosed();
     }
 
     protected void openLogger() {
@@ -755,14 +683,9 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     protected ValidationInfo fireValidationWillStartEvent(String tag) {
-        String autSessionId = getAUTSessionId();
-
         ValidationInfo validationInfo = new ValidationInfo();
         validationInfo.setValidationId("" + (++validationId));
         validationInfo.setTag(tag);
-
-        getSessionEventHandlers().validationWillStart(autSessionId, validationInfo);
-
         return validationInfo;
     }
 
@@ -808,43 +731,13 @@ public abstract class EyesBase implements IEyesBase {
         this.isDisabled = isDisabled;
     }
 
-    protected void openBase() throws EyesException {
-        SyncTaskListener<Void> listener = new SyncTaskListener<>(logger);
-        openBaseAsync(listener);
-        listener.get();
-        if (!isOpen) {
-            throw new EyesException("Failed starting session with the server");
-        }
-    }
-
-    protected void openBaseAsync(final SyncTaskListener<Void> taskListener) throws EyesException {
-        openLogger();
-        if (isDisabled) {
-            logger.verbose("Ignored");
-            return;
-        }
-
-        sessionEventHandlers.testStarted(getAUTSessionId());
-
-        validateApiKey();
-        logOpenBase();
-        validateSessionOpen();
-
-        initProviders();
-
+    protected SessionStartInfo prepareForOpen() {
         this.isViewportSizeSet = false;
-
-        sessionEventHandlers.initStarted();
-
         RectangleSize viewportSize = getViewportSizeForOpen();
         if (viewportSize == null) {
             viewportSize = RectangleSize.EMPTY;
         }
         getConfigurationInstance().setViewportSize(viewportSize);
-        if (runningSession != null) {
-            logger.log("session already running.");
-            return;
-        }
 
         if (getServerConnector() == null) {
             throw new EyesException("server connector not set.");
@@ -869,12 +762,35 @@ public abstract class EyesBase implements IEyesBase {
                 configGetter.getParentBranchName(), configGetter.getBaselineBranchName(), configGetter.getSaveDiffs(),
                 properties, agentSessionId, configGetter.getAbortIdleTestTimeout());
 
-        sessionEventHandlers.initEnded();
+        return sessionStartInfo;
+    }
+
+    protected void openBase() throws EyesException {
+        SyncTaskListener<Void> listener = new SyncTaskListener<>(logger);
+        openBaseAsync(listener);
+        listener.get();
+        if (!isOpen) {
+            throw new EyesException("Failed starting session with the server");
+        }
+    }
+
+    protected void openBaseAsync(final SyncTaskListener<Void> taskListener) throws EyesException {
+        openLogger();
+        if (isDisabled) {
+            logger.verbose("Ignored");
+            return;
+        }
+
+        validateApiKey();
+        logOpenBase();
+        validateSessionOpen();
+
+
+        prepareForOpen();
         taskListener.setId(String.format("openBase %s", sessionStartInfo));
 
-
-        logger.verbose("Application environment is " + appEnv);
-        String testInfo = "'" + getTestName() + "' of '" + getAppName() + "' " + appEnv;
+        logger.verbose("Application environment is " + sessionStartInfo.getEnvironment());
+        String testInfo = "'" + getTestName() + "' of '" + getAppName() + "' " + sessionStartInfo.getEnvironment();
         logger.log("--- Starting test - " + testInfo);
 
         final AtomicInteger timePassed = new AtomicInteger(0);
@@ -949,7 +865,7 @@ public abstract class EyesBase implements IEyesBase {
             }
         };
 
-        logger.log(String.format("Calling start session with agentSessionId %s", agentSessionId));
+        logger.log(String.format("Calling start session with agentSessionId %s", sessionStartInfo.getAgentSessionId()));
         startSession(listener);
     }
 
@@ -975,7 +891,7 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     private void validateSessionOpen() {
-        if (isOpen) {
+        if (isOpen || runningSession != null) {
             abortIfNotClosed();
             String errMsg = "A test is already running";
             logger.log(errMsg);
@@ -1253,22 +1169,6 @@ public abstract class EyesBase implements IEyesBase {
 
     public void log(String message) {
         logger.log(message);
-    }
-
-    protected SessionEventHandlers getSessionEventHandlers() {
-        return sessionEventHandlers;
-    }
-
-    public void addSessionEventHandler(ISessionEventHandler eventHandler) {
-        this.sessionEventHandlers.addEventHandler(eventHandler);
-    }
-
-    public void removeSessionEventHandler(ISessionEventHandler eventHandler) {
-        this.sessionEventHandlers.removeEventHandler(eventHandler);
-    }
-
-    public void clearSessionEventHandlers() {
-        this.sessionEventHandlers.clearEventHandlers();
     }
 
     protected abstract String getAUTSessionId();

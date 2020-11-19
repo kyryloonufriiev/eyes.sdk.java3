@@ -24,8 +24,8 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void stopSession(final TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
-        logger.log(String.format("ending session: %s", runningSession.getSessionId()));
+    public void stopSession(final TaskListener<TestResults> listener, SessionStopInfo sessionStopInfo) {
+        logger.log(String.format("ending session: %s", sessionStopInfo.getRunningSession().getSessionId()));
         TestResults testResults = new TestResults();
         testResults.setStatus(TestResultsStatus.Passed);
         listener.onComplete(testResults);
@@ -67,7 +67,7 @@ public class MockServerConnector extends ServerConnector {
     }
 
     @Override
-    public void matchWindow(final TaskListener<MatchResult> listener, RunningSession runningSession, MatchWindowData data) {
+    public void matchWindow(final TaskListener<MatchResult> listener, MatchWindowData data) {
         final MatchResult result = new MatchResult();
         result.setAsExpected(this.asExpected);
         listener.onComplete(result);

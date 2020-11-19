@@ -8,6 +8,7 @@ import com.applitools.eyes.fluent.ICheckSettingsInternal;
 import com.applitools.utils.ClassVersionGetter;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -59,9 +60,36 @@ public class EyesConnector extends EyesBase implements IBatchCloser {
         return listener.get();
     }
 
-    public MatchResult matchWindow(String resultImageURL, String domLocation, ICheckSettings checkSettings,
-                                   List<? extends IRegion> regions, List<VisualGridSelector[]> regionSelectors, Location location,
-                                   String renderId, String source, RectangleSize virtualViewport) {
+    public MatchResult matchWindow(RenderStatusResults renderResult, ICheckSettings checkSettings,
+                                   List<VisualGridSelector[]> regionSelectors, String source) {
+        String imageLocation = renderResult.getImageLocation();
+        String domLocation = renderResult.getDomLocation();
+        String renderId = renderResult.getRenderId();
+        RectangleSize visualViewport = renderResult.getVisualViewport();
+
+        List<VGRegion> vgRegions = renderResult.getSelectorRegions();
+        List<IRegion> regions = new ArrayList<>();
+        if (vgRegions != null) {
+            for (VGRegion reg : vgRegions) {
+                if (reg.getError() != null) {
+                    logger.log(String.format("Warning: region error: %s", reg.getError()));
+                } else {
+                    regions.add(reg);
+                }
+            }
+        }
+        if (imageLocation == null) {
+            logger.verbose("CHECKING IMAGE WITH NULL LOCATION - ");
+            logger.verbose(renderResult.toString());
+        }
+        Location location = null;
+        if (regionSelectors.size() > 0) {
+            VisualGridSelector[] targetSelector = regionSelectors.get(regionSelectors.size() - 1);
+            if (targetSelector.length > 0 && "target".equals(targetSelector[0].getCategory())) {
+                location = regions.get(regions.size() - 1).getLocation();
+            }
+        }
+
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) checkSettings;
         if (checkSettingsInternal.getStitchContent() == null) {
             checkSettings.fully();
@@ -70,9 +98,10 @@ public class EyesConnector extends EyesBase implements IBatchCloser {
         MatchWindowTask matchWindowTask = new MatchWindowTask(this.logger, getServerConnector(), this.runningSession, getConfigurationInstance().getMatchTimeout(), this);
         ImageMatchSettings imageMatchSettings = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, this);
         String tag = checkSettingsInternal.getName();
-        AppOutput appOutput = new AppOutput(tag, null, domLocation, resultImageURL, virtualViewport);
+        AppOutput appOutput = new AppOutput(tag, null, domLocation, imageLocation, visualViewport);
         AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, null, location);
-        return matchWindowTask.performMatch(appOutputWithScreenshot, tag, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
+        MatchWindowData data = matchWindowTask.prepareForMatch(appOutputWithScreenshot, tag, checkSettingsInternal, imageMatchSettings, regions, regionSelectors, this, renderId, source);
+        return matchWindowTask.performMatch(data);
     }
 
     protected String getBaseAgentId() {

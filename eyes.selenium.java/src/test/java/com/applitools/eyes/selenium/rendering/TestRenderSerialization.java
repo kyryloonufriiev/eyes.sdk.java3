@@ -64,9 +64,9 @@ public class TestRenderSerialization {
         final List<RenderStatusResults> renderStatusResults = new ArrayList<>();
         ServerConnector serverConnector = new ServerConnector() {
             @Override
-            public void matchWindow(TaskListener<MatchResult> listener, final RunningSession runningSession, MatchWindowData matchData) throws EyesException {
+            public void matchWindow(TaskListener<MatchResult> listener, MatchWindowData matchData) throws EyesException {
                 matchWindowDataList.add(matchData);
-                super.matchWindow(listener, runningSession, matchData);
+                super.matchWindow(listener, matchData);
             }
 
             @Override

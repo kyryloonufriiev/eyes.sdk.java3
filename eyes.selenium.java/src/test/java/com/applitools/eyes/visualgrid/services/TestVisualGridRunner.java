@@ -108,8 +108,8 @@ public class TestVisualGridRunner {
             }
 
             @Override
-            public void stopSession(final TaskListener<TestResults> listener, RunningSession runningSession, boolean isAborted, boolean save) {
-                super.stopSession(listener, runningSession, isAborted, save);
+            public void stopSession(final TaskListener<TestResults> listener, SessionStopInfo sessionStopInfo) {
+                super.stopSession(listener, sessionStopInfo);
                 currentlyOpenTests.decrementAndGet();
             }
         };
