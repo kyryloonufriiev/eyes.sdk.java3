@@ -1,6 +1,7 @@
 package com.applitools.eyes.renderingGrid;
 
 import com.applitools.connectivity.ServerConnector;
+import com.applitools.eyes.RectangleSize;
 import com.applitools.eyes.TaskListener;
 import com.applitools.eyes.config.Configuration;
 import com.applitools.eyes.selenium.Eyes;
@@ -52,13 +53,14 @@ public class TestSkipList extends ReportingTestSuite {
         VisualGridRunner runner = new VisualGridRunner(30);
         Eyes eyes = new Eyes(runner);
 
-
         Configuration conf = eyes.getConfiguration();
         conf.setTestName("Skip List");
         conf.setAppName("Visual Grid Render Test");
+        conf.setViewportSize(new RectangleSize(800, 600));
         conf.setBatch(TestDataProvider.batchInfo);
         eyes.setConfiguration(conf);
 
+        eyes.setSaveNewTests(false);
         eyes.setLogHandler(TestUtils.initLogger());
         eyes.setServerConnector(serverConnector);
         ChromeDriver driver = SeleniumUtils.createChromeDriver();
@@ -73,7 +75,7 @@ public class TestSkipList extends ReportingTestSuite {
         } finally {
             driver.quit();
             eyes.abortIfNotClosed();
-            runner.getAllTestResults(false);
+            runner.getAllTestResults();
         }
 
         Set<String> expectedUrls = new HashSet<>();
