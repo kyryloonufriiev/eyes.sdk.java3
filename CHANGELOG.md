@@ -1,3 +1,7 @@
+## [vNext]
+## Updated
+- DOM Snapshot 4.2.7. [Trello 2260](https://trello.com/c/IKvMS37R)
+
 ## [3.184.0] - 2020-11-18
 ### Added
 - New DOM scripts features. [Trello 2268](https://trello.com/c/x6ImzMue)
