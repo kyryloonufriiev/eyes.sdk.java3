@@ -704,11 +704,12 @@ public class Configuration implements IConfiguration {
      * Sets features to for the Eyes test.
      * Overrides existing features.
      */
-    public void setFeatures(Feature feature, Feature... features) {
+    public Configuration setFeatures(Feature feature, Feature... features) {
         this.features.clear();
         this.features.add(feature);
         this.features.addAll(Arrays.asList(features));
         this.features.remove(null);
+        return this;
     }
 
     public List<Feature> getFeatures() {
@@ -719,11 +720,12 @@ public class Configuration implements IConfiguration {
         return features.contains(feature);
     }
 
-    public void setVisualGridOptions(VisualGridOption option, VisualGridOption... options) {
+    public Configuration setVisualGridOptions(VisualGridOption option, VisualGridOption... options) {
         this.visualGridOptions.clear();
         this.visualGridOptions.add(option);
         this.visualGridOptions.addAll(Arrays.asList(options));
         this.visualGridOptions.remove(null);
+        return this;
     }
 
     public List<VisualGridOption> getVisualGridOptions() {
@@ -734,47 +736,53 @@ public class Configuration implements IConfiguration {
         return deviceInfo;
     }
 
-    public void setDeviceInfo(String deviceInfo) {
+    public Configuration setDeviceInfo(String deviceInfo) {
         this.deviceInfo = deviceInfo;
+        return this;
     }
 
     public String getHostingAppInfo() {
         return hostingAppInfo;
     }
 
-    public void setHostingAppInfo(String hostingAppInfo) {
+    public Configuration setHostingAppInfo(String hostingAppInfo) {
         this.hostingAppInfo = hostingAppInfo;
+        return this;
     }
 
     public String getOsInfo() {
         return osInfo;
     }
 
-    public void setOsInfo(String osInfo) {
+    public Configuration setOsInfo(String osInfo) {
         this.osInfo = osInfo;
+        return this;
     }
 
     public boolean isDisableBrowserFetching() {
         return disableBrowserFetching;
     }
 
-    public void setDisableBrowserFetching(boolean disableBrowserFetching) {
+    public Configuration setDisableBrowserFetching(boolean disableBrowserFetching) {
         this.disableBrowserFetching = disableBrowserFetching;
+        return this;
     }
 
     public IDebugResourceWriter getDebugResourceWriter() {
         return debugResourceWriter;
     }
 
-    public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
+    public Configuration setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
         this.debugResourceWriter = debugResourceWriter;
+        return this;
     }
 
     public Integer getAbortIdleTestTimeout() {
         return abortIdleTestTimeout;
     }
 
-    public void setAbortIdleTestTimeout(Integer abortIdleTestTimeout) {
+    public Configuration setAbortIdleTestTimeout(Integer abortIdleTestTimeout) {
         this.abortIdleTestTimeout = abortIdleTestTimeout;
+        return this;
     }
 }

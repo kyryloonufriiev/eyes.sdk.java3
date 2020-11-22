@@ -642,10 +642,16 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     FrameData captureDomSnapshot(EyesTargetLocator switchTo) throws Exception {
         String domScript = userAgent.isInternetExplorer() ? PROCESS_PAGE_FOR_IE : PROCESS_PAGE;
         String pollingScript = userAgent.isInternetExplorer() ? POLL_RESULT_FOR_IE : POLL_RESULT;
+
+        final String skipList;
+        synchronized (renderingGridRunner.getResourcesCacheMap()) {
+            skipList = new ObjectMapper().writeValueAsString(new HashSet<>(renderingGridRunner.getResourcesCacheMap().keySet()));
+        }
+
         Map<String, Object> arguments = new HashMap<String, Object>() {{
             put("serializeResources", true);
             put("dontFetchResources", getConfiguration().isDisableBrowserFetching());
-            put("skipResources", new ObjectMapper().writeValueAsString(renderingGridRunner.getResourcesCacheMap()));
+            put("skipResources", skipList);
         }};
 
         String result = EyesSeleniumUtils.runDomScript(logger, webDriver, userAgent, domScript, arguments, pollingScript);
