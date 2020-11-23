@@ -51,7 +51,7 @@ public class TestResultReportSummary {
     }
 
     @JsonProperty("results")
-    private List<TestResult> testResults = new ArrayList<>();
+    private final List<TestResult> testResults = new ArrayList<>();
 
     @JsonProperty("results")
     public List<TestResult> getTestResults() {
@@ -66,6 +66,6 @@ public class TestResultReportSummary {
 
     @Override
     public String toString() {
-        return "Group: " + group + " ; Result count: " + testResults.size();
+        return String.format("Group: %s ; Result count: %s ; Sandbox: %b", group, testResults.size(), getSandbox());
     }
 }
