@@ -1,4 +1,4 @@
-## [vNext]
+## [3.185.1]
 ### Fixed
 - Fixed a bug in the resource collection task. [Trello 2336](https://trello.com/c/zzgVhf4a)
 
