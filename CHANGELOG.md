@@ -1,6 +1,6 @@
-## [vNext]
+## [3.185.0] - 2020-11-18
 ## Fixed
-- A bug in sanitizing urls with skip list. [Trello 1974](https://trello.com/c/44xq8dze)
+- URLs sanitizing for skip list. [Trello 1974](https://trello.com/c/44xq8dze)
 - All configuration set methods support fluent api. [Trello 2334](https://trello.com/c/oMalocSn)
 ## Updated
 - DOM Snapshot 4.2.7. [Trello 2260](https://trello.com/c/IKvMS37R)
