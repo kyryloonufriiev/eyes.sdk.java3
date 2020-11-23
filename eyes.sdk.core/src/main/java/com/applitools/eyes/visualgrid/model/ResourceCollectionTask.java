@@ -20,7 +20,6 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
     private final Logger logger;
     private final EyesConnector eyesConnector;
     private final FrameData domData;
-    private final UserAgent userAgent;
     private final RenderingInfo renderingInfo;
     private final List<VisualGridSelector[]> regionSelectors;
     private final ICheckSettings checkSettings;
@@ -35,11 +34,10 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
      * For tests only
      */
     public ResourceCollectionTask(EyesConnector eyesConnector, List<VisualGridTask> checkTasks, FrameData domData,
-                                  UserAgent userAgent, ICheckSettings checkSettings, TaskListener<List<RenderingTask>> listTaskListener) {
+                                  ICheckSettings checkSettings, TaskListener<List<RenderingTask>> listTaskListener) {
         this.eyesConnector = eyesConnector;
         this.checkTasks = checkTasks;
         this.domData = domData;
-        this.userAgent = userAgent;
         this.checkSettings = checkSettings;
         this.listener = listTaskListener;
         this.resourcesCacheMap = new HashMap<>();
@@ -50,10 +48,9 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
     }
 
     public ResourceCollectionTask(VisualGridRunner runner, EyesConnector eyesConnector, FrameData domData,
-                                  UserAgent userAgent, List<VisualGridSelector[]> regionSelectors,
-                                  ICheckSettings checkSettings, List<VisualGridTask> checkTasks,
-                                  IDebugResourceWriter debugResourceWriter, TaskListener<List<RenderingTask>> listener,
-                                  RenderingTask.RenderTaskListener renderTaskListener) {
+                                  List<VisualGridSelector[]> regionSelectors, ICheckSettings checkSettings,
+                                  List<VisualGridTask> checkTasks, IDebugResourceWriter debugResourceWriter,
+                                  TaskListener<List<RenderingTask>> listener, RenderingTask.RenderTaskListener renderTaskListener) {
         ArgumentGuard.notNull(checkTasks, "checkTasks");
         ArgumentGuard.notEqual(checkTasks.size(), 0, "checkTasks");
         this.logger = runner.getLogger();
@@ -61,7 +58,6 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
         this.resourcesCacheMap = runner.getResourcesCacheMap();
         this.uploadedResourcesCache = runner.getUploadedResourcesCache();
         this.domData = domData;
-        this.userAgent = userAgent;
         this.checkSettings = checkSettings;
         this.checkTasks = checkTasks;
         this.renderingInfo = runner.getRenderingInfo();
@@ -75,34 +71,55 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
     public TestResultContainer call() {
         try {
             DomAnalyzer domAnalyzer = new DomAnalyzer(logger, eyesConnector.getServerConnector(),
-                    debugResourceWriter, domData, resourcesCacheMap, userAgent);
-            Map<String, RGridResource> resourceMap = domAnalyzer.analyze();
-            List<RenderRequest> renderRequests = buildRenderRequests(domData, resourceMap);
-            if (debugResourceWriter != null && !(debugResourceWriter instanceof NullDebugResourceWriter)) {
-                for (RenderRequest renderRequest : renderRequests) {
+                    debugResourceWriter, domData, resourcesCacheMap, new TaskListener<Map<String, RGridResource>>() {
+                @Override
+                public void onComplete(Map<String, RGridResource> resourceMap) {
                     try {
-                        debugResourceWriter.write(renderRequest.getDom().asResource());
-                    } catch (JsonProcessingException e) {
-                        GeneralUtils.logExceptionStackTrace(logger, e);
-                    }
-                    for (RGridResource value : renderRequest.getResources().values()) {
-                        this.debugResourceWriter.write(value);
+                        RGridDom dom = new RGridDom(domData.getCdt(), resourceMap, domData.getUrl(), logger, "buildRenderRequests");
+                        List<RenderRequest> renderRequests = buildRenderRequests(domData, dom, resourceMap);
+                        if (debugResourceWriter != null && !(debugResourceWriter instanceof NullDebugResourceWriter)) {
+                            for (RenderRequest renderRequest : renderRequests) {
+                                try {
+                                    debugResourceWriter.write(renderRequest.getDom().asResource());
+                                } catch (JsonProcessingException e) {
+                                    GeneralUtils.logExceptionStackTrace(logger, e);
+                                }
+                                for (RGridResource value : renderRequest.getResources().values()) {
+                                    debugResourceWriter.write(value);
+                                }
+                            }
+                        }
+
+                        logger.verbose("Uploading missing resources");
+                        List<RGridResource> missingResources = checkResourcesStatus(renderRequests.get(0).getDom(), resourceMap);
+                        uploadResources(missingResources);
+                        List<RenderingTask> renderingTasks = new ArrayList<>();
+                        for (int i = 0; i < renderRequests.size(); i++) {
+                            VisualGridTask checkTask = checkTasks.get(i);
+                            checkTask.setRenderTaskCreated();
+                            renderingTasks.add(new RenderingTask(logger, eyesConnector, renderRequests.get(i), checkTask, renderTaskListener));
+                        }
+
+                        logger.verbose("exit - returning renderRequest array of length: " + renderRequests.size());
+                        listener.onComplete(renderingTasks);
+                    } catch (Throwable t) {
+                        GeneralUtils.logExceptionStackTrace(logger, t);
+                        for (VisualGridTask checkTask : checkTasks) {
+                            checkTask.setExceptionAndAbort(t);
+                        }
+                        listener.onFail();
                     }
                 }
-            }
 
-            logger.verbose("Uploading missing resources");
-            List<RGridResource> missingResources = checkResourcesStatus(renderRequests.get(0).getDom(), resourceMap);
-            uploadResources(missingResources);
-            List<RenderingTask> renderingTasks = new ArrayList<>();
-            for (int i = 0; i < renderRequests.size(); i++) {
-                VisualGridTask checkTask = checkTasks.get(i);
-                checkTask.setRenderTaskCreated();
-                renderingTasks.add(new RenderingTask(logger, eyesConnector, renderRequests.get(i), checkTask, renderTaskListener));
-            }
+                @Override
+                public void onFail() {
+                    listener.onFail();
+                }
+            });
 
-            logger.verbose("exit - returning renderRequest array of length: " + renderRequests.size());
-            listener.onComplete(renderingTasks);
+            while (!domAnalyzer.run()) {
+                Thread.sleep(10);
+            }
         } catch (Throwable t) {
             GeneralUtils.logExceptionStackTrace(logger, t);
             for (VisualGridTask checkTask : checkTasks) {
@@ -114,9 +131,7 @@ public class ResourceCollectionTask implements Callable<TestResultContainer> {
         return null;
     }
 
-    private List<RenderRequest> buildRenderRequests(FrameData result, Map<String, RGridResource> resourceMapping) {
-        RGridDom dom = new RGridDom(result.getCdt(), resourceMapping, result.getUrl(), logger, "buildRenderRequests");
-
+    private List<RenderRequest> buildRenderRequests(FrameData result, RGridDom dom, Map<String, RGridResource> resourceMapping) {
         //Create RG requests
         List<RenderRequest> allRequestsForRG = new ArrayList<>();
         ICheckSettingsInternal checkSettingsInternal = (ICheckSettingsInternal) this.checkSettings;

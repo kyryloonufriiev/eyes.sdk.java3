@@ -572,8 +572,9 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
             }
 
             logger.verbose(String.format("added %d check tasks", checkVisualGridTasks.size()));
+            scriptResult.setUserAgent(userAgent);
             this.renderingGridRunner.check((ICheckSettings) checkSettingsInternal, getConfiguration().getDebugResourceWriter(), scriptResult,
-                    this.eyesConnector, checkVisualGridTasks, regionsXPaths, userAgent);
+                    this.eyesConnector, checkVisualGridTasks, regionsXPaths);
             logger.verbose("created renderTask  (" + checkSettings.toString() + ")");
         } catch (Throwable e) {
             Error error = new Error(e);

@@ -296,7 +296,7 @@ public class TestRenderings extends ReportingTestSuite {
             }
         }).when(runner).check(any(ICheckSettings.class), nullable(IDebugResourceWriter.class), any(FrameData.class),
                 any(EyesConnector.class), ArgumentMatchers.<List<VisualGridTask>>any(),
-                ArgumentMatchers.<List<VisualGridSelector[]>>any(), any(UserAgent.class));
+                ArgumentMatchers.<List<VisualGridSelector[]>>any());
 
         Eyes eyes = new Eyes(runner);
         eyes.setLogHandler(new StdoutLogHandler());

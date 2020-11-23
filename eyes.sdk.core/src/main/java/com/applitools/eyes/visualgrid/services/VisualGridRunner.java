@@ -538,7 +538,7 @@ public class VisualGridRunner extends EyesRunner {
 
     public synchronized void check(ICheckSettings settings, IDebugResourceWriter debugResourceWriter, FrameData domData,
                                    EyesConnector connector, final List<VisualGridTask> checkVisualGridTasks,
-                                   List<VisualGridSelector[]> selectors, UserAgent userAgent) {
+                                   List<VisualGridSelector[]> selectors) {
 
         if (debugResourceWriter == null) {
             debugResourceWriter = this.debugResourceWriter;
@@ -566,8 +566,7 @@ public class VisualGridRunner extends EyesRunner {
         };
 
         ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(this, connector, domData,
-                userAgent, selectors, settings, checkVisualGridTasks, debugResourceWriter, listener,
-                new RenderingTask.RenderTaskListener() {
+                selectors, settings, checkVisualGridTasks, debugResourceWriter, listener, new RenderingTask.RenderTaskListener() {
             @Override
             public void onRenderSuccess() {
                 logger.verbose("enter");

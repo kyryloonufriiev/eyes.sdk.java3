@@ -69,7 +69,7 @@ public class TestUtils {
                 .queryParam("apiKey", apiKey)
                 .build();
 
-        RestClient client = new RestClient(new Logger(), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }

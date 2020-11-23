@@ -5,10 +5,7 @@ import com.applitools.connectivity.TestServerConnector;
 import com.applitools.connectivity.api.AsyncRequest;
 import com.applitools.connectivity.api.AsyncRequestCallback;
 import com.applitools.connectivity.api.Response;
-import com.applitools.eyes.Logger;
-import com.applitools.eyes.RectangleSize;
-import com.applitools.eyes.TaskListener;
-import com.applitools.eyes.UserAgent;
+import com.applitools.eyes.*;
 import com.applitools.eyes.fluent.CheckSettings;
 import com.applitools.eyes.selenium.BrowserType;
 import com.applitools.eyes.utils.ReportingTestSuite;
@@ -16,6 +13,7 @@ import com.applitools.eyes.visualgrid.services.VisualGridTask;
 import com.applitools.utils.GeneralUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpStatus;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
@@ -65,12 +63,14 @@ public class TestRenderingTask extends ReportingTestSuite {
         when(future.get(anyLong(), (TimeUnit) any())).thenThrow(new IllegalStateException());
         UserAgent userAgent = mock(UserAgent.class);
         when(userAgent.getOriginalUserAgentString()).thenReturn("");
+        when(frameData.getUserAgent()).thenReturn(userAgent);
 
         final AtomicInteger counter = new AtomicInteger();
         ServerConnector serverConnector = mock(ServerConnector.class);
 
+        final SyncTaskListener<Map<String, RGridResource>> listener = new SyncTaskListener<>(new Logger(new StdoutLogHandler()), "dom analyzer");
         final DomAnalyzer domAnalyzer = new DomAnalyzer(new Logger(), serverConnector, new NullDebugResourceWriter(),
-                frameData, new HashMap<String, RGridResource>(), userAgent);
+                frameData, new HashMap<String, RGridResource>(), listener);
 
         RGridResource cachedResource = mock(RGridResource.class);
         when(cachedResource.getUrl()).thenReturn("12");
@@ -123,12 +123,15 @@ public class TestRenderingTask extends ReportingTestSuite {
         });
 
         // We call the method which activates the process of collecting resources and wait to see if it ends properly.
-        Map<URI, FrameData> resourceMap = new HashMap<>();
         for (URI uri : resourceUrls) {
-            resourceMap.put(uri, frameData);
+            domAnalyzer.resourcesToDownload.add(Pair.of(frameData, uri));
         }
-        domAnalyzer.fetchAllResources(resourceMap);
-        domAnalyzer.resourcesPhaser.awaitAdvanceInterruptibly(0, 30, TimeUnit.SECONDS);
+
+        while(!domAnalyzer.run()) {
+            Thread.sleep(10);
+        }
+
+        Assert.assertEquals(listener.get().size(), 8);
         Assert.assertEquals(counter.get(), 7);
     }
 
@@ -187,7 +190,7 @@ public class TestRenderingTask extends ReportingTestSuite {
         when(future.get(anyLong(), (TimeUnit) any())).thenThrow(new IllegalStateException());
         EyesConnector eyesConnector = mock(EyesConnector.class);
         final ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector, null,
-                null, null, null, null);
+                null, null, null);
 
         when(eyesConnector.renderPutResource(any(String.class), any(RGridResource.class),  ArgumentMatchers.<TaskListener<Void>>any()))
                 .thenAnswer(new Answer<Future<?>>() {
@@ -230,10 +233,11 @@ public class TestRenderingTask extends ReportingTestSuite {
         frameData.setFrames(new ArrayList<FrameData>());
         frameData.setCdt(new ArrayList<CdtData>());
         frameData.setSrcAttr("");
+        frameData.setUserAgent(userAgent);
 
         final AtomicReference<List<RenderingTask>> reference = new AtomicReference<>();
         ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector,
-                Collections.singletonList(visualGridTask), frameData, userAgent, checkSettings, new TaskListener<List<RenderingTask>>() {
+                Collections.singletonList(visualGridTask), frameData, checkSettings, new TaskListener<List<RenderingTask>>() {
             @Override
             public void onComplete(List<RenderingTask> renderingTasks) {
                 reference.set(renderingTasks);
@@ -268,7 +272,7 @@ public class TestRenderingTask extends ReportingTestSuite {
     @Test
     public void testCheckResources() throws JsonProcessingException {
         EyesConnector eyesConnector = mock(EyesConnector.class);
-        ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector, null, null, null, null, null);
+        ResourceCollectionTask resourceCollectionTask = new ResourceCollectionTask(eyesConnector, null, null, null, null);
         resourceCollectionTask.uploadedResourcesCache.put("2", null);
         resourceCollectionTask.uploadedResourcesCache.put("4", null);
 
