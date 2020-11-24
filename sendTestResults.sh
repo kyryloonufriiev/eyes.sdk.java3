@@ -1,7 +1,7 @@
 #!/bin/sh
 
 send_test_results() {
-  jq -s '.[0].results = [.[].results | add] | .[0]' "$1"*.json |
+  jq -s '.[0].results = [.[].results[]] | .[0]' "$1"*.json |
     curl -sS \
       -X POST \
       -H 'Content-Type: application/json' \

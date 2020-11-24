@@ -28,10 +28,8 @@ public class EfficientStringReplaceTest {
     }
 
     @Test(dataProvider = "dp")
-    public void efficientStringReplace(String refIdOpenToken,String refIdCloseToken, String input, Map<String, String> replacements, String expectedResult) {
+    public void efficientStringReplace(String refIdOpenToken, String refIdCloseToken, String input, Map<String, String> replacements, String expectedResult) {
         String result = EfficientStringReplace.efficientStringReplace( refIdOpenToken, refIdCloseToken, input, replacements);
         Assert.assertEquals(result, expectedResult);
     }
-
-
 }

@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Listeners({PostTestResultsListener.class, RetryListener.class})
 public abstract class ReportingTestSuite {
@@ -66,7 +67,12 @@ public abstract class ReportingTestSuite {
 
     @AfterClass
     public void oneTimeTearDown(ITestContext testContext) {
-        System.out.println(String.format("Reporting test %s: %s", this.getClass().getName(), reportSummary));
+        if (reportSummary.getTestResults().isEmpty()) {
+            System.out.printf("No results for test %s%n", this.getClass().getName());
+            return;
+        }
+
+        System.out.printf("Reporting test %s: %s%n", this.getClass().getName(), reportSummary);
         createTestResultFile();
     }
 
@@ -94,6 +100,6 @@ public abstract class ReportingTestSuite {
     private String getTestResultFilename() {
         return TestUtils.REPORTING_DIR + reportSummary.getGroup() +
                 TEST_RESULT_FILENAME_PARTS_SEPARATOR + this.getClass().getSimpleName() +
-                Calendar.getInstance().getTimeInMillis() + TEST_RESULT_FILE_EXTENSION;
+                UUID.randomUUID().toString() + TEST_RESULT_FILE_EXTENSION;
     }
 }
