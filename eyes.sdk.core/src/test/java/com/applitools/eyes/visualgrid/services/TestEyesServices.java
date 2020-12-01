@@ -3,21 +3,21 @@ package com.applitools.eyes.visualgrid.services;
 import com.applitools.connectivity.MockServerConnector;
 import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
-import com.applitools.eyes.visualgrid.model.RenderRequest;
-import com.applitools.eyes.visualgrid.model.RenderStatusResults;
-import com.applitools.eyes.visualgrid.model.RunningRender;
+import com.applitools.eyes.visualgrid.model.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TestEyesServices {
-    public static Set<String> getSuccessTasks(ConnectivityService<?, ?> service) {
+    public static Set<String> getSuccessTasks(EyesService<?, ?> service) {
         Set<String> succeededIds = new HashSet<>();
         for (Pair<String, ?> pair : service.outputQueue) {
             succeededIds.add(pair.getLeft());
@@ -26,7 +26,7 @@ public class TestEyesServices {
         return succeededIds;
     }
 
-    public static Set<String> getFailedTasks(ConnectivityService<?, ?> service) {
+    public static Set<String> getFailedTasks(EyesService<?, ?> service) {
         Set<String> failedIds = new HashSet<>();
         for (Pair<String, ?> pair : service.errorQueue) {
             failedIds.add(pair.getLeft());
@@ -262,5 +262,97 @@ public class TestEyesServices {
         renderService.addInput("2", mock(RenderRequest.class));
         renderService.run();
         Assert.assertEquals(getFailedTasks(renderService), new HashSet<>(Arrays.asList("1", "2")));
+    }
+
+    @Test
+    public void testCheckResources() throws JsonProcessingException {
+        final AtomicReference<List<String>> checkedHashes = new AtomicReference<>();
+        ServerConnector serverConnector = new MockServerConnector() {
+            @Override
+            public void checkResourceStatus(final TaskListener<Boolean[]> listener, String renderId, HashObject... hashes) {
+                List<String> hashesList = new ArrayList<>();
+                for (HashObject hash : hashes) {
+                    hashesList.add(hash.getHash());
+                }
+
+                checkedHashes.set(hashesList);
+                listener.onComplete(new Boolean[]{true, false, null, false});
+            }
+        };
+
+        ResourceCollectionService resourceCollectionService = new ResourceCollectionService(new Logger(), serverConnector, null, new HashMap<String, RGridResource>());
+        resourceCollectionService.uploadedResourcesCache.put("2", null);
+        resourceCollectionService.uploadedResourcesCache.put("4", null);
+
+        Map<String, RGridResource> resourceMap = new HashMap<>();
+        for (int i = 0; i < 5; i++) {
+            RGridResource resource = mock(RGridResource.class);
+            when(resource.getHashFormat()).thenCallRealMethod();
+            when(resource.getSha256()).thenReturn(String.valueOf(i));
+            when(resource.getUrl()).thenReturn(String.format("http://url%d.com", i));
+            resourceMap.put(resource.getUrl(), resource);
+        }
+
+        RGridDom dom = mock(RGridDom.class);
+        RGridResource domResource = mock(RGridResource.class);
+        when(dom.asResource()).thenReturn(domResource);
+        when(domResource.getSha256()).thenReturn("5");
+
+        // Dom has the same url as one of the resources
+        when(domResource.getUrl()).thenReturn("http://url1.com");
+
+        final SyncTaskListener<List<RGridResource>> listener = new SyncTaskListener<>(new Logger(new StdoutLogHandler()), "test check resources");
+        resourceCollectionService.checkResourcesStatus(dom, resourceMap, new ServiceTaskListener<List<RGridResource>>() {
+            @Override
+            public void onComplete(List<RGridResource> taskResponse) {
+                listener.onComplete(taskResponse);
+            }
+
+            @Override
+            public void onFail(Throwable t) {
+                listener.onFail();
+            }
+        });
+
+        List<RGridResource> missingResources = listener.get();
+        Assert.assertEquals(checkedHashes.get().toArray(), new String[] {"0", "1", "3", "5"});
+        Assert.assertEquals(missingResources.size(), 3);
+        Assert.assertEquals(missingResources.get(0).getSha256(), "1");
+        Assert.assertEquals(missingResources.get(1).getSha256(), "3");
+        Assert.assertEquals(missingResources.get(2).getSha256(), "5");
+    }
+
+    @Test
+    public void testResourcesCaching() {
+        List<String> urls = Arrays.asList("http://1.com", "http://2.com", "http://3.com");
+        FrameData frameData = new FrameData();
+        frameData.setUrl("http://random.com");
+        frameData.setResourceUrls(urls);
+        frameData.setBlobs(new ArrayList<BlobData>());
+        frameData.setFrames(new ArrayList<FrameData>());
+        frameData.setCdt(new ArrayList<CdtData>());
+        frameData.setSrcAttr("");
+        frameData.setUserAgent(mock(UserAgent.class));
+
+        ServerConnector serverConnector = new MockServerConnector();
+        ResourceCollectionService resourceCollectionService = new ResourceCollectionService(new Logger(new StdoutLogHandler()), serverConnector,
+                null, new HashMap<String, RGridResource>());
+
+        for (String url : urls) {
+            RGridResource resource = new RGridResource(url, "contentType", url.getBytes());
+            resourceCollectionService.resourcesCacheMap.put(url, resource);
+        }
+
+        resourceCollectionService.addInput("1", frameData);
+        resourceCollectionService.run();
+        while (resourceCollectionService.tasksInDomAnalyzingProcess.size() == 1) {
+            resourceCollectionService.run();
+        }
+        Assert.assertEquals(resourceCollectionService.errorQueue.size(), 0);
+        Assert.assertEquals(resourceCollectionService.outputQueue.size(), 1);
+
+        Pair<String, Map<String, RGridResource>> pair = resourceCollectionService.outputQueue.get(0);
+        Assert.assertEquals(pair.getLeft(), "1");
+        Assert.assertEquals(pair.getRight().keySet(), new HashSet<>(urls));
     }
 }

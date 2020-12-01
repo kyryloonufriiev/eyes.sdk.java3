@@ -6,7 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class OpenService extends ConnectivityService<SessionStartInfo, RunningSession> {
+public class OpenService extends EyesService<SessionStartInfo, RunningSession> {
     int TIME_TO_WAIT_FOR_OPEN = 60 * 60 * 1000;
 
     private final int eyesConcurrency;
@@ -96,9 +96,8 @@ public class OpenService extends ConnectivityService<SessionStartInfo, RunningSe
         }
     }
 
-    public int decrementConcurrency() {
+    public void decrementConcurrency() {
         int currentAmount = this.currentTestAmount.decrementAndGet();
         logger.log(String.format("A test was ended. Current running tests: %d", currentAmount));
-        return currentAmount;
     }
 }

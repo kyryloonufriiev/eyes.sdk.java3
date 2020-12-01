@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CheckService extends ConnectivityService<MatchWindowData, MatchResult> {
+public class CheckService extends EyesService<MatchWindowData, MatchResult> {
 
     // Queue for tests that finished uploading and waiting for match window
     private final List<Pair<String, MatchWindowData>> matchWindowQueue = Collections.synchronizedList(new ArrayList<Pair<String, MatchWindowData>>());

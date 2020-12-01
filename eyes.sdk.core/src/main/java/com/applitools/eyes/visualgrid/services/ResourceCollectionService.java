@@ -8,21 +8,25 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
-public class ResourceCollectionService extends ConnectivityService<FrameData, Map<String, RGridResource>> {
+public class ResourceCollectionService extends EyesService<FrameData, Map<String, RGridResource>> {
     final Map<String, RGridResource> resourcesCacheMap;
-    final Map<String, SyncTaskListener<Void>> uploadedResourcesCache;
-    private final IDebugResourceWriter debugResourceWriter;
+    private IDebugResourceWriter debugResourceWriter;
 
-    protected final Map<String, DomAnalyzer> tasksInDomAnalyzingProcess = Collections.synchronizedMap(new HashMap<String, DomAnalyzer>());
+    final Map<String, SyncTaskListener<Void>> uploadedResourcesCache = Collections.synchronizedMap(new HashMap<String, SyncTaskListener<Void>>());
+
+    final Map<String, DomAnalyzer> tasksInDomAnalyzingProcess = Collections.synchronizedMap(new HashMap<String, DomAnalyzer>());
     protected final List<Pair<String, Pair<RGridDom, Map<String, RGridResource>>>> waitingForUploadQueue =
             Collections.synchronizedList(new ArrayList<Pair<String, Pair<RGridDom, Map<String, RGridResource>>>>());
 
     public ResourceCollectionService(Logger logger, ServerConnector serverConnector, IDebugResourceWriter debugResourceWriter,
-                                     Map<String, RGridResource> resourcesCacheMap, Map<String, SyncTaskListener<Void>> uploadedResourcesCache) {
+                                     Map<String, RGridResource> resourcesCacheMap) {
         super(logger, serverConnector);
-        this.debugResourceWriter = debugResourceWriter;
+        this.debugResourceWriter = debugResourceWriter != null ? debugResourceWriter : new NullDebugResourceWriter();
         this.resourcesCacheMap = resourcesCacheMap;
-        this.uploadedResourcesCache = uploadedResourcesCache;
+    }
+
+    public void setDebugResourceWriter(IDebugResourceWriter debugResourceWriter) {
+        this.debugResourceWriter = debugResourceWriter != null ? debugResourceWriter : new NullDebugResourceWriter();
     }
 
     @Override
@@ -33,7 +37,7 @@ public class ResourceCollectionService extends ConnectivityService<FrameData, Ma
             DomAnalyzer domAnalyzer = new DomAnalyzer(logger, serverConnector, debugResourceWriter, frameData, resourcesCacheMap, new TaskListener<Map<String, RGridResource>>() {
                 @Override
                 public void onComplete(final Map<String, RGridResource> resourceMap) {
-                    RGridDom dom = new RGridDom(frameData.getCdt(), resourceMap, frameData.getUrl(), logger, "buildRenderRequests");
+                    RGridDom dom = new RGridDom(frameData.getCdt(), resourceMap, frameData.getUrl());
                     waitingForUploadQueue.add(Pair.of(nextInput.getLeft(), Pair.of(dom, resourceMap)));
                     tasksInDomAnalyzingProcess.remove(nextInput.getLeft());
                 }
@@ -118,6 +122,7 @@ public class ResourceCollectionService extends ConnectivityService<FrameData, Ma
 
         if (hashesToCheck.isEmpty()) {
             listener.onComplete(new ArrayList<RGridResource>());
+            return;
         }
 
         final HashObject[] hashesArray = hashesToCheck.toArray(new HashObject[0]);

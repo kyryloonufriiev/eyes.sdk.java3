@@ -283,7 +283,7 @@ public class ServerConnector extends UfgConnector {
             ResponseParsingCallback<RunningRender[]> callback = new ResponseParsingCallback<>(this, validStatusCodes, new TaskListener<RunningRender[]>() {
                 @Override
                 public void onComplete(RunningRender[] runningRenders) {
-                    listener.onComplete(runningRenders == null ? null : Arrays.asList(runningRenders));
+                    listener.onComplete(runningRenders == null ? null : new ArrayList<>(Arrays.asList(runningRenders)));
                 }
 
                 @Override
@@ -333,7 +333,7 @@ public class ServerConnector extends UfgConnector {
                         }
                     }
 
-                    listener.onComplete(Arrays.asList(renderStatusResults));
+                    listener.onComplete(new ArrayList<>(Arrays.asList(renderStatusResults)));
                 }
 
                 @Override
@@ -488,10 +488,6 @@ public class ServerConnector extends UfgConnector {
         if (restClient != null) {
             restClient.close();
         }
-    }
-
-    public boolean getDontCloseBatches() {
-        return "true".equalsIgnoreCase(GeneralUtils.getEnvString("APPLITOOLS_DONT_CLOSE_BATCHES"));
     }
 
     public Map<String, MobileDeviceInfo> getMobileDevicesInfo() {

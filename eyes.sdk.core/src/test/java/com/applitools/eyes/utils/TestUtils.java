@@ -6,6 +6,7 @@ import com.applitools.eyes.*;
 import com.applitools.eyes.metadata.ActualAppOutput;
 import com.applitools.eyes.metadata.SessionResults;
 import com.applitools.utils.ArgumentGuard;
+import com.applitools.utils.ClassVersionGetter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -70,6 +71,7 @@ public class TestUtils {
                 .build();
 
         RestClient client = new RestClient(new Logger(new StdoutLogHandler()), apiSessionUri, ServerConnector.DEFAULT_CLIENT_TIMEOUT);
+        client.setAgentId(ClassVersionGetter.CURRENT_VERSION);
         if (System.getenv("APPLITOOLS_USE_PROXY") != null) {
             client.setProxy(new ProxySettings("http://127.0.0.1", 8888));
         }

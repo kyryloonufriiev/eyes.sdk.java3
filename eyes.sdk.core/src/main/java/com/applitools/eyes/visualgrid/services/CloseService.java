@@ -4,7 +4,7 @@ import com.applitools.connectivity.ServerConnector;
 import com.applitools.eyes.*;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class CloseService extends ConnectivityService<SessionStopInfo, TestResults> {
+public class CloseService extends EyesService<SessionStopInfo, TestResults> {
 
     public CloseService(Logger logger, ServerConnector serverConnector) {
         super(logger, serverConnector);
@@ -30,6 +30,13 @@ public class CloseService extends ConnectivityService<SessionStopInfo, TestResul
     }
 
     private void operate(final SessionStopInfo sessionStopInfo, final ServiceTaskListener<TestResults> listener) {
+        if (sessionStopInfo == null) {
+            TestResults testResults = new TestResults();
+            testResults.setStatus(TestResultsStatus.NotOpened);
+            listener.onComplete(testResults);
+            return;
+        }
+
         TaskListener<TestResults> taskListener = new TaskListener<TestResults>() {
             @Override
             public void onComplete(TestResults testResults) {

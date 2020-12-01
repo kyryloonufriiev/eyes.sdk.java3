@@ -11,10 +11,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RenderService extends ConnectivityService<RenderRequest, RenderStatusResults> {
+public class RenderService extends EyesService<RenderRequest, RenderStatusResults> {
     int RENDER_STATUS_POLLING_TIMEOUT = 60 * 60 * 1000;
 
-    private final Timer timer = new Timer("VG_StopWatch", true);
     private final AtomicBoolean isTimeElapsed = new AtomicBoolean(false);
 
     // Queue for tests that are in a render process
@@ -35,6 +34,10 @@ public class RenderService extends ConnectivityService<RenderRequest, RenderStat
     @Override
     public void run() {
         sendAllRenderRequests();
+
+        if (renderingQueue.isEmpty()) {
+            return;
+        }
 
         List<Pair<String, String>> list;
         synchronized (renderingQueue) {
@@ -57,6 +60,10 @@ public class RenderService extends ConnectivityService<RenderRequest, RenderStat
     }
 
     private void sendAllRenderRequests() {
+        if (inputQueue.isEmpty()) {
+            return;
+        }
+
         final RenderRequest[] asArray = new RenderRequest[inputQueue.size()];
         final List<String> testIds = new ArrayList<>();
         for (int i = 0; i < inputQueue.size(); i++) {
@@ -118,6 +125,7 @@ public class RenderService extends ConnectivityService<RenderRequest, RenderStat
 
     private void pollRenderingStatus(final List<String> testIds, final List<String> renderIds) {
         logger.verbose("renderIds : " + renderIds);
+        final Timer timer = new Timer("VG_StopWatch", true);
         timer.schedule(new TimeoutTask(), RENDER_STATUS_POLLING_TIMEOUT);
         serverConnector.renderStatusById(new TaskListener<List<RenderStatusResults>>() {
             @Override
@@ -139,10 +147,8 @@ public class RenderService extends ConnectivityService<RenderRequest, RenderStat
                         continue;
                     }
 
-                    String renderId = renderIds.remove(i);
-                    String testId = testIds.remove(i);
-                    renderStatusResultsList.remove(i);
-                    i--;
+                    String renderId = renderIds.get(i);
+                    String testId = testIds.get(i);
                     logger.verbose(String.format("Setting render result. TestId: %s, RenderId: %s, Result: %s", testId, renderId, renderStatusResults));
                     String error = renderStatusResults.getError();
                     if (error != null) {
@@ -155,6 +161,11 @@ public class RenderService extends ConnectivityService<RenderRequest, RenderStat
                             outputQueue.add(Pair.of(testId, renderStatusResults));
                         }
                     }
+
+                    renderIds.remove(i);
+                    testIds.remove(i);
+                    renderStatusResultsList.remove(i);
+                    i--;
                 }
 
                 if (renderIds.isEmpty()) {

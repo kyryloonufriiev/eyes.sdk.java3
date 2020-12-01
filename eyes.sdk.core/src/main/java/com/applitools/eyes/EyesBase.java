@@ -272,7 +272,7 @@ public abstract class EyesBase implements IEyesBase {
     /**
      * @return Whether a session is open.
      */
-    public boolean getIsOpen() {
+    public boolean isOpen() {
         return isOpen;
     }
 
@@ -425,12 +425,9 @@ public abstract class EyesBase implements IEyesBase {
         return debugScreenshotsProvider;
     }
 
-    public SessionStopInfo prepareStopSession(SyncTaskListener<TestResults> listener, boolean isAborted) {
+    public SessionStopInfo prepareStopSession(boolean isAborted) {
         if (runningSession == null || !isOpen) {
             logger.log("Server session was not started --- Empty test ended.");
-            TestResults testResults = new TestResults();
-            testResults.setStatus(TestResultsStatus.NotOpened);
-            listener.onComplete(testResults);
             return null;
         }
 
@@ -439,7 +436,6 @@ public abstract class EyesBase implements IEyesBase {
         clearUserInputs();
         initProviders(true);
 
-        listener.setId(String.format("stop session %s. isAborted: %b", runningSession, isAborted));
         final boolean isNewSession = runningSession.getIsNew();
         logger.verbose("Ending server session...");
         boolean save = (isNewSession && getConfigurationInstance().getSaveNewTests())
@@ -496,10 +492,15 @@ public abstract class EyesBase implements IEyesBase {
             return;
         }
 
-        SessionStopInfo sessionStopInfo = prepareStopSession(listener, isAborted);
+        SessionStopInfo sessionStopInfo = prepareStopSession(isAborted);
+        listener.setId(String.format("stop session %s. isAborted: %b", runningSession, isAborted));
         if (sessionStopInfo == null) {
+            TestResults testResults = new TestResults();
+            testResults.setStatus(TestResultsStatus.NotOpened);
+            listener.onComplete(testResults);
             return;
         }
+
         getServerConnector().stopSession(new TaskListener<TestResults>() {
             @Override
             public void onComplete(TestResults testResults) {
@@ -648,7 +649,7 @@ public abstract class EyesBase implements IEyesBase {
             tag = "";
         }
 
-        ArgumentGuard.isValidState(getIsOpen(), "Eyes not open");
+        ArgumentGuard.isValidState(isOpen(), "Eyes not open");
 
         result = matchWindow(region, tag, checkSettingsInternal, source);
 
@@ -708,7 +709,7 @@ public abstract class EyesBase implements IEyesBase {
         return null;
     }
 
-    private void validateResult(String tag, MatchResult result) {
+    protected void validateResult(String tag, MatchResult result) {
         if (result.getAsExpected()) {
             return;
         }
@@ -731,7 +732,17 @@ public abstract class EyesBase implements IEyesBase {
         this.isDisabled = isDisabled;
     }
 
-    protected SessionStartInfo prepareForOpen() {
+    public SessionStartInfo prepareForOpen() {
+        openLogger();
+        if (isDisabled) {
+            logger.verbose("Ignored");
+            return null;
+        }
+
+        validateApiKey();
+        logOpenBase();
+        validateSessionOpen();
+
         this.isViewportSizeSet = false;
         RectangleSize viewportSize = getViewportSizeForOpen();
         if (viewportSize == null) {
@@ -775,18 +786,9 @@ public abstract class EyesBase implements IEyesBase {
     }
 
     protected void openBaseAsync(final SyncTaskListener<Void> taskListener) throws EyesException {
-        openLogger();
-        if (isDisabled) {
-            logger.verbose("Ignored");
+        if (prepareForOpen() == null) {
             return;
         }
-
-        validateApiKey();
-        logOpenBase();
-        validateSessionOpen();
-
-
-        prepareForOpen();
         taskListener.setId(String.format("openBase %s", sessionStartInfo));
 
         logger.verbose("Application environment is " + sessionStartInfo.getEnvironment());
@@ -806,38 +808,7 @@ public abstract class EyesBase implements IEyesBase {
                     return;
                 }
 
-                isServerConcurrencyLimitReached = false;
-                runningSession = result;
-                logger.verbose("Server session ID is " + runningSession.getId());
-
-                logger.setSessionId(runningSession.getSessionId());
-                if (runningSession.getIsNew()) {
-                    logger.log("--- New test started - " + testName);
-                    shouldMatchWindowRunOnceOnTimeout = true;
-                } else {
-                    logger.log("--- Test started - " + testName);
-                    shouldMatchWindowRunOnceOnTimeout = false;
-                }
-
-                matchWindowTask = new MatchWindowTask(
-                        logger,
-                        getServerConnector(),
-                        runningSession,
-                        getConfigurationInstance().getMatchTimeout(),
-                        EyesBase.this,
-                        // A callback which will call getAppOutput
-                        new AppOutputProvider() {
-                            @Override
-                            public AppOutputWithScreenshot getAppOutput(Region region,
-                                                                        ICheckSettingsInternal checkSettingsInternal,
-                                                                        ImageMatchSettings imageMatchSettings) {
-                                return getAppOutputWithScreenshot(region, checkSettingsInternal, imageMatchSettings);
-                            }
-                        }
-                );
-
-                validationId = -1;
-                isOpen = true;
+                openCompleted(result);
                 taskListener.onComplete(null);
             }
 
@@ -867,6 +838,42 @@ public abstract class EyesBase implements IEyesBase {
 
         logger.log(String.format("Calling start session with agentSessionId %s", sessionStartInfo.getAgentSessionId()));
         startSession(listener);
+    }
+
+    public void openCompleted(RunningSession result) {
+        isServerConcurrencyLimitReached = false;
+        runningSession = result;
+        logger.verbose("Server session ID is " + runningSession.getId());
+
+        String testName = "'" + getTestName() + "'";
+        logger.setSessionId(runningSession.getSessionId());
+        if (runningSession.getIsNew()) {
+            logger.log("--- New test started - " + testName);
+            shouldMatchWindowRunOnceOnTimeout = true;
+        } else {
+            logger.log("--- Test started - " + testName);
+            shouldMatchWindowRunOnceOnTimeout = false;
+        }
+
+        matchWindowTask = new MatchWindowTask(
+                logger,
+                getServerConnector(),
+                runningSession,
+                getConfigurationInstance().getMatchTimeout(),
+                EyesBase.this,
+                // A callback which will call getAppOutput
+                new AppOutputProvider() {
+                    @Override
+                    public AppOutputWithScreenshot getAppOutput(Region region,
+                                                                ICheckSettingsInternal checkSettingsInternal,
+                                                                ImageMatchSettings imageMatchSettings) {
+                        return getAppOutputWithScreenshot(region, checkSettingsInternal, imageMatchSettings);
+                    }
+                }
+        );
+
+        validationId = -1;
+        isOpen = true;
     }
 
     protected RectangleSize getViewportSizeForOpen() {

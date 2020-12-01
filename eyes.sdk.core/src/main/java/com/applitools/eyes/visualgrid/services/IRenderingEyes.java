@@ -6,38 +6,22 @@ import com.applitools.eyes.TestResultContainer;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 public interface IRenderingEyes {
 
     boolean isEyesClosed();
 
-    RunningTest getNextTestToClose();
-
-    void setListener(EyesListener listener);
-
-    ScoreTask getBestScoreTaskForCheck();
-
-    ScoreTask getBestScoreTaskForOpen();
-
-    Collection<Future<TestResultContainer>> close();
-
     Logger getLogger();
-
-    List<TestResultContainer> getAllTestResults();
 
     IBatchCloser getBatchCloser();
 
     String getBatchId();
 
-    interface EyesListener{
+    Map<String, RunningTest> getAllRunningTests();
 
-        void onTaskComplete(VisualGridTask visualGridTask, IRenderingEyes eyes);
+    List<TestResultContainer> getAllTestResults();
 
-        void onRenderComplete();
-    }
-
-    List<RunningTest> getAllRunningTests();
-
-    boolean isServerConcurrencyLimitReached();
+    boolean isCompleted();
 }
