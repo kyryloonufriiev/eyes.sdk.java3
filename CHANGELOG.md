@@ -1,6 +1,7 @@
 ## [3.186.0] - 2020-11-23
 ### Updated
 - Agent ID property name (Internal). [Trello 2344](https://trello.com/c/hNfSbXNe)
+- Disabled skip list feature temporarily. [Trello 2349](https://trello.com/c/V8ldfbZu)
 
 ## [3.185.1] - 2020-11-23
 ### Fixed

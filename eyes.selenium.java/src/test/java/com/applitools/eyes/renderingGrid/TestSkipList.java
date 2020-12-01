@@ -36,7 +36,7 @@ public class TestSkipList extends ReportingTestSuite {
     }
 
     @Test
-    public void Test() throws InterruptedException {
+    public void testSkipList() throws InterruptedException {
         final List<Set<String>> resourceMaps = new ArrayList<>();
 
         ServerConnector serverConnector = spy(new ServerConnector());
@@ -69,7 +69,7 @@ public class TestSkipList extends ReportingTestSuite {
             eyes.open(driver);
             driver.get("https://applitools.github.io/demo/TestPages/VisualGridTestPage/");
             eyes.check("Check1", Target.window());
-            Thread.sleep(5000);
+            Thread.sleep(10000);
             eyes.check("Check2", Target.window());
             eyes.closeAsync();
         } finally {

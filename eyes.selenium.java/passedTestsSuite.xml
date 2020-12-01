@@ -488,7 +488,7 @@
         <classes>
             <class name="com.applitools.eyes.renderingGrid.TestSkipList">
                 <methods>
-                    <include name="Test"/>
+                    <include name="testSkipList"/>
                 </methods>
             </class>
         </classes>
