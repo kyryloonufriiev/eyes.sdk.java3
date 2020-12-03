@@ -8,7 +8,7 @@ public class ClassVersionGetter {
 
     static {
         try {
-            properties.load(ClassVersionGetter.class.getClassLoader().getResourceAsStream("project.properties"));
+            properties.load(ClassVersionGetter.class.getClassLoader().getResourceAsStream("sdk.version"));
         } catch (IOException e) {
             e.printStackTrace();
         }
