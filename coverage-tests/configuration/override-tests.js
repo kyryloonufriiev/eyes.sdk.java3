@@ -1,9 +1,11 @@
 module.exports = {
     // JS specific, no need to implement in java
-    'should return test results from close with passed classic test': {skip: true}, // skipped
-    'should return test results from close with passed vg test': {skip: true}, //   cause
-    'should return test results from close with failed classic test': {skip: true}, // tests
-    'should return test results from close with failed vg test': {skip: true}, // JS specific
+    'should return test results from close with passed classic test': {skipEmit: true}, // skipped
+    'should return test results from close with passed vg test': {skipEmit: true}, //   cause
+    'should return test results from close with failed classic test': {skipEmit: true}, // tests
+    'should return test results from close with failed vg test': {skipEmit: true}, // JS specific
+    'should extract text from regions': {skipEmit: true}, // Not implemented yet
+    'should handle check of stale element in frame if selector is preserved': {skipEmit: true}, // Not implemented yet
     // General
     'should hide and restore scrollbars with vg': {skip: true}, // java.lang.IllegalArgumentException: checkTasks == 0
     'should not check if disabled': {skip: true}, // throws com.applitools.eyes.EyesException: Status is null in the test results
@@ -19,8 +21,8 @@ module.exports = {
     'should set viewport size on edge legacy': {skip: true}, // java.lang.IllegalArgumentException: width < 0
     'should send ignore displacements with vg': {skip: true}, // diffs
     // window
-    'check window with layout breakpoints in config': {skip: true}, // layout breakpoints are not implemented
-    'check window with layout breakpoints': {skip: true}, // layout breakpoints are not implemented
+    'check window with layout breakpoints in config': {skipEmit: true}, // layout breakpoints are not implemented
+    'check window with layout breakpoints': {skipEmit: true}, // layout breakpoints are not implemented
     'check window fully on android chrome emulator on desktop page': {skip: true}, // have diffs
     'check window fully on android chrome emulator on mobile page': {skip: true}, // have diffs
     'check window fully on android chrome emulator on mobile page with horizontal scroll': {skip: true}, // have diffs
