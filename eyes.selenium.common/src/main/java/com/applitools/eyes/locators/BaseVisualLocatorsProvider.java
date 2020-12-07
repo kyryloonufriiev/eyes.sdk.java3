@@ -35,11 +35,12 @@ public abstract class BaseVisualLocatorsProvider implements VisualLocatorsProvid
     public Map<String, List<Region>> getLocators(VisualLocatorSettings visualLocatorSettings) {
         ArgumentGuard.notNull(visualLocatorSettings, "visualLocatorSettings");
 
-        logger.verbose("Get locators with given names: " + visualLocatorSettings.getNames());
+        logger.verbose("Get locators with given names: " + Arrays.toString(visualLocatorSettings.getNames().toArray()));
 
         logger.verbose("Requested viewport screenshot for visual locators...");
         BufferedImage viewPortScreenshot = getViewPortScreenshot();
-        debugScreenshotsProvider.save(viewPortScreenshot, "Visual locators: " + Arrays.toString(visualLocatorSettings.getNames().toArray()));
+        logger.verbose(String.format("Image size after scaling: %dx%d", viewPortScreenshot.getWidth(), viewPortScreenshot.getHeight()));
+        debugScreenshotsProvider.save(viewPortScreenshot, "visual_locators_final");
 
         logger.verbose("Convert screenshot from BufferedImage to base64...");
         byte[] image = ImageUtils.encodeAsPng(viewPortScreenshot);

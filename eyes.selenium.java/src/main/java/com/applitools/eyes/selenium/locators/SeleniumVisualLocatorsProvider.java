@@ -33,14 +33,21 @@ public class SeleniumVisualLocatorsProvider extends BaseVisualLocatorsProvider {
         UserAgent.parseUserAgentString(uaString, true);
         ImageProvider provider = ImageProviderFactory.getImageProvider(userAgent, eyes, logger, driver);
         BufferedImage image = provider.getImage();
+        logger.verbose(String.format("Took screenshot with size: %dx%d", image.getWidth(), image.getHeight()));
+        debugScreenshotsProvider.save(image, "visual_locators_initial");
         if (eyes.getIsCutProviderExplicitlySet()) {
             image = eyes.getCutProvider().cut(image);
+            logger.verbose(String.format("Image size after cutting: %dx%d", image.getWidth(), image.getHeight()));
+            debugScreenshotsProvider.save(image, "visual_locators_cut");
         }
 
         double scaleRatio = devicePixelRatio;
+        logger.verbose(String.format("scale ratio: %f", scaleRatio));
         if (eyes.getIsScaleProviderExplicitlySet()) {
             scaleRatio = eyes.getScaleProvider().getScaleRatio();
+            logger.verbose(String.format("scale ratio from user: %f", scaleRatio));
         }
+
         return ImageUtils.scaleImage(image, 1 / scaleRatio);
     }
 }
