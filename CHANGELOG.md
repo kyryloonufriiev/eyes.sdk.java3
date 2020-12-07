@@ -1,4 +1,4 @@
-## [vNext]
+## [3.187.0] - 2020-11-23
 ### Fixed
 - Added setApiKey and setProxy to BatchClose. [Trello 2189](https://trello.com/c/SlHH9Ssb)
 ### Updated
