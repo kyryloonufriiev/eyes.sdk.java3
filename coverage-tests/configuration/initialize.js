@@ -66,6 +66,7 @@ module.exports = function (tracker, test) {
     addHook('deps', `import coverage.NativeSetup;`)
     addHook('deps', `import com.applitools.eyes.appium.*;`)
     addHook('deps', `import com.applitools.eyes.appium.Target;`)
+    addHook('deps', `import io.appium.java_client.MobileBy;`)
   } else {
     addHook('deps', `import coverage.TestSetup;`)
     addHook('deps', `import com.applitools.eyes.selenium.*;`)
@@ -178,7 +179,7 @@ module.exports = function (tracker, test) {
             throw new Error('Not implemented classic api method was tried to generate')
           }
       } else {
-        addCommand(`eyes.check(${checkSettingsParser(checkSettings)});`)
+        addCommand(`eyes.check(${checkSettingsParser(checkSettings, test.meta.native)});`)
       }
     },
     checkWindow(tag, matchTimeout, stitchContent) {
@@ -193,7 +194,6 @@ module.exports = function (tracker, test) {
       if(tag) commands.push(java`, ${tag}`)
       commands.push(java`);`)
       addCommand([commands.join('')])
-      // addCommand(java`eyes.checkFrame(${findFrame(element)}${extraParameter(matchTimeout)}${extraParameter(tag)});`)
     },
     checkRegion(region, matchTimeout, tag) {
       const commands = []

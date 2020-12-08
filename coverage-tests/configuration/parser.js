@@ -2,7 +2,7 @@
 const types = require('./mapping/types')
 const selectors = require('./mapping/selectors')
 const  {capitalizeFirstLetter} = require('./util')
-function checkSettings(cs) {
+function checkSettings(cs, native) {
     let java = `Target`
     if (cs === undefined) {
         return java + '.window()'
@@ -25,72 +25,76 @@ function checkSettings(cs) {
     if (cs.isFully) options += '.fully()'
     if (cs.name) options += `.withName(${cs.name})`
     return java + element + options
-}
 
-// check settings
+    // check settings
 
-function frames(arr) {
-    return arr.reduce((acc, val) => acc + `${frame(val)}`, '')
-}
-function frame(frame) {
-    return  ( !frame.isRef && frame.frame) ? `.frame(${frameSelector(frame.frame)}).scrollRootElement(${printSelector(frame.scrollRootElement)})` : `.frame(${frameSelector(frame)})`
-}
-function frameSelector(selector) {
-    if(typeof selector === 'string' && !checkCss(selector)) {
-        return JSON.stringify(selector)
-    } else {
-        return printSelector(selector);
+    function frames(arr) {
+        return arr.reduce((acc, val) => acc + `${frame(val)}`, '')
     }
-    function checkCss(string) {
-        return (string.includes('[') && string.includes(']')) || string.includes('#')
+    function frame(frame) {
+        return  ( !frame.isRef && frame.frame) ? `.frame(${frameSelector(frame.frame)}).scrollRootElement(${printSelector(frame.scrollRootElement)})` : `.frame(${frameSelector(frame)})`
     }
-}
-
-function region(region) {
-    return `.region(${regionParameter(region)})`
-}
-
-function ignoreRegions(arr) {
-    return arr.reduce((acc, val) => `${acc}.ignore(${regionParameter(val)})`, '')
-}
-function layoutRegions(arr){
-    return arr.reduce((acc, val) => `${acc}.layout(${regionParameter(val)})`, '')
-}
-function floatingRegions(arr) {
-    return arr.reduce((acc, val) => `${acc}.floating(${floating(val)})`, ``)
-}
-
-function floating(floating) {
-    let string
-    string = regionParameter(floating.region)
-    string += `, ${floating.maxUpOffset}, ${floating.maxDownOffset}, ${floating.maxLeftOffset}, ${floating.maxRightOffset}`
-    return string
-}
-
-function accessibilityRegions(arr) {
-    return arr.reduce((acc, val) => `${acc}.accessibility(${accessibility(val)})`, ``)
-}
-
-function accessibility(val) {
-    return `${regionParameter(val.region)}, AccessibilityRegionType.${capitalizeFirstLetter(val.type)}`
-}
-
-function regionParameter(region) {
-    let string
-    switch (typeof region) {
-        case 'string':
-            string = `By.cssSelector(${JSON.stringify(region)})`
-            break;
-        case "object":
-            string = parseObject(region.type ? region : {value: region, type:'Region'})
-            break;
-        case "function":
-            string = serialize(region)
-            break;
-        default:
-            throw new Error(`Region parameter of the unimplemented type was used:  ${JSON.stringify(region)}`)
+    function frameSelector(selector) {
+        if(typeof selector === 'string' && !checkCss(selector)) {
+            return JSON.stringify(selector)
+        } else {
+            return printSelector(selector);
+        }
+        function checkCss(string) {
+            return (string.includes('[') && string.includes(']')) || string.includes('#')
+        }
     }
-    return string
+
+    function region(region) {
+        return `.region(${regionParameter(region)})`
+    }
+
+    function ignoreRegions(arr) {
+        return arr.reduce((acc, val) => `${acc}.ignore(${regionParameter(val)})`, '')
+    }
+    function layoutRegions(arr){
+        return arr.reduce((acc, val) => `${acc}.layout(${regionParameter(val)})`, '')
+    }
+    function floatingRegions(arr) {
+        return arr.reduce((acc, val) => `${acc}.floating(${floating(val)})`, ``)
+    }
+
+    function floating(floating) {
+        let string
+        string = regionParameter(floating.region)
+        string += `, ${floating.maxUpOffset}, ${floating.maxDownOffset}, ${floating.maxLeftOffset}, ${floating.maxRightOffset}`
+        return string
+    }
+
+    function accessibilityRegions(arr) {
+        return arr.reduce((acc, val) => `${acc}.accessibility(${accessibility(val)})`, ``)
+    }
+
+    function accessibility(val) {
+        return `${regionParameter(val.region)}, AccessibilityRegionType.${capitalizeFirstLetter(val.type)}`
+    }
+
+    function regionParameter(region) {
+        let string
+        switch (typeof region) {
+            case 'string':
+                string = `By.cssSelector(${JSON.stringify(region)})`
+                break;
+            case "object":
+                if(region.type) {
+                    string = native ? `getDriver().findElement(${parseObject(region)})` : parseObject(region)
+                } else {
+                    string = parseObject({value: region, type: 'Region'})
+                }
+                break;
+            case "function":
+                string = serialize(region)
+                break;
+            default:
+                throw new Error(`Region parameter of the unimplemented type was used:  ${JSON.stringify(region)}`)
+        }
+        return string
+    }
 }
 
 // General

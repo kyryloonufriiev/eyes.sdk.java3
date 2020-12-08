@@ -2,9 +2,6 @@ package coverage;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
@@ -92,7 +89,6 @@ public class BuildDriver {
             }
         } else if (isDevice(root)) {
             url = SAUCE_URL;
-            boolean isAndroid = true;
             String device = getDevice(root);
             switch (device) {
                 case "Android 8.0 Chrome Emulator":
@@ -101,6 +97,9 @@ public class BuildDriver {
                     break;
                 case "Samsung Galaxy S8":
                     caps = getSamsungGalaxyS8();
+                    break;
+                case "iPhone XS":
+                    caps = getIphoneXS();
                     break;
                 default:
                     throw new RuntimeException("Unsupported device type was set for the test");
@@ -198,6 +197,17 @@ public class BuildDriver {
         device.setCapability("deviceName", "Samsung Galaxy S8 FHD GoogleAPI Emulator");
         device.setCapability("automationName", "uiautomator2");
         device.setCapability("newCommandTimeout", 600);
+        return setSauceCredentials(device);
+    }
+
+    public Capabilities getIphoneXS() {
+        DesiredCapabilities device = new DesiredCapabilities();
+        device.setCapability("browserName", "");
+        device.setCapability("name", "iOS Native Demo");
+        device.setCapability("platformName", "iOS");
+        device.setCapability("platformVersion", "13.0");
+        device.setCapability("appiumVersion", "1.17.1");
+        device.setCapability("deviceName", "iPhone XS Simulator");
         return setSauceCredentials(device);
     }
 
