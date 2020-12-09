@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -273,6 +274,11 @@ public class TestServerConnector extends ReportingTestSuite {
 
     @Test
     public void testLongRequest() {
+        final AtomicLong firstPollingCompletionTime = new AtomicLong();
+        final AtomicLong secondPollingCompletionTime = new AtomicLong();
+        final AtomicLong thirdPollingCompletionTime = new AtomicLong();
+        final AtomicLong lastRequestCompletionTime = new AtomicLong();
+
         ServerConnector serverConnector = spy(new ServerConnector());
         MockedAsyncRequest request = new MockedAsyncRequest();
         doAnswer(new Answer<Void>() {
@@ -290,9 +296,11 @@ public class TestServerConnector extends ReportingTestSuite {
             public Void answer(InvocationOnMock invocation) {
                 AsyncRequestCallback callback = invocation.getArgument(0);
                 if (!wasPolling.get()) {
+                    firstPollingCompletionTime.set(System.currentTimeMillis());
                     wasPolling.set(true);
-                    callback.onComplete(new MockedResponse(HttpStatus.SC_OK));
+                    callback.onComplete(new MockedResponse(HttpStatus.SC_OK, Pair.of("Retry-After", "5")));
                 } else {
+                    secondPollingCompletionTime.set(System.currentTimeMillis());
                     callback.onComplete(new MockedResponse(HttpStatus.SC_OK, Pair.of("location", "url2")));
                 }
                 return null;
@@ -302,6 +310,7 @@ public class TestServerConnector extends ReportingTestSuite {
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) {
+                thirdPollingCompletionTime.set(System.currentTimeMillis());
                 AsyncRequestCallback callback = invocation.getArgument(0);
                 callback.onComplete(new MockedResponse(HttpStatus.SC_CREATED, Pair.of("location", "url3")));
                 return null;
@@ -311,6 +320,7 @@ public class TestServerConnector extends ReportingTestSuite {
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) {
+                lastRequestCompletionTime.set(System.currentTimeMillis());
                 AsyncRequestCallback callback = invocation.getArgument(0);
                 callback.onComplete(new MockedResponse(HttpStatus.SC_OK, Pair.of("finished", "true")));
                 return null;
@@ -336,5 +346,10 @@ public class TestServerConnector extends ReportingTestSuite {
         Assert.assertEquals(request.headers.keySet(), new HashSet<>(Arrays.asList("Eyes-Expect-Version", "Eyes-Expect", "Eyes-Date")));
         verify(serverConnector, times(1)).sendAsyncRequest(ArgumentMatchers.<AsyncRequest>any(), anyString(), ArgumentMatchers.<AsyncRequestCallback>any(), ArgumentMatchers.<String>isNull(), ArgumentMatchers.<String>isNull());
         verify(serverConnector, times(4)).sendAsyncRequest(ArgumentMatchers.<AsyncRequestCallback>any(), anyString(), anyString());
+
+        Assert.assertTrue(secondPollingCompletionTime.get() - firstPollingCompletionTime.get() > 5000);
+        Assert.assertTrue(thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() > 500 &&
+                thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() < 1000);
+        Assert.assertTrue(lastRequestCompletionTime.get() - thirdPollingCompletionTime.get() < 100);
     }
 }
