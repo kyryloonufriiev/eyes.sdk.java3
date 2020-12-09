@@ -1,11 +1,11 @@
-## [vNext]
+## [3.188.0] - 2020-12-09
 ### Fixed
-- Visual locators user-defined scale provider didn't work properly. [Trello 2300](https://trello.com/c/RdB0I4G2)
+- Visual locators user-defined scale provider. [Trello 2300](https://trello.com/c/RdB0I4G2)
 ### Updated
 - Concurrency version 2. [Trello 2368](https://trello.com/c/0qi2c0jW)
 - Agent ID is now hardcoded instead of property. [Trello 2344](https://trello.com/c/hNfSbXNe)
 
-## [3.187.0] - 2020-11-23
+## [3.187.0] - 2020-12-07
 ### Fixed
 - Added setApiKey and setProxy to BatchClose. [Trello 2189](https://trello.com/c/SlHH9Ssb)
 ### Updated
