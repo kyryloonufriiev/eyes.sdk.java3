@@ -123,7 +123,7 @@ jobs:
           # save the email of the person who did this commit in COMMITTER_EMAIL
         - COMMITTER_EMAIL="$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
         - SDK_VERSION=$(echo $TRAVIS_TAG | sed 's/[^.0-9]*//g')
-        - if [[ $COMMITTER_EMAIL =~ $ALLOWED_RELEASE_COMMITERS ]]; then
+        - if [[ $ALLOWED_RELEASE_COMMITERS =~ $COMMITTER_EMAIL ]]; then
           echo "DEPLOY";
           chmod +x ./extractChangeLog.sh;
           TMP_CHANGELOG=$(./extractChangeLog.sh "$SDK_VERSION" "CHANGELOG.md");
