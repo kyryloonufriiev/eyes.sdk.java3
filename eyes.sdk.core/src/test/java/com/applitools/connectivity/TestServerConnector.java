@@ -349,7 +349,7 @@ public class TestServerConnector extends ReportingTestSuite {
 
         Assert.assertTrue(secondPollingCompletionTime.get() - firstPollingCompletionTime.get() > 5000);
         Assert.assertTrue(thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() > 500 &&
-                thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() < 1000);
+                thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() < 3000);
         Assert.assertTrue(lastRequestCompletionTime.get() - thirdPollingCompletionTime.get() < 100);
     }
 }
