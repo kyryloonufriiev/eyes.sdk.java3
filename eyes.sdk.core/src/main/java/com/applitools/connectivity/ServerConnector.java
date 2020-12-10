@@ -58,6 +58,7 @@ public class ServerConnector extends UfgConnector {
     }
 
     public void setAgentId(String agentId) {
+        logger.log(String.format("Setting agent id: %s", agentId));
         this.agentId = agentId;
     }
 

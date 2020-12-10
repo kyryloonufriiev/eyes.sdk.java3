@@ -347,9 +347,9 @@ public class TestServerConnector extends ReportingTestSuite {
         verify(serverConnector, times(1)).sendAsyncRequest(ArgumentMatchers.<AsyncRequest>any(), anyString(), ArgumentMatchers.<AsyncRequestCallback>any(), ArgumentMatchers.<String>isNull(), ArgumentMatchers.<String>isNull());
         verify(serverConnector, times(4)).sendAsyncRequest(ArgumentMatchers.<AsyncRequestCallback>any(), anyString(), anyString());
 
-        Assert.assertTrue(secondPollingCompletionTime.get() - firstPollingCompletionTime.get() > 5000);
-        Assert.assertTrue(thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() > 500 &&
-                thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() < 3000);
+        Assert.assertTrue(secondPollingCompletionTime.get() - firstPollingCompletionTime.get() >= 5000);
+        Assert.assertTrue(thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() >= 500 &&
+                thirdPollingCompletionTime.get() - secondPollingCompletionTime.get() < 1000);
         Assert.assertTrue(lastRequestCompletionTime.get() - thirdPollingCompletionTime.get() < 100);
     }
 }

@@ -69,7 +69,7 @@ public class DomCapture {
 
         try {
             if (shouldWaitForPhaser) {
-                cssPhaser.awaitAdvanceInterruptibly(0, 60, TimeUnit.SECONDS);
+                cssPhaser.awaitAdvanceInterruptibly(0, 10, TimeUnit.MINUTES);
             }
         } catch (InterruptedException | TimeoutException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
