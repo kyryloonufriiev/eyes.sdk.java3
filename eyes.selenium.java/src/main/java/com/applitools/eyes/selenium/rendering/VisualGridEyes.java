@@ -36,6 +36,8 @@ import java.util.*;
 
 public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     private final Logger logger;
+    private String apiKey = null;
+    private String serverUrl = null;
 
     private final VisualGridRunner runner;
     private final Map<String, RunningTest> testList = new HashMap<>();
@@ -165,10 +167,6 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
 
         if (runner.getAgentId() == null ) {
             runner.setAgentId(getFullAgentId());
-        }
-
-        if (runner.getProxy() == null && getConfiguration().getProxy() != null) {
-            runner.setProxy(getConfiguration().getProxy());
         }
 
         runner.setLogger(logger);
@@ -303,11 +301,15 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     public String getApiKey() {
-        return runner.getApiKey();
+        if (apiKey == null) {
+            apiKey = runner.getApiKey();
+        }
+
+        return apiKey;
     }
 
     public void setApiKey(String apiKey) {
-        runner.setApiKey(apiKey);
+        this.apiKey = apiKey;
     }
 
     public void setIsDisabled(Boolean disabled) {
@@ -319,8 +321,12 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     public URI getServerUrl() {
+        if (serverUrl == null) {
+            serverUrl = runner.getServerUrl();
+        }
+
         try {
-            return new URI(runner.getServerUrl());
+            return new URI(serverUrl);
         } catch (URISyntaxException e) {
             GeneralUtils.logExceptionStackTrace(logger, e);
             return null;
@@ -328,7 +334,15 @@ public class VisualGridEyes implements ISeleniumEyes, IRenderingEyes {
     }
 
     public void setServerUrl(String serverUrl) {
-        runner.setServerUrl(serverUrl);
+        this.serverUrl = serverUrl;
+    }
+
+    public AbstractProxySettings getProxy() {
+        if (getConfiguration().getProxy() == null) {
+            return runner.getProxy();
+        }
+
+        return getConfiguration().getProxy();
     }
 
     @Override

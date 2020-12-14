@@ -78,6 +78,9 @@ public class VisualGridRunner extends EyesRunner {
     public VisualGridRunner(RunnerOptions runnerOptions, String suiteName) {
         int testConcurrency = runnerOptions.getTestConcurrency() == null ? DEFAULT_CONCURRENCY : runnerOptions.getTestConcurrency();
         this.testConcurrency = new TestConcurrency(testConcurrency, false);
+        setApiKey(runnerOptions.getApiKey());
+        setServerUrl(runnerOptions.getServerUrl());
+        setProxy(runnerOptions.getProxy());
         init(suiteName);
     }
 
@@ -92,6 +95,11 @@ public class VisualGridRunner extends EyesRunner {
 
     public void open(IRenderingEyes eyes, List<RunningTest> newTests) {
         logger.verbose("enter");
+
+        setApiKey(eyes.getApiKey());
+        setServerUrl(eyes.getServerUrl().toString());
+        setProxy(eyes.getProxy());
+
         if (renderingInfo == null) {
             renderingInfo = serverConnector.getRenderInfo();
         }
@@ -205,14 +213,16 @@ public class VisualGridRunner extends EyesRunner {
     }
 
     public void setServerUrl(String serverUrl) {
-        if (serverUrl == null) {
-            return;
-        }
-
-        try {
-            serverConnector.setServerUrl(new URI(serverUrl));
-        } catch (URISyntaxException e) {
-            GeneralUtils.logExceptionStackTrace(logger, e);
+        if (serverUrl != null) {
+            if (serverConnector.getServerUrl().equals(GeneralUtils.getServerUrl())) {
+                try {
+                    serverConnector.setServerUrl(new URI(serverUrl));
+                } catch (URISyntaxException e) {
+                    GeneralUtils.logExceptionStackTrace(logger, e);
+                }
+            } else if (!serverConnector.getServerUrl().toString().equals(serverUrl)) {
+                throw new EyesException(String.format("Server url was already set to %s", serverConnector.getServerUrl()));
+            }
         }
     }
 
@@ -226,7 +236,11 @@ public class VisualGridRunner extends EyesRunner {
 
     public void setApiKey(String apiKey) {
         if (apiKey != null) {
-            this.serverConnector.setApiKey(apiKey);
+            if (!serverConnector.wasApiKeySet()) {
+                serverConnector.setApiKey(apiKey);
+            } else if (!serverConnector.getApiKey().equals(apiKey)) {
+                throw new EyesException(String.format("Api key was already set to %s", serverConnector.getApiKey()));
+            }
         }
     }
 
@@ -241,7 +255,11 @@ public class VisualGridRunner extends EyesRunner {
 
     public void setProxy(AbstractProxySettings proxySettings) {
         if (proxySettings != null) {
-            serverConnector.setProxy(proxySettings);
+            if (serverConnector.getProxy() == null) {
+                serverConnector.setProxy(proxySettings);
+            } else if (!serverConnector.getProxy().equals(proxySettings)) {
+                throw new EyesException("Proxy was already set");
+            }
         }
     }
 
