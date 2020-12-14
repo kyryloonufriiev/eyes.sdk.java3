@@ -1570,8 +1570,9 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        EyesWebDriverScreenshot result = getScaledAndCroppedScreenshot(scaleProviderFactory);
-        return result;
+
+        markElementForLayoutRCA(getCurrentFrameScrollRootElement());
+        return getScaledAndCroppedScreenshot(scaleProviderFactory);
     }
 
     boolean shouldTakeFullPageScreenshot(ICheckSettingsInternal checkSettingsInternal) {
@@ -1607,7 +1608,8 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         if (originPositionProvider == null) {
             originPositionProvider = new NullPositionProvider();
         }
-        markElementForLayoutRCA(positionProvider);
+
+        markElementForLayoutRCA(((ISeleniumPositionProvider) positionProvider).getScrolledElement());
         BufferedImage entireFrameOrElement = algo.getStitchedRegion(state.getEffectiveViewport(), state.getFullRegion(), positionProvider, originPositionProvider, state.getStitchOffset());
 
         logger.verbose("Building screenshot object...");
@@ -1644,9 +1646,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         return getConfigurationInstance().getWaitBeforeScreenshots();
     }
 
-    private void markElementForLayoutRCA(PositionProvider elemPositionProvider) {
-        ISeleniumPositionProvider positionProvider = elemPositionProvider != null ? (ISeleniumPositionProvider) elemPositionProvider : ((ISeleniumPositionProvider) getPositionProvider());
-        WebElement scrolledElement = positionProvider.getScrolledElement();
+    private void markElementForLayoutRCA(WebElement scrolledElement) {
         if (scrolledElement != null) {
             try {
                 jsExecutor.executeScript("var e = arguments[0]; if (e != null) e.setAttribute('data-applitools-scroll','true');", scrolledElement);
