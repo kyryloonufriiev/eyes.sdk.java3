@@ -5,7 +5,6 @@ package com.applitools.eyes.selenium;
 
 import com.applitools.ICheckSettings;
 import com.applitools.eyes.*;
-import com.applitools.eyes.capture.AppOutputWithScreenshot;
 import com.applitools.eyes.capture.EyesScreenshotFactory;
 import com.applitools.eyes.capture.ImageProvider;
 import com.applitools.eyes.config.Configuration;
@@ -27,8 +26,8 @@ import com.applitools.eyes.selenium.regionVisibility.MoveToRegionVisibilityStrat
 import com.applitools.eyes.selenium.regionVisibility.NopRegionVisibilityStrategy;
 import com.applitools.eyes.selenium.regionVisibility.RegionVisibilityStrategy;
 import com.applitools.eyes.selenium.wrappers.EyesRemoteWebElement;
-import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.selenium.wrappers.EyesSeleniumDriver;
+import com.applitools.eyes.selenium.wrappers.EyesTargetLocator;
 import com.applitools.eyes.triggers.MouseAction;
 import com.applitools.eyes.visualgrid.model.RenderingInfo;
 import com.applitools.utils.*;
@@ -531,11 +530,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
             debugScreenshotsProvider.save(subScreenshot.getImage(), String.format("subscreenshot_%s", name));
 
-            ImageMatchSettings ims = mwt.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
+            ImageMatchSettings ims = MatchWindowTask.createImageMatchSettings(checkSettingsInternal, subScreenshot, this);
             Location location = subScreenshot.getLocationInScreenshot(Location.ZERO, CoordinatesType.SCREENSHOT_AS_IS);
-            AppOutput appOutput = new AppOutput(name, ImageUtils.encodeAsPng(subScreenshot.getImage()), null, null);
-            AppOutputWithScreenshot appOutputWithScreenshot = new AppOutputWithScreenshot(appOutput, subScreenshot, location);
-            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutputWithScreenshot, name, false,
+            AppOutput appOutput = new AppOutput(name, subScreenshot, null, null, location);
+            MatchResult matchResult = mwt.performMatch(new ArrayList<Trigger>(), appOutput, name, false,
                     ims, this, null, source);
 
             logger.verbose("matchResult.asExcepted: " + matchResult.getAsExpected());
@@ -746,7 +744,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
                 if (state.isStitchContent()) {
                     checkFullWindow(checkSettingsInternal, state, scrollRootElement, source);
                 } else {
-                    checkWindow(checkSettingsInternal, source);
+                    checkWindow(checkSettingsInternal, scrollRootElement, source);
                 }
             }
 
@@ -770,7 +768,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         RectangleSize currentSREScrollSize = EyesRemoteWebElement.getScrollSize(currentFrameSRE, driver, logger);
         state.setFullRegion(new Region(state.getEffectiveViewport().getLocation(), currentSREScrollSize));
 
-        checkWindowBase(null, checkSettingsInternal, source);
+        checkWindowBase(Region.EMPTY, checkSettingsInternal, source);
     }
 
     private void checkFullRegion(ICheckSettingsInternal checkSettingsInternal, Region targetRegion, CheckState state, String source) {
@@ -942,16 +940,16 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
         checkWindowBase(region, checkSettingsInternal, null);
     }
 
-
-    private void checkWindow(ICheckSettingsInternal checkSettingsInternal, String source) {
+    private void checkWindow(ICheckSettingsInternal checkSettingsInternal, WebElement scrollRootElement, String source) {
         logger.verbose("Target.Window()");
-        checkWindowBase(null, checkSettingsInternal, source);
+        Location location = SeleniumScrollPositionProvider.getCurrentPosition(driver, scrollRootElement);
+        checkWindowBase(new Region(location, RectangleSize.EMPTY), checkSettingsInternal, source);
     }
 
     private void checkFullWindow(ICheckSettingsInternal checkSettingsInternal, CheckState state, WebElement scrollRootElement, String source) {
         logger.verbose("Target.Window().Fully(true)");
         initPositionProvidersForCheckWindow(state, scrollRootElement);
-        checkWindowBase(null, checkSettingsInternal, source);
+        checkWindowBase(Region.EMPTY, checkSettingsInternal, source);
     }
 
     private void initPositionProvidersForCheckWindow(CheckState state, WebElement scrollRootElement) {
@@ -1172,40 +1170,6 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
      */
     public WebElement getCurrentFrameScrollRootElement() {
         return EyesSeleniumUtils.getCurrentFrameScrollRootElement(logger, driver, userDefinedSRE);
-    }
-
-    /**
-     * Verifies the current frame.
-     * @param matchTimeout The amount of time to retry matching. (Milliseconds)
-     * @param tag          An optional tag to be associated with the snapshot.
-     */
-    protected void checkCurrentFrame(int matchTimeout, String tag, String source) {
-        try {
-            logger.verbose(String.format("CheckCurrentFrame(%d, '%s')", matchTimeout, tag));
-
-            checkFrameOrElement = true;
-
-            logger.verbose("Getting screenshot as base64..");
-            String screenshot64 = driver.getScreenshotAs(OutputType.BASE64);
-            logger.verbose("Done! Creating image object...");
-            BufferedImage screenshotImage = ImageUtils.imageFromBase64(screenshot64);
-
-            // FIXME - Scaling should be handled in a single place instead
-            ScaleProvider scaleProvider = updateScalingParams().getScaleProvider(screenshotImage.getWidth());
-
-            screenshotImage = ImageUtils.scaleImage(screenshotImage, scaleProvider.getScaleRatio());
-            logger.verbose("Done! Building required object...");
-            final EyesWebDriverScreenshot screenshot = new EyesWebDriverScreenshot(logger, driver, screenshotImage);
-            logger.verbose("Done!");
-
-            logger.verbose("replacing regionToCheck");
-            setRegionToCheck(screenshot.getFrameWindow());
-
-            super.checkWindowBase(null, tag, matchTimeout, source);
-        } finally {
-            checkFrameOrElement = false;
-            regionToCheck = null;
-        }
     }
 
     /**
@@ -1588,7 +1552,7 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
             result = getViewportScreenshot(scaleProviderFactory);
         }
 
-        if (targetRegion != null) {
+        if (targetRegion != null && !targetRegion.isSizeEmpty()) {
             result = result.getSubScreenshot(targetRegion, false);
             debugScreenshotsProvider.save(result.getImage(), "SUB_SCREENSHOT");
         }
