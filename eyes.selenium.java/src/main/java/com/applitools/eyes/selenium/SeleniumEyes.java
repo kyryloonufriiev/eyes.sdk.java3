@@ -942,7 +942,10 @@ public class SeleniumEyes extends EyesBase implements ISeleniumEyes, IBatchClose
 
     private void checkWindow(ICheckSettingsInternal checkSettingsInternal, WebElement scrollRootElement, String source) {
         logger.verbose("Target.Window()");
-        Location location = SeleniumScrollPositionProvider.getCurrentPosition(driver, scrollRootElement);
+        Location location = Location.ZERO;
+        if (!EyesDriverUtils.isMobileDevice(driver)) {
+            location = SeleniumScrollPositionProvider.getCurrentPosition(driver, scrollRootElement);
+        }
         checkWindowBase(new Region(location, RectangleSize.EMPTY), checkSettingsInternal, source);
     }
 
